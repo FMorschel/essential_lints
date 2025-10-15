@@ -1,0 +1,26 @@
+name: basic_lints
+description: New lint rules for Dart projects and related fixes.
+version: 0.0.1
+
+repository: https://github.com/FMorschel/basic_lints
+documentation: https://github.com/FMorschel/basic_lints#readme
+issue_tracker: https://github.com/FMorschel/basic_lints/issues
+license: MIT
+
+environment:
+  sdk: ^3.9.0
+
+# Recommended keywords help users find the package on pub.dev.
+keywords:
+  - lints
+  - dart
+  - analysis
+  - linters
+
+dependencies:
+  analyzer_plugin: ^0.13.9
+
+dev_dependencies:
+  analyzer_testing: ^0.1.4
+  test: ^1.26.3
+  very_good_analysis: ^10.0.0
