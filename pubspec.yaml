@@ -1,10 +1,10 @@
-name: basic_lints
-description: New lint rules for Dart projects and related fixes.
+name: essential_lints
+description: New lint rules for Dart/Flutter projects and related fixes.
 version: 0.0.1
 
-repository: https://github.com/FMorschel/basic_lints
-documentation: https://github.com/FMorschel/basic_lints#readme
-issue_tracker: https://github.com/FMorschel/basic_lints/issues
+repository: https://github.com/FMorschel/essential_lints
+documentation: https://github.com/FMorschel/essential_lints#readme
+issue_tracker: https://github.com/FMorschel/essential_lints/issues
 license: MIT
 
 environment:

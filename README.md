@@ -1,6 +1,6 @@
-# basic_lints
+# essential_lints
 
-This package provides basic lints that help Dart/Flutter developers along with fixes for them.
+This package provides some basic lints that help Dart/Flutter developers along with fixes for them.
 
 This is currently a placeholder for an under-construction package.
 
