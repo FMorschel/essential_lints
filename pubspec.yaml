@@ -18,7 +18,8 @@ keywords:
   - linters
 
 dependencies:
-  analyzer_plugin: ^0.13.9
+  analysis_server_plugin: ^0.3.3
+  analyzer: ^8.4.0
 
 dev_dependencies:
   analyzer_testing: ^0.1.4
