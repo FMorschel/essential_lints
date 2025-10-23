@@ -8,7 +8,7 @@ issue_tracker: https://github.com/FMorschel/essential_lints/issues
 license: MIT
 
 environment:
-  sdk: ^3.9.0
+  sdk: ^3.10.0
 
 # Recommended keywords help users find the package on pub.dev.
 keywords:
@@ -20,6 +20,7 @@ keywords:
 dependencies:
   analysis_server_plugin: ^0.3.3
   analyzer: ^8.4.0
+  analyzer_plugin: ^0.13.10
   meta: ^1.17.0
 
 dev_dependencies:

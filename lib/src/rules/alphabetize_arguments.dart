@@ -4,14 +4,14 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
 import 'essential_lint_rules.dart';
-import 'rules.dart';
+import 'rule.dart';
 
 /// {@template alphabetize_arguments}
 /// A lint rule that enforces alphabetical ordering of function arguments.
 /// {@endtemplate}
-class AlphabetizeArguments extends Rule {
+class AlphabetizeArgumentsRule extends Rule {
   /// {@macro alphabetize_arguments}
-  AlphabetizeArguments()
+  AlphabetizeArgumentsRule()
     : super(
         name: _rule.code.name,
         description: 'Arguments should be in alphabetical order.',
@@ -36,7 +36,7 @@ class AlphabetizeArguments extends Rule {
 class _AlphabetizeArgumentsVisitor extends SimpleAstVisitor<void> {
   _AlphabetizeArgumentsVisitor(this.rule);
 
-  final AlphabetizeArguments rule;
+  final AlphabetizeArgumentsRule rule;
 
   @override
   void visitArgumentList(ArgumentList node) {

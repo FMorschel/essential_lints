@@ -1,8 +1,8 @@
 import 'package:essential_lints/src/rules/alphabetize_arguments.dart';
-import 'package:essential_lints/src/rules/rules.dart';
+import 'package:essential_lints/src/rules/rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import '../src/rules.dart';
+import '../src/rule_test.dart';
 
 void main() {
   defineReflectiveSuite(() {
@@ -13,7 +13,7 @@ void main() {
 @reflectiveTest
 class AlphabetizeArgumentsTest extends RuleTest {
   @override
-  Rule get rule => AlphabetizeArguments();
+  Rule get rule => AlphabetizeArgumentsRule();
 
   Future<void> test_arguments() async {
     await assertDiagnostics(
