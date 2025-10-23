@@ -26,6 +26,17 @@ void foo({int? a, int? b, int? c}) {
     );
   }
 
+  Future<void> test_arguments_more() async {
+    await assertDiagnostics(
+      '''
+void foo({int? a, int? b, int? c}) {
+  foo(c: 3, b: 2, a: 1);
+}
+''',
+      [lint(49, 1)],
+    );
+  }
+
   Future<void> test_arguments_ok() async {
     await assertNoDiagnostics('''
 void foo({int? a, int? b, int? c}) {
