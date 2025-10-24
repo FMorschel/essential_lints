@@ -23,6 +23,9 @@ class AlphabetizeArgumentsFix extends Fix {
   @override
   Future<void> compute(ChangeBuilder builder) async {
     var node = this.node;
+    if (node.parent case Label parent) {
+      node = parent;
+    }
     if (node.parent case NamedExpression(:ArgumentList parent)) {
       node = parent;
     }

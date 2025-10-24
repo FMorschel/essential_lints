@@ -1,23 +1,40 @@
+import 'dart:async';
+
 import 'package:analysis_server_plugin/edit/fix/dart_fix_context.dart';
 import 'package:analysis_server_plugin/edit/fix/fix.dart';
 import 'package:analysis_server_plugin/src/correction/dart_change_workspace.dart';
+import 'package:analysis_server_plugin/src/correction/fix_generators.dart';
 import 'package:analysis_server_plugin/src/correction/fix_processor.dart';
+import 'package:analysis_server_plugin/src/plugin_server.dart';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/analysis/session.dart';
 import 'package:analyzer/diagnostic/diagnostic.dart';
+import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/instrumentation/service.dart';
 import 'package:analyzer/src/dart/analysis/analysis_context_collection.dart';
 import 'package:analyzer/src/dart/analysis/byte_store.dart';
 import 'package:analyzer/src/dart/analysis/driver_based_analysis_context.dart';
-import 'package:analyzer/src/lint/registry.dart';
+import 'package:analyzer/src/test_utilities/mock_sdk.dart';
+import 'package:analyzer_plugin/channel/channel.dart';
+import 'package:analyzer_plugin/protocol/protocol.dart' as protocol;
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
+import 'package:analyzer_plugin/protocol/protocol_generated.dart' as protocol;
+import 'package:analyzer_plugin/src/protocol/protocol_internal.dart'
+    as protocol;
 import 'package:analyzer_plugin/utilities/fixes/fixes.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
+import 'package:analyzer_testing/resource_provider_mixin.dart';
+import 'package:essential_lints/main.dart';
 import 'package:essential_lints/src/plugin_integration.dart';
+import 'package:meta/meta.dart';
 import 'package:test/test.dart';
 
 abstract class FixTest extends AnalysisRuleTest
-    with RulesPluginIntegration, FixesPluginIntegration, PrivateMixin {
+    with
+        RulesPluginIntegration,
+        FixesPluginIntegration,
+        PrivateMixin,
+        PluginServerTestBase {
   FixKind get fixKind;
 
   @override
@@ -25,13 +42,18 @@ abstract class FixTest extends AnalysisRuleTest
 
   @override
   void setUp() {
-    rules.forEach(Registry.ruleRegistry.registerLintRule);
-    fixes.forEach((lintCode, generators) {
-      for (final generator in generators) {
-        // Register the fixes for the rules.
-      }
-    });
+    pluginServer = PluginServer(
+      plugins: [plugin],
+      resourceProvider: resourceProvider,
+    );
+    setUpPlugin();
     super.setUp();
+  }
+
+  @override
+  Future<void> tearDown() async {
+    tearDownPlugin();
+    await super.tearDown();
   }
 
   late String code;
@@ -178,5 +200,89 @@ extension on SomeResolvedLibraryResult {
       return this as T;
     }
     return null;
+  }
+}
+
+class FakeChannel implements PluginCommunicationChannel {
+  final _completers = <String, Completer<protocol.Response>>{};
+
+  final StreamController<protocol.Notification> _notificationsController =
+      StreamController();
+
+  void Function(protocol.Request)? _onRequest;
+
+  int _idCounter = 0;
+
+  Stream<protocol.Notification> get notifications =>
+      _notificationsController.stream;
+
+  @override
+  void close() {}
+
+  @override
+  void listen(
+    void Function(protocol.Request request)? onRequest, {
+    void Function()? onDone,
+    Function? onError,
+    Function? onNotification,
+  }) {
+    _onRequest = onRequest;
+  }
+
+  @override
+  void sendNotification(protocol.Notification notification) {
+    _notificationsController.add(notification);
+  }
+
+  Future<protocol.Response> sendRequest(protocol.RequestParams params) {
+    if (_onRequest == null) {
+      fail(
+        '_onReuest is null! `listen` has not yet been called on this channel.',
+      );
+    }
+    var id = (_idCounter++).toString();
+    var request = params.toRequest(id);
+    var completer = Completer<protocol.Response>();
+    _completers[request.id] = completer;
+    _onRequest!(request);
+    return completer.future;
+  }
+
+  @override
+  void sendResponse(protocol.Response response) {
+    var completer = _completers.remove(response.id);
+    completer?.complete(response);
+  }
+}
+
+mixin PluginServerTestBase on ResourceProviderMixin {
+  final channel = FakeChannel();
+
+  late final PluginServer pluginServer;
+
+  Folder get byteStoreRoot => getFolder('/byteStore');
+
+  Folder get sdkRoot => getFolder('/sdk');
+
+  @mustCallSuper
+  void setUpPlugin() {
+    createMockSdk(resourceProvider: resourceProvider, root: sdkRoot);
+  }
+
+  Future<void> startPlugin() async {
+    await pluginServer.initialize();
+    pluginServer.start(channel);
+
+    await pluginServer.handlePluginVersionCheck(
+      protocol.PluginVersionCheckParams(
+        byteStoreRoot.path,
+        sdkRoot.path,
+        '0.0.1',
+      ),
+    );
+  }
+
+  void tearDownPlugin() {
+    registeredFixGenerators.clearLintProducers();
   }
 }
