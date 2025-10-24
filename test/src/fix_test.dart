@@ -2,25 +2,30 @@ import 'dart:async';
 
 import 'package:analysis_server_plugin/edit/fix/dart_fix_context.dart';
 import 'package:analysis_server_plugin/edit/fix/fix.dart';
-import 'package:analysis_server_plugin/src/correction/dart_change_workspace.dart';
-import 'package:analysis_server_plugin/src/correction/fix_generators.dart';
-import 'package:analysis_server_plugin/src/correction/fix_processor.dart';
-import 'package:analysis_server_plugin/src/plugin_server.dart';
+import 'package:analysis_server_plugin/src/correction/dart_change_workspace.dart'
+    as dart_change_workspace;
+import 'package:analysis_server_plugin/src/correction/fix_generators.dart'
+    as fix_generators;
+import 'package:analysis_server_plugin/src/correction/fix_processor.dart'
+    as fix_processor;
+import 'package:analysis_server_plugin/src/plugin_server.dart' as plugin_server;
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/analysis/session.dart';
 import 'package:analyzer/diagnostic/diagnostic.dart';
 import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/instrumentation/service.dart';
-import 'package:analyzer/src/dart/analysis/analysis_context_collection.dart';
-import 'package:analyzer/src/dart/analysis/byte_store.dart';
-import 'package:analyzer/src/dart/analysis/driver_based_analysis_context.dart';
-import 'package:analyzer/src/test_utilities/mock_sdk.dart';
+import 'package:analyzer/src/dart/analysis/analysis_context_collection.dart'
+    as analysis_context_collection;
+import 'package:analyzer/src/dart/analysis/byte_store.dart' as byte_store;
+import 'package:analyzer/src/dart/analysis/driver_based_analysis_context.dart'
+    as driver_based_analysis_context;
+import 'package:analyzer/src/test_utilities/mock_sdk.dart' as mock_sdk;
 import 'package:analyzer_plugin/channel/channel.dart';
-import 'package:analyzer_plugin/protocol/protocol.dart' as protocol;
+import 'package:analyzer_plugin/protocol/protocol.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
-import 'package:analyzer_plugin/protocol/protocol_generated.dart' as protocol;
+import 'package:analyzer_plugin/protocol/protocol_generated.dart';
 import 'package:analyzer_plugin/src/protocol/protocol_internal.dart'
-    as protocol;
+    as protocol_internal;
 import 'package:analyzer_plugin/utilities/fixes/fixes.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:analyzer_testing/resource_provider_mixin.dart';
@@ -42,7 +47,7 @@ abstract class FixTest extends AnalysisRuleTest
 
   @override
   void setUp() {
-    pluginServer = PluginServer(
+    pluginServer = plugin_server.PluginServer(
       plugins: [plugin],
       resourceProvider: resourceProvider,
     );
@@ -63,7 +68,8 @@ abstract class FixTest extends AnalysisRuleTest
   late ResolvedLibraryResult? testLibrary;
 
   @override
-  AnalysisContextCollectionImpl? _analysisContextCollection;
+  analysis_context_collection.AnalysisContextCollectionImpl?
+  _analysisContextCollection;
 
   Future<void> resolveTestCode(String code) async {
     this.code = code;
@@ -114,12 +120,14 @@ abstract class FixTest extends AnalysisRuleTest
     }
     var context = DartFixContext(
       instrumentationService: TestInstrumentationService(),
-      workspace: DartChangeWorkspace([sessionFor(testUnit.path)]),
+      workspace: dart_change_workspace.DartChangeWorkspace([
+        sessionFor(testUnit.path),
+      ]),
       libraryResult: libraryResult,
       unitResult: testUnit,
       error: diagnostic,
     );
-    return computeFixes(context);
+    return fix_processor.computeFixes(context);
   }
 }
 
@@ -145,12 +153,16 @@ mixin PrivateMixin on AnalysisRuleTest {
   /// This allows reusing all unlinked and linked summaries for SDK, so that
   /// tests run much faster. However nothing is preserved between Dart VM runs,
   /// so changes to the implementation are still fully verified.
-  static final MemoryByteStore _sharedByteStore = MemoryByteStore();
+  static final byte_store.MemoryByteStore _sharedByteStore =
+      byte_store.MemoryByteStore();
 
-  final MemoryByteStore _byteStore = _sharedByteStore;
+  final byte_store.MemoryByteStore _byteStore = _sharedByteStore;
 
-  AnalysisContextCollectionImpl? get _analysisContextCollection;
-  set _analysisContextCollection(AnalysisContextCollectionImpl? value);
+  analysis_context_collection.AnalysisContextCollectionImpl?
+  get _analysisContextCollection;
+  set _analysisContextCollection(
+    analysis_context_collection.AnalysisContextCollectionImpl? value,
+  );
 
   List<String> get _collectionIncludedPaths => [workspaceRootPath];
 
@@ -170,7 +182,9 @@ mixin PrivateMixin on AnalysisRuleTest {
     )).ifTypeOrNull<ResolvedLibraryResult>();
   }
 
-  DriverBasedAnalysisContext _contextFor(String path) {
+  driver_based_analysis_context.DriverBasedAnalysisContext _contextFor(
+    String path,
+  ) {
     _createAnalysisContexts();
 
     var convertedPath = convertPath(path);
@@ -183,14 +197,15 @@ mixin PrivateMixin on AnalysisRuleTest {
       return;
     }
 
-    _analysisContextCollection = AnalysisContextCollectionImpl(
-      byteStore: _byteStore,
-      declaredVariables: {},
-      enableIndex: true,
-      includedPaths: _collectionIncludedPaths.map(convertPath).toList(),
-      resourceProvider: resourceProvider,
-      sdkPath: newFolder('/sdk').path,
-    );
+    _analysisContextCollection =
+        analysis_context_collection.AnalysisContextCollectionImpl(
+          byteStore: _byteStore,
+          declaredVariables: {},
+          enableIndex: true,
+          includedPaths: _collectionIncludedPaths.map(convertPath).toList(),
+          resourceProvider: resourceProvider,
+          sdkPath: newFolder('/sdk').path,
+        );
   }
 }
 
@@ -204,24 +219,23 @@ extension on SomeResolvedLibraryResult {
 }
 
 class FakeChannel implements PluginCommunicationChannel {
-  final _completers = <String, Completer<protocol.Response>>{};
+  final _completers = <String, Completer<Response>>{};
 
-  final StreamController<protocol.Notification> _notificationsController =
+  final StreamController<Notification> _notificationsController =
       StreamController();
 
-  void Function(protocol.Request)? _onRequest;
+  void Function(Request)? _onRequest;
 
   int _idCounter = 0;
 
-  Stream<protocol.Notification> get notifications =>
-      _notificationsController.stream;
+  Stream<Notification> get notifications => _notificationsController.stream;
 
   @override
   void close() {}
 
   @override
   void listen(
-    void Function(protocol.Request request)? onRequest, {
+    void Function(Request request)? onRequest, {
     void Function()? onDone,
     Function? onError,
     Function? onNotification,
@@ -230,11 +244,11 @@ class FakeChannel implements PluginCommunicationChannel {
   }
 
   @override
-  void sendNotification(protocol.Notification notification) {
+  void sendNotification(Notification notification) {
     _notificationsController.add(notification);
   }
 
-  Future<protocol.Response> sendRequest(protocol.RequestParams params) {
+  Future<Response> sendRequest(protocol_internal.RequestParams params) {
     if (_onRequest == null) {
       fail(
         '_onReuest is null! `listen` has not yet been called on this channel.',
@@ -242,14 +256,14 @@ class FakeChannel implements PluginCommunicationChannel {
     }
     var id = (_idCounter++).toString();
     var request = params.toRequest(id);
-    var completer = Completer<protocol.Response>();
+    var completer = Completer<Response>();
     _completers[request.id] = completer;
     _onRequest!(request);
     return completer.future;
   }
 
   @override
-  void sendResponse(protocol.Response response) {
+  void sendResponse(Response response) {
     var completer = _completers.remove(response.id);
     completer?.complete(response);
   }
@@ -258,7 +272,7 @@ class FakeChannel implements PluginCommunicationChannel {
 mixin PluginServerTestBase on ResourceProviderMixin {
   final channel = FakeChannel();
 
-  late final PluginServer pluginServer;
+  late final plugin_server.PluginServer pluginServer;
 
   Folder get byteStoreRoot => getFolder('/byteStore');
 
@@ -266,7 +280,7 @@ mixin PluginServerTestBase on ResourceProviderMixin {
 
   @mustCallSuper
   void setUpPlugin() {
-    createMockSdk(resourceProvider: resourceProvider, root: sdkRoot);
+    mock_sdk.createMockSdk(resourceProvider: resourceProvider, root: sdkRoot);
   }
 
   Future<void> startPlugin() async {
@@ -274,7 +288,7 @@ mixin PluginServerTestBase on ResourceProviderMixin {
     pluginServer.start(channel);
 
     await pluginServer.handlePluginVersionCheck(
-      protocol.PluginVersionCheckParams(
+      PluginVersionCheckParams(
         byteStoreRoot.path,
         sdkRoot.path,
         '0.0.1',
@@ -283,6 +297,6 @@ mixin PluginServerTestBase on ResourceProviderMixin {
   }
 
   void tearDownPlugin() {
-    registeredFixGenerators.clearLintProducers();
+    fix_generators.registeredFixGenerators.clearLintProducers();
   }
 }
