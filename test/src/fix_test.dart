@@ -19,45 +19,54 @@ import 'package:analyzer/src/dart/analysis/analysis_context_collection.dart'
 import 'package:analyzer/src/dart/analysis/byte_store.dart' as byte_store;
 import 'package:analyzer/src/dart/analysis/driver_based_analysis_context.dart'
     as driver_based_analysis_context;
-import 'package:analyzer/src/test_utilities/mock_sdk.dart' as mock_sdk;
 import 'package:analyzer_plugin/channel/channel.dart';
 import 'package:analyzer_plugin/protocol/protocol.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
 import 'package:analyzer_plugin/protocol/protocol_generated.dart';
-import 'package:analyzer_plugin/src/protocol/protocol_internal.dart'
-    as protocol_internal;
 import 'package:analyzer_plugin/utilities/fixes/fixes.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
-import 'package:analyzer_testing/resource_provider_mixin.dart';
 import 'package:essential_lints/main.dart';
 import 'package:essential_lints/src/plugin_integration.dart';
-import 'package:meta/meta.dart';
 import 'package:test/test.dart';
 
 abstract class FixTest extends AnalysisRuleTest
-    with
-        RulesPluginIntegration,
-        FixesPluginIntegration,
-        PrivateMixin,
-        PluginServerTestBase {
+    with RulesPluginIntegration, FixesPluginIntegration, PrivateMixin {
   FixKind get fixKind;
+
+  final channel = FakeChannel();
 
   @override
   late final analysisRule = rules.first.rule.code.name;
 
+  late final plugin_server.PluginServer pluginServer;
+
+  Folder get byteStoreRoot => getFolder('/byteStore');
+
+  Folder get sdkRoot => getFolder('/sdk');
+
   @override
-  void setUp() {
+  Future<void> setUp() async {
     pluginServer = plugin_server.PluginServer(
       plugins: [plugin],
       resourceProvider: resourceProvider,
     );
-    setUpPlugin();
+    await pluginServer.initialize();
+    pluginServer.start(channel);
+    await pluginServer.handlePluginVersionCheck(
+      PluginVersionCheckParams(
+        byteStoreRoot.path,
+        sdkRoot.path,
+        '0.0.1',
+      ),
+    );
     super.setUp();
   }
 
   @override
   Future<void> tearDown() async {
-    tearDownPlugin();
+    fix_generators.registeredFixGenerators.clearLintProducers();
+    await _analysisContextCollection?.dispose();
+    _analysisContextCollection = null;
     await super.tearDown();
   }
 
@@ -219,17 +228,6 @@ extension on SomeResolvedLibraryResult {
 }
 
 class FakeChannel implements PluginCommunicationChannel {
-  final _completers = <String, Completer<Response>>{};
-
-  final StreamController<Notification> _notificationsController =
-      StreamController();
-
-  void Function(Request)? _onRequest;
-
-  int _idCounter = 0;
-
-  Stream<Notification> get notifications => _notificationsController.stream;
-
   @override
   void close() {}
 
@@ -239,64 +237,11 @@ class FakeChannel implements PluginCommunicationChannel {
     void Function()? onDone,
     Function? onError,
     Function? onNotification,
-  }) {
-    _onRequest = onRequest;
-  }
+  }) {}
 
   @override
-  void sendNotification(Notification notification) {
-    _notificationsController.add(notification);
-  }
-
-  Future<Response> sendRequest(protocol_internal.RequestParams params) {
-    if (_onRequest == null) {
-      fail(
-        '_onReuest is null! `listen` has not yet been called on this channel.',
-      );
-    }
-    var id = (_idCounter++).toString();
-    var request = params.toRequest(id);
-    var completer = Completer<Response>();
-    _completers[request.id] = completer;
-    _onRequest!(request);
-    return completer.future;
-  }
+  void sendNotification(Notification notification) {}
 
   @override
-  void sendResponse(Response response) {
-    var completer = _completers.remove(response.id);
-    completer?.complete(response);
-  }
-}
-
-mixin PluginServerTestBase on ResourceProviderMixin {
-  final channel = FakeChannel();
-
-  late final plugin_server.PluginServer pluginServer;
-
-  Folder get byteStoreRoot => getFolder('/byteStore');
-
-  Folder get sdkRoot => getFolder('/sdk');
-
-  @mustCallSuper
-  void setUpPlugin() {
-    mock_sdk.createMockSdk(resourceProvider: resourceProvider, root: sdkRoot);
-  }
-
-  Future<void> startPlugin() async {
-    await pluginServer.initialize();
-    pluginServer.start(channel);
-
-    await pluginServer.handlePluginVersionCheck(
-      PluginVersionCheckParams(
-        byteStoreRoot.path,
-        sdkRoot.path,
-        '0.0.1',
-      ),
-    );
-  }
-
-  void tearDownPlugin() {
-    fix_generators.registeredFixGenerators.clearLintProducers();
-  }
+  void sendResponse(Response response) {}
 }
