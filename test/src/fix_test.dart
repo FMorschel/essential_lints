@@ -140,22 +140,6 @@ abstract class FixTest extends AnalysisRuleTest
   }
 }
 
-class TestInstrumentationService implements InstrumentationService {
-  @override
-  void logException(
-    Object exception, [
-    StackTrace? stackTrace,
-    List<InstrumentationServiceAttachment>? attachments,
-  ]) {
-    throw StateError('$exception\n\n$stackTrace');
-  }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) {
-    return super.noSuchMethod(invocation);
-  }
-}
-
 mixin PrivateMixin on AnalysisRuleTest {
   /// The byte store that is reused between tests.
   ///
@@ -218,12 +202,19 @@ mixin PrivateMixin on AnalysisRuleTest {
   }
 }
 
-extension on SomeResolvedLibraryResult {
-  T? ifTypeOrNull<T extends SomeResolvedLibraryResult>() {
-    if (this is T) {
-      return this as T;
-    }
-    return null;
+class TestInstrumentationService implements InstrumentationService {
+  @override
+  void logException(
+    Object exception, [
+    StackTrace? stackTrace,
+    List<InstrumentationServiceAttachment>? attachments,
+  ]) {
+    throw StateError('$exception\n\n$stackTrace');
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) {
+    return super.noSuchMethod(invocation);
   }
 }
 
@@ -244,4 +235,13 @@ class FakeChannel implements PluginCommunicationChannel {
 
   @override
   void sendResponse(Response response) {}
+}
+
+extension on SomeResolvedLibraryResult {
+  T? ifTypeOrNull<T extends SomeResolvedLibraryResult>() {
+    if (this is T) {
+      return this as T;
+    }
+    return null;
+  }
 }
