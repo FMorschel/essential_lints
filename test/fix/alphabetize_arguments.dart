@@ -27,4 +27,25 @@ void foo({int? a, int? b, int? c}) {
 }
 ''');
   }
+
+  Future<void> test_alphabetizeNamedArguments_newLines() async {
+    await resolveTestCode('''
+void foo({int? a, int? b, int? c}) {
+  foo(
+    c: 3,
+    b: 2,
+    a: 1
+  );
+}
+''');
+    await assertHasFix('''
+void foo({int? a, int? b, int? c}) {
+  foo(
+    a: 1,
+    b: 2,
+    c: 3
+  );
+}
+''');
+  }
 }
