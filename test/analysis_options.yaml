@@ -7,3 +7,4 @@ analyzer:
 linter:
   rules:
     unreachable_from_main: true
+    specify_nonobvious_property_types: false
