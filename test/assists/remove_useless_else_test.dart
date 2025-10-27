@@ -1,3 +1,5 @@
+import 'package:analysis_server_plugin/plugin.dart';
+import 'package:essential_lints/main.dart';
 import 'package:essential_lints/src/assist/essential_lint_assists.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
@@ -13,6 +15,9 @@ void main() {
 class RemoveUselessElseTest extends AssistTestProcessor {
   @override
   EssentialLintAssists get assistKind => .removeUselessElse;
+
+  @override
+  List<Plugin> get plugins => [plugin];
 
   Future<void> test_return() async {
     await resolveTestCode('''
