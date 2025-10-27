@@ -2,7 +2,7 @@ import 'package:essential_lints/src/rules/alphabetize_arguments.dart';
 import 'package:essential_lints/src/rules/rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import '../src/rule_test.dart';
+import '../src/rule_test_processor.dart';
 
 void main() {
   defineReflectiveSuite(() {
@@ -11,7 +11,7 @@ void main() {
 }
 
 @reflectiveTest
-class AlphabetizeArgumentsTest extends RuleTest {
+class AlphabetizeArgumentsTest extends RuleTestProcessor {
   @override
   Rule get rule => AlphabetizeArgumentsRule();
 

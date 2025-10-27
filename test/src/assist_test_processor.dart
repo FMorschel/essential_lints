@@ -23,9 +23,9 @@ import 'package:essential_lints/src/assist/essential_lint_assists.dart';
 import 'package:essential_lints/src/plugin_integration.dart';
 import 'package:test/test.dart';
 
-import 'fix_test.dart';
+import 'fix_test_processor.dart';
 
-abstract class AssistTest extends AnalysisRuleTest
+abstract class AssistTestProcessor extends AnalysisRuleTest
     with
         RulesPluginIntegration,
         FixesPluginIntegration,

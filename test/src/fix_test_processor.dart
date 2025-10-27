@@ -29,7 +29,7 @@ import 'package:essential_lints/main.dart';
 import 'package:essential_lints/src/plugin_integration.dart';
 import 'package:test/test.dart';
 
-abstract class FixTest extends AnalysisRuleTest
+abstract class FixTestProcessor extends AnalysisRuleTest
     with RulesPluginIntegration, FixesPluginIntegration, PrivateMixin {
   FixKind get fixKind;
 

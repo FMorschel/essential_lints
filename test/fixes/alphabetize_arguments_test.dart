@@ -2,7 +2,7 @@ import 'package:analyzer_plugin/utilities/fixes/fixes.dart';
 import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import '../src/fix_test.dart';
+import '../src/fix_test_processor.dart';
 
 void main() {
   defineReflectiveSuite(() {
@@ -11,7 +11,7 @@ void main() {
 }
 
 @reflectiveTest
-class AlphabetizeArgumentsTest extends FixTest {
+class AlphabetizeArgumentsTest extends FixTestProcessor {
   @override
   FixKind get fixKind => EssentialLintFixes.alphabetizeArguments.fixKind;
 

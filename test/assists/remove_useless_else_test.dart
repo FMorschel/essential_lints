@@ -1,7 +1,7 @@
 import 'package:essential_lints/src/assist/essential_lint_assists.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import '../src/assist_test.dart';
+import '../src/assist_test_processor.dart';
 
 void main() {
   defineReflectiveSuite(() {
@@ -10,7 +10,7 @@ void main() {
 }
 
 @reflectiveTest
-class RemoveUselessElseTest extends AssistTest {
+class RemoveUselessElseTest extends AssistTestProcessor {
   @override
   EssentialLintAssists get assistKind => .removeUselessElse;
 
