@@ -23,18 +23,24 @@ abstract class AssistTestProcessor extends BaseEditTestProcessor {
   /// have been applied.
   Future<void> assertHasAssist(
     String expected, {
-    Map<String, ({String original, String result})>? additionallyChangedFiles,
+    List<({String path, String original, String result})>?
+    additionallyChangedFiles,
     int index = 0,
   }) async {
     setPositionOrRange(index);
-    additionallyChangedFiles = additionallyChangedFiles?.map(
-      (key, record) => MapEntry(key, (
-        original: test_code_format.TestCode.parseNormalized(
-          record.original,
-        ).code,
-        result: test_code_format.TestCode.parseNormalized(record.result).code,
-      )),
-    );
+    additionallyChangedFiles = additionallyChangedFiles
+        ?.map(
+          (record) => (
+            path: record.path,
+            original: test_code_format.TestCode.parseNormalized(
+              record.original,
+            ).code,
+            result: test_code_format.TestCode.parseNormalized(
+              record.result,
+            ).code,
+          ),
+        )
+        .toList();
 
     // Remove any marker in the expected code. We allow markers to prevent an
     // otherwise empty line from having the leading whitespace be removed.
@@ -54,15 +60,13 @@ abstract class AssistTestProcessor extends BaseEditTestProcessor {
       expect(change.edits, hasLength(additionallyChangedFiles.length + 1));
       var fileEdit = change.getFileEdit(testFile.path)!;
       matchesExpected(expected, fileEdit: fileEdit);
-      for (final additionalEntry in additionallyChangedFiles.entries) {
-        var filePath = additionalEntry.key;
-        var pair = additionalEntry.value;
-        var fileEdit = change.getFileEdit(filePath)!;
+      for (final (:path, :original, :result) in additionallyChangedFiles) {
+        var fileEdit = change.getFileEdit(path)!;
         matchesExpected(
-          pair.result,
+          result,
           fileEdit: fileEdit,
-          target: filePath,
-          original: pair.original,
+          target: path,
+          original: original,
         );
       }
     }
