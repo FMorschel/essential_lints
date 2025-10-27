@@ -1,7 +1,12 @@
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analysis_server_plugin/registry.dart';
+// ignore: implementation_imports, open issue
+import 'package:analysis_server_plugin/src/correction/fix_generators.dart'
+    as fix_generators;
 import 'package:analyzer/error/error.dart';
 
+import 'assist/essential_lint_assists.dart';
+import 'assist/remove_useless_else.dart';
 import 'fixes/alphabetize_arguments.dart';
 import 'fixes/essential_lint_fixes.dart';
 import 'fixes/fix.dart';
@@ -62,5 +67,26 @@ mixin FixesPluginIntegration {
       }
     }
     return fixes;
+  }
+}
+
+/// Mixin to integrate plugin fixes.
+mixin AssistsPluginIntegration {
+  /// Registers all assists with the given registry.
+  void registerAssists(PluginRegistry registry) {
+    assists.forEach(registry.registerAssist);
+  }
+
+  /// Returns the list of registered assists.
+  Set<fix_generators.ProducerGenerator> get assists {
+    final assists = <fix_generators.ProducerGenerator>{};
+
+    for (final assist in EssentialLintAssists.values) {
+      switch (assist) {
+        case EssentialLintAssists.removeUselessElse:
+          assists.add(RemoveUselessElse.new);
+      }
+    }
+    return assists;
   }
 }

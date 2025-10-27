@@ -5,7 +5,10 @@ import 'plugin_integration.dart';
 
 /// The analysis server plugin for Essential Lints.
 class EssentialLintsPlugin extends Plugin
-    with RulesPluginIntegration, FixesPluginIntegration {
+    with
+        RulesPluginIntegration,
+        FixesPluginIntegration,
+        AssistsPluginIntegration {
   @override
   String get name => 'essential_lints';
 
@@ -13,5 +16,6 @@ class EssentialLintsPlugin extends Plugin
   void register(PluginRegistry registry) {
     registerRules(registry);
     registerFixes(registry);
+    registerAssists(registry);
   }
 }

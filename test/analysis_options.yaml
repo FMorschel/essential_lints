@@ -2,8 +2,11 @@ include: ../analysis_options.yaml
 
 analyzer:
   errors:
+    parameter_assignments: false
     non_constant_identifier_names: false
+    avoid_catches_without_on_clauses: false
 
 linter:
   rules:
     unreachable_from_main: true
+    specify_nonobvious_property_types: false

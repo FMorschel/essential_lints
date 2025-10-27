@@ -65,8 +65,8 @@ abstract class FixTest extends AnalysisRuleTest
   @override
   Future<void> tearDown() async {
     fix_generators.registeredFixGenerators.clearLintProducers();
-    await _analysisContextCollection?.dispose();
-    _analysisContextCollection = null;
+    await analysisContextCollection?.dispose();
+    analysisContextCollection = null;
     await super.tearDown();
   }
 
@@ -78,7 +78,7 @@ abstract class FixTest extends AnalysisRuleTest
 
   @override
   analysis_context_collection.AnalysisContextCollectionImpl?
-  _analysisContextCollection;
+  analysisContextCollection;
 
   Future<void> resolveTestCode(String code) async {
     this.code = code;
@@ -152,8 +152,8 @@ mixin PrivateMixin on AnalysisRuleTest {
   final byte_store.MemoryByteStore _byteStore = _sharedByteStore;
 
   analysis_context_collection.AnalysisContextCollectionImpl?
-  get _analysisContextCollection;
-  set _analysisContextCollection(
+  get analysisContextCollection;
+  set analysisContextCollection(
     analysis_context_collection.AnalysisContextCollectionImpl? value,
   );
 
@@ -181,16 +181,16 @@ mixin PrivateMixin on AnalysisRuleTest {
     _createAnalysisContexts();
 
     var convertedPath = convertPath(path);
-    return _analysisContextCollection!.contextFor(convertedPath);
+    return analysisContextCollection!.contextFor(convertedPath);
   }
 
   /// Creates all analysis contexts in [_collectionIncludedPaths].
   void _createAnalysisContexts() {
-    if (_analysisContextCollection != null) {
+    if (analysisContextCollection != null) {
       return;
     }
 
-    _analysisContextCollection =
+    analysisContextCollection =
         analysis_context_collection.AnalysisContextCollectionImpl(
           byteStore: _byteStore,
           declaredVariables: {},
