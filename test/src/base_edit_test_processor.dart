@@ -7,7 +7,6 @@ import 'package:analysis_server_plugin/src/correction/dart_change_workspace.dart
     as dart_change_workspace;
 import 'package:analysis_server_plugin/src/correction/fix_generators.dart'
     as fix_generators;
-import 'package:analysis_server_plugin/src/plugin_server.dart' as plugin_server;
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/analysis/session.dart';
 import 'package:analyzer/file_system/file_system.dart';
@@ -37,8 +36,6 @@ abstract class BaseEditTestProcessor extends AnalysisRuleTest
   List<Plugin> get plugins;
 
   static final channel = _FakeChannel();
-
-  late plugin_server.PluginServer pluginServer;
 
   // ignore: library_private_types_in_public_api, only used internally.
   _TestInstrumentationService get instrumentationService => .new();
