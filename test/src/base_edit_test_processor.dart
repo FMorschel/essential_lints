@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:analysis_server_plugin/plugin.dart';
+import 'package:analysis_server_plugin/src/correction/assist_generators.dart'
+    as assist_generators;
 import 'package:analysis_server_plugin/src/correction/dart_change_workspace.dart'
     as dart_change_workspace;
 import 'package:analysis_server_plugin/src/correction/fix_generators.dart'
@@ -15,24 +17,27 @@ import 'package:analyzer/src/dart/analysis/analysis_context_collection.dart'
 import 'package:analyzer/src/dart/analysis/byte_store.dart' as byte_store;
 import 'package:analyzer/src/dart/analysis/driver_based_analysis_context.dart'
     as driver_based_analysis_context;
+import 'package:analyzer/src/lint/registry.dart' as registry;
 import 'package:analyzer/src/test_utilities/test_code_format.dart'
     as test_code_format;
 import 'package:analyzer_plugin/channel/channel.dart';
 import 'package:analyzer_plugin/protocol/protocol.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
-import 'package:analyzer_plugin/protocol/protocol_generated.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
-import 'package:essential_lints/src/rules/essential_lint_rules.dart';
+import 'package:essential_lints/src/plugin_integration.dart';
 import 'package:test/test.dart';
 
 abstract class BaseEditTestProcessor extends AnalysisRuleTest
-    with _PrivateMixin, _SelectionMixin {
+    with
+        _PrivateMixin,
+        _SelectionMixin,
+        RulesPluginIntegration,
+        FixesPluginIntegration,
+        AssistsPluginIntegration {
   List<Plugin> get plugins;
 
   static final channel = _FakeChannel();
 
-  @override
-  late final analysisRule = EssentialLintRules.values.first.code.name;
   late plugin_server.PluginServer pluginServer;
 
   // ignore: library_private_types_in_public_api, only used internally.
@@ -45,25 +50,16 @@ abstract class BaseEditTestProcessor extends AnalysisRuleTest
 
   @override
   Future<void> setUp() async {
-    pluginServer = plugin_server.PluginServer(
-      plugins: plugins,
-      resourceProvider: resourceProvider,
-    );
-    await pluginServer.initialize();
-    pluginServer.start(channel);
-    await pluginServer.handlePluginVersionCheck(
-      PluginVersionCheckParams(
-        byteStoreRoot.path,
-        sdkRoot.path,
-        '0.0.1',
-      ),
+    rules.forEach(registry.Registry.ruleRegistry.registerLintRule);
+    fix_generators.registeredFixGenerators.lintProducers.addAll(fixes);
+    assist_generators.registeredAssistGenerators.producerGenerators.addAll(
+      assists,
     );
     super.setUp();
   }
 
   @override
   Future<void> tearDown() async {
-    fix_generators.registeredFixGenerators.clearLintProducers();
     await analysisContextCollection?.dispose();
     analysisContextCollection = null;
     await super.tearDown();
@@ -108,7 +104,10 @@ abstract class BaseEditTestProcessor extends AnalysisRuleTest
       code = original ?? this.code;
     }
     var resultCode = SourceEdit.applySequence(code, fileEdit.edits);
-    expect(resultCode, test_code_format.TestCode.parseNormalized(expected));
+    expect(
+      resultCode,
+      test_code_format.TestCode.parseNormalized(expected).code,
+    );
   }
 }
 

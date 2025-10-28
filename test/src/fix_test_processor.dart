@@ -7,6 +7,7 @@ import 'package:analysis_server_plugin/src/correction/fix_processor.dart'
     as fix_processor;
 import 'package:analyzer/diagnostic/diagnostic.dart';
 import 'package:analyzer_plugin/utilities/fixes/fixes.dart';
+import 'package:essential_lints/src/rules/rule.dart';
 import 'package:test/test.dart';
 
 import 'base_edit_test_processor.dart';
@@ -15,6 +16,11 @@ typedef DiagnosticFilter = bool Function(Diagnostic diagnostic);
 
 abstract class FixTestProcessor extends BaseEditTestProcessor {
   FixKind get fixKind;
+
+  Rule get rule;
+
+  @override
+  String get analysisRule => rule.rule.code.name;
 
   Future<void> assertHasFix(
     String expected, {

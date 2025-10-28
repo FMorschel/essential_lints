@@ -7,12 +7,16 @@ import 'package:analysis_server_plugin/src/correction/assist_processor.dart'
 import 'package:analyzer/src/test_utilities/test_code_format.dart'
     as test_code_format;
 import 'package:essential_lints/src/assist/essential_lint_assists.dart';
+import 'package:essential_lints/src/rules/essential_lint_rules.dart';
 import 'package:test/test.dart';
 
 import 'base_edit_test_processor.dart';
 
 abstract class AssistTestProcessor extends BaseEditTestProcessor {
   EssentialLintAssists get assistKind;
+
+  @override
+  late final analysisRule = EssentialLintRules.values.first.code.name;
 
   /// Asserts that there is an assist of the given [assistKind] at [offset]
   /// which produces the [expected] code when applied to [testCode]. The map of
