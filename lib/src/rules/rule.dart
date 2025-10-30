@@ -11,10 +11,14 @@ import 'essential_lint_rules.dart';
 /// {@endtemplate}
 abstract class Rule extends AnalysisRule {
   /// {@macro rule}
-  Rule({required super.name, required super.description});
+  Rule(this.rule)
+    : super(
+        name: rule.code.name,
+        description: rule.code.problemMessage,
+      );
 
   /// The essential lint rule associated with this analysis rule.
-  EssentialLintRules get rule;
+  final EssentialLintRules rule;
 
   @override
   DiagnosticCode get diagnosticCode => rule.code;

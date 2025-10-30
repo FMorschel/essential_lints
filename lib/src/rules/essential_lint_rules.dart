@@ -8,7 +8,8 @@ enum EssentialLintRules {
       'alphabetize_arguments',
       'Arguments should be in alphabetical order.',
     ),
-  );
+  ),
+  ;
 
   const EssentialLintRules(this.code);
 

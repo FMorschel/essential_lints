@@ -3,7 +3,6 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
-import 'essential_lint_rules.dart';
 import 'rule.dart';
 
 /// {@template alphabetize_arguments}
@@ -11,17 +10,7 @@ import 'rule.dart';
 /// {@endtemplate}
 class AlphabetizeArgumentsRule extends Rule {
   /// {@macro alphabetize_arguments}
-  AlphabetizeArgumentsRule()
-    : super(
-        name: _rule.code.name,
-        description: 'Arguments should be in alphabetical order.',
-      );
-
-  static const EssentialLintRules _rule =
-      EssentialLintRules.alphabetizeArguments;
-
-  @override
-  EssentialLintRules get rule => _rule;
+  AlphabetizeArgumentsRule() : super(.alphabetizeArguments);
 
   @override
   void registerNodeProcessors(

@@ -30,7 +30,7 @@ mixin RulesPluginIntegration {
     final rules = <Rule>[];
     for (final rule in EssentialLintRules.values) {
       rules.add(switch (rule) {
-        EssentialLintRules.alphabetizeArguments => AlphabetizeArgumentsRule(),
+        .alphabetizeArguments => AlphabetizeArgumentsRule(),
       });
     }
     return rules;
