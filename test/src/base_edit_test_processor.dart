@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:analysis_server_plugin/plugin.dart';
 import 'package:analysis_server_plugin/src/correction/assist_generators.dart'
     as assist_generators;
 import 'package:analysis_server_plugin/src/correction/dart_change_workspace.dart'
@@ -33,8 +32,6 @@ abstract class BaseEditTestProcessor extends AnalysisRuleTest
         RulesPluginIntegration,
         FixesPluginIntegration,
         AssistsPluginIntegration {
-  List<Plugin> get plugins;
-
   static final channel = _FakeChannel();
 
   // ignore: library_private_types_in_public_api, only used internally.

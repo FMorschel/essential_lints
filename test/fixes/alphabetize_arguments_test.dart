@@ -1,6 +1,3 @@
-import 'package:analysis_server_plugin/plugin.dart';
-import 'package:analyzer_plugin/utilities/fixes/fixes.dart';
-import 'package:essential_lints/main.dart';
 import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
 import 'package:essential_lints/src/rules/alphabetize_arguments.dart';
 import 'package:essential_lints/src/rules/rule.dart';
@@ -17,13 +14,10 @@ void main() {
 @reflectiveTest
 class AlphabetizeArgumentsTest extends FixTestProcessor {
   @override
-  FixKind get fixKind => EssentialLintFixes.alphabetizeArguments.fixKind;
+  EssentialLintFixes get fix => .alphabetizeArguments;
 
   @override
   Rule get rule => AlphabetizeArgumentsRule();
-
-  @override
-  List<Plugin> get plugins => [plugin];
 
   Future<void> test_alphabetizeNamedArguments() async {
     await resolveTestCode('''

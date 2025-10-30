@@ -6,7 +6,7 @@ import 'package:analysis_server_plugin/edit/fix/fix.dart';
 import 'package:analysis_server_plugin/src/correction/fix_processor.dart'
     as fix_processor;
 import 'package:analyzer/diagnostic/diagnostic.dart';
-import 'package:analyzer_plugin/utilities/fixes/fixes.dart';
+import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
 import 'package:essential_lints/src/rules/rule.dart';
 import 'package:test/test.dart';
 
@@ -15,7 +15,7 @@ import 'base_edit_test_processor.dart';
 typedef DiagnosticFilter = bool Function(Diagnostic diagnostic);
 
 abstract class FixTestProcessor extends BaseEditTestProcessor {
-  FixKind get fixKind;
+  EssentialLintFixes get fix;
 
   Rule get rule;
 
@@ -48,13 +48,13 @@ abstract class FixTestProcessor extends BaseEditTestProcessor {
     Pattern? matchFixMessage,
     bool allowFixAllFixes = false,
   }) {
-    fixes = fixes.where((fix) => fix.kind == fixKind).toList();
+    fixes = fixes.where((fix) => fix.kind == this.fix.fixKind).toList();
     if (expectedNumberOfFixesForKind != null) {
       expect(
         fixes,
         hasLength(expectedNumberOfFixesForKind),
         reason:
-            'Expected $expectedNumberOfFixesForKind fixes for kind $fixKind, '
+            'Expected $expectedNumberOfFixesForKind fixes for kind $this.fix, '
             'found ${fixes.length}.',
       );
     }
@@ -74,7 +74,7 @@ abstract class FixTestProcessor extends BaseEditTestProcessor {
       if (!allowFixAllFixes &&
           fix.kind.priority == DartFixKindPriority.inFile) {
         fail(
-          'A fix-all fix was found for the error: $fixKind '
+          'A fix-all fix was found for the error: $this.fix '
           'in the computed set of fixes:\n${fixes.join('\n')}',
         );
       }
@@ -94,11 +94,12 @@ abstract class FixTestProcessor extends BaseEditTestProcessor {
       diagnostics = diagnostics.where(filter).toList();
     }
     if (diagnostics.isEmpty) {
-      throw StateError('Expected at least one diagnostic, found none.');
+      expect(diagnostics, hasLength(1));
     }
     if (diagnostics.length > 1) {
-      throw StateError(
-        'Expected a single diagnostic, found ${diagnostics.length}.',
+      fail(
+        'Expected a single diagnostic, found ${diagnostics.length}:\n'
+        '${diagnostics.join('\n')}',
       );
     }
     return diagnostics.first;

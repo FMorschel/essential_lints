@@ -8,9 +8,11 @@ import 'package:analyzer/error/error.dart';
 import 'assist/essential_lint_assists.dart';
 import 'assist/remove_useless_else.dart';
 import 'fixes/alphabetize_arguments.dart';
+import 'fixes/double_literal_format.dart';
 import 'fixes/essential_lint_fixes.dart';
 import 'fixes/fix.dart';
 import 'rules/alphabetize_arguments.dart';
+import 'rules/double_literal_format.dart';
 import 'rules/essential_lint_rules.dart';
 import 'rules/prefer_explicitly_named_parameters.dart';
 import 'rules/rule.dart';
@@ -33,6 +35,7 @@ mixin RulesPluginIntegration {
       rules.add(switch (rule) {
         .alphabetizeArguments => AlphabetizeArgumentsRule(),
         .preferExplicitlyNamedParameter => PreferExplicitlyNamedParameterRule(),
+        .doubleLiteralFormat => DoubleLiteralFormatRule(),
       });
     }
     return rules;
@@ -62,9 +65,13 @@ mixin FixesPluginIntegration {
 
     for (final fix in EssentialLintFixes.values) {
       switch (fix) {
-        case EssentialLintFixes.alphabetizeArguments:
+        case .alphabetizeArguments:
           addFixTo(AlphabetizeArgumentsFix.new, [
-            EssentialLintRules.alphabetizeArguments,
+            .alphabetizeArguments,
+          ]);
+        case .doubleLiteralFormat:
+          addFixTo(DoubleLiteralFormatFix.new, [
+            .doubleLiteralFormat,
           ]);
       }
     }

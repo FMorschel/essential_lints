@@ -27,6 +27,19 @@ enum EssentialLintRules {
           'in function type declarations for improved code clarity and '
           'completion.',
     ),
+  ),
+
+  /// Double literals should follow the preferred format.
+  doubleLiteralFormat(
+    RuleCode(
+      'double_literal_format',
+      'Double literals should follow the preferred format.',
+      correctionMessage:
+          'Reformat the double literal to match the preferred style.',
+      description:
+          'A lint rule that enforces a consistent format for double literals '
+          'in the codebase.',
+    ),
   )
   ;
 
