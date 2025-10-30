@@ -14,7 +14,7 @@ abstract class Rule extends AnalysisRule {
   Rule(this.rule)
     : super(
         name: rule.code.name,
-        description: rule.code.problemMessage,
+        description: rule.code.description,
       );
 
   /// The essential lint rule associated with this analysis rule.

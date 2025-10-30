@@ -12,6 +12,7 @@ import 'fixes/essential_lint_fixes.dart';
 import 'fixes/fix.dart';
 import 'rules/alphabetize_arguments.dart';
 import 'rules/essential_lint_rules.dart';
+import 'rules/prefer_explicitly_named_parameters.dart';
 import 'rules/rule.dart';
 
 /// A typedef for the base fix constructor.
@@ -31,6 +32,7 @@ mixin RulesPluginIntegration {
     for (final rule in EssentialLintRules.values) {
       rules.add(switch (rule) {
         .alphabetizeArguments => AlphabetizeArgumentsRule(),
+        .preferExplicitlyNamedParameter => PreferExplicitlyNamedParameterRule(),
       });
     }
     return rules;
