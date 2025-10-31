@@ -15,6 +15,7 @@ import 'rules/alphabetize_arguments.dart';
 import 'rules/double_literal_format.dart';
 import 'rules/essential_lint_rules.dart';
 import 'rules/prefer_explicitly_named_parameters.dart';
+import 'rules/prefer_last.dart';
 import 'rules/rule.dart';
 
 /// A typedef for the base fix constructor.
@@ -36,6 +37,7 @@ mixin RulesPluginIntegration {
         .alphabetizeArguments => AlphabetizeArgumentsRule(),
         .preferExplicitlyNamedParameter => PreferExplicitlyNamedParameterRule(),
         .doubleLiteralFormat => DoubleLiteralFormatRule(),
+        .preferLast => PreferLastRule(),
       });
     }
     return rules;

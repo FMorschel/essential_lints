@@ -40,7 +40,22 @@ enum EssentialLintRules {
           'A lint rule that enforces a consistent format for double literals '
           'in the codebase.',
     ),
-  )
+  ),
+
+  /// Prefer using the `last` property to access the last element of a
+  /// list-like object.
+  preferLast(
+    RuleCode(
+      'prefer_last',
+      'Prefer using the `last` property to access the last element of a '
+          'list-like object.',
+      correctionMessage: 'Replace the index access with the `last` property.',
+      description:
+          'A lint rule that suggests using the `last` property instead of '
+          'accessing the last element of a list-like object using length - 1 '
+          'index.',
+    ),
+  ),
   ;
 
   const EssentialLintRules(this.code);
