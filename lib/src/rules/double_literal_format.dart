@@ -3,6 +3,7 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
+import '../utils/double_literal_parser.dart';
 import 'rule.dart';
 
 /// {@template double_literal_format}
@@ -28,23 +29,24 @@ class _DoubleLiteralFormatVisitor extends SimpleAstVisitor<void> {
 
   final DoubleLiteralFormatRule rule;
 
-  static final _trailingZeros = RegExp(r'\.[0-9]+0+(e(\+|-)?[0-9]+)?$');
-
-  static final _leadingZerosInExponential = RegExp(r'e(\+|-)?0+[0-9]+$');
-
   @override
   void visitDoubleLiteral(DoubleLiteral node) {
-    var lexeme = node.literal.lexeme;
-    if (lexeme.startsWith(RegExp('^0+[0-9]+.'))) {
+    var parsed = DoubleLiteralParser(node.literal.lexeme);
+    if (!parsed.isValidDouble) {
+      // Must have either decimal point or exponent
+      super.visitDoubleLiteral(node);
+      return;
+    }
+    if (parsed.hasLeadingZeros) {
       // Unnecessary leading zeros
       rule.reportAtNode(node);
-    } else if (lexeme.startsWith('.')) {
+    } else if (parsed.hasDecimalPoint && !parsed.hasIntegerPart) {
       // Missing explicit zero in unity
       rule.reportAtNode(node);
-    } else if (_trailingZeros.hasMatch(lexeme)) {
+    } else if (parsed.hasTrailingZeros) {
       // Trailing zeros after dot
       rule.reportAtNode(node);
-    } else if (_leadingZerosInExponential.hasMatch(lexeme)) {
+    } else if (parsed.hasExponentLeadingZeros) {
       // Leading zeros in exponential
       rule.reportAtNode(node);
     }

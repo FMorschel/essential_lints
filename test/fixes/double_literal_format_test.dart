@@ -83,4 +83,17 @@ void f() {
 }
 ''');
   }
+
+  Future<void> test_exponential_leadingZero() async {
+    await resolveTestCode('''
+void f() {
+  var _ = 1E01;
+}
+''');
+    await assertHasFix('''
+void f() {
+  var _ = 1E1;
+}
+''');
+  }
 }

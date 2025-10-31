@@ -77,4 +77,22 @@ var _ = .0e+1;
       [lint(8, 5)],
     );
   }
+
+  Future<void> test_decimal_and_exponential() async {
+    await assertDiagnostics(
+      '''
+var _ = 1.1e01;
+''',
+      [lint(8, 6)],
+    );
+  }
+
+  Future<void> test_exponential_only() async {
+    await assertDiagnostics(
+      '''
+var _ = 1e05;
+''',
+      [lint(8, 4)],
+    );
+  }
 }
