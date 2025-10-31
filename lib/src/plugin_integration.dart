@@ -15,6 +15,7 @@ import 'rules/alphabetize_arguments.dart';
 import 'rules/double_literal_format.dart';
 import 'rules/essential_lint_rules.dart';
 import 'rules/prefer_explicitly_named_parameters.dart';
+import 'rules/prefer_first.dart';
 import 'rules/prefer_last.dart';
 import 'rules/rule.dart';
 
@@ -35,8 +36,9 @@ mixin RulesPluginIntegration {
     for (final rule in EssentialLintRules.values) {
       rules.add(switch (rule) {
         .alphabetizeArguments => AlphabetizeArgumentsRule(),
-        .preferExplicitlyNamedParameter => PreferExplicitlyNamedParameterRule(),
         .doubleLiteralFormat => DoubleLiteralFormatRule(),
+        .preferExplicitlyNamedParameter => PreferExplicitlyNamedParameterRule(),
+        .preferFirst => PreferFirstRule(),
         .preferLast => PreferLastRule(),
       });
     }

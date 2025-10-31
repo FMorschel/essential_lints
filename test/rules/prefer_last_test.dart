@@ -15,7 +15,7 @@ class PreferLastTest extends RuleTestProcessor {
   @override
   Rule get rule => PreferLastRule();
 
-  Future<void> test_preferLast() async {
+  Future<void> test_report() async {
     await assertDiagnostics(
       '''
 void f(List<int> numbers) {
@@ -26,7 +26,7 @@ void f(List<int> numbers) {
     );
   }
 
-  Future<void> test_preferLast_other_index() async {
+  Future<void> test_other_index() async {
     await assertNoDiagnostics('''
 void f(List<int> numbers, List<int> others) {
   var lastNumber = numbers[others.length - 1];
@@ -34,7 +34,7 @@ void f(List<int> numbers, List<int> others) {
 ''');
   }
 
-  Future<void> test_preferLast_other_target() async {
+  Future<void> test_other_target() async {
     await assertNoDiagnostics('''
 void f(List<int> numbers, List<int> others) {
   var lastNumber = numbers[others.length - 1];
@@ -42,7 +42,7 @@ void f(List<int> numbers, List<int> others) {
 ''');
   }
 
-  Future<void> test_preferLast_extension() async {
+  Future<void> test_extension() async {
     await assertDiagnostics(
       '''
 extension on List {
@@ -56,7 +56,7 @@ extension on List {
   }
 
   @FailingTest(reason: "Mock SDK doesn't have Iterable.elementAt")
-  Future<void> test_preferLast_elementAt() async {
+  Future<void> test_elementAt() async {
     await assertDiagnostics(
       '''
 void f(List<int> numbers) {

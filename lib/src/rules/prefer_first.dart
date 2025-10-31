@@ -1,7 +1,6 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -9,30 +8,30 @@ import 'package:analyzer/dart/element/type.dart';
 import '../utils/extensions/ast.dart';
 import 'rule.dart';
 
-/// {@template prefer_last}
-/// A rule that suggests using `last` property instead of accessing
-/// the last element of a list-like object using length - 1 index.
+/// {@template prefer_first}
+/// A rule that suggests using the `first` property instead of accessing
+/// the first element of a list-like object using index 0.
 /// {@endtemplate}
-class PreferLastRule extends Rule {
-  /// {@macro prefer_last}
-  PreferLastRule() : super(.preferLast);
+class PreferFirstRule extends Rule {
+  /// {@macro prefer_first}
+  PreferFirstRule() : super(.preferFirst);
 
   @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _PreferLastVisitor(this, context);
+    var visitor = _PreferFirstVisitor(this, context);
     registry
       ..addIndexExpression(this, visitor)
       ..addMethodInvocation(this, visitor);
   }
 }
 
-class _PreferLastVisitor extends SimpleAstVisitor<void> {
-  _PreferLastVisitor(this.rule, this.context);
+class _PreferFirstVisitor extends SimpleAstVisitor<void> {
+  _PreferFirstVisitor(this.rule, this.context);
 
-  final PreferLastRule rule;
+  final PreferFirstRule rule;
 
   final RuleContext context;
 
@@ -49,7 +48,7 @@ class _PreferLastVisitor extends SimpleAstVisitor<void> {
       super.visitMethodInvocation(node);
       return;
     }
-    if (_elementDoesntContainLast(targetTypeElement)) {
+    if (_elementDoesntContainFirst(targetTypeElement)) {
       super.visitMethodInvocation(node);
       return;
     }
@@ -58,15 +57,9 @@ class _PreferLastVisitor extends SimpleAstVisitor<void> {
       return;
     }
     var expression = node.argumentList.arguments.first;
-    var offset = node.methodName.offset;
-    var endOffset = node.methodName.end;
-    _reportWhenLengthMinusOne(
-      expression,
-      targetElement,
-      targetTypeElement,
-      offset,
-      endOffset,
-    );
+    if (expression case IntegerLiteral(:var value) when value == 0) {
+      rule.reportAtNode(node.argumentList);
+    }
     super.visitMethodInvocation(node);
   }
 
@@ -90,60 +83,24 @@ class _PreferLastVisitor extends SimpleAstVisitor<void> {
       super.visitIndexExpression(node);
       return;
     }
-    if (_elementDoesntContainLast(element)) {
+    if (_elementDoesntContainFirst(element)) {
       super.visitIndexExpression(node);
       return;
     }
     var expression = node.index;
-    var offset = node.leftBracket.offset;
-    var endOffset = node.rightBracket.end;
-    _reportWhenLengthMinusOne(
-      expression,
-      targetElement,
-      element,
-      offset,
-      endOffset,
-    );
+    if (expression case IntegerLiteral(:var value) when value == 0) {
+      var offset = node.leftBracket.offset;
+      var endOffset = node.rightBracket.end;
+      rule.reportAtOffset(offset, endOffset - offset);
+    }
     super.visitIndexExpression(node);
   }
 
-  bool _elementDoesntContainLast(Element element) {
+  bool _elementDoesntContainFirst(Element element) {
     return element is! InterfaceElement ||
         !element.interfaceMembers.entries
             .map((entry) => entry.key.name)
-            .contains('last');
-  }
-
-  void _reportWhenLengthMinusOne(
-    Expression expression,
-    Element targetElement,
-    Element targetTypeElement,
-    int offset,
-    int endOffset,
-  ) {
-    if (expression case BinaryExpression(
-      :var operator,
-      :Expression leftOperand,
-      :IntegerLiteral rightOperand,
-    ) when operator.type == TokenType.MINUS && rightOperand.value == 1) {
-      switch (leftOperand) {
-        case PrefixedIdentifier(
-              identifier: SimpleIdentifier(name: 'length'),
-              prefix: SimpleIdentifier(:var staticType, :var element),
-            )
-            when staticType?.element == targetTypeElement &&
-                targetElement == element:
-          rule.reportAtOffset(offset, endOffset - offset);
-        case SimpleIdentifier(
-              name: 'length',
-              element: GetterElement() || FieldElement(),
-              :var enclosingTypeElement,
-            )
-            when enclosingTypeElement == targetTypeElement &&
-                targetElement == enclosingTypeElement:
-          rule.reportAtOffset(offset, endOffset - offset);
-      }
-    }
+            .contains('first');
   }
 
   bool _methodIsIterableElementAt(MethodInvocation node) {

@@ -56,6 +56,20 @@ enum EssentialLintRules {
           'index.',
     ),
   ),
+
+  /// Prefer using the `first` property to access the first element of a
+  /// list-like object.
+  preferFirst(
+    RuleCode(
+      'prefer_first',
+      'Prefer using the `first` property to access the first element of a '
+          'list-like object.',
+      correctionMessage: 'Replace the index access with the `first` property.',
+      description:
+          'A lint rule that suggests using the `first` property instead of '
+          'accessing the first element of a list-like object using index 0.',
+    ),
+  )
   ;
 
   const EssentialLintRules(this.code);
