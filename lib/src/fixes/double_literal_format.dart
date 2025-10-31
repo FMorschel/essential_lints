@@ -20,7 +20,7 @@ class DoubleLiteralFormatFix extends Fix {
   EssentialLintFixes get fix => .doubleLiteralFormat;
 
   static final _regexp = RegExp(
-    r'^(0+)?(([0-9]*)\.(([0-9]*[1-9]+)|0))(0+)?((e(\+|-)?)(0+)?([0-9]+))?$',
+    r'^(0+)?(([0-9]*)\.(([0-9]*[1-9])|0))(0+)?((e(\+|-)?)(0+)?([0-9]+))?$',
   );
 
   static const _leadingZeroGroup = 1;
