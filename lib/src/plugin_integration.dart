@@ -14,6 +14,7 @@ import 'fixes/fix.dart';
 import 'rules/alphabetize_arguments.dart';
 import 'rules/double_literal_format.dart';
 import 'rules/essential_lint_rules.dart';
+import 'rules/getters_in_member_list.dart';
 import 'rules/prefer_explicitly_named_parameters.dart';
 import 'rules/prefer_first.dart';
 import 'rules/prefer_last.dart';
@@ -40,6 +41,7 @@ mixin RulesPluginIntegration {
         .preferExplicitlyNamedParameter => PreferExplicitlyNamedParameterRule(),
         .preferFirst => PreferFirstRule(),
         .preferLast => PreferLastRule(),
+        .gettersInMemberList => GettersInMemberListRule(),
       });
     }
     return rules;
@@ -68,16 +70,14 @@ mixin FixesPluginIntegration {
     }
 
     for (final fix in EssentialLintFixes.values) {
-      switch (fix) {
-        case .alphabetizeArguments:
-          addFixTo(AlphabetizeArgumentsFix.new, [
-            .alphabetizeArguments,
-          ]);
-        case .doubleLiteralFormat:
-          addFixTo(DoubleLiteralFormatFix.new, [
-            .doubleLiteralFormat,
-          ]);
-      }
+      var _ = switch (fix) {
+        .alphabetizeArguments => addFixTo(AlphabetizeArgumentsFix.new, [
+          .alphabetizeArguments,
+        ]),
+        .doubleLiteralFormat => addFixTo(DoubleLiteralFormatFix.new, [
+          .doubleLiteralFormat,
+        ]),
+      };
     }
     return fixes;
   }

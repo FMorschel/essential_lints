@@ -69,6 +69,18 @@ enum EssentialLintRules {
           'A lint rule that suggests using the `first` property instead of '
           'accessing the first element of a list-like object using index 0.',
     ),
+  ),
+
+  /// Getters should be included in member lists.
+  gettersInMemberList(
+    RuleCode(
+      'getters_in_member_list',
+      'Getters/fields should be included in member lists.',
+      correctionMessage: 'Include the getter/field in the member list.',
+      description:
+          'A lint rule that ensures getters/fields are included in the member '
+          'list.',
+    ),
   )
   ;
 
