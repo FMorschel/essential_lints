@@ -6,8 +6,8 @@ import 'package:analysis_server_plugin/edit/fix/fix.dart';
 import 'package:analysis_server_plugin/src/correction/fix_processor.dart'
     as fix_processor;
 import 'package:analyzer/diagnostic/diagnostic.dart';
-import '../../lib/src/fixes/essential_lint_fixes.dart';
-import '../../lib/src/rules/rule.dart';
+import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
+import 'package:essential_lints/src/rules/rule.dart';
 import 'package:test/test.dart';
 
 import 'base_edit_test_processor.dart';

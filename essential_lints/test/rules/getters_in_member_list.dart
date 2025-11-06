@@ -1,5 +1,5 @@
-import '../../lib/src/rules/getters_in_member_list.dart';
-import '../../lib/src/rules/rule.dart';
+import 'package:essential_lints/src/rules/getters_in_member_list.dart';
+import 'package:essential_lints/src/rules/rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import '../src/rule_test_processor.dart';

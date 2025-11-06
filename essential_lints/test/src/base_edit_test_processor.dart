@@ -22,7 +22,7 @@ import 'package:analyzer_plugin/channel/channel.dart';
 import 'package:analyzer_plugin/protocol/protocol.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
-import '../../lib/src/plugin_integration.dart';
+import 'package:essential_lints/src/plugin_integration.dart';
 import 'package:test/test.dart';
 
 abstract class BaseEditTestProcessor extends AnalysisRuleTest

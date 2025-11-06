@@ -1,4 +1,4 @@
-import '../../lib/src/assist/essential_lint_assists.dart';
+import 'package:essential_lints/src/assist/essential_lint_assists.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import '../src/assist_test_processor.dart';

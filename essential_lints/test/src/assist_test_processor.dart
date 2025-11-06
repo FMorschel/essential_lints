@@ -6,8 +6,8 @@ import 'package:analysis_server_plugin/src/correction/assist_processor.dart'
     as assist_processor;
 import 'package:analyzer/src/test_utilities/test_code_format.dart'
     as test_code_format;
-import '../../lib/src/assist/essential_lint_assists.dart';
-import '../../lib/src/rules/essential_lint_rules.dart';
+import 'package:essential_lints/src/assist/essential_lint_assists.dart';
+import 'package:essential_lints/src/rules/essential_lint_rules.dart';
 import 'package:test/test.dart';
 
 import 'base_edit_test_processor.dart';
