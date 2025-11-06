@@ -3,7 +3,6 @@ description: New lint rules for Dart/Flutter projects and related fixes.
 version: 0.0.1
 
 repository: https://github.com/FMorschel/essential_lints
-documentation: https://github.com/FMorschel/essential_lints#readme
 issue_tracker: https://github.com/FMorschel/essential_lints/issues
 license: MIT
 

@@ -2,6 +2,10 @@ name: essential_lints_annotations
 description: Annotations for essential_lints package.
 version: 0.0.1
 
+repository: https://github.com/FMorschel/essential_lints
+issue_tracker: https://github.com/FMorschel/essential_lints/issues
+license: MIT
+
 environment:
   sdk: ^3.10.0
 
