@@ -1,5 +1,5 @@
-import 'package:essential_lints/src/rules/prefer_first.dart';
-import 'package:essential_lints/src/rules/rule.dart';
+import '../../lib/src/rules/prefer_first.dart';
+import '../../lib/src/rules/rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import '../src/rule_test_processor.dart';

@@ -1,6 +1,6 @@
-import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
-import 'package:essential_lints/src/rules/double_literal_format.dart';
-import 'package:essential_lints/src/rules/rule.dart';
+import '../../lib/src/fixes/essential_lint_fixes.dart';
+import '../../lib/src/rules/double_literal_format.dart';
+import '../../lib/src/rules/rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import '../src/fix_test_processor.dart';

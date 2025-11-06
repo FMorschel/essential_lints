@@ -1,4 +1,4 @@
-import 'package:essential_lints/src/utils/double_literal_parser.dart';
+import '../../lib/src/utils/double_literal_parser.dart';
 import 'package:test/test.dart';
 
 void main() {
