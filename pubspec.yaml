@@ -12,6 +12,7 @@ environment:
 
 workspace:
   - essential_lints
+  - essential_lints_annotations
 
 dev_dependencies:
   analyzer_testing: ^0.1.4

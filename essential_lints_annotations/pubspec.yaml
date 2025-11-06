@@ -1,0 +1,18 @@
+name: essential_lints_annotations
+description: Annotations for essential_lints package.
+version: 0.0.1
+
+environment:
+  sdk: ^3.10.0
+
+resolution: workspace
+
+# Recommended keywords help users find the package on pub.dev.
+keywords:
+  - dart
+  - analysis
+  - annotations
+  - meta
+
+dev_dependencies:
+  test: any
