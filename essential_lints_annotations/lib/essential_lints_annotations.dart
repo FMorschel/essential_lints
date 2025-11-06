@@ -1,0 +1,1 @@
+export 'src/getters_in_member_list.dart';
