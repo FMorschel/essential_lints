@@ -24,47 +24,29 @@ import 'rules/rule.dart';
 typedef FixGenerator =
     Fix Function({required CorrectionProducerContext context});
 
-/// Mixin to integrate plugin rules.
-mixin RulesPluginIntegration {
-  /// Registers all lint rules with the given registry.
-  void registerRules(PluginRegistry registry) {
-    rules.forEach(registry.registerLintRule);
+/// Mixin to integrate plugin fixes.
+mixin AssistsPluginIntegration {
+  /// Returns the list of registered assists.
+  Set<fix_generators.ProducerGenerator> get assists {
+    final assists = <fix_generators.ProducerGenerator>{};
+
+    for (final assist in EssentialLintAssists.values) {
+      switch (assist) {
+        case EssentialLintAssists.removeUselessElse:
+          assists.add(RemoveUselessElse.new);
+      }
+    }
+    return assists;
   }
 
-  /// Returns the list of registered rules.
-  Set<Rule> get rules {
-    final rules = <Rule>{};
-    // Single instance to satisfy exhaustive switch requirement.
-    var gettersInMemberListRule = GettersInMemberListRule();
-    for (final rule in EssentialLintRules.values) {
-      rules.add(switch (rule) {
-        .alphabetizeArguments => AlphabetizeArgumentsRule(),
-        .doubleLiteralFormat => DoubleLiteralFormatRule(),
-        .preferExplicitlyNamedParameter => PreferExplicitlyNamedParameterRule(),
-        .preferFirst => PreferFirstRule(),
-        .preferLast => PreferLastRule(),
-        .gettersInMemberList ||
-        .missingInstanceGettersInMemberList ||
-        .notClassGettersInMemberList ||
-        .emptyMemberListNameGettersInMemberList ||
-        .invalidMemberListGettersInMemberList => gettersInMemberListRule,
-      });
-    }
-    return rules;
+  /// Registers all assists with the given registry.
+  void registerAssists(PluginRegistry registry) {
+    assists.forEach(registry.registerAssist);
   }
 }
 
 /// Mixin to integrate plugin fixes.
 mixin FixesPluginIntegration {
-  /// Registers all fixes with the given registry.
-  void registerFixes(PluginRegistry registry) {
-    fixes.forEach((lintCode, generators) {
-      for (final generator in generators) {
-        registry.registerFixForRule(lintCode, generator);
-      }
-    });
-  }
-
   /// Returns the list of registered fixes.
   Map<LintCode, List<FixGenerator>> get fixes {
     final fixes = <LintCode, List<FixGenerator>>{};
@@ -87,25 +69,44 @@ mixin FixesPluginIntegration {
     }
     return fixes;
   }
+
+  /// Registers all fixes with the given registry.
+  void registerFixes(PluginRegistry registry) {
+    fixes.forEach((lintCode, generators) {
+      for (final generator in generators) {
+        registry.registerFixForRule(lintCode, generator);
+      }
+    });
+  }
 }
 
-/// Mixin to integrate plugin fixes.
-mixin AssistsPluginIntegration {
-  /// Registers all assists with the given registry.
-  void registerAssists(PluginRegistry registry) {
-    assists.forEach(registry.registerAssist);
+/// Mixin to integrate plugin rules.
+mixin RulesPluginIntegration {
+  /// Returns the list of registered rules.
+  Set<Rule> get rules {
+    final rules = <Rule>{};
+    // Single instance to satisfy exhaustive switch requirement.
+    var gettersInMemberListRule = GettersInMemberListRule();
+    for (final rule in EssentialLintRules.values) {
+      rules.add(switch (rule) {
+        .alphabetizeArguments => AlphabetizeArgumentsRule(),
+        .doubleLiteralFormat => DoubleLiteralFormatRule(),
+        .preferExplicitlyNamedParameter => PreferExplicitlyNamedParameterRule(),
+        .preferFirst => PreferFirstRule(),
+        .preferLast => PreferLastRule(),
+        .gettersInMemberList ||
+        .missingInstanceGettersInMemberList ||
+        .notClassGettersInMemberList ||
+        .emptyMemberListNameGettersInMemberList ||
+        .invalidMemberListGettersInMemberList ||
+        .nonMemberInGettersInMemberList => gettersInMemberListRule,
+      });
+    }
+    return rules;
   }
 
-  /// Returns the list of registered assists.
-  Set<fix_generators.ProducerGenerator> get assists {
-    final assists = <fix_generators.ProducerGenerator>{};
-
-    for (final assist in EssentialLintAssists.values) {
-      switch (assist) {
-        case EssentialLintAssists.removeUselessElse:
-          assists.add(RemoveUselessElse.new);
-      }
-    }
-    return assists;
+  /// Registers all lint rules with the given registry.
+  void registerRules(PluginRegistry registry) {
+    rules.forEach(registry.registerLintRule);
   }
 }

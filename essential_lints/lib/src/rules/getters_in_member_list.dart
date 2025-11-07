@@ -5,6 +5,7 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:collection/collection.dart';
 
 import '../utils/extensions/list.dart';
 import 'rule.dart';
@@ -28,8 +29,32 @@ class GettersInMemberListRule extends Rule {
   }
 }
 
+class _GettersInMemberListAnnotation {
+  _GettersInMemberListAnnotation({
+    required this.memberListName,
+    required this.getters,
+    required this.fields,
+    required this.types,
+  });
+
+  final String memberListName;
+  final List<DartType> types;
+  final bool getters;
+  final bool fields;
+
+  String get gettersAndFieldsDescription => getters && !fields
+      ? 'getters'
+      : !getters && fields
+      ? 'fields'
+      : 'getters/fields';
+}
+
 class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
   _GettersInMemberListVisitor(this.rule, this.context);
+
+  static final Uri _annotationUri = Uri.parse(
+    'package:essential_lints_annotations/src/getters_in_member_list.dart',
+  );
 
   final GettersInMemberListRule rule;
 
@@ -80,7 +105,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
         rule.reportAtToken(
           node.name,
           diagnosticCode: .missingInstanceGettersInMemberList,
-          arguments: [annotation.memberListName, annotation.memberListName],
+          arguments: [annotation.memberListName],
         );
         continue;
       }
@@ -112,7 +137,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
       if (memberName == null || memberElement == null) {
         continue;
       }
-      var expression = _calculateList(member);
+      var expression = _calculateList(member, memberName);
       if (expression == null) {
         continue;
       }
@@ -130,9 +155,60 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
     }
   }
 
-  static final Uri _annotationUri = Uri.parse(
-    'package:essential_lints_annotations/src/getters_in_member_list.dart',
-  );
+  ListLiteral? _calculateList(ClassMember? member, Token memberName) {
+    Expression? expression;
+    if (member case MethodDeclaration(:var body, isGetter: true)) {
+      switch (body) {
+        case BlockFunctionBody(:var block):
+          var statement = block.statements.last;
+          if (statement is! ReturnStatement) {
+            // We don't know how to handle this case.
+            return null;
+          }
+          expression = statement.expression;
+        case ExpressionFunctionBody(expression: var expressionBody):
+          expression = expressionBody;
+        case EmptyFunctionBody():
+        case NativeFunctionBody():
+          rule.reportAtToken(
+            member.name,
+            diagnosticCode: .invalidMemberListGettersInMemberList,
+            arguments: [memberName.lexeme],
+          );
+          return null;
+      }
+    } else if (member case FieldDeclaration(
+      fields: VariableDeclarationList(
+        :var variables,
+      ),
+    )) {
+      for (final variable in variables) {
+        if (variable.initializer != null) {
+          expression = variable.initializer;
+          break;
+        }
+      }
+    }
+    if (expression == null) {
+      rule.reportAtNode(
+        member,
+        diagnosticCode: .invalidMemberListGettersInMemberList,
+        arguments: [memberName.lexeme],
+      );
+      return null;
+    }
+    if (expression is! ListLiteral) {
+      rule.reportAtOffset(
+        expression.offset,
+        1,
+        diagnosticCode: .invalidMemberListGettersInMemberList,
+        arguments: [memberName.lexeme],
+      );
+      // We don't know how to handle this case.
+      return null;
+    }
+    return expression;
+  }
 
   /// Sees if the [list] contains all required getters/fields.
   ///
@@ -143,33 +219,48 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
     _GettersInMemberListAnnotation annotation,
     ListLiteral list,
   ) {
-    var literalElements = <Element>[];
-    for (final getter in list.elements) {
+    var literalElements = <(CollectionElement, Element)>[];
+    for (final expression in list.elements) {
       SimpleIdentifier? getterIdentifier;
-      if (getter
+      if (expression
           case SimpleIdentifier identifier ||
               PropertyAccess(propertyName: var identifier)) {
         getterIdentifier = identifier;
       }
       var getterElement = getterIdentifier?.element;
       if (getterElement == null) {
+        rule.reportAtNode(
+          expression,
+          diagnosticCode: .nonMemberInGettersInMemberList,
+        );
         continue;
       }
-      literalElements.add(getterElement);
+      literalElements.add((expression, getterElement));
+    }
+
+    bool valid(GetterElement element) {
+      if (!annotation.getters && element.variable.isSynthetic ||
+          !annotation.fields && !element.variable.isSynthetic ||
+          annotation.types.isNotEmpty &&
+              !annotation.types.contains(element.returnType)) {
+        return false;
+      }
+      return true;
+    }
+
+    var validGetters = getters.where(valid).toList();
+    for (final (expression, element) in literalElements) {
+      if (!validGetters.contains(element)) {
+        rule.reportAtNode(
+          expression,
+          diagnosticCode: .nonMemberInGettersInMemberList,
+        );
+      }
     }
     var missing = <String>[];
-    for (final element in getters) {
-      if (!annotation.getters && element.variable.isSynthetic) {
-        continue;
-      }
-      if (!annotation.fields && !element.variable.isSynthetic) {
-        continue;
-      }
-      if (annotation.types.isNotEmpty &&
-          !annotation.types.contains(element.returnType)) {
-        continue;
-      }
-      if (!literalElements.contains(element)) {
+    var elements = literalElements.map((e) => e.$2).toList();
+    for (final element in validGetters) {
+      if (!elements.contains(element)) {
         missing.add(element.displayName);
       }
     }
@@ -237,58 +328,6 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
       types: types,
     );
   }
-
-  ListLiteral? _calculateList(ClassMember? member) {
-    Expression? expression;
-    if (member case MethodDeclaration(:var body, isGetter: true)) {
-      switch (body) {
-        case BlockFunctionBody(:var block):
-          var statement = block.statements.last;
-          if (statement is! ReturnStatement) {
-            // We don't know how to handle this case.
-            return null;
-          }
-          expression = statement.expression;
-        case ExpressionFunctionBody(expression: var expressionBody):
-          expression = expressionBody;
-        case EmptyFunctionBody():
-        case NativeFunctionBody():
-          rule.reportAtToken(
-            member.name,
-            diagnosticCode: .invalidMemberListGettersInMemberList,
-          );
-          return null;
-      }
-    } else if (member case FieldDeclaration(
-      fields: VariableDeclarationList(
-        :var variables,
-      ),
-    )) {
-      for (final variable in variables) {
-        if (variable.initializer != null) {
-          expression = variable.initializer;
-          break;
-        }
-      }
-    }
-    if (expression == null) {
-      rule.reportAtNode(
-        member,
-        diagnosticCode: .invalidMemberListGettersInMemberList,
-      );
-      return null;
-    }
-    if (expression is! ListLiteral) {
-      rule.reportAtOffset(
-        expression.offset,
-        1,
-        diagnosticCode: .invalidMemberListGettersInMemberList,
-      );
-      // We don't know how to handle this case.
-      return null;
-    }
-    return expression;
-  }
 }
 
 extension on (Rule, GetterElement) {
@@ -320,24 +359,4 @@ extension on TypeArgumentList {
     }
     return arguments.first.type;
   }
-}
-
-class _GettersInMemberListAnnotation {
-  _GettersInMemberListAnnotation({
-    required this.memberListName,
-    required this.getters,
-    required this.fields,
-    required this.types,
-  });
-
-  final String memberListName;
-  final List<DartType> types;
-  final bool getters;
-  final bool fields;
-
-  String get gettersAndFieldsDescription => getters && !fields
-      ? 'getters'
-      : !getters && fields
-      ? 'fields'
-      : 'getters/fields';
 }

@@ -89,7 +89,7 @@ enum EssentialLintRules {
       'getters_in_member_list',
       'The class needs an instance member called {0} to list the members.',
       correctionMessage:
-          'Include the missing member {1} or turn the static member into an '
+          'Include the missing member {0} or turn the static member into an '
           'instance member.',
       description:
           'A lint rule that ensures getters/fields list instance member is '
@@ -137,8 +137,24 @@ enum EssentialLintRules {
       correctionMessage:
           'Modify the declaration of {0} to be a getter or a single field '
           'that returns a literal list of the members.',
-      description: 'A lint rule that ensures the declaration of {0} is valid.',
+      description:
+          'A lint rule that ensures the declaration of the member list is '
+          'valid.',
       uniqueName: 'invalid_member_list_getters_in_member_list',
+    ),
+  ),
+
+  /// Something listed in the member list is not a member of the class.
+  nonMemberInGettersInMemberList(
+    RuleCode(
+      'getters_in_member_list',
+      'This is not a member of the class that should be included in the member '
+          'list.',
+      correctionMessage: 'Remove this from the member list.',
+      description:
+          'A lint rule that ensures everything listed in the member list is a '
+          'valid expected member of the class.',
+      uniqueName: 'non_member_in_getters_in_member_list',
     ),
   )
   ;
