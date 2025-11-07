@@ -32,8 +32,10 @@ mixin RulesPluginIntegration {
   }
 
   /// Returns the list of registered rules.
-  List<Rule> get rules {
-    final rules = <Rule>[];
+  Set<Rule> get rules {
+    final rules = <Rule>{};
+    // Single instance to satisfy exhaustive switch requirement.
+    var gettersInMemberListRule = GettersInMemberListRule();
     for (final rule in EssentialLintRules.values) {
       rules.add(switch (rule) {
         .alphabetizeArguments => AlphabetizeArgumentsRule(),
@@ -41,7 +43,11 @@ mixin RulesPluginIntegration {
         .preferExplicitlyNamedParameter => PreferExplicitlyNamedParameterRule(),
         .preferFirst => PreferFirstRule(),
         .preferLast => PreferLastRule(),
-        .gettersInMemberList => GettersInMemberListRule(),
+        .gettersInMemberList ||
+        .missingInstanceGettersInMemberList ||
+        .notClassGettersInMemberList ||
+        .emptyMemberListNameGettersInMemberList ||
+        .invalidMemberListGettersInMemberList => gettersInMemberListRule,
       });
     }
     return rules;

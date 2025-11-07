@@ -9,7 +9,7 @@ class GettersInMemberList {
     required this.memberListName,
     this.getters = true,
     this.fields = true,
-    this.types = const <Type>[],
+    this.types = const <TypeHolder<Object?>>[],
   });
 
   /// The name of the member list to check.
@@ -18,11 +18,28 @@ class GettersInMemberList {
   /// The types of members to check.
   ///
   /// If empty, all types are checked.
-  final List<Type> types;
+  final List<TypeHolder<Object?>> types;
 
   /// Whether to check for getters.
   final bool getters;
 
   /// Whether to check for fields.
   final bool fields;
+}
+
+/// A type alias for [TypeHolder].
+///
+/// This is to simplify the syntax when creating instances of [TypeHolder].
+// ignore: camel_case_types
+typedef th<T> = TypeHolder<T>;
+
+/// {@template type_holder}
+/// A type holder to be used in [GettersInMemberList.types].
+///
+/// We suggest using the type alias [th] to create instances of this class. This
+/// way you have less characters to write.
+/// {@endtemplate}
+class TypeHolder<T> {
+  /// {@macro type_holder}
+  const TypeHolder();
 }

@@ -75,11 +75,70 @@ enum EssentialLintRules {
   gettersInMemberList(
     RuleCode(
       'getters_in_member_list',
-      'Getters/fields should be included in member lists.',
-      correctionMessage: 'Include the getter/field in the member list.',
+      'All {0} should be included in member lists.',
+      correctionMessage: 'Include the missing member(s) {1}',
       description:
           'A lint rule that ensures getters/fields are included in the member '
           'list.',
+    ),
+  ),
+
+  /// An instance member list is missing to include getters/fields.
+  missingInstanceGettersInMemberList(
+    RuleCode(
+      'getters_in_member_list',
+      'The class needs an instance member called {0} to list the members.',
+      correctionMessage:
+          'Include the missing member {1} or turn the static member into an '
+          'instance member.',
+      description:
+          'A lint rule that ensures getters/fields list instance member is '
+          'declared.',
+      uniqueName: 'missing_instance_getters_in_member_list',
+    ),
+  ),
+
+  /// Invalid use of the GettersInMemberList annotation.
+  notClassGettersInMemberList(
+    RuleCode(
+      'getters_in_member_list',
+      'The annotation @GettersInMemberList can only be applied to classes.',
+      correctionMessage:
+          'Remove the @GettersInMemberList annotation from '
+          'this declaration or convert it into a class.',
+      description:
+          'A lint rule that ensures the @GettersInMemberList annotation is '
+          'only applied to classes.',
+      uniqueName: 'not_class_getters_in_member_list',
+    ),
+  ),
+
+  /// Empty member list name in GettersInMemberList annotation.
+  emptyMemberListNameGettersInMemberList(
+    RuleCode(
+      'getters_in_member_list',
+      'The name of the member list in @GettersInMemberList cannot be empty.',
+      correctionMessage:
+          'Provide a valid member list name in the '
+          '@GettersInMemberList annotation.',
+      description:
+          'A lint rule that ensures the name of the member list in the '
+          '@GettersInMemberList annotation is not empty.',
+      uniqueName: 'empty_member_list_name_getters_in_member_list',
+    ),
+  ),
+
+  /// Invalid member list for GettersInMemberList annotation.
+  invalidMemberListGettersInMemberList(
+    RuleCode(
+      'getters_in_member_list',
+      'The declaration of {0} must be a getter or a single field that '
+          'returns a literal list containing the members.',
+      correctionMessage:
+          'Modify the declaration of {0} to be a getter or a single field '
+          'that returns a literal list of the members.',
+      description: 'A lint rule that ensures the declaration of {0} is valid.',
+      uniqueName: 'invalid_member_list_getters_in_member_list',
     ),
   )
   ;
