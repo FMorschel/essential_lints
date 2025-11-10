@@ -8,13 +8,15 @@ class EssentialLintsPlugin extends Plugin
     with
         RulesPluginIntegration,
         FixesPluginIntegration,
-        AssistsPluginIntegration {
+        AssistsPluginIntegration,
+        WarningsPluginIntegration {
   @override
   String get name => 'essential_lints';
 
   @override
   void register(PluginRegistry registry) {
     registerRules(registry);
+    registerWarnings(registry);
     registerFixes(registry);
     registerAssists(registry);
   }

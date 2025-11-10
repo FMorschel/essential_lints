@@ -15,7 +15,7 @@ workspace:
   - essential_lints_annotations
 
 dev_dependencies:
-  analyzer_testing: ^0.1.4
+  analyzer_testing: ^0.1.5
   test: ^1.26.3
   test_reflective_loader: ^0.4.0
   very_good_analysis: ^10.0.0

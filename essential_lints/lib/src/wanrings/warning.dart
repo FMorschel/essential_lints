@@ -9,21 +9,21 @@ import 'package:analyzer/error/error.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:meta/meta.dart';
 
-import 'essential_lint_rules.dart';
+import 'essential_lint_warnings.dart';
 
 /// {@template rule}
 /// The base class for all essential lint rules.
 /// {@endtemplate}
-abstract class Rule extends AnalysisRule {
+abstract class WarningRule<T extends SubWarnings> extends AnalysisRule {
   /// {@macro rule}
-  Rule(this.rule)
+  WarningRule(this.rule)
     : super(
         name: rule.code.name,
         description: rule.code.description,
       );
 
   /// The essential lint rule associated with this analysis rule.
-  final EssentialLintRules rule;
+  final EssentialLintWarnings<T> rule;
 
   late DiagnosticReporter _reporter;
 
@@ -48,7 +48,7 @@ abstract class Rule extends AnalysisRule {
     AstNode? node, {
     List<Object> arguments = const [],
     List<DiagnosticMessage>? contextMessages,
-    EssentialLintRules? diagnosticCode,
+    T? diagnosticCode,
   }) {
     if (diagnosticCode == null) {
       return super.reportAtNode(
@@ -74,7 +74,7 @@ abstract class Rule extends AnalysisRule {
     int length, {
     List<Object> arguments = const [],
     List<DiagnosticMessage>? contextMessages,
-    EssentialLintRules? diagnosticCode,
+    T? diagnosticCode,
   }) {
     _reporter.atOffset(
       offset: offset,
@@ -90,7 +90,7 @@ abstract class Rule extends AnalysisRule {
     PubspecNode node, {
     List<Object> arguments = const [],
     List<DiagnosticMessage> contextMessages = const [],
-    EssentialLintRules? diagnosticCode,
+    T? diagnosticCode,
   }) {
     if (diagnosticCode == null) {
       return super.reportAtPubNode(
@@ -112,7 +112,7 @@ abstract class Rule extends AnalysisRule {
     Token token, {
     List<Object> arguments = const [],
     List<DiagnosticMessage>? contextMessages,
-    EssentialLintRules? diagnosticCode,
+    T? diagnosticCode,
   }) {
     if (diagnosticCode == null) {
       return super.reportAtToken(

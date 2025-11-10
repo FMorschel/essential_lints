@@ -34,31 +34,6 @@ abstract class BaseEditTestProcessor extends AnalysisRuleTest
         AssistsPluginIntegration {
   static final channel = _FakeChannel();
 
-  // ignore: library_private_types_in_public_api, only used internally.
-  _TestInstrumentationService get instrumentationService => .new();
-  Folder get byteStoreRoot => getFolder('/byteStore');
-  Folder get sdkRoot => getFolder('/sdk');
-  dart_change_workspace.DartChangeWorkspace get workspace => .new([
-    sessionFor(testUnit.path),
-  ]);
-
-  @override
-  Future<void> setUp() async {
-    rules.forEach(registry.Registry.ruleRegistry.registerLintRule);
-    fix_generators.registeredFixGenerators.lintProducers.addAll(fixes);
-    assist_generators.registeredAssistGenerators.producerGenerators.addAll(
-      assists,
-    );
-    super.setUp();
-  }
-
-  @override
-  Future<void> tearDown() async {
-    await analysisContextCollection?.dispose();
-    analysisContextCollection = null;
-    await super.tearDown();
-  }
-
   late String code;
   late ResolvedUnitResult testUnit;
   late ResolvedLibraryResult? testLibrary;
@@ -69,14 +44,14 @@ abstract class BaseEditTestProcessor extends AnalysisRuleTest
   analysis_context_collection.AnalysisContextCollectionImpl?
   analysisContextCollection;
 
-  Future<void> resolveTestCode(String code) async {
-    testCode = test_code_format.TestCode.parseNormalized(code);
-    this.code = testCode.code;
-    testFile.writeAsStringSync(testCode.code);
-    testUnit = await resolveFile(testFile.path);
-    testLibrary = await resolveLibrary(testFile.path);
-  }
+  Folder get byteStoreRoot => getFolder('/byteStore');
 
+  // ignore: library_private_types_in_public_api, only used internally.
+  _TestInstrumentationService get instrumentationService => .new();
+  Folder get sdkRoot => getFolder('/sdk');
+  dart_change_workspace.DartChangeWorkspace get workspace => .new([
+    sessionFor(testUnit.path),
+  ]);
   void matchesExpected(
     String expected, {
     SourceChange? change,
@@ -103,6 +78,50 @@ abstract class BaseEditTestProcessor extends AnalysisRuleTest
       test_code_format.TestCode.parseNormalized(expected).code,
     );
   }
+
+  Future<void> resolveTestCode(String code) async {
+    testCode = test_code_format.TestCode.parseNormalized(code);
+    this.code = testCode.code;
+    testFile.writeAsStringSync(testCode.code);
+    testUnit = await resolveFile(testFile.path);
+    testLibrary = await resolveLibrary(testFile.path);
+  }
+
+  @override
+  Future<void> setUp() async {
+    rules.forEach(registry.Registry.ruleRegistry.registerLintRule);
+    fix_generators.registeredFixGenerators.lintProducers.addAll(lintFixes);
+    assist_generators.registeredAssistGenerators.producerGenerators.addAll(
+      assists,
+    );
+    super.setUp();
+  }
+
+  @override
+  Future<void> tearDown() async {
+    await analysisContextCollection?.dispose();
+    analysisContextCollection = null;
+    await super.tearDown();
+  }
+}
+
+class _FakeChannel implements PluginCommunicationChannel {
+  @override
+  void close() {}
+
+  @override
+  void listen(
+    void Function(Request request)? onRequest, {
+    void Function()? onDone,
+    Function? onError,
+    Function? onNotification,
+  }) {}
+
+  @override
+  void sendNotification(Notification notification) {}
+
+  @override
+  void sendResponse(Response response) {}
 }
 
 mixin _PrivateMixin on AnalysisRuleTest {
@@ -124,11 +143,6 @@ mixin _PrivateMixin on AnalysisRuleTest {
 
   List<String> get _collectionIncludedPaths => [workspaceRootPath];
 
-  AnalysisSession sessionFor(String path) {
-    var analysisContext = _contextFor(path);
-    return analysisContext.currentSession;
-  }
-
   /// Resolves a Dart source file at [path].
   ///
   /// [path] must be converted for this file system.
@@ -138,6 +152,11 @@ mixin _PrivateMixin on AnalysisRuleTest {
     return (await session.getResolvedLibrary(
       path,
     )).ifTypeOrNull<ResolvedLibraryResult>();
+  }
+
+  AnalysisSession sessionFor(String path) {
+    var analysisContext = _contextFor(path);
+    return analysisContext.currentSession;
   }
 
   driver_based_analysis_context.DriverBasedAnalysisContext _contextFor(
@@ -167,55 +186,11 @@ mixin _PrivateMixin on AnalysisRuleTest {
   }
 }
 
-class _FakeChannel implements PluginCommunicationChannel {
-  @override
-  void close() {}
-
-  @override
-  void listen(
-    void Function(Request request)? onRequest, {
-    void Function()? onDone,
-    Function? onError,
-    Function? onNotification,
-  }) {}
-
-  @override
-  void sendNotification(Notification notification) {}
-
-  @override
-  void sendResponse(Response response) {}
-}
-
-extension on SomeResolvedLibraryResult {
-  T? ifTypeOrNull<T extends SomeResolvedLibraryResult>() {
-    if (this is T) {
-      return this as T;
-    }
-    return null;
-  }
-}
-
-class _TestInstrumentationService implements InstrumentationService {
-  @override
-  void logException(
-    Object exception, [
-    StackTrace? stackTrace,
-    List<InstrumentationServiceAttachment>? attachments,
-  ]) {
-    throw StateError('$exception\n\n$stackTrace');
-  }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) {
-    return super.noSuchMethod(invocation);
-  }
-}
-
 mixin _SelectionMixin on AnalysisRuleTest {
-  test_code_format.TestCode get testCode;
-
   late int offset;
+
   late int length;
+  test_code_format.TestCode get testCode;
 
   void setPosition(int index) {
     if (index < 0 || index >= testCode.positions.length) {
@@ -245,5 +220,30 @@ mixin _SelectionMixin on AnalysisRuleTest {
     var range = testCode.ranges[index].sourceRange;
     offset = range.offset;
     length = range.length;
+  }
+}
+
+class _TestInstrumentationService implements InstrumentationService {
+  @override
+  void logException(
+    Object exception, [
+    StackTrace? stackTrace,
+    List<InstrumentationServiceAttachment>? attachments,
+  ]) {
+    throw StateError('$exception\n\n$stackTrace');
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) {
+    return super.noSuchMethod(invocation);
+  }
+}
+
+extension on SomeResolvedLibraryResult {
+  T? ifTypeOrNull<T extends SomeResolvedLibraryResult>() {
+    if (this is T) {
+      return this as T;
+    }
+    return null;
   }
 }

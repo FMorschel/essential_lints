@@ -8,12 +8,13 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
 
 import '../utils/extensions/list.dart';
-import 'rule.dart';
+import 'essential_lint_warnings.dart';
+import 'warning.dart';
 
 /// {@template getters_in_member_list_rule}
 /// A lint rule that ensures getters/fields are included in member lists.
 /// {@endtemplate}
-class GettersInMemberListRule extends Rule {
+class GettersInMemberListRule extends WarningRule<GettersInMemberListWarnings> {
   /// {@macro getters_in_member_list_rule}
   GettersInMemberListRule() : super(.gettersInMemberList);
 
@@ -35,10 +36,12 @@ class _GettersInMemberListAnnotation {
     required this.getters,
     required this.fields,
     required this.types,
+    required this.superTypes,
   });
 
   final String memberListName;
   final List<DartType> types;
+  final List<DartType> superTypes;
   final bool getters;
   final bool fields;
 
@@ -242,7 +245,14 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
       if (!annotation.getters && element.variable.isSynthetic ||
           !annotation.fields && !element.variable.isSynthetic ||
           annotation.types.isNotEmpty &&
-              !annotation.types.contains(element.returnType)) {
+              !annotation.types.contains(element.returnType) ||
+          annotation.superTypes.isNotEmpty &&
+              annotation.superTypes.none(
+                (type) => context.typeSystem.isSubtypeOf(
+                  element.returnType,
+                  type,
+                ),
+              )) {
         return false;
       }
       return true;
@@ -289,6 +299,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
     var getters = true;
     var fields = true;
     var types = <DartType>[];
+    var superTypes = <DartType>[];
     for (final element in argumentList.arguments) {
       if (element is NamedExpression) {
         var name = element.name.label.name;
@@ -318,6 +329,18 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
               types.add(singleType);
             }
           }
+        } else if (name == 'superTypes' && expression is ListLiteral) {
+          for (final identifier in expression.elements) {
+            if (identifier case InstanceCreationExpression(
+              constructorName: ConstructorName(
+                type: NamedType(
+                  typeArguments: TypeArgumentList(:var singleType?),
+                ),
+              ),
+            )) {
+              superTypes.add(singleType);
+            }
+          }
         }
       }
     }
@@ -326,11 +349,12 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
       getters: getters,
       fields: fields,
       types: types,
+      superTypes: superTypes,
     );
   }
 }
 
-extension on (Rule, GetterElement) {
+extension on (WarningRule, GetterElement) {
   bool whereMatches(ClassMember member) {
     if (member case MethodDeclaration(
       declaredFragment: Fragment(:var element),

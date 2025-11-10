@@ -27,3 +27,19 @@ enum EssentialLintFixes {
   /// The fix kind associated with this lint fix.
   final FixKind fixKind;
 }
+
+enum EssentialLintWarningFixes {
+  addsMissing(
+    FixKind(
+      'dart.fix.addsMissing',
+      DartFixKindPriority.standard,
+      'Add missing member',
+    ),
+  ),
+  ;
+
+  const EssentialLintWarningFixes(this.fixKind);
+
+  /// The fix kind associated with this lint fix.
+  final FixKind fixKind;
+}

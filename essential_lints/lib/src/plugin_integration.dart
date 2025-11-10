@@ -14,11 +14,13 @@ import 'fixes/fix.dart';
 import 'rules/alphabetize_arguments.dart';
 import 'rules/double_literal_format.dart';
 import 'rules/essential_lint_rules.dart';
-import 'rules/getters_in_member_list.dart';
 import 'rules/prefer_explicitly_named_parameters.dart';
 import 'rules/prefer_first.dart';
 import 'rules/prefer_last.dart';
 import 'rules/rule.dart';
+import 'wanrings/essential_lint_warnings.dart';
+import 'wanrings/getters_in_member_list.dart';
+import 'wanrings/warning.dart';
 
 /// A typedef for the base fix constructor.
 typedef FixGenerator =
@@ -47,8 +49,8 @@ mixin AssistsPluginIntegration {
 
 /// Mixin to integrate plugin fixes.
 mixin FixesPluginIntegration {
-  /// Returns the list of registered fixes.
-  Map<LintCode, List<FixGenerator>> get fixes {
+  /// Returns the list of registered lint fixes.
+  Map<LintCode, List<FixGenerator>> get lintFixes {
     final fixes = <LintCode, List<FixGenerator>>{};
 
     void addFixTo(FixGenerator generator, List<EssentialLintRules> rules) {
@@ -70,11 +72,34 @@ mixin FixesPluginIntegration {
     return fixes;
   }
 
+  /// Returns the list of registered lint fixes.
+  Map<DiagnosticCode, List<FixGenerator>> get warningFixes {
+    final fixes = <DiagnosticCode, List<FixGenerator>>{};
+
+    void addFixTo(FixGenerator generator, List<EssentialLintWarnings> rules) {
+      for (final rule in rules) {
+        fixes.putIfAbsent(rule.code, () => []).add(generator);
+      }
+    }
+
+    for (final fix in EssentialLintWarningFixes.values) {
+      // var _ = switch (fix) {
+
+      // };
+    }
+    return fixes;
+  }
+
   /// Registers all fixes with the given registry.
   void registerFixes(PluginRegistry registry) {
-    fixes.forEach((lintCode, generators) {
+    lintFixes.forEach((diagnosticCode, generators) {
       for (final generator in generators) {
-        registry.registerFixForRule(lintCode, generator);
+        registry.registerFixForRule(diagnosticCode, generator);
+      }
+    });
+    warningFixes.forEach((diagnosticCode, generators) {
+      for (final generator in generators) {
+        registry.registerFixForRule(diagnosticCode, generator);
       }
     });
   }
@@ -85,8 +110,6 @@ mixin RulesPluginIntegration {
   /// Returns the list of registered rules.
   Set<Rule> get rules {
     final rules = <Rule>{};
-    // Single instance to satisfy exhaustive switch requirement.
-    var gettersInMemberListRule = GettersInMemberListRule();
     for (final rule in EssentialLintRules.values) {
       rules.add(switch (rule) {
         .alphabetizeArguments => AlphabetizeArgumentsRule(),
@@ -94,12 +117,6 @@ mixin RulesPluginIntegration {
         .preferExplicitlyNamedParameter => PreferExplicitlyNamedParameterRule(),
         .preferFirst => PreferFirstRule(),
         .preferLast => PreferLastRule(),
-        .gettersInMemberList ||
-        .missingInstanceGettersInMemberList ||
-        .notClassGettersInMemberList ||
-        .emptyMemberListNameGettersInMemberList ||
-        .invalidMemberListGettersInMemberList ||
-        .nonMemberInGettersInMemberList => gettersInMemberListRule,
       });
     }
     return rules;
@@ -108,5 +125,25 @@ mixin RulesPluginIntegration {
   /// Registers all lint rules with the given registry.
   void registerRules(PluginRegistry registry) {
     rules.forEach(registry.registerLintRule);
+  }
+}
+
+/// Mixin to integrate plugin rules.
+mixin WarningsPluginIntegration {
+  /// Returns the list of registered warnings.
+  Set<WarningRule> get warnings {
+    final rules = <WarningRule>{};
+    // Single instance to satisfy exhaustive switch requirement.
+    for (final rule in EssentialLintWarnings.values) {
+      rules.add(switch (rule) {
+        .gettersInMemberList => GettersInMemberListRule(),
+      });
+    }
+    return rules;
+  }
+
+  /// Registers all lint rules with the given registry.
+  void registerWarnings(PluginRegistry registry) {
+    warnings.forEach(registry.registerWarningRule);
   }
 }

@@ -1,5 +1,11 @@
 // ignore_for_file: annotation members don't need to be public
 
+/// A type alias for [TypeHolder].
+///
+/// This is to simplify the syntax when creating instances of [TypeHolder].
+// ignore: camel_case_types
+typedef th<T> = TypeHolder<T>;
+
 /// {@template getters_in_member_list}
 /// Annotations for the `getters-in-member-list` lint rule.
 /// {@endtemplate}
@@ -10,6 +16,7 @@ class GettersInMemberList {
     this.getters = true,
     this.fields = true,
     this.types = const <TypeHolder<Object?>>[],
+    this.superTypes = const <TypeHolder<Object?>>[],
   });
 
   /// The name of the member list to check.
@@ -20,18 +27,17 @@ class GettersInMemberList {
   /// If empty, all types are checked.
   final List<TypeHolder<Object?>> types;
 
+  /// The super types of members to check.
+  ///
+  /// If empty, all types are checked.
+  final List<TypeHolder<Object?>> superTypes;
+
   /// Whether to check for getters.
   final bool getters;
 
   /// Whether to check for fields.
   final bool fields;
 }
-
-/// A type alias for [TypeHolder].
-///
-/// This is to simplify the syntax when creating instances of [TypeHolder].
-// ignore: camel_case_types
-typedef th<T> = TypeHolder<T>;
 
 /// {@template type_holder}
 /// A type holder to be used in [GettersInMemberList.types].
