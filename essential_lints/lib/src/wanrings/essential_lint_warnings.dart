@@ -19,7 +19,6 @@ enum EssentialLintWarnings<T extends SubWarnings> implements EnumDiagnostic {
       description:
           'A lint rule that ensures getters/fields are included in the member '
           'list.',
-      severity: .WARNING,
     ),
   )
   ;
@@ -148,9 +147,9 @@ class WarningCode extends DiagnosticCode {
     required super.correctionMessage,
     required this.description,
     super.hasPublishedDocs,
-    this.severity = DiagnosticSeverity.INFO,
+    this.severity = .WARNING,
     String? uniqueName,
-    this.type = DiagnosticType.STATIC_WARNING,
+    this.type = .STATIC_WARNING,
   }) : super(
          uniqueName: uniqueName ?? name,
          isUnresolvedIdentifier: false,

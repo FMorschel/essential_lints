@@ -12,7 +12,7 @@ void main() {
 }
 
 @reflectiveTest
-class DoubleLiteralFormatTest extends FixTestProcessor {
+class DoubleLiteralFormatTest extends LintFixTestProcessor {
   @override
   EssentialLintFixes get fix => .doubleLiteralFormat;
 

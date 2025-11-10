@@ -8,15 +8,15 @@ import '../src/fix_test_processor.dart';
 
 void main() {
   defineReflectiveSuite(() {
-    defineReflectiveTests(AddMissingMembersTest);
+    defineReflectiveTests(RemoveExpressionTest);
   });
 }
 
 @reflectiveTest
-class AddMissingMembersTest extends WarningFixTestProcessor
+class RemoveExpressionTest extends WarningFixTestProcessor
     with AnnotationsDependencyMixin {
   @override
-  EssentialLintWarningFixes get fix => .addMissingMembers;
+  EssentialLintWarningFixes get fix => .removeExpression;
 
   @override
   WarningRule get rule => GettersInMemberListRule();
@@ -27,7 +27,7 @@ class AddMissingMembersTest extends WarningFixTestProcessor
     addAnnotationsDependency();
   }
 
-  Future<void> test_addsMissingGetters_field() async {
+  Future<void> test_removeExpression_first() async {
     await resolveTestCode('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
@@ -36,32 +36,7 @@ class A {
   A(this.value);
   final int value;
 
-  List<Object?> members = [], other = [];
-}
-''');
-    await assertHasFix('''
-import 'package:essential_lints_annotations/essential_lints_annotations.dart';
-
-@GettersInMemberList(memberListName: 'members')
-class A {
-  A(this.value);
-  final int value;
-
-  List<Object?> members = [value, other], other = [];
-}
-''');
-  }
-
-  Future<void> test_addsMissingGetters_single() async {
-    await resolveTestCode('''
-import 'package:essential_lints_annotations/essential_lints_annotations.dart';
-
-@GettersInMemberList(memberListName: 'members')
-class A {
-  A(this.value);
-  final int value;
-
-  List<Object?> get members => [];
+  List<Object?> get members => [0, value];
 }
 ''');
     await assertHasFix('''
@@ -77,7 +52,63 @@ class A {
 ''');
   }
 
-  Future<void> test_addsMissingGetters_two() async {
+  Future<void> test_removeExpression_last() async {
+    await resolveTestCode('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: 'members')
+class A {
+  A(this.value);
+  final int value;
+
+  List<Object?> get members => [value, 0];
+}
+''');
+    await assertHasFix('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: 'members')
+class A {
+  A(this.value);
+  final int value;
+
+  List<Object?> get members => [value];
+}
+''');
+  }
+
+  Future<void> test_removeExpression_nullable() async {
+    await resolveTestCode('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+int? get nullableInt => null;
+
+@GettersInMemberList(memberListName: 'members')
+class A {
+  A(this.value, this.value2);
+  final int value;
+  final int value2;
+
+  List<Object?> get members => [value, ?nullableInt, value2];
+}
+''');
+    await assertHasFix('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+int? get nullableInt => null;
+
+@GettersInMemberList(memberListName: 'members')
+class A {
+  A(this.value, this.value2);
+  final int value;
+  final int value2;
+
+  List<Object?> get members => [value, value2];
+}
+''');
+  }
+
+  Future<void> test_removeExpression_second() async {
     await resolveTestCode('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
@@ -87,7 +118,7 @@ class A {
   final int value;
   final int value2;
 
-  List<Object?> get members => [];
+  List<Object?> get members => [value, 0, value2];
 }
 ''');
     await assertHasFix('''

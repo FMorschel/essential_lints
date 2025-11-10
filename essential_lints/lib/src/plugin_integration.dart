@@ -12,6 +12,7 @@ import 'fixes/alphabetize_arguments.dart';
 import 'fixes/double_literal_format.dart';
 import 'fixes/essential_lint_fixes.dart';
 import 'fixes/fix.dart';
+import 'fixes/remove_expression.dart';
 import 'rules/alphabetize_arguments.dart';
 import 'rules/double_literal_format.dart';
 import 'rules/essential_lint_rules.dart';
@@ -87,6 +88,9 @@ mixin FixesPluginIntegration {
       var _ = switch (fix) {
         .addMissingMembers => addFixTo(AddMissingMembersFix.new, [
           EssentialLintWarnings.gettersInMemberList,
+        ]),
+        .removeExpression => addFixTo(RemoveExpressionFix.new, [
+          GettersInMemberListWarnings.nonMemberInGettersInMemberList,
         ]),
       };
     }

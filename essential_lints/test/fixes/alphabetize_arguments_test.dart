@@ -12,7 +12,7 @@ void main() {
 }
 
 @reflectiveTest
-class AlphabetizeArgumentsTest extends FixTestProcessor {
+class AlphabetizeArgumentsTest extends LintFixTestProcessor {
   @override
   EssentialLintFixes get fix => .alphabetizeArguments;
 

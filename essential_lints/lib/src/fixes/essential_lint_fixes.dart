@@ -47,6 +47,15 @@ enum EssentialLintWarningFixes implements EnumFix {
       'Add missing members',
     ),
   ),
+
+  /// Fix to remove an expression from the code.
+  removeExpression(
+    FixKind(
+      'dart.fix.remove.expression',
+      DartFixKindPriority.standard,
+      'Remove expression',
+    ),
+  )
   ;
 
   const EssentialLintWarningFixes(this.fixKind);

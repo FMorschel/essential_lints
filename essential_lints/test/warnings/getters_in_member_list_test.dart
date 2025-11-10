@@ -289,6 +289,55 @@ class A {
     );
   }
 
+  Future<void> test_findsAnnotation_nomMember() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: 'members')
+class A {
+  A(this.value);
+  final int value;
+
+  List<Object?> get members => [value, 0];
+}
+''',
+      [
+        error(
+          GettersInMemberListWarnings.nonMemberInGettersInMemberList.code,
+          214,
+          1,
+        ),
+      ],
+    );
+  }
+
+  Future<void> test_findsAnnotation_nomMember_nullable() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+int? get nullableInt => null;
+
+@GettersInMemberList(memberListName: 'members')
+class A {
+  A(this.value, this.value2);
+  final int value;
+  final int value2;
+
+  List<Object?> get members => [value, ?nullableInt, value2];
+}
+''',
+      [
+        error(
+          GettersInMemberListWarnings.nonMemberInGettersInMemberList.code,
+          278,
+          12,
+        ),
+      ],
+    );
+  }
+
   Future<void> test_findsAnnotation_notClass() async {
     await assertDiagnostics(
       '''
