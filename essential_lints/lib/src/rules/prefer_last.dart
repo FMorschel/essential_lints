@@ -13,7 +13,7 @@ import 'rule.dart';
 /// A rule that suggests using `last` property instead of accessing
 /// the last element of a list-like object using length - 1 index.
 /// {@endtemplate}
-class PreferLastRule extends Rule {
+class PreferLastRule extends LintRule {
   /// {@macro prefer_last}
   PreferLastRule() : super(.preferLast);
 
@@ -35,40 +35,6 @@ class _PreferLastVisitor extends SimpleAstVisitor<void> {
   final PreferLastRule rule;
 
   final RuleContext context;
-
-  @override
-  void visitMethodInvocation(MethodInvocation node) {
-    var target = node.target;
-    if (target is! SimpleIdentifier) {
-      super.visitMethodInvocation(node);
-      return;
-    }
-    var targetElement = target.element;
-    var targetTypeElement = target.staticType?.element;
-    if (targetTypeElement == null || targetElement == null) {
-      super.visitMethodInvocation(node);
-      return;
-    }
-    if (_elementDoesntContainLast(targetTypeElement)) {
-      super.visitMethodInvocation(node);
-      return;
-    }
-    if (!_methodIsIterableElementAt(node)) {
-      super.visitMethodInvocation(node);
-      return;
-    }
-    var expression = node.argumentList.arguments.first;
-    var offset = node.methodName.offset;
-    var endOffset = node.methodName.end;
-    _reportWhenLengthMinusOne(
-      expression,
-      targetElement,
-      targetTypeElement,
-      offset,
-      endOffset,
-    );
-    super.visitMethodInvocation(node);
-  }
 
   @override
   void visitIndexExpression(IndexExpression node) {
@@ -107,11 +73,67 @@ class _PreferLastVisitor extends SimpleAstVisitor<void> {
     super.visitIndexExpression(node);
   }
 
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    var target = node.target;
+    if (target is! SimpleIdentifier) {
+      super.visitMethodInvocation(node);
+      return;
+    }
+    var targetElement = target.element;
+    var targetTypeElement = target.staticType?.element;
+    if (targetTypeElement == null || targetElement == null) {
+      super.visitMethodInvocation(node);
+      return;
+    }
+    if (_elementDoesntContainLast(targetTypeElement)) {
+      super.visitMethodInvocation(node);
+      return;
+    }
+    if (!_methodIsIterableElementAt(node)) {
+      super.visitMethodInvocation(node);
+      return;
+    }
+    var expression = node.argumentList.arguments.first;
+    var offset = node.methodName.offset;
+    var endOffset = node.methodName.end;
+    _reportWhenLengthMinusOne(
+      expression,
+      targetElement,
+      targetTypeElement,
+      offset,
+      endOffset,
+    );
+    super.visitMethodInvocation(node);
+  }
+
   bool _elementDoesntContainLast(Element element) {
     return element is! InterfaceElement ||
         !element.interfaceMembers.entries
             .map((entry) => entry.key.name)
             .contains('last');
+  }
+
+  bool _methodIsIterableElementAt(MethodInvocation node) {
+    var element = node.methodName.element;
+    if (element == null) {
+      return false;
+    }
+    var typeElement = element.enclosingElement;
+    if (typeElement is! InterfaceElement) {
+      return false;
+    }
+    var isIterable = context.typeSystem.isAssignableTo(
+      typeElement.thisType,
+      context.typeProvider.iterableDynamicType,
+    );
+    if (!isIterable) {
+      return false;
+    }
+    if (node.methodName.name != 'elementAt') {
+      return false;
+    }
+    return true;
   }
 
   void _reportWhenLengthMinusOne(
@@ -144,27 +166,5 @@ class _PreferLastVisitor extends SimpleAstVisitor<void> {
           rule.reportAtOffset(offset, endOffset - offset);
       }
     }
-  }
-
-  bool _methodIsIterableElementAt(MethodInvocation node) {
-    var element = node.methodName.element;
-    if (element == null) {
-      return false;
-    }
-    var typeElement = element.enclosingElement;
-    if (typeElement is! InterfaceElement) {
-      return false;
-    }
-    var isIterable = context.typeSystem.isAssignableTo(
-      typeElement.thisType,
-      context.typeProvider.iterableDynamicType,
-    );
-    if (!isIterable) {
-      return false;
-    }
-    if (node.methodName.name != 'elementAt') {
-      return false;
-    }
-    return true;
   }
 }

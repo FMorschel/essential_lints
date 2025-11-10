@@ -10,7 +10,7 @@ import 'fix.dart';
 /// {@template double_literal_format}
 /// A fix that formats double literals to adhere to a consistent style.
 /// {@endtemplate}
-class DoubleLiteralFormatFix extends Fix {
+class DoubleLiteralFormatFix extends LintFix {
   /// {@macro double_literal_format}
   DoubleLiteralFormatFix({required super.context});
 

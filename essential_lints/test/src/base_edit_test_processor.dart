@@ -31,7 +31,8 @@ abstract class BaseEditTestProcessor extends AnalysisRuleTest
         _SelectionMixin,
         RulesPluginIntegration,
         FixesPluginIntegration,
-        AssistsPluginIntegration {
+        AssistsPluginIntegration,
+        WarningsPluginIntegration {
   static final channel = _FakeChannel();
 
   late String code;
@@ -90,7 +91,11 @@ abstract class BaseEditTestProcessor extends AnalysisRuleTest
   @override
   Future<void> setUp() async {
     rules.forEach(registry.Registry.ruleRegistry.registerLintRule);
+    warnings.forEach(registry.Registry.ruleRegistry.registerWarningRule);
     fix_generators.registeredFixGenerators.lintProducers.addAll(lintFixes);
+    fix_generators.registeredFixGenerators.nonLintProducers.addAll(
+      warningFixes,
+    );
     assist_generators.registeredAssistGenerators.producerGenerators.addAll(
       assists,
     );

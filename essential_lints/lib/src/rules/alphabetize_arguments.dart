@@ -8,7 +8,7 @@ import 'rule.dart';
 /// {@template alphabetize_arguments}
 /// A lint rule that enforces alphabetical ordering of function arguments.
 /// {@endtemplate}
-class AlphabetizeArgumentsRule extends Rule {
+class AlphabetizeArgumentsRule extends LintRule {
   /// {@macro alphabetize_arguments}
   AlphabetizeArgumentsRule() : super(.alphabetizeArguments);
 

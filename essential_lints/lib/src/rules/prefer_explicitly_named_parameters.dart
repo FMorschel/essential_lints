@@ -9,7 +9,7 @@ import 'rule.dart';
 /// A lint rule that encourages the use of explicitly named parameters
 /// in function type declarations for improved code clarity and completion.
 /// {@endtemplate}
-class PreferExplicitlyNamedParameterRule extends Rule {
+class PreferExplicitlyNamedParameterRule extends LintRule {
   /// {@macro prefer_explicitly_named_parameters}
   PreferExplicitlyNamedParameterRule() : super(.preferExplicitlyNamedParameter);
 

@@ -17,7 +17,33 @@ class DoubleLiteralFormatTest extends FixTestProcessor {
   EssentialLintFixes get fix => .doubleLiteralFormat;
 
   @override
-  Rule get rule => DoubleLiteralFormatRule();
+  LintRule get rule => DoubleLiteralFormatRule();
+
+  Future<void> test_exponential_leadingZero() async {
+    await resolveTestCode('''
+void f() {
+  var _ = 1E01;
+}
+''');
+    await assertHasFix('''
+void f() {
+  var _ = 1E1;
+}
+''');
+  }
+
+  Future<void> test_exponential_leadingZeros() async {
+    await resolveTestCode('''
+void f() {
+  var _ = 0.0e+01;
+}
+''');
+    await assertHasFix('''
+void f() {
+  var _ = 0.0e+1;
+}
+''');
+  }
 
   Future<void> test_leadingZero_number() async {
     await resolveTestCode('''
@@ -28,6 +54,19 @@ void f() {
     await assertHasFix('''
 void f() {
   var _ = 1.2;
+}
+''');
+  }
+
+  Future<void> test_noLeadingZero() async {
+    await resolveTestCode('''
+void f() {
+  var _ = .0e+1;
+}
+''');
+    await assertHasFix('''
+void f() {
+  var _ = 0.0e+1;
 }
 ''');
   }
@@ -54,45 +93,6 @@ void f() {
     await assertHasFix('''
 void f() {
   var _ = 0.2e1;
-}
-''');
-  }
-
-  Future<void> test_exponential_leadingZeros() async {
-    await resolveTestCode('''
-void f() {
-  var _ = 0.0e+01;
-}
-''');
-    await assertHasFix('''
-void f() {
-  var _ = 0.0e+1;
-}
-''');
-  }
-
-  Future<void> test_noLeadingZero() async {
-    await resolveTestCode('''
-void f() {
-  var _ = .0e+1;
-}
-''');
-    await assertHasFix('''
-void f() {
-  var _ = 0.0e+1;
-}
-''');
-  }
-
-  Future<void> test_exponential_leadingZero() async {
-    await resolveTestCode('''
-void f() {
-  var _ = 1E01;
-}
-''');
-    await assertHasFix('''
-void f() {
-  var _ = 1E1;
 }
 ''');
   }

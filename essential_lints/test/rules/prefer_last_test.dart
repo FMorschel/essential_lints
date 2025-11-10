@@ -13,7 +13,7 @@ void main() {
 @reflectiveTest
 class PreferLastTest extends RuleTestProcessor {
   @override
-  Rule get rule => PreferLastRule();
+  LintRule get rule => PreferLastRule();
 
   Future<void> test_report() async {
     await assertDiagnostics(

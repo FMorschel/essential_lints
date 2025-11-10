@@ -13,7 +13,7 @@ void main() {
 @reflectiveTest
 class DoubleLiteralFormatTest extends RuleTestProcessor {
   @override
-  Rule get rule => DoubleLiteralFormatRule();
+  LintRule get rule => DoubleLiteralFormatRule();
 
   Future<void> test_leadingZero_number() async {
     await assertDiagnostics(

@@ -12,7 +12,7 @@ import 'rule.dart';
 /// A rule that suggests using the `first` property instead of accessing
 /// the first element of a list-like object using index 0.
 /// {@endtemplate}
-class PreferFirstRule extends Rule {
+class PreferFirstRule extends LintRule {
   /// {@macro prefer_first}
   PreferFirstRule() : super(.preferFirst);
 
@@ -34,34 +34,6 @@ class _PreferFirstVisitor extends SimpleAstVisitor<void> {
   final PreferFirstRule rule;
 
   final RuleContext context;
-
-  @override
-  void visitMethodInvocation(MethodInvocation node) {
-    var target = node.target;
-    if (target is! SimpleIdentifier) {
-      super.visitMethodInvocation(node);
-      return;
-    }
-    var targetElement = target.element;
-    var targetTypeElement = target.staticType?.element;
-    if (targetTypeElement == null || targetElement == null) {
-      super.visitMethodInvocation(node);
-      return;
-    }
-    if (_elementDoesntContainFirst(targetTypeElement)) {
-      super.visitMethodInvocation(node);
-      return;
-    }
-    if (!_methodIsIterableElementAt(node)) {
-      super.visitMethodInvocation(node);
-      return;
-    }
-    var expression = node.argumentList.arguments.first;
-    if (expression case IntegerLiteral(:var value) when value == 0) {
-      rule.reportAtNode(node.argumentList);
-    }
-    super.visitMethodInvocation(node);
-  }
 
   @override
   void visitIndexExpression(IndexExpression node) {
@@ -94,6 +66,34 @@ class _PreferFirstVisitor extends SimpleAstVisitor<void> {
       rule.reportAtOffset(offset, endOffset - offset);
     }
     super.visitIndexExpression(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    var target = node.target;
+    if (target is! SimpleIdentifier) {
+      super.visitMethodInvocation(node);
+      return;
+    }
+    var targetElement = target.element;
+    var targetTypeElement = target.staticType?.element;
+    if (targetTypeElement == null || targetElement == null) {
+      super.visitMethodInvocation(node);
+      return;
+    }
+    if (_elementDoesntContainFirst(targetTypeElement)) {
+      super.visitMethodInvocation(node);
+      return;
+    }
+    if (!_methodIsIterableElementAt(node)) {
+      super.visitMethodInvocation(node);
+      return;
+    }
+    var expression = node.argumentList.arguments.first;
+    if (expression case IntegerLiteral(:var value) when value == 0) {
+      rule.reportAtNode(node.argumentList);
+    }
+    super.visitMethodInvocation(node);
   }
 
   bool _elementDoesntContainFirst(Element element) {

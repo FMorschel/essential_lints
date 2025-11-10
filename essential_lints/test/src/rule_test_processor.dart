@@ -7,7 +7,7 @@ abstract class RuleTestProcessor extends AnalysisRuleTest {
   @override
   String get analysisRule => rule.rule.code.name;
 
-  Rule get rule;
+  LintRule get rule;
 
   @override
   void setUp() {

@@ -14,9 +14,9 @@ import 'essential_lint_rules.dart';
 /// {@template rule}
 /// The base class for all essential lint rules.
 /// {@endtemplate}
-abstract class Rule extends AnalysisRule {
+abstract class LintRule extends AnalysisRule {
   /// {@macro rule}
-  Rule(this.rule)
+  LintRule(this.rule)
     : super(
         name: rule.code.name,
         description: rule.code.description,

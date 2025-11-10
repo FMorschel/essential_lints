@@ -1,8 +1,16 @@
 import 'package:analysis_server_plugin/edit/dart/dart_fix_kind_priority.dart';
 import 'package:analyzer_plugin/utilities/fixes/fixes.dart';
 
+/// {@template enum_fix}
+/// A mixin for enums that provide a fix kind.
+/// {@endtemplate}
+abstract class EnumFix {
+  /// The fix kind associated with this lint fix.
+  FixKind get fixKind;
+}
+
 /// Enum representing essential lint fixes.
-enum EssentialLintFixes {
+enum EssentialLintFixes implements EnumFix {
   /// Fix to alphabetize arguments in function, method, or constructor calls.
   alphabetizeArguments(
     FixKind(
@@ -25,15 +33,18 @@ enum EssentialLintFixes {
   const EssentialLintFixes(this.fixKind);
 
   /// The fix kind associated with this lint fix.
+  @override
   final FixKind fixKind;
 }
 
-enum EssentialLintWarningFixes {
-  addsMissing(
+/// Enum representing essential lint warning fixes.
+enum EssentialLintWarningFixes implements EnumFix {
+  /// Fix to add missing members to a class or interface.
+  addMissingMembers(
     FixKind(
-      'dart.fix.addsMissing',
+      'dart.fix.add.missingMembers',
       DartFixKindPriority.standard,
-      'Add missing member',
+      'Add missing members',
     ),
   ),
   ;
@@ -41,5 +52,6 @@ enum EssentialLintWarningFixes {
   const EssentialLintWarningFixes(this.fixKind);
 
   /// The fix kind associated with this lint fix.
+  @override
   final FixKind fixKind;
 }

@@ -19,6 +19,7 @@ enum EssentialLintWarnings<T extends SubWarnings> implements EnumDiagnostic {
       description:
           'A lint rule that ensures getters/fields are included in the member '
           'list.',
+      severity: .WARNING,
     ),
   )
   ;

@@ -13,16 +13,17 @@ void main() {
 @reflectiveTest
 class PreferFirstTest extends RuleTestProcessor {
   @override
-  Rule get rule => PreferFirstRule();
+  LintRule get rule => PreferFirstRule();
 
-  Future<void> test_report() async {
+  @FailingTest(reason: "Mock SDK doesn't have Iterable.elementAt")
+  Future<void> test_elementAt() async {
     await assertDiagnostics(
       '''
 void f(List<int> numbers) {
-  var firstNumber = numbers[0];
+  var firstNumber = numbers.elementAt(0);
 }
 ''',
-      [lint(55, 3)],
+      [lint(64, 3)],
     );
   }
 
@@ -39,15 +40,14 @@ extension on List {
     );
   }
 
-  @FailingTest(reason: "Mock SDK doesn't have Iterable.elementAt")
-  Future<void> test_elementAt() async {
+  Future<void> test_report() async {
     await assertDiagnostics(
       '''
 void f(List<int> numbers) {
-  var firstNumber = numbers.elementAt(0);
+  var firstNumber = numbers[0];
 }
 ''',
-      [lint(64, 3)],
+      [lint(55, 3)],
     );
   }
 }

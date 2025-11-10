@@ -7,6 +7,7 @@ import 'package:analyzer/error/error.dart';
 
 import 'assist/essential_lint_assists.dart';
 import 'assist/remove_useless_else.dart';
+import 'fixes/add_missing_members.dart';
 import 'fixes/alphabetize_arguments.dart';
 import 'fixes/double_literal_format.dart';
 import 'fixes/essential_lint_fixes.dart';
@@ -76,16 +77,18 @@ mixin FixesPluginIntegration {
   Map<DiagnosticCode, List<FixGenerator>> get warningFixes {
     final fixes = <DiagnosticCode, List<FixGenerator>>{};
 
-    void addFixTo(FixGenerator generator, List<EssentialLintWarnings> rules) {
+    void addFixTo(FixGenerator generator, List<EnumDiagnostic> rules) {
       for (final rule in rules) {
         fixes.putIfAbsent(rule.code, () => []).add(generator);
       }
     }
 
     for (final fix in EssentialLintWarningFixes.values) {
-      // var _ = switch (fix) {
-
-      // };
+      var _ = switch (fix) {
+        .addMissingMembers => addFixTo(AddMissingMembersFix.new, [
+          EssentialLintWarnings.gettersInMemberList,
+        ]),
+      };
     }
     return fixes;
   }
@@ -108,8 +111,8 @@ mixin FixesPluginIntegration {
 /// Mixin to integrate plugin rules.
 mixin RulesPluginIntegration {
   /// Returns the list of registered rules.
-  Set<Rule> get rules {
-    final rules = <Rule>{};
+  Set<LintRule> get rules {
+    final rules = <LintRule>{};
     for (final rule in EssentialLintRules.values) {
       rules.add(switch (rule) {
         .alphabetizeArguments => AlphabetizeArgumentsRule(),

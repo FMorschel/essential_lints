@@ -5,9 +5,9 @@ import 'package:analysis_server_plugin/edit/fix/dart_fix_context.dart';
 import 'package:analysis_server_plugin/edit/fix/fix.dart';
 import 'package:analysis_server_plugin/src/correction/fix_processor.dart'
     as fix_processor;
+import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/diagnostic/diagnostic.dart';
 import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
-import 'package:essential_lints/src/rules/rule.dart';
 import 'package:test/test.dart';
 
 import 'base_edit_test_processor.dart';
@@ -15,12 +15,12 @@ import 'base_edit_test_processor.dart';
 typedef DiagnosticFilter = bool Function(Diagnostic diagnostic);
 
 abstract class FixTestProcessor extends BaseEditTestProcessor {
-  EssentialLintFixes get fix;
-
-  Rule get rule;
-
   @override
-  String get analysisRule => rule.rule.code.name;
+  String get analysisRule => rule.diagnosticCode.name;
+
+  EnumFix get fix;
+
+  AnalysisRule get rule;
 
   Future<void> assertHasFix(
     String expected, {
@@ -40,6 +40,28 @@ abstract class FixTestProcessor extends BaseEditTestProcessor {
     );
     expect(fix, hasLength(1));
     matchesExpected(expected, change: fix.single.change, target: target);
+  }
+
+  Future<void> assertNoFix({DiagnosticFilter? filter}) async {
+    var diagnostic = _singleDiagnostic(filter: filter);
+    var fixes = await _computeFixes(diagnostic);
+    expect(fixes, isEmpty);
+  }
+
+  /// Computes fixes for the given [diagnostic] in [testUnit].
+  Future<List<Fix>> _computeFixes(Diagnostic diagnostic) async {
+    var libraryResult = testLibrary;
+    if (libraryResult == null) {
+      return const [];
+    }
+    var context = DartFixContext(
+      instrumentationService: instrumentationService,
+      workspace: workspace,
+      libraryResult: libraryResult,
+      unitResult: testUnit,
+      error: diagnostic,
+    );
+    return fix_processor.computeFixes(context);
   }
 
   List<Fix> _parseFix(
@@ -82,12 +104,6 @@ abstract class FixTestProcessor extends BaseEditTestProcessor {
     return fixes;
   }
 
-  Future<void> assertNoFix({DiagnosticFilter? filter}) async {
-    var diagnostic = _singleDiagnostic(filter: filter);
-    var fixes = await _computeFixes(diagnostic);
-    expect(fixes, isEmpty);
-  }
-
   Diagnostic _singleDiagnostic({DiagnosticFilter? filter}) {
     var diagnostics = testUnit.diagnostics;
     if (filter != null) {
@@ -103,21 +119,5 @@ abstract class FixTestProcessor extends BaseEditTestProcessor {
       );
     }
     return diagnostics.first;
-  }
-
-  /// Computes fixes for the given [diagnostic] in [testUnit].
-  Future<List<Fix>> _computeFixes(Diagnostic diagnostic) async {
-    var libraryResult = testLibrary;
-    if (libraryResult == null) {
-      return const [];
-    }
-    var context = DartFixContext(
-      instrumentationService: instrumentationService,
-      workspace: workspace,
-      libraryResult: libraryResult,
-      unitResult: testUnit,
-      error: diagnostic,
-    );
-    return fix_processor.computeFixes(context);
   }
 }

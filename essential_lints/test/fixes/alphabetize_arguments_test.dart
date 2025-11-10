@@ -17,7 +17,7 @@ class AlphabetizeArgumentsTest extends FixTestProcessor {
   EssentialLintFixes get fix => .alphabetizeArguments;
 
   @override
-  Rule get rule => AlphabetizeArgumentsRule();
+  LintRule get rule => AlphabetizeArgumentsRule();
 
   Future<void> test_alphabetizeNamedArguments() async {
     await resolveTestCode('''

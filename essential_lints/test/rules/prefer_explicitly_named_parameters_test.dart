@@ -13,7 +13,7 @@ void main() {
 @reflectiveTest
 class PreferExplicitlyNamedParameterTest extends RuleTestProcessor {
   @override
-  Rule get rule => PreferExplicitlyNamedParameterRule();
+  LintRule get rule => PreferExplicitlyNamedParameterRule();
 
   Future<void> test_missingName() async {
     await assertDiagnostics(
@@ -21,15 +21,6 @@ class PreferExplicitlyNamedParameterTest extends RuleTestProcessor {
 typedef MyFunction = void Function(int, {int b});
 ''',
       [lint(35, 3)],
-    );
-  }
-
-  Future<void> test_missingName_two() async {
-    await assertDiagnostics(
-      '''
-typedef MyFunction = void Function(int, int);
-''',
-      [lint(35, 3), lint(40, 3)],
     );
   }
 
@@ -48,6 +39,15 @@ typedef MyFunction = void Function(int, int n);
 typedef MyFunction = void Function([int]);
 ''',
       [lint(36, 3)],
+    );
+  }
+
+  Future<void> test_missingName_two() async {
+    await assertDiagnostics(
+      '''
+typedef MyFunction = void Function(int, int);
+''',
+      [lint(35, 3), lint(40, 3)],
     );
   }
 

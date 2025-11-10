@@ -10,7 +10,7 @@ import 'rule.dart';
 /// A lint rule that enforces a consistent format for double literals
 /// in the codebase.
 /// {@endtemplate}
-class DoubleLiteralFormatRule extends Rule {
+class DoubleLiteralFormatRule extends LintRule {
   /// {@macro double_literal_format}
   DoubleLiteralFormatRule() : super(.doubleLiteralFormat);
 

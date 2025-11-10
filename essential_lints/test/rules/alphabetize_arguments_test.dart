@@ -13,7 +13,7 @@ void main() {
 @reflectiveTest
 class AlphabetizeArgumentsTest extends RuleTestProcessor {
   @override
-  Rule get rule => AlphabetizeArgumentsRule();
+  LintRule get rule => AlphabetizeArgumentsRule();
 
   Future<void> test_arguments() async {
     await assertDiagnostics(
