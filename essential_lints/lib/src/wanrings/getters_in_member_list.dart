@@ -242,7 +242,8 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
     }
 
     bool valid(GetterElement element) {
-      if (!annotation.getters && element.variable.isSynthetic ||
+      if (element.isStatic ||
+          !annotation.getters && element.variable.isSynthetic ||
           !annotation.fields && !element.variable.isSynthetic ||
           annotation.types.isNotEmpty &&
               !annotation.types.contains(element.returnType) ||

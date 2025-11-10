@@ -356,6 +356,31 @@ void foo() {}
     );
   }
 
+  Future<void> test_findsAnnotation_static() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: 'members')
+class A {
+  A(this.value);
+  final int value;
+
+  static const int staticValue = 0;
+
+  List<Object?> get members => [value, staticValue];
+}
+''',
+      [
+        error(
+          GettersInMemberListWarnings.nonMemberInGettersInMemberList.code,
+          251,
+          11,
+        ),
+      ],
+    );
+  }
+
   Future<void> test_findsAnnotation_staticMember() async {
     await assertDiagnostics(
       '''

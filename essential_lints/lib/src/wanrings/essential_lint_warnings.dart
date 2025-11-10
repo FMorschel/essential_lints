@@ -107,7 +107,7 @@ enum GettersInMemberListWarnings implements SubWarnings {
       correctionMessage: 'Remove this from the member list.',
       description:
           'A lint rule that ensures everything listed in the member list is a '
-          'valid expected member of the class.',
+          'valid expected instance member of the class.',
       uniqueName: 'non_member_in_getters_in_member_list',
     ),
   )
