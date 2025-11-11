@@ -84,22 +84,6 @@ enum GettersInMemberList with EnumDiagnostic, SubWarnings {
     ),
   ),
 
-  /// Invalid use of the GettersInMemberList annotation.
-  notClass(
-    WarningCode(
-      name: 'getters_in_member_list',
-      problemMessage:
-          'The annotation @GettersInMemberList can only be applied to classes.',
-      correctionMessage:
-          'Remove the @GettersInMemberList annotation from '
-          'this declaration or convert it into a class.',
-      description:
-          'A lint rule that ensures the @GettersInMemberList annotation is '
-          'only applied to classes.',
-      uniqueName: 'not_class_getters_in_member_list',
-    ),
-  ),
-
   /// Empty member list name in GettersInMemberList annotation.
   emptyMemberListName(
     WarningCode(

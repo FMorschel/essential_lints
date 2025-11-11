@@ -58,7 +58,7 @@ class _GettersInMemberListAnnotation {
 class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
   _GettersInMemberListVisitor(this.rule, this.context);
 
-  static final Uri _annotationUri = Uri.parse(
+  static final Uri _annotationUri = .parse(
     'package:essential_lints_annotations/src/getters_in_member_list.dart',
   );
 
@@ -72,10 +72,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
       return;
     }
     if (node.parent is! ClassDeclaration) {
-      rule.reportAtNode(
-        node.name,
-        diagnosticCode: GettersInMemberList.notClass.code,
-      );
+      return;
     }
   }
 
@@ -110,7 +107,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
       if (getterMember == null || getterMember.isStatic) {
         rule.reportAtToken(
           node.name,
-          diagnosticCode: GettersInMemberList.missingInstance.code,
+          diagnosticCode: GettersInMemberList.missingInstance,
           arguments: [annotation.memberListName],
         );
         continue;
@@ -152,7 +149,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
       if (missing.isNotEmpty) {
         rule.reportAtToken(
           memberName,
-          diagnosticCode: EssentialMultiWarnings.gettersInMemberList.code,
+          diagnosticCode: EssentialMultiWarnings.gettersInMemberList,
           arguments: [
             annotation.gettersAndFieldsDescription,
             missing.quotedAndCommaSeparatedWithAnd,
@@ -179,7 +176,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
         case NativeFunctionBody():
           rule.reportAtToken(
             member.name,
-            diagnosticCode: GettersInMemberList.invalidMemberList.code,
+            diagnosticCode: GettersInMemberList.invalidMemberList,
             arguments: [memberName.lexeme],
           );
           return null;
@@ -199,7 +196,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
     if (expression == null) {
       rule.reportAtNode(
         member,
-        diagnosticCode: GettersInMemberList.invalidMemberList.code,
+        diagnosticCode: GettersInMemberList.invalidMemberList,
         arguments: [memberName.lexeme],
       );
       return null;
@@ -208,7 +205,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
       rule.reportAtOffset(
         expression.offset,
         1,
-        diagnosticCode: GettersInMemberList.invalidMemberList.code,
+        diagnosticCode: GettersInMemberList.invalidMemberList,
         arguments: [memberName.lexeme],
       );
       // We don't know how to handle this case.
@@ -238,7 +235,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
       if (getterElement == null) {
         rule.reportAtNode(
           expression,
-          diagnosticCode: GettersInMemberList.nonMemberIn.code,
+          diagnosticCode: GettersInMemberList.nonMemberIn,
         );
         continue;
       }
@@ -268,7 +265,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
       if (!validGetters.contains(element)) {
         rule.reportAtNode(
           expression,
-          diagnosticCode: GettersInMemberList.nonMemberIn.code,
+          diagnosticCode: GettersInMemberList.nonMemberIn,
         );
       }
     }
@@ -314,7 +311,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
           if (memberListName.isEmpty) {
             rule.reportAtNode(
               expression,
-              diagnosticCode: GettersInMemberList.emptyMemberListName.code,
+              diagnosticCode: GettersInMemberList.emptyMemberListName,
             );
             return null;
           }

@@ -336,24 +336,6 @@ class A {
     );
   }
 
-  Future<void> test_findsAnnotation_notClass() async {
-    await assertDiagnostics(
-      '''
-import 'package:essential_lints_annotations/essential_lints_annotations.dart';
-
-@GettersInMemberList(memberListName: 'members')
-void foo() {}
-''',
-      [
-        error(
-          GettersInMemberList.notClass.code,
-          81,
-          19,
-        ),
-      ],
-    );
-  }
-
   Future<void> test_findsAnnotation_static() async {
     await assertDiagnostics(
       '''

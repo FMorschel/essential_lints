@@ -20,3 +20,5 @@ keywords:
 
 dev_dependencies:
   test: any
+dependencies:
+  meta: ^1.17.0
