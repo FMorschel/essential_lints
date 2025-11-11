@@ -9,6 +9,7 @@ import 'assist/essential_lint_assists.dart';
 import 'assist/remove_useless_else.dart';
 import 'fixes/add_missing_members.dart';
 import 'fixes/alphabetize_arguments.dart';
+import 'fixes/create_getter.dart';
 import 'fixes/double_literal_format.dart';
 import 'fixes/essential_lint_fixes.dart';
 import 'fixes/fix.dart';
@@ -57,7 +58,7 @@ mixin FixesPluginIntegration {
 
     void addFixTo(FixGenerator generator, List<EssentialLintRules> rules) {
       for (final rule in rules) {
-        fixes.putIfAbsent(rule.code, () => []).add(generator);
+        fixes.putIfAbsent(rule, () => []).add(generator);
       }
     }
 
@@ -80,7 +81,7 @@ mixin FixesPluginIntegration {
 
     void addFixTo(FixGenerator generator, List<EnumDiagnostic> rules) {
       for (final rule in rules) {
-        fixes.putIfAbsent(rule.code, () => []).add(generator);
+        fixes.putIfAbsent(rule, () => []).add(generator);
       }
     }
 
@@ -91,6 +92,9 @@ mixin FixesPluginIntegration {
         ]),
         .removeExpression => addFixTo(RemoveExpressionFix.new, [
           GettersInMemberList.nonMemberIn,
+        ]),
+        .createGetter => addFixTo(CreateGetterFix.new, [
+          GettersInMemberList.missingList,
         ]),
       };
     }

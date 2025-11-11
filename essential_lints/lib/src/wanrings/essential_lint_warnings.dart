@@ -69,13 +69,14 @@ enum EssentialMultiWarnings<T extends SubWarnings> with EnumDiagnostic {
 /// The list of sub-warnings for the GettersInMemberList warning.
 enum GettersInMemberList with EnumDiagnostic, SubWarnings {
   /// An instance member list is missing to include getters/fields.
-  missingInstance(
+  missingList(
     WarningCode(
       name: 'getters_in_member_list',
       problemMessage:
-          'The class needs an instance member called {0} to list the members.',
+          "The class needs an instance member called '{0}' to list the "
+          'members.',
       correctionMessage:
-          'Include the missing member {0} or turn the static member into an '
+          "Include the missing member '{0}' or turn the static member into an "
           'instance member.',
       description:
           'A lint rule that ensures getters/fields list instance member is '

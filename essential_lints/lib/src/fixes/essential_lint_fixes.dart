@@ -55,6 +55,15 @@ enum EssentialLintWarningFixes implements EnumFix {
       DartFixKindPriority.standard,
       'Remove expression',
     ),
+  ),
+
+  /// Fix to create a getter for a missing getter reference.
+  createGetter(
+    FixKind(
+      'dart.fix.create.getter',
+      DartFixKindPriority.standard,
+      'Create getter',
+    ),
   )
   ;
 

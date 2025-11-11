@@ -5,7 +5,7 @@ import '../wanrings/essential_lint_warnings.dart';
 /// {@template enum_lint}
 /// A mixin for enums that provide a lint rule code.
 /// {@endtemplate}
-mixin EnumLint on EnumDiagnostic {
+mixin EnumLint on EnumDiagnostic implements LintCode {
   @override
   LintRuleCode get code;
 }

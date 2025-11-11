@@ -35,7 +35,7 @@ class A {}
 ''',
       [
         error(
-          GettersInMemberList.emptyMemberListName.code,
+          GettersInMemberList.emptyMemberListName,
           117,
           2,
         ),
@@ -279,7 +279,7 @@ class A {
 ''',
       [
         error(
-          GettersInMemberList.missingInstance.code,
+          GettersInMemberList.missingList,
           134,
           1,
         ),
@@ -302,7 +302,7 @@ class A {
 ''',
       [
         error(
-          GettersInMemberList.nonMemberIn.code,
+          GettersInMemberList.nonMemberIn,
           214,
           1,
         ),
@@ -328,7 +328,7 @@ class A {
 ''',
       [
         error(
-          GettersInMemberList.nonMemberIn.code,
+          GettersInMemberList.nonMemberIn,
           278,
           12,
         ),
@@ -353,7 +353,7 @@ class A {
 ''',
       [
         error(
-          GettersInMemberList.nonMemberIn.code,
+          GettersInMemberList.nonMemberIn,
           251,
           11,
         ),
@@ -373,7 +373,7 @@ class A {
 ''',
       [
         error(
-          GettersInMemberList.missingInstance.code,
+          GettersInMemberList.missingList,
           134,
           1,
         ),

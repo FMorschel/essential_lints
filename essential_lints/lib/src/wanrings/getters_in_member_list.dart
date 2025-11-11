@@ -107,7 +107,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
       if (getterMember == null || getterMember.isStatic) {
         rule.reportAtToken(
           node.name,
-          diagnosticCode: GettersInMemberList.missingInstance,
+          diagnosticCode: GettersInMemberList.missingList,
           arguments: [annotation.memberListName],
         );
         continue;
