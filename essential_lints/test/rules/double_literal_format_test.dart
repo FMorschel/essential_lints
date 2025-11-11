@@ -11,14 +11,32 @@ void main() {
 }
 
 @reflectiveTest
-class DoubleLiteralFormatTest extends RuleTestProcessor {
+class DoubleLiteralFormatTest extends LintTestProcessor {
   @override
   LintRule get rule => DoubleLiteralFormatRule();
 
-  Future<void> test_leadingZero_number() async {
+  Future<void> test_decimal_and_exponential() async {
     await assertDiagnostics(
       '''
-var _ = 01.2;
+var _ = 1.1e01;
+''',
+      [lint(8, 6)],
+    );
+  }
+
+  Future<void> test_exponential_leadingZeros() async {
+    await assertDiagnostics(
+      '''
+var _ = 0.0e+01;
+''',
+      [lint(8, 7)],
+    );
+  }
+
+  Future<void> test_exponential_only() async {
+    await assertDiagnostics(
+      '''
+var _ = 1e05;
 ''',
       [lint(8, 4)],
     );
@@ -30,42 +48,12 @@ var _ = 0.2;
 ''');
   }
 
-  Future<void> test_trailingZero_number() async {
+  Future<void> test_leadingZero_number() async {
     await assertDiagnostics(
       '''
-var _ = 0.200;
+var _ = 01.2;
 ''',
-      [lint(8, 5)],
-    );
-  }
-
-  Future<void> test_trailingZero() async {
-    await assertNoDiagnostics('''
-var _ = 0.0;
-''');
-  }
-
-  Future<void> test_trailingZero_number_exponential() async {
-    await assertDiagnostics(
-      '''
-var _ = 0.200e1;
-''',
-      [lint(8, 7)],
-    );
-  }
-
-  Future<void> test_trailingZero_exponential() async {
-    await assertNoDiagnostics('''
-var _ = 0.0e+1;
-''');
-  }
-
-  Future<void> test_exponential_leadingZeros() async {
-    await assertDiagnostics(
-      '''
-var _ = 0.0e+01;
-''',
-      [lint(8, 7)],
+      [lint(8, 4)],
     );
   }
 
@@ -78,21 +66,33 @@ var _ = .0e+1;
     );
   }
 
-  Future<void> test_decimal_and_exponential() async {
+  Future<void> test_trailingZero() async {
+    await assertNoDiagnostics('''
+var _ = 0.0;
+''');
+  }
+
+  Future<void> test_trailingZero_exponential() async {
+    await assertNoDiagnostics('''
+var _ = 0.0e+1;
+''');
+  }
+
+  Future<void> test_trailingZero_number() async {
     await assertDiagnostics(
       '''
-var _ = 1.1e01;
+var _ = 0.200;
 ''',
-      [lint(8, 6)],
+      [lint(8, 5)],
     );
   }
 
-  Future<void> test_exponential_only() async {
+  Future<void> test_trailingZero_number_exponential() async {
     await assertDiagnostics(
       '''
-var _ = 1e05;
+var _ = 0.200e1;
 ''',
-      [lint(8, 4)],
+      [lint(8, 7)],
     );
   }
 }

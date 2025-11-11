@@ -11,7 +11,7 @@ void main() {
 }
 
 @reflectiveTest
-class PreferExplicitlyNamedParameterTest extends RuleTestProcessor {
+class PreferExplicitlyNamedParameterTest extends LintTestProcessor {
   @override
   LintRule get rule => PreferExplicitlyNamedParameterRule();
 

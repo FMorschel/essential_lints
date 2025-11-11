@@ -11,7 +11,7 @@ void main() {
 }
 
 @reflectiveTest
-class AlphabetizeArgumentsTest extends RuleTestProcessor {
+class AlphabetizeArgumentsTest extends LintTestProcessor {
   @override
   LintRule get rule => AlphabetizeArgumentsRule();
 

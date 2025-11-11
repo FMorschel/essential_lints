@@ -20,6 +20,7 @@ import 'rules/essential_lint_rules.dart';
 import 'rules/prefer_explicitly_named_parameters.dart';
 import 'rules/prefer_first.dart';
 import 'rules/prefer_last.dart';
+import 'rules/returning_widgets.dart';
 import 'rules/rule.dart';
 import 'wanrings/essential_lint_warnings.dart';
 import 'wanrings/getters_in_member_list.dart';
@@ -128,6 +129,7 @@ mixin RulesPluginIntegration {
         .preferExplicitlyNamedParameter => PreferExplicitlyNamedParameterRule(),
         .preferFirst => PreferFirstRule(),
         .preferLast => PreferLastRule(),
+        .returningWidgets => ReturningWidgetsRule(),
       });
     }
     return rules;

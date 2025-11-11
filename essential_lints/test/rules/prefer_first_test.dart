@@ -11,7 +11,7 @@ void main() {
 }
 
 @reflectiveTest
-class PreferFirstTest extends RuleTestProcessor {
+class PreferFirstTest extends LintTestProcessor {
   @override
   LintRule get rule => PreferFirstRule();
 

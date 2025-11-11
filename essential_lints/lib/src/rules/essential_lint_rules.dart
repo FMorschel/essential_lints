@@ -82,6 +82,19 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
           'accessing the first element of a list-like object using index 0.',
     ),
   ),
+
+  /// Avoid returning Widgets from functions.
+  returningWidgets(
+    LintRuleCode(
+      name: 'returning_widgets',
+      problemMessage: 'Avoid returning Widgets from functions.',
+      correctionMessage: 'Prefer extracting the widget into a separate class.',
+      description:
+          'A lint rule that discourages returning Widgets from functions and '
+          'encourages extracting them into separate classes for better code '
+          'organization and reusability.',
+    ),
+  ),
   ;
 
   const EssentialLintRules(this.code);
