@@ -1,7 +1,7 @@
 import 'package:analyzer/src/lint/registry.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:analyzer_testing/utilities/utilities.dart';
-import 'package:essential_lints/src/wanrings/warning.dart';
+import 'package:essential_lints/src/warnings/warning.dart';
 
 abstract class WarningTestProcessor extends AnalysisRuleTest {
   @override

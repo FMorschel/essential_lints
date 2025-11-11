@@ -9,7 +9,7 @@ import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/diagnostic/diagnostic.dart';
 import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
 import 'package:essential_lints/src/rules/rule.dart';
-import 'package:essential_lints/src/wanrings/warning.dart';
+import 'package:essential_lints/src/warnings/warning.dart';
 import 'package:test/test.dart';
 
 import 'base_edit_test_processor.dart';

@@ -1,6 +1,6 @@
 import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
-import 'package:essential_lints/src/wanrings/getters_in_member_list.dart';
-import 'package:essential_lints/src/wanrings/warning.dart';
+import 'package:essential_lints/src/warnings/getters_in_member_list.dart';
+import 'package:essential_lints/src/warnings/warning.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import '../src/dependencies.dart';

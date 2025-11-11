@@ -22,9 +22,9 @@ import 'rules/prefer_first.dart';
 import 'rules/prefer_last.dart';
 import 'rules/returning_widgets.dart';
 import 'rules/rule.dart';
-import 'wanrings/essential_lint_warnings.dart';
-import 'wanrings/getters_in_member_list.dart';
-import 'wanrings/warning.dart';
+import 'warnings/essential_lint_warnings.dart';
+import 'warnings/getters_in_member_list.dart';
+import 'warnings/warning.dart';
 
 /// A typedef for the base fix constructor.
 typedef FixGenerator =

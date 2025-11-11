@@ -1,7 +1,7 @@
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
-import 'package:essential_lints/src/wanrings/essential_lint_warnings.dart';
-import 'package:essential_lints/src/wanrings/getters_in_member_list.dart';
-import 'package:essential_lints/src/wanrings/warning.dart';
+import 'package:essential_lints/src/warnings/essential_lint_warnings.dart';
+import 'package:essential_lints/src/warnings/getters_in_member_list.dart';
+import 'package:essential_lints/src/warnings/warning.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import '../src/dependencies.dart';

@@ -1,6 +1,6 @@
 import 'package:analyzer/error/error.dart';
 
-import '../wanrings/essential_lint_warnings.dart';
+import '../warnings/essential_lint_warnings.dart';
 
 /// {@template enum_lint}
 /// A mixin for enums that provide a lint rule code.
