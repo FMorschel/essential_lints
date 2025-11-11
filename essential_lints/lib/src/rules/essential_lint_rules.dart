@@ -95,6 +95,21 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
           'organization and reusability.',
     ),
   ),
+
+  paddingOverContainer(
+    LintRuleCode(
+      name: 'padding_over_container',
+      problemMessage:
+          'Prefer using the inner padding property from Container over '
+          'wrapping with padding.',
+      correctionMessage:
+          'Use the padding property of Container instead of wrapping it with '
+          'a Padding widget.',
+      description:
+          'A lint rule that suggests using the padding property of Container '
+          'instead of wrapping it with a Padding widget.',
+    ),
+  ),
   ;
 
   const EssentialLintRules(this.code);

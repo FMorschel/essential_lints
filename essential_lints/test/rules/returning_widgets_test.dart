@@ -4,6 +4,7 @@ import 'package:essential_lints/src/rules/returning_widgets.dart';
 import 'package:essential_lints/src/rules/rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
+import '../src/flutter_dependency_mixin.dart';
 import '../src/rule_test_processor.dart';
 
 void main() {
@@ -13,33 +14,15 @@ void main() {
 }
 
 @reflectiveTest
-class ReturningWidgetsTest extends LintTestProcessor {
+class ReturningWidgetsTest extends LintTestProcessor
+    with FlutterDependencyMixin {
   @override
   LintRule get rule => ReturningWidgetsRule();
 
   @override
   void setUp() {
     super.setUp();
-    var flutterFolder = newFolder('/packages/flutter');
-    newFile(
-      join(flutterFolder.path, 'lib', 'src', 'widgets', 'framework.dart'),
-      '''
-abstract class BuildContext {}
-abstract class Widget {}
-abstract class StatelessWidget extends Widget {
-  Widget build(BuildContext context);
-}
-abstract class StatefulWidget extends Widget {}
-abstract class State<T extends StatefulWidget> {
-  Widget build(BuildContext context);
-}
-class Container extends Widget {}
-''',
-    );
-    newFile(join(flutterFolder.path, 'lib', 'widgets.dart'), '''
-export 'src/widgets/framework.dart';
-''');
-
+    createFlutterMock();
     newPackageConfigJsonFileFromBuilder(
       testPackageRootPath,
       PackageConfigFileBuilder()..add(

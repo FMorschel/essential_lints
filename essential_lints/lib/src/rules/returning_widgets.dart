@@ -2,10 +2,10 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../utils/extensions/ast.dart';
+import '../utils/extensions/element.dart';
 import 'rule.dart';
 
 /// {@template returning_widgets_rule}
@@ -61,55 +61,4 @@ class _ReturningWidgetsVisitor extends SimpleAstVisitor<void> {
 extension on MethodDeclaration {
   bool get notInStateOrStateless =>
       !enclosingTypeElement.isState && !enclosingTypeElement.isStatelessWidget;
-}
-
-extension on InterfaceElement {
-  static const _widgetName = 'Widget';
-  static const _statelessWidgetName = 'StatelessWidget';
-  static const _stateName = 'State';
-  static final Uri _uriFramework = .parse(
-    'package:flutter/src/widgets/framework.dart',
-  );
-
-  bool get isState {
-    var self = this;
-    if (self is! ClassElement) {
-      return false;
-    }
-    return self._isExactly(_stateName, _uriFramework) ||
-        self.allSupertypes.any(
-          (type) => type.element._isExactly(_stateName, _uriFramework),
-        );
-  }
-
-  bool get isStatelessWidget {
-    var self = this;
-    if (self is! ClassElement) {
-      return false;
-    }
-    return self._isExactly(_statelessWidgetName, _uriFramework) ||
-        self.allSupertypes.any(
-          (type) =>
-              type.element._isExactly(_statelessWidgetName, _uriFramework),
-        );
-  }
-
-  bool get isWidget {
-    var self = this;
-    if (self is! ClassElement) {
-      return false;
-    }
-    if (_isExactly(_widgetName, _uriFramework)) {
-      return true;
-    }
-    return self.allSupertypes.any(
-      (type) => type.element._isExactly(_widgetName, _uriFramework),
-    );
-  }
-
-  /// Whether this is the exact [type] defined in the file with the given [uri].
-  bool _isExactly(String type, Uri uri) {
-    var self = this;
-    return self is ClassElement && self.name == type && self.library.uri == uri;
-  }
 }

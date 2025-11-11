@@ -17,6 +17,7 @@ import 'fixes/remove_expression.dart';
 import 'rules/alphabetize_arguments.dart';
 import 'rules/double_literal_format.dart';
 import 'rules/essential_lint_rules.dart';
+import 'rules/padding_over_container.dart';
 import 'rules/prefer_explicitly_named_parameters.dart';
 import 'rules/prefer_first.dart';
 import 'rules/prefer_last.dart';
@@ -130,6 +131,7 @@ mixin RulesPluginIntegration {
         .preferFirst => PreferFirstRule(),
         .preferLast => PreferLastRule(),
         .returningWidgets => ReturningWidgetsRule(),
+        .paddingOverContainer => PaddingOverContainerRule(),
       });
     }
     return rules;
