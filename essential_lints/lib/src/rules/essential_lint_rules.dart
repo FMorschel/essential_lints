@@ -2,8 +2,16 @@ import 'package:analyzer/error/error.dart';
 
 import '../wanrings/essential_lint_warnings.dart';
 
+/// {@template enum_lint}
+/// A mixin for enums that provide a lint rule code.
+/// {@endtemplate}
+mixin EnumLint on EnumDiagnostic {
+  @override
+  LintRuleCode get code;
+}
+
 /// The list of all essential lint rules.
-enum EssentialLintRules implements EnumDiagnostic {
+enum EssentialLintRules with EnumDiagnostic, EnumLint {
   /// Arguments should be in alphabetical order.
   alphabetizeArguments(
     LintRuleCode(
@@ -83,6 +91,26 @@ enum EssentialLintRules implements EnumDiagnostic {
   final LintRuleCode code;
 }
 
+/// The list of all essential lint rules.
+enum EssentialMultiLints<T extends SubLints> with EnumDiagnostic, EnumLint {
+  /// Getters should be included in member lists.
+  // ignore: unused_field
+  _placeholder(
+    LintRuleCode(
+      name: 'placeholder',
+      problemMessage: '',
+      correctionMessage: '',
+      description: '',
+    ),
+  )
+  ;
+
+  const EssentialMultiLints(this.code);
+
+  @override
+  final LintRuleCode code;
+}
+
 /// {@template lint_rule_code}
 /// A diagnostic code for a lint rule.
 /// {@endtemplate}
@@ -97,4 +125,15 @@ class LintRuleCode extends WarningCode implements LintCode {
     super.hasPublishedDocs,
     super.uniqueName,
   }) : super(type: DiagnosticType.LINT);
+}
+
+/// {@template sub_warnings}
+/// A grouping of sub-warnings under a base warning.
+/// {@endtemplate}
+mixin SubLints on EnumDiagnostic {
+  /// The base warning.
+  EssentialMultiLints get base;
+
+  @override
+  LintRuleCode get code;
 }

@@ -14,10 +14,10 @@ void main() {
 }
 
 @reflectiveTest
-class GettersInMemberListTest extends WarningTestProcessor
+class GettersInMemberListTest extends MultiWarningTestProcessor
     with AnnotationsDependencyMixin {
   @override
-  WarningRule get rule => GettersInMemberListRule();
+  MultiWarningRule get rule => GettersInMemberListRule();
 
   @override
   void setUp() {
@@ -35,9 +35,7 @@ class A {}
 ''',
       [
         error(
-          GettersInMemberListWarnings
-              .emptyMemberListNameGettersInMemberList
-              .code,
+          GettersInMemberList.emptyMemberListName.code,
           117,
           2,
         ),
@@ -281,7 +279,7 @@ class A {
 ''',
       [
         error(
-          GettersInMemberListWarnings.missingInstanceGettersInMemberList.code,
+          GettersInMemberList.missingInstance.code,
           134,
           1,
         ),
@@ -304,7 +302,7 @@ class A {
 ''',
       [
         error(
-          GettersInMemberListWarnings.nonMemberInGettersInMemberList.code,
+          GettersInMemberList.nonMemberIn.code,
           214,
           1,
         ),
@@ -330,7 +328,7 @@ class A {
 ''',
       [
         error(
-          GettersInMemberListWarnings.nonMemberInGettersInMemberList.code,
+          GettersInMemberList.nonMemberIn.code,
           278,
           12,
         ),
@@ -348,7 +346,7 @@ void foo() {}
 ''',
       [
         error(
-          GettersInMemberListWarnings.notClassGettersInMemberList.code,
+          GettersInMemberList.notClass.code,
           81,
           19,
         ),
@@ -373,7 +371,7 @@ class A {
 ''',
       [
         error(
-          GettersInMemberListWarnings.nonMemberInGettersInMemberList.code,
+          GettersInMemberList.nonMemberIn.code,
           251,
           11,
         ),
@@ -393,7 +391,7 @@ class A {
 ''',
       [
         error(
-          GettersInMemberListWarnings.missingInstanceGettersInMemberList.code,
+          GettersInMemberList.missingInstance.code,
           134,
           1,
         ),

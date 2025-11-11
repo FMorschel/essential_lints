@@ -20,3 +20,21 @@ optional-checks:
     super.setUp();
   }
 }
+
+abstract class MultiWarningTestProcessor extends AnalysisRuleTest {
+  @override
+  String get analysisRule => rule.rule.code.name;
+
+  MultiWarningRule get rule;
+
+  @override
+  void setUp() {
+    Registry.ruleRegistry.registerWarningRule(rule);
+    newAnalysisOptionsYamlFile(testPackageRootPath, '''
+${analysisOptionsContent()}
+optional-checks:
+  propagate-linter-exceptions: true
+''');
+    super.setUp();
+  }
+}

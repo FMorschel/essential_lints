@@ -87,10 +87,10 @@ mixin FixesPluginIntegration {
     for (final fix in EssentialLintWarningFixes.values) {
       var _ = switch (fix) {
         .addMissingMembers => addFixTo(AddMissingMembersFix.new, [
-          EssentialLintWarnings.gettersInMemberList,
+          EssentialMultiWarnings.gettersInMemberList,
         ]),
         .removeExpression => addFixTo(RemoveExpressionFix.new, [
-          GettersInMemberListWarnings.nonMemberInGettersInMemberList,
+          GettersInMemberList.nonMemberIn,
         ]),
       };
     }
@@ -138,10 +138,10 @@ mixin RulesPluginIntegration {
 /// Mixin to integrate plugin rules.
 mixin WarningsPluginIntegration {
   /// Returns the list of registered warnings.
-  Set<WarningRule> get warnings {
-    final rules = <WarningRule>{};
+  Set<MultiWarningRule> get warnings {
+    final rules = <MultiWarningRule>{};
     // Single instance to satisfy exhaustive switch requirement.
-    for (final rule in EssentialLintWarnings.values) {
+    for (final rule in EssentialMultiWarnings.values) {
       rules.add(switch (rule) {
         .gettersInMemberList => GettersInMemberListRule(),
       });

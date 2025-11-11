@@ -13,13 +13,13 @@ void main() {
 }
 
 @reflectiveTest
-class AddMissingMembersTest extends WarningFixTestProcessor
+class AddMissingMembersTest extends MultiWarningFixTestProcessor
     with AnnotationsDependencyMixin {
   @override
   EssentialLintWarningFixes get fix => .addMissingMembers;
 
   @override
-  WarningRule get rule => GettersInMemberListRule();
+  MultiWarningRule get rule => GettersInMemberListRule();
 
   @override
   Future<void> setUp() async {

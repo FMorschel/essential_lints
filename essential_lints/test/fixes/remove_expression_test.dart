@@ -13,13 +13,13 @@ void main() {
 }
 
 @reflectiveTest
-class RemoveExpressionTest extends WarningFixTestProcessor
+class RemoveExpressionTest extends MultiWarningFixTestProcessor
     with AnnotationsDependencyMixin {
   @override
   EssentialLintWarningFixes get fix => .removeExpression;
 
   @override
-  WarningRule get rule => GettersInMemberListRule();
+  MultiWarningRule get rule => GettersInMemberListRule();
 
   @override
   Future<void> setUp() async {

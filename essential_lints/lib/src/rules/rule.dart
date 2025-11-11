@@ -1,12 +1,7 @@
 import 'package:analyzer/analysis_rule/analysis_rule.dart';
-import 'package:analyzer/analysis_rule/pubspec.dart';
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
-import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/diagnostic/diagnostic.dart';
 import 'package:analyzer/error/error.dart';
-import 'package:analyzer/error/listener.dart';
 import 'package:meta/meta.dart';
 
 import 'essential_lint_rules.dart';
@@ -25,16 +20,8 @@ abstract class LintRule extends AnalysisRule {
   /// The essential lint rule associated with this analysis rule.
   final EssentialLintRules rule;
 
-  late DiagnosticReporter _reporter;
-
   @override
-  DiagnosticCode get diagnosticCode => rule.code;
-
-  @override
-  set reporter(DiagnosticReporter value) {
-    super.reporter = value;
-    _reporter = value;
-  }
+  DiagnosticCode get diagnosticCode => rule;
 
   @override
   @mustBeOverridden
@@ -42,90 +29,35 @@ abstract class LintRule extends AnalysisRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   );
+}
 
-  @override
-  void reportAtNode(
-    AstNode? node, {
-    List<Object> arguments = const [],
-    List<DiagnosticMessage>? contextMessages,
-    EssentialLintRules? diagnosticCode,
-  }) {
-    if (diagnosticCode == null) {
-      return super.reportAtNode(
-        node,
-        arguments: arguments,
-        contextMessages: contextMessages,
+/// {@template rule}
+/// The base class for all essential multi-lints rules.
+/// {@endtemplate}
+abstract class MultiLintRule<T extends SubLints> extends MultiAnalysisRule {
+  /// {@macro rule}
+  MultiLintRule(this.rule)
+    : super(
+        name: rule.code.name,
+        description: rule.code.description,
       );
-    }
-    if (node == null) {
-      return;
-    }
-    _reporter.atNode(
-      node,
-      diagnosticCode.code,
-      arguments: arguments,
-      contextMessages: contextMessages,
-    );
-  }
+
+  /// The essential lint rule associated with this analysis rule.
+  final EssentialMultiLints<T> rule;
 
   @override
-  void reportAtOffset(
-    int offset,
-    int length, {
-    List<Object> arguments = const [],
-    List<DiagnosticMessage>? contextMessages,
-    EssentialLintRules? diagnosticCode,
-  }) {
-    _reporter.atOffset(
-      offset: offset,
-      length: length,
-      diagnosticCode: diagnosticCode?.code ?? rule.code,
-      arguments: arguments,
-      contextMessages: contextMessages,
-    );
-  }
+  List<DiagnosticCode> get diagnosticCodes => [
+    rule.code,
+    ...subLints.map((e) => e.code),
+  ];
+
+  /// The list of sub-lints associated with this analysis rule.
+  List<T> get subLints;
 
   @override
-  void reportAtPubNode(
-    PubspecNode node, {
-    List<Object> arguments = const [],
-    List<DiagnosticMessage> contextMessages = const [],
-    EssentialLintRules? diagnosticCode,
-  }) {
-    if (diagnosticCode == null) {
-      return super.reportAtPubNode(
-        node,
-        arguments: arguments,
-        contextMessages: contextMessages,
-      );
-    }
-    _reporter.atSourceSpan(
-      node.span,
-      diagnosticCode.code,
-      arguments: arguments,
-      contextMessages: contextMessages,
-    );
-  }
-
-  @override
-  void reportAtToken(
-    Token token, {
-    List<Object> arguments = const [],
-    List<DiagnosticMessage>? contextMessages,
-    EssentialLintRules? diagnosticCode,
-  }) {
-    if (diagnosticCode == null) {
-      return super.reportAtToken(
-        token,
-        arguments: arguments,
-        contextMessages: contextMessages,
-      );
-    }
-    _reporter.atToken(
-      token,
-      diagnosticCode.code,
-      arguments: arguments,
-      contextMessages: contextMessages,
-    );
-  }
+  @mustBeOverridden
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
+  );
 }

@@ -14,9 +14,12 @@ import 'warning.dart';
 /// {@template getters_in_member_list_rule}
 /// A lint rule that ensures getters/fields are included in member lists.
 /// {@endtemplate}
-class GettersInMemberListRule extends WarningRule<GettersInMemberListWarnings> {
+class GettersInMemberListRule extends MultiWarningRule<GettersInMemberList> {
   /// {@macro getters_in_member_list_rule}
   GettersInMemberListRule() : super(.gettersInMemberList);
+
+  @override
+  List<GettersInMemberList> get subWarnings => GettersInMemberList.values;
 
   @override
   void registerNodeProcessors(
@@ -71,7 +74,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
     if (node.parent is! ClassDeclaration) {
       rule.reportAtNode(
         node.name,
-        diagnosticCode: .notClassGettersInMemberList,
+        diagnosticCode: GettersInMemberList.notClass.code,
       );
     }
   }
@@ -107,7 +110,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
       if (getterMember == null || getterMember.isStatic) {
         rule.reportAtToken(
           node.name,
-          diagnosticCode: .missingInstanceGettersInMemberList,
+          diagnosticCode: GettersInMemberList.missingInstance.code,
           arguments: [annotation.memberListName],
         );
         continue;
@@ -149,6 +152,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
       if (missing.isNotEmpty) {
         rule.reportAtToken(
           memberName,
+          diagnosticCode: EssentialMultiWarnings.gettersInMemberList.code,
           arguments: [
             annotation.gettersAndFieldsDescription,
             missing.quotedAndCommaSeparatedWithAnd,
@@ -175,7 +179,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
         case NativeFunctionBody():
           rule.reportAtToken(
             member.name,
-            diagnosticCode: .invalidMemberListGettersInMemberList,
+            diagnosticCode: GettersInMemberList.invalidMemberList.code,
             arguments: [memberName.lexeme],
           );
           return null;
@@ -195,7 +199,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
     if (expression == null) {
       rule.reportAtNode(
         member,
-        diagnosticCode: .invalidMemberListGettersInMemberList,
+        diagnosticCode: GettersInMemberList.invalidMemberList.code,
         arguments: [memberName.lexeme],
       );
       return null;
@@ -204,7 +208,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
       rule.reportAtOffset(
         expression.offset,
         1,
-        diagnosticCode: .invalidMemberListGettersInMemberList,
+        diagnosticCode: GettersInMemberList.invalidMemberList.code,
         arguments: [memberName.lexeme],
       );
       // We don't know how to handle this case.
@@ -234,7 +238,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
       if (getterElement == null) {
         rule.reportAtNode(
           expression,
-          diagnosticCode: .nonMemberInGettersInMemberList,
+          diagnosticCode: GettersInMemberList.nonMemberIn.code,
         );
         continue;
       }
@@ -264,7 +268,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
       if (!validGetters.contains(element)) {
         rule.reportAtNode(
           expression,
-          diagnosticCode: .nonMemberInGettersInMemberList,
+          diagnosticCode: GettersInMemberList.nonMemberIn.code,
         );
       }
     }
@@ -310,7 +314,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
           if (memberListName.isEmpty) {
             rule.reportAtNode(
               expression,
-              diagnosticCode: .emptyMemberListNameGettersInMemberList,
+              diagnosticCode: GettersInMemberList.emptyMemberListName.code,
             );
             return null;
           }
@@ -355,7 +359,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
   }
 }
 
-extension on (WarningRule, GetterElement) {
+extension on (MultiWarningRule, GetterElement) {
   bool whereMatches(ClassMember member) {
     if (member case MethodDeclaration(
       declaredFragment: Fragment(:var element),

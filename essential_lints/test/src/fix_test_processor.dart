@@ -16,29 +16,8 @@ import 'base_edit_test_processor.dart';
 
 typedef DiagnosticFilter = bool Function(Diagnostic diagnostic);
 
-abstract class LintFixTestProcessor extends FixTestProcessor {
-  @override
-  EssentialLintFixes get fix;
-
-  @override
-  LintRule get rule;
-}
-
-abstract class WarningFixTestProcessor extends FixTestProcessor {
-  @override
-  EssentialLintWarningFixes get fix;
-
-  @override
-  WarningRule get rule;
-}
-
-abstract class FixTestProcessor extends BaseEditTestProcessor {
-  @override
-  String get analysisRule => rule.diagnosticCode.name;
-
+mixin EditTestProcessorMixin on BaseEditTestProcessor {
   EnumFix get fix;
-
-  AnalysisRule get rule;
 
   Future<void> assertHasFix(
     String expected, {
@@ -138,4 +117,39 @@ abstract class FixTestProcessor extends BaseEditTestProcessor {
     }
     return diagnostics.first;
   }
+}
+
+abstract class FixTestProcessor extends BaseEditTestProcessor
+    with EditTestProcessorMixin {
+  @override
+  String get analysisRule => rule.diagnosticCode.name;
+
+  AnalysisRule get rule;
+}
+
+abstract class LintFixTestProcessor extends FixTestProcessor {
+  @override
+  EssentialLintFixes get fix;
+
+  @override
+  LintRule get rule;
+}
+
+abstract class MultiWarningFixTestProcessor extends BaseEditTestProcessor
+    with EditTestProcessorMixin {
+  @override
+  String get analysisRule => rule.rule.code.name;
+
+  @override
+  EssentialLintWarningFixes get fix;
+
+  MultiWarningRule get rule;
+}
+
+abstract class WarningFixTestProcessor extends FixTestProcessor {
+  @override
+  EssentialLintWarningFixes get fix;
+
+  @override
+  WarningRule get rule;
 }

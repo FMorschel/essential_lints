@@ -3,15 +3,52 @@ import 'package:analyzer/error/error.dart';
 /// {@template enum_diagnostic}
 /// A mixin for enums that provide a diagnostic code.
 /// {@endtemplate}
-mixin EnumDiagnostic {
+mixin EnumDiagnostic implements DiagnosticCode {
   /// The diagnostic code associated with the enum value.
   DiagnosticCode get code;
+
+  @override
+  String? get correctionMessage => code.correctionMessage;
+
+  @override
+  // ignore: deprecated_member_use, overriding all members
+  DiagnosticSeverity get errorSeverity => code.errorSeverity;
+
+  @override
+  bool get hasPublishedDocs => code.hasPublishedDocs;
+
+  @override
+  bool get isIgnorable => code.isIgnorable;
+
+  @override
+  bool get isUnresolvedIdentifier => code.isUnresolvedIdentifier;
+
+  @override
+  String get name => code.name;
+
+  @override
+  int get numParameters => code.numParameters;
+
+  @override
+  String get problemMessage => code.problemMessage;
+
+  @override
+  DiagnosticSeverity get severity => code.severity;
+
+  @override
+  DiagnosticType get type => code.type;
+
+  @override
+  String get uniqueName => code.uniqueName;
+
+  @override
+  String? get url => code.url;
 }
 
 /// The list of all essential lint rules.
-enum EssentialLintWarnings<T extends SubWarnings> implements EnumDiagnostic {
+enum EssentialMultiWarnings<T extends SubWarnings> with EnumDiagnostic {
   /// Getters should be included in member lists.
-  gettersInMemberList<GettersInMemberListWarnings>(
+  gettersInMemberList<GettersInMemberList>(
     WarningCode(
       name: 'getters_in_member_list',
       problemMessage: 'All {0} should be included in member lists.',
@@ -23,16 +60,16 @@ enum EssentialLintWarnings<T extends SubWarnings> implements EnumDiagnostic {
   )
   ;
 
-  const EssentialLintWarnings(this.code);
+  const EssentialMultiWarnings(this.code);
 
   @override
   final WarningCode code;
 }
 
 /// The list of sub-warnings for the GettersInMemberList warning.
-enum GettersInMemberListWarnings implements SubWarnings {
+enum GettersInMemberList with EnumDiagnostic, SubWarnings {
   /// An instance member list is missing to include getters/fields.
-  missingInstanceGettersInMemberList(
+  missingInstance(
     WarningCode(
       name: 'getters_in_member_list',
       problemMessage:
@@ -48,7 +85,7 @@ enum GettersInMemberListWarnings implements SubWarnings {
   ),
 
   /// Invalid use of the GettersInMemberList annotation.
-  notClassGettersInMemberList(
+  notClass(
     WarningCode(
       name: 'getters_in_member_list',
       problemMessage:
@@ -64,7 +101,7 @@ enum GettersInMemberListWarnings implements SubWarnings {
   ),
 
   /// Empty member list name in GettersInMemberList annotation.
-  emptyMemberListNameGettersInMemberList(
+  emptyMemberListName(
     WarningCode(
       name: 'getters_in_member_list',
       problemMessage:
@@ -81,7 +118,7 @@ enum GettersInMemberListWarnings implements SubWarnings {
   ),
 
   /// Invalid member list for GettersInMemberList annotation.
-  invalidMemberListGettersInMemberList(
+  invalidMemberList(
     WarningCode(
       name: 'getters_in_member_list',
       problemMessage:
@@ -98,7 +135,7 @@ enum GettersInMemberListWarnings implements SubWarnings {
   ),
 
   /// Something listed in the member list is not a member of the class.
-  nonMemberInGettersInMemberList(
+  nonMemberIn(
     WarningCode(
       name: 'getters_in_member_list',
       problemMessage:
@@ -113,10 +150,10 @@ enum GettersInMemberListWarnings implements SubWarnings {
   )
   ;
 
-  const GettersInMemberListWarnings(this.code);
+  const GettersInMemberList(this.code);
 
   @override
-  final EssentialLintWarnings base = .gettersInMemberList;
+  final EssentialMultiWarnings base = .gettersInMemberList;
 
   @override
   final WarningCode code;
@@ -125,15 +162,12 @@ enum GettersInMemberListWarnings implements SubWarnings {
 /// {@template sub_warnings}
 /// A grouping of sub-warnings under a base warning.
 /// {@endtemplate}
-final class SubWarnings implements EnumDiagnostic {
-  /// {@macro sub_warnings}
-  SubWarnings(this.base, this.code);
-
+mixin SubWarnings on EnumDiagnostic {
   /// The base warning.
-  final EssentialLintWarnings base;
+  EssentialMultiWarnings get base;
 
   @override
-  final WarningCode code;
+  WarningCode get code;
 }
 
 /// {@template rule_code}
