@@ -36,7 +36,11 @@ abstract class State<T extends StatefulWidget> {
       join(flutterFolder.path, 'lib', 'src', 'widgets', 'container.dart'),
       '''
 import 'framework.dart';
-class Container extends Widget {}
+import '../painting/edge_insets.dart';
+
+class Container extends Widget {
+  Container({Widget? child, EdgeInsets? padding});
+}
 ''',
     );
     newFile(

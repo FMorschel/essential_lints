@@ -28,6 +28,16 @@ enum EssentialLintFixes implements EnumFix {
       'Format double literal',
     ),
   ),
+
+  /// Fix to use the padding property of a Container instead of wrapping with
+  /// a Padding widget.
+  usePaddingProperty(
+    FixKind(
+      'dart.fix.usePaddingProperty',
+      DartFixKindPriority.standard,
+      'Use padding property',
+    ),
+  )
   ;
 
   const EssentialLintFixes(this.fixKind);

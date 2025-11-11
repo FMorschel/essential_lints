@@ -14,6 +14,7 @@ import 'fixes/double_literal_format.dart';
 import 'fixes/essential_lint_fixes.dart';
 import 'fixes/fix.dart';
 import 'fixes/remove_expression.dart';
+import 'fixes/use_padding_property.dart';
 import 'rules/alphabetize_arguments.dart';
 import 'rules/double_literal_format.dart';
 import 'rules/essential_lint_rules.dart';
@@ -71,6 +72,9 @@ mixin FixesPluginIntegration {
         ]),
         .doubleLiteralFormat => addFixTo(DoubleLiteralFormatFix.new, [
           .doubleLiteralFormat,
+        ]),
+        .usePaddingProperty => addFixTo(UsePaddingPropertyFix.new, [
+          .paddingOverContainer,
         ]),
       };
     }
