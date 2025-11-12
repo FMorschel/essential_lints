@@ -96,6 +96,8 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
     ),
   ),
 
+  /// Prefer using the padding property of Container instead of wrapping it with
+  /// a Padding widget.
   paddingOverContainer(
     LintRuleCode(
       name: 'padding_over_container',
@@ -108,6 +110,18 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
       description:
           'A lint rule that suggests using the padding property of Container '
           'instead of wrapping it with a Padding widget.',
+    ),
+  ),
+
+  /// Detects unnecessary calls to setState in Flutter widgets.
+  unnecessarySetstate(
+    LintRuleCode(
+      name: 'unnecessary_setstate',
+      problemMessage: 'Unnecessary calls to setState detected.',
+      correctionMessage: 'Remove the unnecessary call to setState.',
+      description:
+          'A lint rule that detects and flags unnecessary calls to setState '
+          'in State classes.',
     ),
   ),
   ;

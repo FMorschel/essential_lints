@@ -5,14 +5,64 @@ import 'object.dart';
 
 /// Extension to get the enclosing type element of an AST node.
 extension AstExtension on AstNode {
-  /// Gets the enclosing type element of the AST node.
-  InterfaceElement get enclosingTypeElement {
+  /// Gets the enclosing executable element of the AST node.
+  ExecutableElement? get enclosingExecutableElement {
     for (final ancestor in withAncestors) {
       switch (ancestor) {
-        case ClassDeclaration(
-          declaredFragment: InterfaceFragment(:var element),
-        ):
+        case MethodDeclaration(
+              declaredFragment: ExecutableFragment(:var element),
+            ) ||
+            FunctionExpression(
+              parent: FunctionDeclaration(
+                declaredFragment: ExecutableFragment(:var element),
+              ),
+            ) ||
+            FunctionExpression(
+              declaredFragment: ExecutableFragment(:var element),
+            ) ||
+            ConstructorDeclaration(
+              declaredFragment: ExecutableFragment(:var element),
+            ):
           return element;
+      }
+    }
+    return null;
+  }
+
+  /// Gets the enclosing executable element of the AST node if it is
+  /// synchronous.
+  ExecutableElement? get enclosingExecutableElementIfSync {
+    for (final ancestor in withAncestors) {
+      switch (ancestor) {
+        case MethodDeclaration(
+                  declaredFragment: ExecutableFragment(:var element),
+                  :var body,
+                ) ||
+                FunctionExpression(
+                  parent: FunctionDeclaration(
+                    declaredFragment: ExecutableFragment(:var element),
+                  ),
+                  :var body,
+                ) ||
+                FunctionExpression(
+                  declaredFragment: ExecutableFragment(:var element),
+                  :var body,
+                ) ||
+                ConstructorDeclaration(
+                  declaredFragment: ExecutableFragment(:var element),
+                  :var body,
+                )
+            when body.isSynchronous:
+          return element;
+      }
+    }
+    return null;
+  }
+
+  /// Gets the enclosing type element of the AST node.
+  InterfaceElement? get enclosingTypeElement {
+    for (final ancestor in withAncestors) {
+      switch (ancestor) {
         case ExtensionDeclaration(
           declaredFragment: ExtensionFragment(:var element),
         ):
@@ -21,19 +71,22 @@ extension AstExtension on AstNode {
           if (extendedElement != null) {
             return extendedElement;
           }
-        case ExtensionTypeDeclaration(
-          declaredFragment: InterfaceFragment(:var element),
-        ):
-          return element;
-        case EnumDeclaration(declaredFragment: InterfaceFragment(:var element)):
-          return element;
-        case MixinDeclaration(
-          declaredFragment: InterfaceFragment(:var element),
-        ):
+        case ClassDeclaration(
+              declaredFragment: InterfaceFragment(:var element),
+            ) ||
+            ExtensionTypeDeclaration(
+              declaredFragment: InterfaceFragment(:var element),
+            ) ||
+            EnumDeclaration(
+              declaredFragment: InterfaceFragment(:var element),
+            ) ||
+            MixinDeclaration(
+              declaredFragment: InterfaceFragment(:var element),
+            ):
           return element;
       }
     }
-    throw StateError('No enclosing type element found.');
+    return null;
   }
 
   /// An iterable of this node and all its ancestors, starting from this node.

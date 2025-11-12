@@ -28,6 +28,11 @@ abstract class StatelessWidget extends Widget {
 }
 abstract class StatefulWidget extends Widget {}
 abstract class State<T extends StatefulWidget> {
+  void setState(VoidCallback fn);
+  void initState() {}
+  void didChangeDependencies() {}
+  void didUpdateWidget(covariant T oldWidget) {}
+  void dispose() {}
   Widget build(BuildContext context);
 }
 ''',
