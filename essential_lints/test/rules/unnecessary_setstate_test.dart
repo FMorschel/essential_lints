@@ -1,4 +1,5 @@
 import 'package:analyzer/utilities/package_config_file_builder.dart';
+import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:analyzer_testing/utilities/utilities.dart';
 import 'package:essential_lints/src/rules/rule.dart';
 import 'package:essential_lints/src/rules/unnecessary_setstate.dart';
@@ -48,7 +49,7 @@ abstract class MyState extends State {
   }
 }
 ''',
-      [lint(134, 8)],
+      [lint(134, 8, contextMessages: [])],
     );
   }
 
@@ -69,7 +70,9 @@ abstract class MyState extends State {
   }
 }
 ''',
-      [lint(134, 5)],
+      [
+        lint(134, 5, contextMessages: [contextMessage(testFile, 193, 8)]),
+      ],
     );
   }
 
