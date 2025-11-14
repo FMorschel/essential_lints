@@ -30,12 +30,12 @@ class SubtypeNamingTest extends MultiWarningTestProcessor
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@SubtypeNaming(prefixName: 'My', suffixName: 'Class', containingName: 'Other')
+@SubtypeNaming(prefix: 'My', suffix: 'Class', containing: 'Other')
 class YourService {}
 
 class Foo extends YourService {}
 ''',
-      [error(rule.rule, 187, 3)],
+      [error(rule.rule, 175, 3)],
     );
   }
 
@@ -43,7 +43,7 @@ class Foo extends YourService {}
     await assertNoDiagnostics('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@SubtypeNaming(containingName: 'Service')
+@SubtypeNaming(containing: 'Service')
 class UserService {}
 
 class UserServiceImpl extends UserService {}
@@ -54,7 +54,7 @@ class UserServiceImpl extends UserService {}
     await assertNoDiagnostics('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@SubtypeNaming(prefixName: 'My')
+@SubtypeNaming(prefix: 'My')
 class MyClass {}
 
 class MyClassImpl extends MyClass {}
@@ -65,7 +65,7 @@ class MyClassImpl extends MyClass {}
     await assertNoDiagnostics('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@SubtypeNaming(suffixName: 'Class')
+@SubtypeNaming(suffix: 'Class')
 class MyClass {}
 
 class MyOtherClass extends MyClass {}
@@ -76,12 +76,12 @@ class MyOtherClass extends MyClass {}
     await assertDiagnostics(
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
-@SubtypeNaming(prefixName: 'I')
+@SubtypeNaming(prefix: 'I')
 enum E { e }
 
 extension type Ext(E e) implements E {}
 ''',
-      [error(rule.rule, 140, 3)],
+      [error(rule.rule, 136, 3)],
     );
   }
 
@@ -89,12 +89,12 @@ extension type Ext(E e) implements E {}
     await assertDiagnostics(
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
-@SubtypeNaming(prefixName: 'I')
+@SubtypeNaming(prefix: 'I')
 extension type E(int i) {}
 
 extension type Ext(E e) implements E {}
 ''',
-      [error(rule.rule, 154, 3)],
+      [error(rule.rule, 150, 3)],
     );
   }
 
@@ -103,12 +103,12 @@ extension type Ext(E e) implements E {}
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@SubtypeNaming(prefixName: 'My')
+@SubtypeNaming(prefix: 'My')
 class MyClass {}
 
 class YourClass extends MyClass {}
 ''',
-      [error(rule.rule, 137, 9)],
+      [error(rule.rule, 133, 9)],
     );
   }
 
@@ -117,12 +117,12 @@ class YourClass extends MyClass {}
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@SubtypeNaming(suffixName: 'Class')
+@SubtypeNaming(suffix: 'Class')
 class MyClass {}
 
 class MyClassImpl extends MyClass {}
 ''',
-      [error(rule.rule, 140, 11)],
+      [error(rule.rule, 136, 11)],
     );
   }
 
@@ -142,12 +142,12 @@ class MyClass {}
     await assertDiagnostics(
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
-@SubtypeNaming(prefixName: 'I')
+@SubtypeNaming(prefix: 'I')
 mixin InterfaceMixin {}
 
 class MyClass with InterfaceMixin {}
 ''',
-      [error(rule.rule, 142, 7)],
+      [error(rule.rule, 138, 7)],
     );
   }
 
@@ -156,12 +156,12 @@ class MyClass with InterfaceMixin {}
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@SubtypeNaming(containingName: 'Service')
+@SubtypeNaming(containing: 'Service')
 class MyClass {}
 
 class MyClassImpl extends MyClass {}
 ''',
-      [error(rule.rule, 146, 11)],
+      [error(rule.rule, 142, 11)],
     );
   }
 
@@ -169,7 +169,7 @@ class MyClassImpl extends MyClass {}
     await assertNoDiagnostics('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@SubtypeNaming(prefixName: 'My', suffixName: 'Class')
+@SubtypeNaming(prefix: 'My', suffix: 'Class')
 class MyClass {}
 ''');
   }

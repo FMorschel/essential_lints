@@ -12,17 +12,17 @@ import 'package:meta/meta_meta.dart';
 class SubtypeNaming {
   /// {@macro subtype_naming}
   const SubtypeNaming({
-    this.prefixName,
-    this.suffixName,
-    this.containingName,
+    this.prefix,
+    this.suffix,
+    this.containing,
   });
 
   /// The required prefix for the subtype name.
-  final String? prefixName;
+  final String? prefix;
 
   /// The required suffix for the subtype name.
-  final String? suffixName;
+  final String? suffix;
 
   /// The required part of the name of the subtype.
-  final String? containingName;
+  final String? containing;
 }

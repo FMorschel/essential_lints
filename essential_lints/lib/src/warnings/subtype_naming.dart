@@ -35,20 +35,20 @@ class SubtypeNamingRule extends MultiWarningRule<SubtypeNaming> {
 
 class _SubtypeNamingAnnotation {
   const _SubtypeNamingAnnotation({
-    required this.prefixName,
-    required this.suffixName,
-    required this.containingName,
+    required this.prefix,
+    required this.suffix,
+    required this.containing,
   });
 
   static _SubtypeNamingAnnotation empty = const .new(
-    prefixName: null,
-    suffixName: null,
-    containingName: null,
+    prefix: null,
+    suffix: null,
+    containing: null,
   );
 
-  final String? prefixName;
-  final String? suffixName;
-  final String? containingName;
+  final String? prefix;
+  final String? suffix;
+  final String? containing;
 }
 
 class _SubtypeNamingVisitor extends SimpleAstVisitor<void> {
@@ -67,9 +67,9 @@ class _SubtypeNamingVisitor extends SimpleAstVisitor<void> {
   void visitAnnotation(Annotation node) {
     if (_isSubtypeNamingAnnotation(node.elementAnnotation)) {
       var annotation = _mapKnownArguments(node.elementAnnotation);
-      if (annotation.prefixName == null &&
-          annotation.suffixName == null &&
-          annotation.containingName == null) {
+      if (annotation.prefix == null &&
+          annotation.suffix == null &&
+          annotation.containing == null) {
         rule.reportAtNode(
           node,
           diagnosticCode: SubtypeNaming.missingNameDefinition,
@@ -121,14 +121,14 @@ class _SubtypeNamingVisitor extends SimpleAstVisitor<void> {
 
     var type = annotation.computeConstantValue();
     if (type == null) return .empty;
-    var prefixName = type.getField('prefixName')?.toStringValue();
-    var suffixName = type.getField('suffixName')?.toStringValue();
-    var containingName = type.getField('containingName')?.toStringValue();
+    var prefix = type.getField('prefix')?.toStringValue();
+    var suffix = type.getField('suffix')?.toStringValue();
+    var containing = type.getField('containing')?.toStringValue();
 
     return _SubtypeNamingAnnotation(
-      prefixName: prefixName,
-      suffixName: suffixName,
-      containingName: containingName,
+      prefix: prefix,
+      suffix: suffix,
+      containing: containing,
     );
   }
 
@@ -151,20 +151,20 @@ class _SubtypeNamingVisitor extends SimpleAstVisitor<void> {
     }
     for (final annotation in annotations) {
       var typeName = name.lexeme;
-      if (annotation.prefixName != null &&
-          !typeName.startsWith(annotation.prefixName!)) {
+      if (annotation.prefix != null &&
+          !typeName.startsWith(annotation.prefix!)) {
         rule.reportAtToken(
           name,
           diagnosticCode: rule.rule,
         );
-      } else if (annotation.suffixName != null &&
-          !typeName.endsWith(annotation.suffixName!)) {
+      } else if (annotation.suffix != null &&
+          !typeName.endsWith(annotation.suffix!)) {
         rule.reportAtToken(
           name,
           diagnosticCode: rule.rule,
         );
-      } else if (annotation.containingName != null &&
-          !typeName.contains(annotation.containingName!)) {
+      } else if (annotation.containing != null &&
+          !typeName.contains(annotation.containing!)) {
         rule.reportAtToken(
           name,
           diagnosticCode: rule.rule,
