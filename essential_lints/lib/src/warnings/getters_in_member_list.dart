@@ -8,6 +8,7 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
 
 import '../utils/extensions/list.dart';
+import '../utils/extensions/object.dart';
 import 'essential_lint_warnings.dart';
 import 'warning.dart';
 
@@ -34,13 +35,21 @@ class GettersInMemberListRule extends MultiWarningRule<GettersInMemberList> {
 }
 
 class _GettersInMemberListAnnotation {
-  _GettersInMemberListAnnotation({
+  const _GettersInMemberListAnnotation({
     required this.memberListName,
     required this.getters,
     required this.fields,
     required this.types,
     required this.superTypes,
   });
+
+  static const _GettersInMemberListAnnotation empty = .new(
+    memberListName: '',
+    getters: true,
+    fields: false,
+    types: [],
+    superTypes: [],
+  );
 
   final String memberListName;
   final List<DartType> types;
@@ -58,48 +67,47 @@ class _GettersInMemberListAnnotation {
 class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
   _GettersInMemberListVisitor(this.rule, this.context);
 
+  static const _annotationName = 'GettersInMemberList';
+
   static final Uri _annotationUri = .parse(
     'package:essential_lints_annotations/src/getters_in_member_list.dart',
   );
 
   final GettersInMemberListRule rule;
-
   final RuleContext context;
 
   @override
   void visitAnnotation(Annotation node) {
-    if (!_isGettersInMemberListAnnotation(node)) {
-      return;
-    }
-    if (node.parent is! ClassDeclaration) {
-      return;
+    if (_isGettersInMemberListAnnotation(node.elementAnnotation)) {
+      var annotation = _mapKnownArguments(node.elementAnnotation);
+      if (annotation == null) {
+        assert(false, 'The annotation should not be null here.');
+        return;
+      }
+      if (annotation.memberListName.isEmpty) {
+        rule.reportAtNode(
+          node.arguments?.arguments
+                  .firstWhereOrNull(_isMemberListName)
+                  .whenTypeOrNull<NamedExpression>()
+                  ?.expression ??
+              node.name,
+          diagnosticCode: GettersInMemberList.emptyMemberListName,
+        );
+      }
     }
   }
 
   @override
   void visitClassDeclaration(ClassDeclaration node) {
-    var annotations = node.sortedCommentAndAnnotations.whereType<Annotation>();
-    if (annotations.isEmpty) {
-      return;
-    }
-    var relevant = annotations.where(_isGettersInMemberListAnnotation);
-    if (relevant.isEmpty) {
-      return;
-    }
-    var arguments = relevant.map((annotation) => annotation.arguments).nonNulls;
-    var finalAnnotations = <_GettersInMemberListAnnotation?>[];
-    for (final argument in arguments) {
-      finalAnnotations.add(_mapKnownArguments(argument));
-    }
-    if (finalAnnotations.isEmpty) {
-      assert(false, 'We should be able to map at least one annotation.');
-      return;
-    }
     var element = node.declaredFragment?.element;
     if (element == null) {
       return;
     }
-    for (final annotation in finalAnnotations.nonNulls) {
+    var relevant = element.metadata.annotations
+        .where(_isGettersInMemberListAnnotation)
+        .map(_mapKnownArguments)
+        .nonNulls;
+    for (final annotation in relevant) {
       if (annotation.memberListName.isEmpty) {
         continue;
       }
@@ -279,79 +287,44 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
     return missing;
   }
 
-  bool _isGettersInMemberListAnnotation(Annotation annotation) {
-    if (annotation.name.name != 'GettersInMemberList') {
+  bool _isGettersInMemberListAnnotation(ElementAnnotation? annotation) {
+    if (annotation?.element is! ConstructorElement) {
       return false;
     }
-    var element = annotation.element;
-    if (element == null) {
+    var element = annotation?.computeConstantValue()?.type?.element;
+    return element?.library?.uri == _annotationUri &&
+        element?.name == _annotationName;
+  }
+
+  bool _isMemberListName(Expression element) {
+    if (element is! NamedExpression) {
       return false;
     }
-    var library = element.library;
-    if (library == null) {
-      return false;
-    }
-    return library.uri == _annotationUri;
+    return element.name.label.name == 'memberListName';
   }
 
   _GettersInMemberListAnnotation? _mapKnownArguments(
-    ArgumentList argumentList,
+    ElementAnnotation? annotation,
   ) {
-    var memberListName = '';
-    var getters = true;
-    var fields = true;
-    var types = <DartType>[];
-    var superTypes = <DartType>[];
-    for (final element in argumentList.arguments) {
-      if (element is NamedExpression) {
-        var name = element.name.label.name;
-        var expression = element.expression;
-        if (name == 'memberListName' && expression is StringLiteral) {
-          memberListName = expression.stringValue ?? '';
-          if (memberListName.isEmpty) {
-            rule.reportAtNode(
-              expression,
-              diagnosticCode: GettersInMemberList.emptyMemberListName,
-            );
-            return null;
-          }
-        } else if (name == 'getters' && expression is BooleanLiteral) {
-          getters = expression.value;
-        } else if (name == 'fields' && expression is BooleanLiteral) {
-          fields = expression.value;
-        } else if (name == 'types' && expression is ListLiteral) {
-          for (final identifier in expression.elements) {
-            if (identifier case InstanceCreationExpression(
-              constructorName: ConstructorName(
-                type: NamedType(
-                  typeArguments: TypeArgumentList(:var singleType?),
-                ),
-              ),
-            )) {
-              types.add(singleType);
-            }
-          }
-        } else if (name == 'superTypes' && expression is ListLiteral) {
-          for (final identifier in expression.elements) {
-            if (identifier case InstanceCreationExpression(
-              constructorName: ConstructorName(
-                type: NamedType(
-                  typeArguments: TypeArgumentList(:var singleType?),
-                ),
-              ),
-            )) {
-              superTypes.add(singleType);
-            }
-          }
-        }
-      }
-    }
+    var element = annotation?.element;
+    if (element is! ConstructorElement) return .empty;
+
+    var type = annotation?.computeConstantValue();
+    if (type == null) return .empty;
+    var memberListName = type.getField('memberListName')?.toStringValue();
+    var getters = type.getField('getters')?.toBoolValue();
+    var fields = type.getField('fields')?.toBoolValue();
+    var types = type.getField('types')?.toListValue();
+    var superTypes = type.getField('superTypes')?.toListValue();
+
     return _GettersInMemberListAnnotation(
-      memberListName: memberListName,
-      getters: getters,
-      fields: fields,
-      types: types,
-      superTypes: superTypes,
+      memberListName: memberListName ?? '',
+      getters: getters ?? true,
+      fields: fields ?? false,
+      types: [...?types?.map((e) => e.type.singleTypeArgument).nonNulls],
+      superTypes: [
+        ...?superTypes?.map((e) => e.type.singleTypeArgument).nonNulls,
+      ],
     );
   }
 }
@@ -378,11 +351,11 @@ extension on (MultiWarningRule, GetterElement) {
   }
 }
 
-extension on TypeArgumentList {
-  DartType? get singleType {
-    if (arguments.length != 1) {
-      return null;
+extension on DartType? {
+  DartType? get singleTypeArgument {
+    if (this case InterfaceType type) {
+      return type.typeArguments.singleOrNull;
     }
-    return arguments.first.type;
+    return null;
   }
 }

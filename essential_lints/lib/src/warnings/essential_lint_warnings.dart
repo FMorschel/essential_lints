@@ -57,7 +57,23 @@ enum EssentialMultiWarnings<T extends SubWarnings> with EnumDiagnostic {
           'A lint rule that ensures getters/fields are included in the member '
           'list.',
     ),
-  )
+  ),
+
+  /// Subtypes should follow specific naming conventions.
+  subtypeNaming<SubtypeNaming>(
+    WarningCode(
+      name: 'subtype_naming',
+      problemMessage:
+          'The name of this subtype does not follow the required naming '
+          'conventions.',
+      correctionMessage:
+          'Rename the subtype to follow the required naming conventions.',
+      description:
+          'A lint rule that ensures subtypes follow specific naming '
+          'conventions such as required prefixes, suffixes, or containing '
+          'names.',
+    ),
+  ),
   ;
 
   const EssentialMultiWarnings(this.code);
@@ -139,6 +155,35 @@ enum GettersInMemberList with EnumDiagnostic, SubWarnings {
 
   @override
   final EssentialMultiWarnings base = .gettersInMemberList;
+
+  @override
+  final WarningCode code;
+}
+
+/// The list of sub-warnings for the SubtypeNaming warning.
+enum SubtypeNaming with EnumDiagnostic, SubWarnings {
+  /// The annotation does not specify any naming conventions.
+  missingNameDefinition(
+    WarningCode(
+      name: 'missing_subtype_naming_definition',
+      problemMessage:
+          'The @SubtypeNaming annotation must specify at least one naming '
+          'convention (prefix, suffix, or containing name).',
+      correctionMessage:
+          'Add at least one naming convention to the @SubtypeNaming '
+          'annotation.',
+      description:
+          'A lint rule that ensures the @SubtypeNaming annotation specifies '
+          'at least one naming convention (prefix, suffix, or containing '
+          'name).',
+    ),
+  ),
+  ;
+
+  const SubtypeNaming(this.code);
+
+  @override
+  final EssentialMultiWarnings base = .subtypeNaming;
 
   @override
   final WarningCode code;

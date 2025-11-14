@@ -27,6 +27,7 @@ import 'rules/rule.dart';
 import 'rules/unnecessary_setstate.dart';
 import 'warnings/essential_lint_warnings.dart';
 import 'warnings/getters_in_member_list.dart';
+import 'warnings/subtype_naming.dart';
 import 'warnings/warning.dart';
 
 /// A typedef for the base fix constructor.
@@ -158,6 +159,7 @@ mixin WarningsPluginIntegration {
     for (final rule in EssentialMultiWarnings.values) {
       rules.add(switch (rule) {
         .gettersInMemberList => GettersInMemberListRule(),
+        .subtypeNaming => SubtypeNamingRule(),
       });
     }
     return rules;
