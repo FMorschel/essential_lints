@@ -1,9 +1,11 @@
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/source/source_range.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
 
+import '../rules/essential_lint_rules.dart';
 import 'essential_lint_fixes.dart';
 import 'fix.dart';
 
@@ -23,11 +25,30 @@ class RemoveExpressionFix extends WarningFix {
   @override
   Future<void> compute(ChangeBuilder builder) async {
     var node = this.node;
-    if (node is! Expression && node is! NullAwareElement) {
-      return;
+    if (diagnostic?.diagnosticCode == EssentialLintRules.emptyContainer) {
+      node = node.thisOrAncestorOfType<Expression>() ?? node;
+    }
+    if (node.parent case NamedExpression parent) {
+      node = parent;
     }
     if (node.parent case NullAwareElement nullAware) {
       node = nullAware;
+    }
+    if (node is! Expression && node is! NullAwareElement) {
+      return;
+    }
+    if (node.parent
+        case ReturnStatement() ||
+            YieldStatement() ||
+            VariableDeclaration() ||
+            AssignmentExpression()) {
+      return;
+    }
+    if (node case Expression(
+      parent: ArgumentList(),
+      correspondingParameter: FormalParameterElement(isRequired: true),
+    )) {
+      return;
     }
     SourceRange deletionRange;
     if (node.parent case ExpressionStatement statement) {

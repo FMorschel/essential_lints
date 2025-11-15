@@ -37,7 +37,16 @@ enum EssentialLintFixes implements EnumFix {
       DartFixKindPriority.standard,
       'Use padding property',
     ),
-  )
+  ),
+
+  /// Fix to replace an empty Container with a SizedBox.shrink().
+  replaceWithSizedBox(
+    FixKind(
+      'dart.fix.replaceWithSizedBox',
+      DartFixKindPriority.standard,
+      "Replace with 'SizedBox.shrink()'",
+    ),
+  ),
   ;
 
   const EssentialLintFixes(this.fixKind);

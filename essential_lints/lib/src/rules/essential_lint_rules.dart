@@ -124,6 +124,17 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
           'in State classes.',
     ),
   ),
+
+  /// A rule that detects empty container widgets in Flutter code.
+  emptyContainer(
+    LintRuleCode(
+      name: 'empty_container',
+      problemMessage: 'Empty Container widget detected.',
+      correctionMessage: 'Remove the empty Container widget.',
+      description:
+          'A lint rule that detects empty Container widgets in Flutter code.',
+    ),
+  ),
   ;
 
   const EssentialLintRules(this.code);

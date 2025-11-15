@@ -151,5 +151,5 @@ abstract class WarningFixTestProcessor extends FixTestProcessor {
   EssentialLintWarningFixes get fix;
 
   @override
-  WarningRule get rule;
+  AnalysisRule get rule;
 }

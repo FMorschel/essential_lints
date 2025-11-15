@@ -14,9 +14,11 @@ import 'fixes/double_literal_format.dart';
 import 'fixes/essential_lint_fixes.dart';
 import 'fixes/fix.dart';
 import 'fixes/remove_expression.dart';
+import 'fixes/replace_with_squared_box.dart';
 import 'fixes/use_padding_property.dart';
 import 'rules/alphabetize_arguments.dart';
 import 'rules/double_literal_format.dart';
+import 'rules/empty_container.dart';
 import 'rules/essential_lint_rules.dart';
 import 'rules/padding_over_container.dart';
 import 'rules/prefer_explicitly_named_parameters.dart';
@@ -67,6 +69,8 @@ mixin FixesPluginIntegration {
       }
     }
 
+    addFixTo(RemoveExpressionFix.new, [.emptyContainer]);
+
     for (final fix in EssentialLintFixes.values) {
       var _ = switch (fix) {
         .alphabetizeArguments => addFixTo(AlphabetizeArgumentsFix.new, [
@@ -77,6 +81,9 @@ mixin FixesPluginIntegration {
         ]),
         .usePaddingProperty => addFixTo(UsePaddingPropertyFix.new, [
           .paddingOverContainer,
+        ]),
+        .replaceWithSizedBox => addFixTo(ReplaceWithSizedBoxFix.new, [
+          .emptyContainer,
         ]),
       };
     }
@@ -139,6 +146,7 @@ mixin RulesPluginIntegration {
         .returningWidgets => ReturningWidgetsRule(),
         .paddingOverContainer => PaddingOverContainerRule(),
         .unnecessarySetstate => UnnecessarySetstateRule(),
+        .emptyContainer => EmptyContainerRule(),
       });
     }
     return rules;

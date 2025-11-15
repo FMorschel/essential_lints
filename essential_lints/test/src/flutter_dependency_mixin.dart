@@ -22,11 +22,16 @@ abstract class State<T extends StatefulWidget> {
       join(flutterFolder.path, 'lib', 'src', 'widgets', 'framework.dart'),
       '''
 abstract class BuildContext {}
-abstract class Widget {}
+abstract class Widget {
+  const Widget();
+}
 abstract class StatelessWidget extends Widget {
+  const StatelessWidget();
   Widget build(BuildContext context);
 }
-abstract class StatefulWidget extends Widget {}
+abstract class StatefulWidget extends Widget {
+  const StatefulWidget();
+}
 abstract class State<T extends StatefulWidget> {
   void setState(VoidCallback fn);
   void initState() {}
@@ -57,7 +62,11 @@ import '../painting/edge_insets.dart';
 export '../../painting.dart';
 
 class Padding extends Widget {
-  Padding({required EdgeInsets padding, Widget? child});
+  const Padding({required EdgeInsets padding, Widget? child});
+}
+
+class SizedBox extends Widget {
+  const SizedBox.shrink();
 }
 ''',
     );
@@ -65,7 +74,7 @@ class Padding extends Widget {
       join(flutterFolder.path, 'lib', 'src', 'painting', 'edge_insets.dart'),
       '''
 class EdgeInsets {
-  EdgeInsets.all(double value);
+  const EdgeInsets.all(double value);
 }
 ''',
     );
