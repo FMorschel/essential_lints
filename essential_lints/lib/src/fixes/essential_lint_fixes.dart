@@ -47,6 +47,15 @@ enum EssentialLintFixes implements EnumFix {
       "Replace with 'SizedBox.shrink()'",
     ),
   ),
+
+  /// Fix to sort enum constants alphabetically.
+  sortEnumConstants(
+    FixKind(
+      'dart.fix.sortEnumConstants',
+      DartFixKindPriority.standard,
+      'Sort enum constants',
+    ),
+  ),
   ;
 
   const EssentialLintFixes(this.fixKind);

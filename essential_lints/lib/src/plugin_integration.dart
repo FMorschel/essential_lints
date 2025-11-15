@@ -15,8 +15,10 @@ import 'fixes/essential_lint_fixes.dart';
 import 'fixes/fix.dart';
 import 'fixes/remove_expression.dart';
 import 'fixes/replace_with_squared_box.dart';
+import 'fixes/sort_enum_constants.dart';
 import 'fixes/use_padding_property.dart';
 import 'rules/alphabetize_arguments.dart';
+import 'rules/alphabetize_enum_constants.dart';
 import 'rules/double_literal_format.dart';
 import 'rules/empty_container.dart';
 import 'rules/essential_lint_rules.dart';
@@ -85,6 +87,9 @@ mixin FixesPluginIntegration {
         .replaceWithSizedBox => addFixTo(ReplaceWithSizedBoxFix.new, [
           .emptyContainer,
         ]),
+        .sortEnumConstants => addFixTo(SortEnumConstantsFix.new, [
+          .alphabetizeEnumConstants,
+        ]),
       };
     }
     return fixes;
@@ -138,6 +143,7 @@ mixin RulesPluginIntegration {
     final rules = <LintRule>{};
     for (final rule in EssentialLintRules.values) {
       rules.add(switch (rule) {
+        .alphabetizeEnumConstants => AlphabetizeEnumConstantsRule(),
         .alphabetizeArguments => AlphabetizeArgumentsRule(),
         .doubleLiteralFormat => DoubleLiteralFormatRule(),
         .preferExplicitlyNamedParameter => PreferExplicitlyNamedParameterRule(),

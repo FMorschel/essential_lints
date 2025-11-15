@@ -135,6 +135,17 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
           'A lint rule that detects empty Container widgets in Flutter code.',
     ),
   ),
+
+  /// A rule that enforces alphabetical ordering of enum constants.
+  alphabetizeEnumConstants(
+    LintRuleCode(
+      name: 'alphabetize_enum_constants',
+      problemMessage: 'Enum constants should be in alphabetical order.',
+      correctionMessage: 'Reorder the enum constants alphabetically.',
+      description:
+          'A lint rule that enforces alphabetical ordering of enum constants.',
+    ),
+  )
   ;
 
   const EssentialLintRules(this.code);
