@@ -3,6 +3,7 @@ import 'package:analysis_server_plugin/registry.dart';
 // ignore: implementation_imports, open issue
 import 'package:analysis_server_plugin/src/correction/fix_generators.dart'
     as fix_generators;
+import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/error/error.dart';
 
 import 'assist/essential_lint_assists.dart';
@@ -23,11 +24,11 @@ import 'rules/double_literal_format.dart';
 import 'rules/empty_container.dart';
 import 'rules/essential_lint_rules.dart';
 import 'rules/padding_over_container.dart';
+import 'rules/pending_listener.dart';
 import 'rules/prefer_explicitly_named_parameters.dart';
 import 'rules/prefer_first.dart';
 import 'rules/prefer_last.dart';
 import 'rules/returning_widgets.dart';
-import 'rules/rule.dart';
 import 'rules/unnecessary_setstate.dart';
 import 'warnings/essential_lint_warnings.dart';
 import 'warnings/getters_in_member_list.dart';
@@ -139,8 +140,8 @@ mixin FixesPluginIntegration {
 /// Mixin to integrate plugin rules.
 mixin RulesPluginIntegration {
   /// Returns the list of registered rules.
-  Set<LintRule> get rules {
-    final rules = <LintRule>{};
+  Set<AbstractAnalysisRule> get rules {
+    final rules = <AbstractAnalysisRule>{};
     for (final rule in EssentialLintRules.values) {
       rules.add(switch (rule) {
         .alphabetizeEnumConstants => AlphabetizeEnumConstantsRule(),
@@ -153,6 +154,11 @@ mixin RulesPluginIntegration {
         .paddingOverContainer => PaddingOverContainerRule(),
         .unnecessarySetstate => UnnecessarySetstateRule(),
         .emptyContainer => EmptyContainerRule(),
+      });
+    }
+    for (final rule in EssentialMultiLints.values) {
+      rules.add(switch (rule) {
+        .pendingListener => PendingListenerRule(),
       });
     }
     return rules;

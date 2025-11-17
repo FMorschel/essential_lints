@@ -145,7 +145,7 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
       description:
           'A lint rule that enforces alphabetical ordering of enum constants.',
     ),
-  )
+  ),
   ;
 
   const EssentialLintRules(this.code);
@@ -157,16 +157,18 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
 
 /// The list of all essential lint rules.
 enum EssentialMultiLints<T extends SubLints> with EnumDiagnostic, EnumLint {
-  /// Getters should be included in member lists.
-  // ignore: unused_field
-  _placeholder(
+  /// A lint rule that detects pending listeners and reminds developers to
+  /// remove them.
+  pendingListener<PendingListener>(
     LintRuleCode(
-      name: 'placeholder',
-      problemMessage: '',
-      correctionMessage: '',
-      description: '',
+      name: 'pending_listener',
+      problemMessage: 'Pending listener detected.',
+      correctionMessage: 'Remove the pending listener.',
+      description:
+          'A lint rule that detects pending listeners and reminds developers '
+          'to remove them.',
     ),
-  )
+  ),
   ;
 
   const EssentialMultiLints(this.code);
@@ -189,6 +191,48 @@ class LintRuleCode extends WarningCode implements LintCode {
     super.hasPublishedDocs,
     super.uniqueName,
   }) : super(type: DiagnosticType.LINT);
+}
+
+/// {@template pending_listener}
+/// Sub-lints for the PendingListener lint rule.
+/// {@endtemplate}
+enum PendingListener with EnumDiagnostic, SubLints {
+  /// Closures used as listeners cannot be matched for removal.
+  closuresCannotBeMatched(
+    LintRuleCode(
+      name: 'closures_cannot_be_matched',
+      problemMessage:
+          'Closures used as listeners cannot be matched for '
+          'removal.',
+      correctionMessage:
+          'Avoid using closures as listeners to ensure they can be properly '
+          'removed.',
+      description:
+          'A sub-lint that highlights the use of closures as listeners, which '
+          'cannot be matched for removal later.',
+    ),
+  ),
+
+  /// Unnecessary calls to remove listeners that were never added.
+  unnecessaryRemove(
+    LintRuleCode(
+      name: 'unnecessary_remove',
+      problemMessage: 'Unnecessary listener removal detected.',
+      correctionMessage: 'Remove the unnecessary listener removal call.',
+      description:
+          'A sub-lint that detects unnecessary calls to remove listeners that '
+          'were never added.',
+    ),
+  ),
+  ;
+
+  const PendingListener(this.code);
+
+  @override
+  final EssentialMultiLints base = .pendingListener;
+
+  @override
+  final LintRuleCode code;
 }
 
 /// {@template sub_warnings}

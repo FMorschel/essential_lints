@@ -60,6 +60,7 @@ import 'framework.dart';
 import '../painting/edge_insets.dart';
 
 export '../../painting.dart';
+export '../../foundation.dart' show Listenable;
 
 class Padding extends Widget {
   const Padding({required EdgeInsets padding, Widget? child});
@@ -68,6 +69,38 @@ class Padding extends Widget {
 class SizedBox extends Widget {
   const SizedBox.shrink();
 }
+''',
+    );
+    newFile(
+      join(
+        flutterFolder.path,
+        'lib',
+        'src',
+        'foundation',
+        'change_notifier.dart',
+      ),
+      '''
+typedef VoidCallback = void Function();
+
+abstract class Listenable {
+  const Listenable();
+  void addListener(VoidCallback listener);
+  void removeListener(VoidCallback listener);
+}
+
+mixin class ChangeNotifier implements Listenable {
+  void dispose() {}
+}
+''',
+    );
+    newFile(
+      join(
+        flutterFolder.path,
+        'lib',
+        'foundation.dart',
+      ),
+      '''
+export 'src/foundation/change_notifier.dart';
 ''',
     );
     newFile(
