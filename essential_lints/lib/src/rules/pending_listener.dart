@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
@@ -31,27 +29,11 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
     RuleContext context,
   ) {
     final visitor = _PendingListenerVisitor(this, context);
-    var file =
-        File(
-          '${context.definingUnit.file.parent.path}/debug.txt',
-        )..writeAsStringSync(
-          'Evaluating ${context.definingUnit.file.path}\n',
-          mode: FileMode.append,
-        );
     registry
       ..addMethodInvocation(this, visitor)
       ..afterLibrary(this, () {
-        file.writeAsStringSync(
-          'Completed evaluation of ${context.definingUnit.file.path}\n',
-          mode: FileMode.append,
-        );
         var addedListeners = visitor.addedListeners;
         var removedListeners = visitor.removedListeners;
-        file.writeAsStringSync(
-          'Added Listeners: $addedListeners\n'
-          'Removed Listeners: $removedListeners\n',
-          mode: FileMode.append,
-        );
         _reportFor(addedListeners, removedListeners, rule);
         _reportFor(
           removedListeners,
@@ -143,7 +125,8 @@ class _PendingListenerVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    var targetType = node.target?.staticType.whenTypeOrNull<InterfaceType>();
+    var targetType = node.realTarget?.staticType
+        .whenTypeOrNull<InterfaceType>();
     var targetElement = _targetElement(node);
     if (targetElement == null) {
       return;

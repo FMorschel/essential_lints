@@ -37,6 +37,24 @@ class PendingListenerTest extends MultiLintTestProcessor<PendingListener>
     );
   }
 
+  Future<void> test_added_cascade() async {
+    await assertDiagnostics(
+      '''
+import 'package:flutter/foundation.dart';
+
+class C {
+  C(this.listenable);
+  final Listenable listenable;
+
+  void a() {
+    listenable..addListener(a);
+  }
+}
+''',
+      [lint(148, 1)],
+    );
+  }
+
   Future<void> test_added() async {
     await assertDiagnostics(
       '''
