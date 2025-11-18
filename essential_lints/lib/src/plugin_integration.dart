@@ -5,6 +5,7 @@ import 'package:analysis_server_plugin/src/correction/fix_generators.dart'
     as fix_generators;
 import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/error/error.dart';
+import 'package:logging/logging.dart';
 
 import 'assist/essential_lint_assists.dart';
 import 'assist/remove_useless_else.dart';
@@ -18,6 +19,7 @@ import 'fixes/remove_expression.dart';
 import 'fixes/replace_with_squared_box.dart';
 import 'fixes/sort_enum_constants.dart';
 import 'fixes/use_padding_property.dart';
+import 'plugin.dart';
 import 'rules/alphabetize_arguments.dart';
 import 'rules/alphabetize_enum_constants.dart';
 import 'rules/double_literal_format.dart';
@@ -30,6 +32,7 @@ import 'rules/prefer_first.dart';
 import 'rules/prefer_last.dart';
 import 'rules/returning_widgets.dart';
 import 'rules/unnecessary_setstate.dart';
+import 'utils/extensions/logger.dart';
 import 'warnings/essential_lint_warnings.dart';
 import 'warnings/getters_in_member_list.dart';
 import 'warnings/subtype_naming.dart';
@@ -41,8 +44,14 @@ typedef FixGenerator =
 
 /// Mixin to integrate plugin fixes.
 mixin AssistsPluginIntegration {
+  /// The logger for the assists integration.
+  static final Logger logger = EssentialLintsPlugin.logger.newChild(
+    'AssistsPluginIntegration',
+  );
+
   /// Returns the list of registered assists.
   Set<fix_generators.ProducerGenerator> get assists {
+    logger.info('Mapping assists');
     final assists = <fix_generators.ProducerGenerator>{};
 
     for (final assist in EssentialLintAssists.values) {
@@ -51,19 +60,28 @@ mixin AssistsPluginIntegration {
           assists.add(RemoveUselessElse.new);
       }
     }
+    logger.info('Mapped assists');
     return assists;
   }
 
   /// Registers all assists with the given registry.
   void registerAssists(PluginRegistry registry) {
+    logger.info('Registering assists');
     assists.forEach(registry.registerAssist);
+    logger.info('Registered assists');
   }
 }
 
 /// Mixin to integrate plugin fixes.
 mixin FixesPluginIntegration {
+  /// The logger for the fixes integration.
+  static final Logger logger = EssentialLintsPlugin.logger.newChild(
+    'FixesPluginIntegration',
+  );
+
   /// Returns the list of registered lint fixes.
   Map<LintCode, List<FixGenerator>> get lintFixes {
+    logger.info('Mapping lint fixes');
     final fixes = <LintCode, List<FixGenerator>>{};
 
     void addFixTo(FixGenerator generator, List<EssentialLintRules> rules) {
@@ -93,11 +111,13 @@ mixin FixesPluginIntegration {
         ]),
       };
     }
+    logger.info('Mapped lint fixes');
     return fixes;
   }
 
   /// Returns the list of registered lint fixes.
   Map<DiagnosticCode, List<FixGenerator>> get warningFixes {
+    logger.info('Mapping warning fixes');
     final fixes = <DiagnosticCode, List<FixGenerator>>{};
 
     void addFixTo(FixGenerator generator, List<EnumDiagnostic> rules) {
@@ -119,28 +139,40 @@ mixin FixesPluginIntegration {
         ]),
       };
     }
+    logger.info('Mapped warning fixes');
     return fixes;
   }
 
   /// Registers all fixes with the given registry.
   void registerFixes(PluginRegistry registry) {
+    logger.info('Registering lint fixes');
     lintFixes.forEach((diagnosticCode, generators) {
       for (final generator in generators) {
         registry.registerFixForRule(diagnosticCode, generator);
       }
     });
+    logger
+      ..info('Registered lint fixes')
+      ..info('Registering warning fixes');
     warningFixes.forEach((diagnosticCode, generators) {
       for (final generator in generators) {
         registry.registerFixForRule(diagnosticCode, generator);
       }
     });
+    logger.info('Registered warning fixes');
   }
 }
 
 /// Mixin to integrate plugin rules.
 mixin RulesPluginIntegration {
+  /// The logger for the rules integration.
+  static final Logger logger = EssentialLintsPlugin.logger.newChild(
+    'RulesPluginIntegration',
+  );
+
   /// Returns the list of registered rules.
   Set<AbstractAnalysisRule> get rules {
+    logger.info('Mapping lint rules');
     final rules = <AbstractAnalysisRule>{};
     for (final rule in EssentialLintRules.values) {
       rules.add(switch (rule) {
@@ -156,24 +188,36 @@ mixin RulesPluginIntegration {
         .emptyContainer => EmptyContainerRule(),
       });
     }
+    logger
+      ..info('Mapped lint rules')
+      ..info('Mapping multi lint rules');
     for (final rule in EssentialMultiLints.values) {
       rules.add(switch (rule) {
         .pendingListener => PendingListenerRule(),
       });
     }
+    logger.info('Mapped multi lint rules');
     return rules;
   }
 
   /// Registers all lint rules with the given registry.
   void registerRules(PluginRegistry registry) {
+    logger.info('Registering lint rules');
     rules.forEach(registry.registerLintRule);
+    logger.info('Registered lint rules');
   }
 }
 
 /// Mixin to integrate plugin rules.
 mixin WarningsPluginIntegration {
+  /// The logger for the warnings integration.
+  static final Logger logger = EssentialLintsPlugin.logger.newChild(
+    'WarningsPluginIntegration',
+  );
+
   /// Returns the list of registered warnings.
   Set<MultiWarningRule> get warnings {
+    logger.info('Mapping warning rules');
     final rules = <MultiWarningRule>{};
     // Single instance to satisfy exhaustive switch requirement.
     for (final rule in EssentialMultiWarnings.values) {
@@ -182,11 +226,14 @@ mixin WarningsPluginIntegration {
         .subtypeNaming => SubtypeNamingRule(),
       });
     }
+    logger.info('Mapped warning rules');
     return rules;
   }
 
   /// Registers all lint rules with the given registry.
   void registerWarnings(PluginRegistry registry) {
+    logger.info('Registering warning rules');
     warnings.forEach(registry.registerWarningRule);
+    logger.info('Registered warning rules');
   }
 }
