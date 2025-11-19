@@ -8,20 +8,6 @@ mixin FlutterDependencyMixin on AnalysisRuleTest {
       join(flutterFolder.path, 'lib', 'src', 'widgets', 'framework.dart'),
       '''
 abstract class BuildContext {}
-abstract class Widget {}
-abstract class StatelessWidget extends Widget {
-  Widget build(BuildContext context);
-}
-abstract class StatefulWidget extends Widget {}
-abstract class State<T extends StatefulWidget> {
-  Widget build(BuildContext context);
-}
-''',
-    );
-    newFile(
-      join(flutterFolder.path, 'lib', 'src', 'widgets', 'framework.dart'),
-      '''
-abstract class BuildContext {}
 abstract class Widget {
   const Widget();
 }
@@ -33,7 +19,7 @@ abstract class StatefulWidget extends Widget {
   const StatefulWidget();
 }
 abstract class State<T extends StatefulWidget> {
-  void setState(VoidCallback fn);
+  void setState(VoidCallback fn) {}
   void initState() {}
   void didChangeDependencies() {}
   void didUpdateWidget(covariant T oldWidget) {}

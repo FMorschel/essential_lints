@@ -173,4 +173,29 @@ import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 class MyClass {}
 ''');
   }
+
+  Future<void> test_onlyConcrete_concrete() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeNaming(prefix: 'My', onlyConcrete: true)
+class MyClass {}
+
+class OtherClass extends MyClass {}
+''',
+      [error(rule.rule, 153, 10)],
+    );
+  }
+
+  Future<void> test_onlyConcrete_abstract() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeNaming(prefix: 'My', onlyConcrete: true)
+class MyClass {}
+
+abstract class MyOtherClass extends MyClass {}
+''');
+  }
 }

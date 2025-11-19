@@ -42,7 +42,8 @@ mixin EditTestProcessorMixin on BaseEditTestProcessor {
   Future<void> assertNoFix({DiagnosticFilter? filter}) async {
     var diagnostic = _singleDiagnostic(filter: filter);
     var fixes = await _computeFixes(diagnostic);
-    expect(fixes, isEmpty);
+    var fix = _parseFix(fixes);
+    expect(fix, isEmpty);
   }
 
   /// Computes fixes for the given [diagnostic] in [testUnit].
@@ -124,6 +125,7 @@ abstract class FixTestProcessor extends BaseEditTestProcessor
   @override
   String get analysisRule => rule.diagnosticCode.name;
 
+  @override
   AnalysisRule get rule;
 }
 
@@ -143,6 +145,7 @@ abstract class MultiWarningFixTestProcessor extends BaseEditTestProcessor
   @override
   EssentialLintWarningFixes get fix;
 
+  @override
   MultiWarningRule get rule;
 }
 

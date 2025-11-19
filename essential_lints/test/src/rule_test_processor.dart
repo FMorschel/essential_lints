@@ -8,11 +8,13 @@ abstract class LintTestProcessor extends AnalysisRuleTest {
   @override
   String get analysisRule => rule.rule.code.name;
 
+  @override
   LintRule get rule;
 
   @override
   void setUp() {
     Registry.ruleRegistry.registerLintRule(rule);
+    super.setUp();
     newAnalysisOptionsYamlFile(testPackageRootPath, '''
 ${analysisOptionsContent()}
 optional-checks:
@@ -27,11 +29,13 @@ abstract class MultiLintTestProcessor<T extends SubLints>
   @override
   String get analysisRule => rule.rule.code.name;
 
+  @override
   MultiLintRule<T> get rule;
 
   @override
   void setUp() {
     Registry.ruleRegistry.registerLintRule(rule);
+    super.setUp();
     newAnalysisOptionsYamlFile(testPackageRootPath, '''
 ${analysisOptionsContent()}
 optional-checks:

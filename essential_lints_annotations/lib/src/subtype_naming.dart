@@ -15,6 +15,7 @@ class SubtypeNaming {
     this.prefix,
     this.suffix,
     this.containing,
+    this.onlyConcrete = false,
   });
 
   /// The required prefix for the subtype name.
@@ -25,4 +26,7 @@ class SubtypeNaming {
 
   /// The required part of the name of the subtype.
   final String? containing;
+
+  /// Whether the annotation should only be applied to concrete subtypes.
+  final bool onlyConcrete;
 }

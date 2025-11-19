@@ -38,17 +38,20 @@ class _SubtypeNamingAnnotation {
     required this.prefix,
     required this.suffix,
     required this.containing,
+    required this.onlyConcrete,
   });
 
   static _SubtypeNamingAnnotation empty = const .new(
     prefix: null,
     suffix: null,
     containing: null,
+    onlyConcrete: false,
   );
 
   final String? prefix;
   final String? suffix;
   final String? containing;
+  final bool onlyConcrete;
 }
 
 class _SubtypeNamingVisitor extends SimpleAstVisitor<void> {
@@ -81,7 +84,9 @@ class _SubtypeNamingVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitClassDeclaration(ClassDeclaration node) {
-    _verifySuperTypes(node.name, node.declaredFragment?.element);
+    if (node.abstractKeyword == null) {
+      _verifySuperTypes(node.name, node.declaredFragment?.element);
+    }
     super.visitClassDeclaration(node);
   }
 
@@ -124,11 +129,13 @@ class _SubtypeNamingVisitor extends SimpleAstVisitor<void> {
     var prefix = type.getField('prefix')?.toStringValue();
     var suffix = type.getField('suffix')?.toStringValue();
     var containing = type.getField('containing')?.toStringValue();
+    var onlyConcrete = type.getField('onlyConcrete')?.toBoolValue() ?? false;
 
     return _SubtypeNamingAnnotation(
       prefix: prefix,
       suffix: suffix,
       containing: containing,
+      onlyConcrete: onlyConcrete,
     );
   }
 
