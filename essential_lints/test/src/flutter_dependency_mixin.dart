@@ -112,8 +112,46 @@ class EdgeInsets {
 ''',
     );
     newFile(
+      join(flutterFolder.path, 'lib', 'src', 'painting', 'borders.dart'),
+      '''
+enum BorderStyle { none, solid, }
+
+class BorderSide {
+  const BorderSide({
+    Color color = const Color(0xFF000000),
+    double width = 1.0,
+    BorderStyle style = BorderStyle.solid,
+    double strokeAlign = strokeAlignInside,
+  });
+
+  static const double strokeAlignInside = -1.0;
+}
+''',
+    );
+    newFile(
+      join(flutterFolder.path, 'lib', 'src', 'painting', 'box_border.dart'),
+      '''
+import 'borders.dart';
+
+class Border {
+  const Border();
+
+  factory Border.all({
+    Color color = const Color(0xFF000000),
+    double width = 1.0,
+    BorderStyle style = BorderStyle.solid,
+    double strokeAlign = BorderSide.strokeAlignInside,
+  }) => Border();
+
+  const Border.fromBorderSide(BorderSide side);
+}
+''',
+    );
+    newFile(
       join(flutterFolder.path, 'lib', 'painting.dart'),
       '''
+export 'src/painting/borders.dart';
+export 'src/painting/box_border.dart';
 export 'src/painting/edge_insets.dart';
 ''',
     );

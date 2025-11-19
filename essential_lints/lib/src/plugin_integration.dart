@@ -16,12 +16,14 @@ import 'fixes/double_literal_format.dart';
 import 'fixes/essential_lint_fixes.dart';
 import 'fixes/fix.dart';
 import 'fixes/remove_expression.dart';
+import 'fixes/replace_with_from_border_side.dart';
 import 'fixes/replace_with_squared_box.dart';
 import 'fixes/sort_enum_constants.dart';
 import 'fixes/use_padding_property.dart';
 import 'plugin.dart';
 import 'rules/alphabetize_arguments.dart';
 import 'rules/alphabetize_enum_constants.dart';
+import 'rules/border_all.dart';
 import 'rules/double_literal_format.dart';
 import 'rules/empty_container.dart';
 import 'rules/essential_lint_rules.dart';
@@ -109,6 +111,10 @@ mixin FixesPluginIntegration {
         .sortEnumConstants => addFixTo(SortEnumConstantsFix.new, [
           .alphabetizeEnumConstants,
         ]),
+        .replaceWithFromBorderSide => addFixTo(
+          ReplaceWithFromBorderSideFix.new,
+          [.borderAll],
+        ),
       };
     }
     logger.info('Mapped lint fixes');
@@ -186,6 +192,7 @@ mixin RulesPluginIntegration {
         .paddingOverContainer => PaddingOverContainerRule(),
         .unnecessarySetstate => UnnecessarySetstateRule(),
         .emptyContainer => EmptyContainerRule(),
+        .borderAll => BorderAllRule(),
       });
     }
     logger

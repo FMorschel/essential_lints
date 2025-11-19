@@ -56,6 +56,15 @@ enum EssentialLintFixes implements EnumFix {
       'Sort enum constants',
     ),
   ),
+
+  /// Fix to replace `Border.all` with `Border.fromBorderSide`.
+  replaceWithFromBorderSide(
+    FixKind(
+      'dart.fix.replaceWithFromBorderSide',
+      DartFixKindPriority.standard,
+      'Replace with Border.fromBorderSide',
+    ),
+  ),
   ;
 
   const EssentialLintFixes(this.fixKind);

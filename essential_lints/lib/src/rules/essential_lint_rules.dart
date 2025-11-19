@@ -146,6 +146,18 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
           'A lint rule that enforces alphabetical ordering of enum constants.',
     ),
   ),
+
+  /// A lint rule that checks for the use of `Border.all` in Flutter widgets.
+  borderAll(
+    LintRuleCode(
+      name: 'border_all',
+      problemMessage: 'Avoid using Border.all in Flutter widgets.',
+      correctionMessage: 'Use Border.fromBorderSide instead of Border.all.',
+      description:
+          'A lint rule that checks for the use of Border.all in Flutter '
+          'widgets.',
+    ),
+  ),
   ;
 
   const EssentialLintRules(this.code);
@@ -187,7 +199,7 @@ class LintRuleCode extends WarningCode implements LintCode {
     required super.problemMessage,
     required super.correctionMessage,
     required super.description,
-    super.severity,
+    super.severity = .INFO,
     super.hasPublishedDocs,
     super.uniqueName,
   }) : super(type: DiagnosticType.LINT);
