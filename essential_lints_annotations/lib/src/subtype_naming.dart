@@ -1,7 +1,7 @@
 import 'package:meta/meta_meta.dart';
 
 /// {@template subtype_naming}
-/// Annotations for the `subtype_naming` lint rule.
+/// Annotations for the `subtype_naming` rule.
 /// {@endtemplate}
 @Target({
   TargetKind.classType,

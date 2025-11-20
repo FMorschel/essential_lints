@@ -37,6 +37,7 @@ import 'rules/unnecessary_setstate.dart';
 import 'utils/extensions/logger.dart';
 import 'warnings/essential_lint_warnings.dart';
 import 'warnings/getters_in_member_list.dart';
+import 'warnings/subtype_annotating.dart';
 import 'warnings/subtype_naming.dart';
 import 'warnings/warning.dart';
 
@@ -231,6 +232,7 @@ mixin WarningsPluginIntegration {
       rules.add(switch (rule) {
         .gettersInMemberList => GettersInMemberListRule(),
         .subtypeNaming => SubtypeNamingRule(),
+        .subtypeAnnotating => SubtypeAnnotatingRule(),
       });
     }
     logger.info('Mapped warning rules');

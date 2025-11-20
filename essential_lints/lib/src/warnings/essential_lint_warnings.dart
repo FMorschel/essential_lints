@@ -74,6 +74,20 @@ enum EssentialMultiWarnings<T extends SubWarnings> with EnumDiagnostic {
           'names.',
     ),
   ),
+
+  /// Subtypes should be annotated with specific annotations.
+  subtypeAnnotating<SubtypeAnnotating>(
+    WarningCode(
+      name: 'subtype_annotating',
+      problemMessage:
+          'The subtype is missing required annotations as specified by the '
+          '@SubtypeAnnotating annotation.',
+      correctionMessage: 'Add the required annotation(s): {0}',
+      description:
+          'A rule that ensures subtypes are annotated with specific '
+          'annotations as defined by the @SubtypeAnnotating annotation.',
+    ),
+  ),
   ;
 
   const EssentialMultiWarnings(this.code);
@@ -155,6 +169,50 @@ enum GettersInMemberList with EnumDiagnostic, SubWarnings {
 
   @override
   final EssentialMultiWarnings base = .gettersInMemberList;
+
+  @override
+  final WarningCode code;
+}
+
+/// The list of sub-warnings for the SubtypeAnnotating warning.
+enum SubtypeAnnotating with EnumDiagnostic, SubWarnings {
+  /// The annotation does not specify any required annotations.
+  missingAnnotation(
+    WarningCode(
+      name: 'missing_annotation',
+      problemMessage:
+          'The @SubtypeAnnotating annotation must specify at least one '
+          'required annotation.',
+      correctionMessage:
+          'Add at least one required annotation to the '
+          '@SubtypeAnnotating annotation.',
+      description:
+          'A lint rule that ensures the @SubtypeAnnotating annotation '
+          'specifies at least one required annotation.',
+    ),
+  ),
+
+  /// The added object a constructor (invocation/tear off) and not just a type
+  /// name.
+  constructorNotType(
+    WarningCode(
+      name: 'constructor_not_type',
+      problemMessage:
+          'The @SubtypeAnnotating annotation should specify type names, not '
+          'constructor invocations or tear-offs.',
+      correctionMessage:
+          'Replace the constructor invocation or tear-off with the type name.',
+      description:
+          'A lint rule that ensures the @SubtypeAnnotating annotation '
+          'specifies type names and not constructor invocations or tear-offs.',
+    ),
+  ),
+  ;
+
+  const SubtypeAnnotating(this.code);
+
+  @override
+  final EssentialMultiWarnings base = .subtypeAnnotating;
 
   @override
   final WarningCode code;

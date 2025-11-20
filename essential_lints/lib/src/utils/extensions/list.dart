@@ -1,6 +1,6 @@
 /// A set of extension getters on [List<String>] to produce comma-separated
 /// string representations.
-extension StringListExt on List<String> {
+extension StringListExt on Iterable<String> {
   /// Produce a comma-separated representation of this iterable, with the last
   /// element preceded by 'and' when there are more than two elements in this
   /// iterable.

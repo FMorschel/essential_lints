@@ -3,27 +3,30 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:collection/collection.dart';
 
+import '../utils/extensions/list.dart';
 import 'essential_lint_warnings.dart';
 import 'warning.dart';
 
-/// {@template subtype_naming_rule}
-/// The rule for the subtype_naming warning.
+/// {@template subtype_annotating_rule}
+/// The rule for subtype_annotating warning.
 /// {@endtemplate}
-class SubtypeNamingRule extends MultiWarningRule<SubtypeNaming> {
-  /// {@macro subtype_naming_rule}
-  SubtypeNamingRule() : super(.subtypeNaming);
+class SubtypeAnnotatingRule extends MultiWarningRule<SubtypeAnnotating> {
+  /// {@macro subtype_annotating_rule}
+  SubtypeAnnotatingRule() : super(.subtypeAnnotating);
 
   @override
-  List<SubtypeNaming> get subWarnings => SubtypeNaming.values;
+  List<SubtypeAnnotating> get subWarnings => SubtypeAnnotating.values;
 
   @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _SubtypeNamingVisitor(this, context);
+    var visitor = _SubtypeAnnotatingVisitor(this, context);
     registry
       ..addAnnotation(this, visitor)
       ..addClassDeclaration(this, visitor)
@@ -33,49 +36,48 @@ class SubtypeNamingRule extends MultiWarningRule<SubtypeNaming> {
   }
 }
 
-class _SubtypeNamingAnnotation {
-  const _SubtypeNamingAnnotation({
-    required this.prefix,
-    required this.suffix,
-    required this.containing,
-    required this.onlyConcrete,
-  });
+class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
+  _SubtypeAnnotatingVisitor(this.rule, this.context);
 
-  static _SubtypeNamingAnnotation empty = const .new(
-    prefix: null,
-    suffix: null,
-    containing: null,
-    onlyConcrete: false,
-  );
-
-  final String? prefix;
-  final String? suffix;
-  final String? containing;
-  final bool onlyConcrete;
-}
-
-class _SubtypeNamingVisitor extends SimpleAstVisitor<void> {
-  _SubtypeNamingVisitor(this.rule, this.context);
-
-  static const _annotationName = 'SubtypeNaming';
+  static const _annotationName = 'SubtypeAnnotating';
 
   static final Uri _annotationUri = .parse(
-    'package:essential_lints_annotations/src/subtype_naming.dart',
+    'package:essential_lints_annotations/src/subtype_annotating.dart',
   );
 
-  final SubtypeNamingRule rule;
+  final SubtypeAnnotatingRule rule;
   final RuleContext context;
 
   @override
   void visitAnnotation(Annotation node) {
     if (_isSubtypeNamingAnnotation(node.elementAnnotation)) {
       var annotation = _mapKnownArguments(node.elementAnnotation);
-      if (annotation.prefix == null &&
-          annotation.suffix == null &&
-          annotation.containing == null) {
+      for (final parameter in [...?node.arguments?.arguments]) {
+        if (parameter case NamedExpression(
+          :var name,
+        ) when name.label.token.lexeme != 'annotations') {
+          continue;
+        }
+        if (parameter is! NamedExpression) {
+          continue;
+        }
+        var list = parameter.expression;
+        if (list is! ListLiteral) {
+          continue;
+        }
+        for (final element in list.elements) {
+          if (element is ConstructorReference) {
+            rule.reportAtNode(
+              element,
+              diagnosticCode: SubtypeAnnotating.constructorNotType,
+            );
+          }
+        }
+      }
+      if (annotation.annotations.isEmpty) {
         rule.reportAtNode(
-          node,
-          diagnosticCode: SubtypeNaming.missingNameDefinition,
+          node.name,
+          diagnosticCode: SubtypeAnnotating.missingAnnotation,
         );
       }
     }
@@ -87,6 +89,7 @@ class _SubtypeNamingVisitor extends SimpleAstVisitor<void> {
     _verifySuperTypes(
       node.name,
       node.declaredFragment?.element,
+      node.metadata,
       abstract: node.abstractKeyword != null,
     );
     super.visitClassDeclaration(node);
@@ -94,19 +97,19 @@ class _SubtypeNamingVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitEnumDeclaration(EnumDeclaration node) {
-    _verifySuperTypes(node.name, node.declaredFragment?.element);
+    _verifySuperTypes(node.name, node.declaredFragment?.element, node.metadata);
     super.visitEnumDeclaration(node);
   }
 
   @override
   void visitExtensionTypeDeclaration(ExtensionTypeDeclaration node) {
-    _verifySuperTypes(node.name, node.declaredFragment?.element);
+    _verifySuperTypes(node.name, node.declaredFragment?.element, node.metadata);
     super.visitExtensionTypeDeclaration(node);
   }
 
   @override
   void visitMixinDeclaration(MixinDeclaration node) {
-    _verifySuperTypes(node.name, node.declaredFragment?.element);
+    _verifySuperTypes(node.name, node.declaredFragment?.element, node.metadata);
     super.visitMixinDeclaration(node);
   }
 
@@ -128,22 +131,19 @@ class _SubtypeNamingVisitor extends SimpleAstVisitor<void> {
 
     var type = annotation.computeConstantValue();
     if (type == null) return .empty;
-    var prefix = type.getField('prefix')?.toStringValue();
-    var suffix = type.getField('suffix')?.toStringValue();
-    var containing = type.getField('containing')?.toStringValue();
+    var annotations = [...?type.getField('annotations')?.toListValue()];
     var onlyConcrete = type.getField('onlyConcrete')?.toBoolValue() ?? false;
 
     return _SubtypeNamingAnnotation(
-      prefix: prefix,
-      suffix: suffix,
-      containing: containing,
+      annotations: annotations,
       onlyConcrete: onlyConcrete,
     );
   }
 
   void _verifySuperTypes(
     Token name,
-    InterfaceElement? element, {
+    InterfaceElement? element,
+    NodeList<Annotation> metadata, {
     bool abstract = false,
   }) {
     if (element == null) {
@@ -162,30 +162,54 @@ class _SubtypeNamingVisitor extends SimpleAstVisitor<void> {
             .map(_mapKnownArguments),
       );
     }
+
+    bool existing(DartObject annotation) {
+      for (final meta in metadata) {
+        var value = meta.elementAnnotation?.computeConstantValue();
+        if (value == null) continue;
+        if (value == annotation || annotation.toTypeValue() == value.type) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    String gettersAndTypes(DartObject annotation) {
+      if (annotation.toTypeValue() case var type?) {
+        return 'an object of type ${type.getDisplayString()}';
+      }
+      return "'${annotation.variable?.displayName}'";
+    }
+
     for (final annotation in annotations) {
       if (annotation.onlyConcrete && abstract) {
         continue;
       }
-      var typeName = name.lexeme;
-      if (annotation.prefix != null &&
-          !typeName.startsWith(annotation.prefix!)) {
+      var missingAnnotations = annotation.annotations.whereNot(existing);
+      if (missingAnnotations.isNotEmpty) {
         rule.reportAtToken(
           name,
           diagnosticCode: rule.rule,
-        );
-      } else if (annotation.suffix != null &&
-          !typeName.endsWith(annotation.suffix!)) {
-        rule.reportAtToken(
-          name,
-          diagnosticCode: rule.rule,
-        );
-      } else if (annotation.containing != null &&
-          !typeName.contains(annotation.containing!)) {
-        rule.reportAtToken(
-          name,
-          diagnosticCode: rule.rule,
+          arguments: [
+            missingAnnotations.map(gettersAndTypes).commaSeparatedWithAnd,
+          ],
         );
       }
     }
   }
+}
+
+class _SubtypeNamingAnnotation {
+  const _SubtypeNamingAnnotation({
+    required this.annotations,
+    required this.onlyConcrete,
+  });
+
+  static _SubtypeNamingAnnotation empty = const .new(
+    annotations: [],
+    onlyConcrete: false,
+  );
+
+  final List<DartObject> annotations;
+  final bool onlyConcrete;
 }
