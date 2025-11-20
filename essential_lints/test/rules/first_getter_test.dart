@@ -1,4 +1,4 @@
-import 'package:essential_lints/src/rules/prefer_first.dart';
+import 'package:essential_lints/src/rules/first_getter.dart';
 import 'package:essential_lints/src/rules/rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
@@ -6,14 +6,14 @@ import '../src/rule_test_processor.dart';
 
 void main() {
   defineReflectiveSuite(() {
-    defineReflectiveTests(PreferFirstTest);
+    defineReflectiveTests(FirstGetterTest);
   });
 }
 
 @reflectiveTest
-class PreferFirstTest extends LintTestProcessor {
+class FirstGetterTest extends LintTestProcessor {
   @override
-  LintRule get rule => PreferFirstRule();
+  LintRule get rule => FirstGetterRule();
 
   @FailingTest(reason: "Mock SDK doesn't have Iterable.elementAt")
   Future<void> test_elementAt() async {

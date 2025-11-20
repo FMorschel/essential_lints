@@ -1,5 +1,5 @@
 import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
-import 'package:essential_lints/src/rules/double_literal_format.dart';
+import 'package:essential_lints/src/rules/numeric_constant_style.dart';
 import 'package:essential_lints/src/rules/rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
@@ -14,10 +14,10 @@ void main() {
 @reflectiveTest
 class DoubleLiteralFormatTest extends LintFixTestProcessor {
   @override
-  EssentialLintFixes get fix => .doubleLiteralFormat;
+  EssentialLintFixes get fix => .numericConstantStyle;
 
   @override
-  LintRule get rule => DoubleLiteralFormatRule();
+  LintRule get rule => NumericConstantStyleRule();
 
   Future<void> test_exponential_leadingZero() async {
     await resolveTestCode('''

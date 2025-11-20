@@ -1,4 +1,4 @@
-import 'package:essential_lints/src/rules/double_literal_format.dart';
+import 'package:essential_lints/src/rules/numeric_constant_style.dart';
 import 'package:essential_lints/src/rules/rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
@@ -6,14 +6,14 @@ import '../src/rule_test_processor.dart';
 
 void main() {
   defineReflectiveSuite(() {
-    defineReflectiveTests(DoubleLiteralFormatTest);
+    defineReflectiveTests(NumericConstantStyleTest);
   });
 }
 
 @reflectiveTest
-class DoubleLiteralFormatTest extends LintTestProcessor {
+class NumericConstantStyleTest extends LintTestProcessor {
   @override
-  LintRule get rule => DoubleLiteralFormatRule();
+  LintRule get rule => NumericConstantStyleRule();
 
   Future<void> test_decimal_and_exponential() async {
     await assertDiagnostics(

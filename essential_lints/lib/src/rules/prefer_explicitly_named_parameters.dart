@@ -1,3 +1,6 @@
+// This code is based on the an idea from dart_code_metrics package see
+// https://dcm.dev/docs/rules/common/prefer-explicit-parameter-names/.
+
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';

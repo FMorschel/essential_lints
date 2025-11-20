@@ -40,9 +40,9 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
   ),
 
   /// Double literals should follow the preferred format.
-  doubleLiteralFormat(
+  numericConstantStyle(
     LintRuleCode(
-      name: 'double_literal_format',
+      name: 'numeric_constant_style',
       problemMessage: 'Double literals should follow the preferred format.',
       correctionMessage:
           'Reformat the double literal to match the preferred style.',
@@ -52,34 +52,34 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
     ),
   ),
 
-  /// Prefer using the `last` property to access the last element of a
+  /// Prefer using the `last` getter to access the last element of a
   /// list-like object.
-  preferLast(
+  lastGetter(
     LintRuleCode(
-      name: 'prefer_last',
+      name: 'last_getter',
       problemMessage:
-          'Prefer using the `last` property to access the last element of a '
+          'Prefer using the `last` getter to access the last element of a '
           'list-like object.',
-      correctionMessage: 'Replace the index access with the `last` property.',
+      correctionMessage: 'Replace the index access with the `last` getter.',
       description:
-          'A lint rule that suggests using the `last` property instead of '
+          'A lint rule that suggests using the `last` getter instead of '
           'accessing the last element of a list-like object using length - 1 '
           'index.',
     ),
   ),
 
-  /// Prefer using the `first` property to access the first element of a
+  /// Prefer using the `first` getter to access the first element of a
   /// list-like object.
-  preferFirst(
+  firstGetter(
     LintRuleCode(
-      name: 'prefer_first',
+      name: 'first_getter',
       problemMessage:
-          'Prefer using the `first` property to access the first element of a '
+          'Prefer using the `first` getter to access the first element of a '
           'list-like object.',
-      correctionMessage: 'Replace the index access with the `first` property.',
+      correctionMessage: 'Replace the index access with the `first` getter.',
       description:
-          'A lint rule that suggests using the `first` property instead of '
-          'accessing the first element of a list-like object using index 0.',
+          'A lint rule that suggests using the `first` getter instead of '
+          'accessing the first element of a list-like object using 0 index.',
     ),
   ),
 

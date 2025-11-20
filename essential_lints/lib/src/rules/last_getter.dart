@@ -1,3 +1,6 @@
+// This code is based on the an idea from dart_code_metrics package see
+// https://github.com/dart-code-checker/dart-code-metrics/blob/master/lib/src/analyzers/lint_analyzer/rules/rules_list/prefer_last/prefer_last_rule.dart.
+
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
@@ -9,13 +12,13 @@ import 'package:analyzer/dart/element/type.dart';
 import '../utils/extensions/ast.dart';
 import 'rule.dart';
 
-/// {@template prefer_last}
+/// {@template last_getter}
 /// A rule that suggests using `last` property instead of accessing
 /// the last element of a list-like object using length - 1 index.
 /// {@endtemplate}
-class PreferLastRule extends LintRule {
-  /// {@macro prefer_last}
-  PreferLastRule() : super(.preferLast);
+class LastGetterRule extends LintRule {
+  /// {@macro last_getter}
+  LastGetterRule() : super(.lastGetter);
 
   @override
   void registerNodeProcessors(
@@ -32,7 +35,7 @@ class PreferLastRule extends LintRule {
 class _PreferLastVisitor extends SimpleAstVisitor<void> {
   _PreferLastVisitor(this.rule, this.context);
 
-  final PreferLastRule rule;
+  final LastGetterRule rule;
 
   final RuleContext context;
 

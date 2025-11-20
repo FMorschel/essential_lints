@@ -7,18 +7,18 @@ import '../utils/double_literal_parser.dart';
 import 'essential_lint_fixes.dart';
 import 'fix.dart';
 
-/// {@template double_literal_format}
+/// {@template numeric_constant_style}
 /// A fix that formats double literals to adhere to a consistent style.
 /// {@endtemplate}
-class DoubleLiteralFormatFix extends LintFix {
-  /// {@macro double_literal_format}
-  DoubleLiteralFormatFix({required super.context});
+class NumericConstantStyleFix extends LintFix {
+  /// {@macro numeric_constant_style}
+  NumericConstantStyleFix({required super.context});
 
   @override
   CorrectionApplicability get applicability => .acrossSingleFile;
 
   @override
-  EssentialLintFixes get fix => .doubleLiteralFormat;
+  EssentialLintFixes get fix => .numericConstantStyle;
 
   @override
   Future<void> compute(ChangeBuilder builder) async {

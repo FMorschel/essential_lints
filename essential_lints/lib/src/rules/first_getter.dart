@@ -1,3 +1,6 @@
+// This code is based on the an idea from dart_code_metrics package see
+// https://github.com/dart-code-checker/dart-code-metrics/blob/master/lib/src/analyzers/lint_analyzer/rules/rules_list/prefer_first/prefer_first_rule.dart.
+
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
@@ -8,13 +11,13 @@ import 'package:analyzer/dart/element/type.dart';
 import '../utils/extensions/ast.dart';
 import 'rule.dart';
 
-/// {@template prefer_first}
+/// {@template first_getter}
 /// A rule that suggests using the `first` property instead of accessing
 /// the first element of a list-like object using index 0.
 /// {@endtemplate}
-class PreferFirstRule extends LintRule {
-  /// {@macro prefer_first}
-  PreferFirstRule() : super(.preferFirst);
+class FirstGetterRule extends LintRule {
+  /// {@macro first_getter}
+  FirstGetterRule() : super(.firstGetter);
 
   @override
   void registerNodeProcessors(
@@ -31,7 +34,7 @@ class PreferFirstRule extends LintRule {
 class _PreferFirstVisitor extends SimpleAstVisitor<void> {
   _PreferFirstVisitor(this.rule, this.context);
 
-  final PreferFirstRule rule;
+  final FirstGetterRule rule;
 
   final RuleContext context;
 

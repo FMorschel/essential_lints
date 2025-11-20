@@ -1,3 +1,6 @@
+// This code is based on the an idea from dart_code_metrics package see
+// https://github.com/dart-code-checker/dart-code-metrics/blob/master/lib/src/analyzers/lint_analyzer/rules/rules_list/double_literal_format/double_literal_format_rule.dart.
+
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
@@ -6,28 +9,28 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import '../utils/double_literal_parser.dart';
 import 'rule.dart';
 
-/// {@template double_literal_format}
+/// {@template numeric_constant_style}
 /// A lint rule that enforces a consistent format for double literals
 /// in the codebase.
 /// {@endtemplate}
-class DoubleLiteralFormatRule extends LintRule {
-  /// {@macro double_literal_format}
-  DoubleLiteralFormatRule() : super(.doubleLiteralFormat);
+class NumericConstantStyleRule extends LintRule {
+  /// {@macro numeric_constant_style}
+  NumericConstantStyleRule() : super(.numericConstantStyle);
 
   @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _DoubleLiteralFormatVisitor(this);
+    final visitor = _NumericConstantStyleVisitor(this);
     registry.addDoubleLiteral(this, visitor);
   }
 }
 
-class _DoubleLiteralFormatVisitor extends SimpleAstVisitor<void> {
-  _DoubleLiteralFormatVisitor(this.rule);
+class _NumericConstantStyleVisitor extends SimpleAstVisitor<void> {
+  _NumericConstantStyleVisitor(this.rule);
 
-  final DoubleLiteralFormatRule rule;
+  final NumericConstantStyleRule rule;
 
   @override
   void visitDoubleLiteral(DoubleLiteral node) {

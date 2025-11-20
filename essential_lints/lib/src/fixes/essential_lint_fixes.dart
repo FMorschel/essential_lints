@@ -21,9 +21,9 @@ enum EssentialLintFixes implements EnumFix {
   ),
 
   /// Fix to prefer formatting of double literals in a consistent style.
-  doubleLiteralFormat(
+  numericConstantStyle(
     FixKind(
-      'dart.fix.doubleLiteralFormat',
+      'dart.fix.numericConstantStyle',
       DartFixKindPriority.standard,
       'Format double literal',
     ),

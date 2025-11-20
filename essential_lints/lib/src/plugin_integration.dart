@@ -12,9 +12,9 @@ import 'assist/remove_useless_else.dart';
 import 'fixes/add_missing_members.dart';
 import 'fixes/alphabetize_arguments.dart';
 import 'fixes/create_getter.dart';
-import 'fixes/double_literal_format.dart';
 import 'fixes/essential_lint_fixes.dart';
 import 'fixes/fix.dart';
+import 'fixes/numeric_constant_style.dart';
 import 'fixes/remove_expression.dart';
 import 'fixes/replace_with_from_border_side.dart';
 import 'fixes/replace_with_squared_box.dart';
@@ -24,14 +24,14 @@ import 'plugin.dart';
 import 'rules/alphabetize_arguments.dart';
 import 'rules/alphabetize_enum_constants.dart';
 import 'rules/border_all.dart';
-import 'rules/double_literal_format.dart';
 import 'rules/empty_container.dart';
 import 'rules/essential_lint_rules.dart';
+import 'rules/first_getter.dart';
+import 'rules/last_getter.dart';
+import 'rules/numeric_constant_style.dart';
 import 'rules/padding_over_container.dart';
 import 'rules/pending_listener.dart';
 import 'rules/prefer_explicitly_named_parameters.dart';
-import 'rules/prefer_first.dart';
-import 'rules/prefer_last.dart';
 import 'rules/returning_widgets.dart';
 import 'rules/unnecessary_setstate.dart';
 import 'utils/extensions/logger.dart';
@@ -100,8 +100,8 @@ mixin FixesPluginIntegration {
         .alphabetizeArguments => addFixTo(AlphabetizeArgumentsFix.new, [
           .alphabetizeArguments,
         ]),
-        .doubleLiteralFormat => addFixTo(DoubleLiteralFormatFix.new, [
-          .doubleLiteralFormat,
+        .numericConstantStyle => addFixTo(NumericConstantStyleFix.new, [
+          .numericConstantStyle,
         ]),
         .usePaddingProperty => addFixTo(UsePaddingPropertyFix.new, [
           .paddingOverContainer,
@@ -185,10 +185,10 @@ mixin RulesPluginIntegration {
       rules.add(switch (rule) {
         .alphabetizeEnumConstants => AlphabetizeEnumConstantsRule(),
         .alphabetizeArguments => AlphabetizeArgumentsRule(),
-        .doubleLiteralFormat => DoubleLiteralFormatRule(),
+        .numericConstantStyle => NumericConstantStyleRule(),
         .preferExplicitlyNamedParameter => PreferExplicitlyNamedParameterRule(),
-        .preferFirst => PreferFirstRule(),
-        .preferLast => PreferLastRule(),
+        .firstGetter => FirstGetterRule(),
+        .lastGetter => LastGetterRule(),
         .returningWidgets => ReturningWidgetsRule(),
         .paddingOverContainer => PaddingOverContainerRule(),
         .unnecessarySetstate => UnnecessarySetstateRule(),
