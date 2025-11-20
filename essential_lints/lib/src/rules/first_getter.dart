@@ -1,4 +1,4 @@
-// This code is based on the an idea from dart_code_metrics package see
+// This code is based on an idea from dart_code_metrics package see
 // https://github.com/dart-code-checker/dart-code-metrics/blob/master/lib/src/analyzers/lint_analyzer/rules/rules_list/prefer_first/prefer_first_rule.dart.
 
 import 'package:analyzer/analysis_rule/rule_context.dart';
