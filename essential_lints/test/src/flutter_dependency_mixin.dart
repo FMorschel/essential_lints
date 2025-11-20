@@ -131,6 +131,25 @@ class EdgeInsets {
 ''',
     );
     newFile(
+      join(flutterFolder.path, 'lib', 'src', 'painting', 'border_radius.dart'),
+      '''
+import 'basic_types.dart';
+
+class BorderRadius {
+  const BorderRadius.all(Radius radius);
+  BorderRadius.circular(double radius);
+}
+''',
+    );
+    newFile(
+      join(flutterFolder.path, 'lib', 'src', 'painting', 'basic_types.dart'),
+      '''
+class Radius {
+  const Radius.circular(double radius);
+}
+''',
+    );
+    newFile(
       join(flutterFolder.path, 'lib', 'src', 'painting', 'borders.dart'),
       '''
 enum BorderStyle { none, solid, }
@@ -169,6 +188,8 @@ class Border {
     newFile(
       join(flutterFolder.path, 'lib', 'painting.dart'),
       '''
+export 'src/painting/basic_types.dart';
+export 'src/painting/border_radius.dart';
 export 'src/painting/borders.dart';
 export 'src/painting/box_border.dart';
 export 'src/painting/edge_insets.dart';

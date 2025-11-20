@@ -11,6 +11,7 @@ import 'assist/essential_lint_assists.dart';
 import 'assist/remove_useless_else.dart';
 import 'fixes/add_missing_members.dart';
 import 'fixes/alphabetize_arguments.dart';
+import 'fixes/replace_with_border_radius_all.dart';
 import 'fixes/create_getter.dart';
 import 'fixes/essential_lint_fixes.dart';
 import 'fixes/fix.dart';
@@ -24,6 +25,7 @@ import 'plugin.dart';
 import 'rules/alphabetize_arguments.dart';
 import 'rules/alphabetize_enum_constants.dart';
 import 'rules/border_all.dart';
+import 'rules/border_radius_all.dart';
 import 'rules/empty_container.dart';
 import 'rules/essential_lint_rules.dart';
 import 'rules/first_getter.dart';
@@ -116,6 +118,10 @@ mixin FixesPluginIntegration {
           ReplaceWithFromBorderSideFix.new,
           [.borderAll],
         ),
+        .replaceWithBorderRadiusAll => addFixTo(
+          ReplaceWithBorderRadiusAllFix.new,
+          [.borderRadiusAll],
+        ),
       };
     }
     logger.info('Mapped lint fixes');
@@ -194,6 +200,7 @@ mixin RulesPluginIntegration {
         .unnecessarySetstate => UnnecessarySetstateRule(),
         .emptyContainer => EmptyContainerRule(),
         .borderAll => BorderAllRule(),
+        .borderRadiusAll => BorderRadiusAllRule(),
       });
     }
     logger

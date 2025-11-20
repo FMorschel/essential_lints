@@ -158,6 +158,20 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
           'widgets.',
     ),
   ),
+
+  /// A lint rule that checks for the use of BorderRadius.circular in
+  /// Flutter widgets.
+  borderRadiusAll(
+    LintRuleCode(
+      name: 'border_radius_all',
+      problemMessage: 'Avoid using BorderRadius.circular in Flutter widgets.',
+      correctionMessage:
+          'Use BorderRadius.all instead of BorderRadius.circular.',
+      description:
+          'A lint rule that checks for the use of BorderRadius.circular in '
+          'Flutter widgets.',
+    ),
+  ),
   ;
 
   const EssentialLintRules(this.code);

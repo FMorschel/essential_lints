@@ -65,6 +65,15 @@ enum EssentialLintFixes implements EnumFix {
       'Replace with Border.fromBorderSide',
     ),
   ),
+
+  /// Fix to replace `BorderRadius.circular` with `BorderRadius.all`.
+  replaceWithBorderRadiusAll(
+    FixKind(
+      'dart.fix.replaceWithBorderRadiusAll',
+      DartFixKindPriority.standard,
+      'Replace with BorderRadius.all',
+    ),
+  ),
   ;
 
   const EssentialLintFixes(this.fixKind);
