@@ -52,4 +52,42 @@ void foo({int? a, int? b, int? c}) {
 }
 ''');
   }
+
+  Future<void> test_alphabetizeNamedArguments_newLines_withPositional() async {
+    await resolveTestCode('''
+void foo(int x, int y, {int? a, int? b, int? c}) {
+  foo(
+    0,
+    c: 3,
+    1,
+    b: 2,
+    a: 1
+  );
+}
+''');
+    await assertHasFix('''
+void foo(int x, int y, {int? a, int? b, int? c}) {
+  foo(
+    0,
+    a: 1,
+    1,
+    b: 2,
+    c: 3
+  );
+}
+''');
+  }
+
+  Future<void> test_alphabetizeNamedArguments_withPositional() async {
+    await resolveTestCode('''
+void foo(int x, int y, {int? a, int? b, int? c}) {
+  foo(0, b: 2, 1, a: 1, c: 3);
+}
+''');
+    await assertHasFix('''
+void foo(int x, int y, {int? a, int? b, int? c}) {
+  foo(0, a: 1, 1, b: 2, c: 3);
+}
+''');
+  }
 }
