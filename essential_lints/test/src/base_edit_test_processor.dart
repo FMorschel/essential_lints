@@ -154,7 +154,7 @@ mixin _PrivateMixin on AnalysisRuleTest {
   Future<ResolvedLibraryResult?> resolveLibrary(String path) async {
     var analysisContext = _contextFor(path);
     var session = analysisContext.currentSession;
-    return (await session.getResolvedLibrary(
+    return (await session.getResolvedLibraryContaining(
       path,
     )).ifTypeOrNull<ResolvedLibraryResult>();
   }

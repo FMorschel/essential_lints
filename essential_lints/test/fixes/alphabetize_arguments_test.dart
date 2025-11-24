@@ -19,20 +19,7 @@ class AlphabetizeArgumentsTest extends LintFixTestProcessor {
   @override
   LintRule get rule => AlphabetizeArgumentsRule();
 
-  Future<void> test_alphabetizeNamedArguments() async {
-    await resolveTestCode('''
-void foo({int? a, int? b, int? c}) {
-  foo(b: 2, a: 1, c: 3);
-}
-''');
-    await assertHasFix('''
-void foo({int? a, int? b, int? c}) {
-  foo(a: 1, b: 2, c: 3);
-}
-''');
-  }
-
-  Future<void> test_alphabetizeNamedArguments_newLines() async {
+  Future<void> test_newLines() async {
     await resolveTestCode('''
 void foo({int? a, int? b, int? c}) {
   foo(
@@ -53,7 +40,7 @@ void foo({int? a, int? b, int? c}) {
 ''');
   }
 
-  Future<void> test_alphabetizeNamedArguments_newLines_withPositional() async {
+  Future<void> test_newLines_withPositional() async {
     await resolveTestCode('''
 void foo(int x, int y, {int? a, int? b, int? c}) {
   foo(
@@ -78,7 +65,33 @@ void foo(int x, int y, {int? a, int? b, int? c}) {
 ''');
   }
 
-  Future<void> test_alphabetizeNamedArguments_withPositional() async {
+  Future<void> test_part() async {
+    newFile(join(testPackageLibPath, 'main.dart'), "part 'test.dart';");
+    await resolveTestCode('''
+part of 'main.dart';
+
+void foo({int? a, int? b, int? c}) {
+  foo(
+    c: 3,
+    b: 2,
+    a: 1
+  );
+}
+''');
+    await assertHasFix('''
+part of 'main.dart';
+
+void foo({int? a, int? b, int? c}) {
+  foo(
+    a: 1,
+    b: 2,
+    c: 3
+  );
+}
+''');
+  }
+
+  Future<void> test_withPositional() async {
     await resolveTestCode('''
 void foo(int x, int y, {int? a, int? b, int? c}) {
   foo(0, b: 2, 1, a: 1, c: 3);
@@ -87,6 +100,19 @@ void foo(int x, int y, {int? a, int? b, int? c}) {
     await assertHasFix('''
 void foo(int x, int y, {int? a, int? b, int? c}) {
   foo(0, a: 1, 1, b: 2, c: 3);
+}
+''');
+  }
+
+  Future<void> test_works() async {
+    await resolveTestCode('''
+void foo({int? a, int? b, int? c}) {
+  foo(b: 2, a: 1, c: 3);
+}
+''');
+    await assertHasFix('''
+void foo({int? a, int? b, int? c}) {
+  foo(a: 1, b: 2, c: 3);
 }
 ''');
   }
