@@ -72,7 +72,19 @@ mixin AssistsPluginIntegration {
   /// Registers all assists with the given registry.
   void registerAssists(PluginRegistry registry) {
     logger.info('Registering assists');
-    assists.forEach(registry.registerAssist);
+    for (final generator in assists) {
+      try {
+        registry.registerAssist(generator);
+        // ignore: avoid_catches_without_on_clauses, handles integration
+      } catch (e, st) {
+        logger.severe(
+          'Failed to register assist generator '
+          "'${generator.runtimeType}'",
+          e,
+          st,
+        );
+      }
+    }
     logger.info('Registered assists');
   }
 }
@@ -161,7 +173,17 @@ mixin FixesPluginIntegration {
     logger.info('Registering lint fixes');
     lintFixes.forEach((diagnosticCode, generators) {
       for (final generator in generators) {
-        registry.registerFixForRule(diagnosticCode, generator);
+        try {
+          registry.registerFixForRule(diagnosticCode, generator);
+          // ignore: avoid_catches_without_on_clauses, handles integration
+        } catch (e, st) {
+          logger.severe(
+            'Failed to register fix for rule '
+            "'${diagnosticCode.name}'",
+            e,
+            st,
+          );
+        }
       }
     });
     logger
@@ -169,7 +191,17 @@ mixin FixesPluginIntegration {
       ..info('Registering warning fixes');
     warningFixes.forEach((diagnosticCode, generators) {
       for (final generator in generators) {
-        registry.registerFixForRule(diagnosticCode, generator);
+        try {
+          registry.registerFixForRule(diagnosticCode, generator);
+          // ignore: avoid_catches_without_on_clauses, handles integration
+        } catch (e, st) {
+          logger.severe(
+            'Failed to register fix for rule '
+            "'${diagnosticCode.name}'",
+            e,
+            st,
+          );
+        }
       }
     });
     logger.info('Registered warning fixes');
@@ -218,7 +250,19 @@ mixin RulesPluginIntegration {
   /// Registers all lint rules with the given registry.
   void registerRules(PluginRegistry registry) {
     logger.info('Registering lint rules');
-    rules.forEach(registry.registerLintRule);
+    for (final rule in rules) {
+      try {
+        registry.registerLintRule(rule);
+        // ignore: avoid_catches_without_on_clauses, handles integration
+      } catch (e, st) {
+        logger.severe(
+          'Failed to register rule '
+          "'${rule.name}'",
+          e,
+          st,
+        );
+      }
+    }
     logger.info('Registered lint rules');
   }
 }
@@ -249,7 +293,18 @@ mixin WarningsPluginIntegration {
   /// Registers all lint rules with the given registry.
   void registerWarnings(PluginRegistry registry) {
     logger.info('Registering warning rules');
-    warnings.forEach(registry.registerWarningRule);
+    for (final rule in warnings) {
+      try {
+        registry.registerWarningRule(rule);
+        // ignore: avoid_catches_without_on_clauses, handles integration
+      } catch (e, st) {
+        logger.severe(
+          'Failed to register warning rule',
+          e,
+          st,
+        );
+      }
+    }
     logger.info('Registered warning rules');
   }
 }
