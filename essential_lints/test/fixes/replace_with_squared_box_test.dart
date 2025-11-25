@@ -3,10 +3,18 @@ import 'package:analyzer_testing/utilities/utilities.dart';
 import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
 import 'package:essential_lints/src/rules/empty_container.dart';
 import 'package:essential_lints/src/rules/rule.dart';
+import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import '../src/fix_test_processor.dart';
 import '../src/flutter_dependency_mixin.dart';
 
+void main() {
+  defineReflectiveSuite(() {
+    defineReflectiveTests(ReplaceWithSquaredBoxTest);
+  });
+}
+
+@reflectiveTest
 class ReplaceWithSquaredBoxTest extends LintFixTestProcessor
     with FlutterDependencyMixin {
   @override

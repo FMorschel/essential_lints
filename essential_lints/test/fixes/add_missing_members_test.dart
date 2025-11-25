@@ -24,7 +24,7 @@ class AddMissingMembersTest extends MultiWarningFixTestProcessor
   @override
   Future<void> setUp() async {
     await super.setUp();
-    addAnnotationsDependency();
+    await addAnnotationsDependency();
   }
 
   Future<void> test_addsMissingGetters_field() async {

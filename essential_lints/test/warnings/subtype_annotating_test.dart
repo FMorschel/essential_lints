@@ -20,9 +20,9 @@ class SubtypeAnnotatingTest extends MultiWarningTestProcessor
   MultiWarningRule<SubWarnings> get rule => SubtypeAnnotatingRule();
 
   @override
-  void setUp() {
+  Future<void> setUp() async {
     super.setUp();
-    addAnnotationsDependency();
+    await addAnnotationsDependency();
   }
 
   Future<void> test_allMissing() async {

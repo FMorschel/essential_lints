@@ -164,7 +164,7 @@ class RemoveExpressionTest extends MultiWarningFixTestProcessor
   @override
   Future<void> setUp() async {
     await super.setUp();
-    addAnnotationsDependency();
+    await addAnnotationsDependency();
   }
 
   Future<void> test_removeExpression_first() async {

@@ -20,9 +20,9 @@ class SubtypeNamingTest extends MultiWarningTestProcessor
   MultiWarningRule<SubWarnings> get rule => SubtypeNamingRule();
 
   @override
-  void setUp() {
+  Future<void> setUp() async {
     super.setUp();
-    addAnnotationsDependency();
+    await addAnnotationsDependency();
   }
 
   Future<void> test_allInvalid() async {

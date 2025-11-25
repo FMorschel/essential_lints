@@ -20,9 +20,9 @@ class GettersInMemberListTest extends MultiWarningTestProcessor
   MultiWarningRule get rule => GettersInMemberListRule();
 
   @override
-  void setUp() {
+  Future<void> setUp() async {
     super.setUp();
-    addAnnotationsDependency();
+    await addAnnotationsDependency();
   }
 
   Future<void> test_findsAnnotation_emptyName() async {
