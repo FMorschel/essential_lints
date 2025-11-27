@@ -35,6 +35,7 @@ import 'rules/padding_over_container.dart';
 import 'rules/pending_listener.dart';
 import 'rules/prefer_explicitly_named_parameters.dart';
 import 'rules/returning_widgets.dart';
+import 'rules/standard_comment_style.dart';
 import 'rules/unnecessary_setstate.dart';
 import 'utils/extensions/logger.dart';
 import 'warnings/essential_lint_warnings.dart';
@@ -233,6 +234,7 @@ mixin RulesPluginIntegration {
         .emptyContainer => EmptyContainerRule(),
         .borderAll => BorderAllRule(),
         .borderRadiusAll => BorderRadiusAllRule(),
+        .standardCommentStyle => StandardCommentStyleRule(),
       });
     }
     logger

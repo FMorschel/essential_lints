@@ -172,6 +172,17 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
           'Flutter widgets.',
     ),
   ),
+
+  /// A rule that checks for proper phrasing of comments.
+  standardCommentStyle(
+    LintRuleCode(
+      name: 'standard_comment_style',
+      problemMessage: 'Comments should be phrased.',
+      correctionMessage:
+          'Format comments to end with proper punctuation and capitalization.',
+      description: 'A lint rule that checks for proper phrasing of comments.',
+    ),
+  ),
   ;
 
   const EssentialLintRules(this.code);
