@@ -195,6 +195,21 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
           'A lint rule that enforces direct imports within the same package.',
     ),
   ),
+
+  /// A lint rule that detects cascades being used on members that return new
+  /// instances.
+  newInstanceCascade(
+    LintRuleCode(
+      name: 'new_instance_cascade',
+      problemMessage:
+          'Avoid using cascades on members that return new instances.',
+      correctionMessage:
+          'Do not use cascades on members that return new instances.',
+      description:
+          'A lint rule that detects cascades being used on members that return '
+          'new instances.',
+    ),
+  ),
   ;
 
   const EssentialLintRules(this.code);

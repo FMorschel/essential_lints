@@ -41,8 +41,6 @@ class SamePackageDirectImportVisitor extends SimpleAstVisitor<void> {
        _rule = rule;
 
   final SamePackageDirectImportRule? _rule;
-
-  // ignore: unused_field, reviewed later
   final RuleContext? _context;
 
   /// A callback of all detected URIs.

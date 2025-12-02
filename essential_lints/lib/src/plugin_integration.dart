@@ -31,6 +31,7 @@ import 'rules/empty_container.dart';
 import 'rules/essential_lint_rules.dart';
 import 'rules/first_getter.dart';
 import 'rules/last_getter.dart';
+import 'rules/new_instance_cascade.dart';
 import 'rules/numeric_constant_style.dart';
 import 'rules/padding_over_container.dart';
 import 'rules/pending_listener.dart';
@@ -242,6 +243,7 @@ mixin RulesPluginIntegration {
         .borderRadiusAll => BorderRadiusAllRule(),
         .standardCommentStyle => StandardCommentStyleRule(),
         .samePackageDirectImport => SamePackageDirectImportRule(),
+        .newInstanceCascade => NewInstanceCascadeRule(),
       });
     }
     logger

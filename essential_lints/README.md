@@ -43,3 +43,7 @@ Some of the rules provided by this package are inspired by equivalent rules from
 <!---
 https://github.com/dart-code-checker/dart-code-metrics/blob/master/lib/src/analyzers/lint_analyzer/rules/rules_list/member_ordering/member_ordering_rule.dart
 !--->
+
+Some of the rules are based on issues in the Dart SDK repository. These are:
+
+- new_instance_cascade [based on this SDK issue](https://github.com/dart-lang/sdk/issues/59754)
