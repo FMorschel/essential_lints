@@ -227,6 +227,23 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
           '`FutureOr` instances that accept `Future` values.',
     ),
   ),
+
+  /// A lint rule that checks for variable declarations that shadow other
+  /// variables in the same scope.
+  variableShadowing(
+    LintRuleCode(
+      name: 'variable_shadowing',
+      problemMessage:
+          'Variable declarations should not shadow other variables in the '
+          'same scope.',
+      correctionMessage:
+          'Rename the variable to avoid shadowing another variable in the '
+          'same scope.',
+      description:
+          'A lint rule that checks for variable declarations that shadow other '
+          'variables in the same scope.',
+    ),
+  )
   ;
 
   const EssentialLintRules(this.code);

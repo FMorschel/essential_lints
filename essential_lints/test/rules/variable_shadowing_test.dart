@@ -1,0 +1,89 @@
+import 'package:essential_lints/src/rules/rule.dart';
+import 'package:essential_lints/src/rules/variable_shadowing.dart';
+import 'package:test_reflective_loader/test_reflective_loader.dart';
+
+import '../src/rule_test_processor.dart';
+
+void main() {
+  defineReflectiveSuite(() {
+    defineReflectiveTests(VariableShadowingTest);
+  });
+}
+
+@reflectiveTest
+class VariableShadowingTest extends LintTestProcessor {
+  @override
+  LintRule get rule => VariableShadowingRule();
+
+  Future<void> test_variableDeclaration_notShadowing() async {
+    await assertNoDiagnostics('''
+void f() {
+  var a = 1;
+  {
+    var o = 2;
+    print(o);
+  }
+}
+''');
+  }
+
+  Future<void> test_variableDeclaration_shadowing() async {
+    await assertDiagnostics(
+      '''
+void f() {
+  var a = 1;
+  {
+    var a = 2;
+    print(a);
+  }
+}
+''',
+      [lint(36, 1)],
+    );
+  }
+
+  Future<void> test_variableDeclaration_shadowingGlobal() async {
+    await assertNoDiagnostics('''
+var a = 0;
+void f() {
+  var a = 1;
+  print(a);
+}
+''');
+  }
+
+  Future<void> test_variableDeclaration_shadowingClass() async {
+    await assertNoDiagnostics('''
+class C {
+  var a = 0;
+  void m() {
+    var a = 1;
+    print(a);
+  }
+}
+''');
+  }
+
+  Future<void> test_variableDeclarationPattern_notShadowing() async {
+    await assertNoDiagnostics('''
+void f(int a) {
+  if (a case var o) {
+    print(o);
+  }
+}
+''');
+  }
+
+  Future<void> test_variableDeclarationPattern_shadowing() async {
+    await assertDiagnostics(
+      '''
+void f(int a) {
+  if (a case var a) {
+    print(a);
+  }
+}
+''',
+      [lint(33, 1)],
+    );
+  }
+}
