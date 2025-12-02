@@ -47,3 +47,4 @@ https://github.com/dart-code-checker/dart-code-metrics/blob/master/lib/src/analy
 Some of the rules are based on issues in the Dart SDK repository. These are:
 
 - new_instance_cascade [based on this SDK issue](https://github.com/dart-lang/sdk/issues/59754)
+- is_future [based on this SDK issue](https://github.com/dart-lang/sdk/issues/59355)

@@ -210,6 +210,23 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
           'new instances.',
     ),
   ),
+
+  /// A lint rule that checks for usages of `is Future` type checks in
+  /// `FutureOr` instances that accept `Future` values.
+  isFuture(
+    LintRuleCode(
+      name: 'is_future',
+      problemMessage:
+          'Avoid using `is Future` type checks in `FutureOr` instances that '
+          'accept `Future` values.',
+      correctionMessage:
+          'Remove the `is Future` type check when working with `FutureOr` '
+          'instances.',
+      description:
+          'A lint rule that checks for usages of `is Future` type checks in '
+          '`FutureOr` instances that accept `Future` values.',
+    ),
+  ),
   ;
 
   const EssentialLintRules(this.code);

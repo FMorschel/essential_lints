@@ -30,6 +30,7 @@ import 'rules/border_radius_all.dart';
 import 'rules/empty_container.dart';
 import 'rules/essential_lint_rules.dart';
 import 'rules/first_getter.dart';
+import 'rules/is_future.dart';
 import 'rules/last_getter.dart';
 import 'rules/new_instance_cascade.dart';
 import 'rules/numeric_constant_style.dart';
@@ -244,6 +245,7 @@ mixin RulesPluginIntegration {
         .standardCommentStyle => StandardCommentStyleRule(),
         .samePackageDirectImport => SamePackageDirectImportRule(),
         .newInstanceCascade => NewInstanceCascadeRule(),
+        .isFuture => IsFutureRule(),
       });
     }
     logger
