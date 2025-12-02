@@ -183,6 +183,18 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
       description: 'A lint rule that checks for proper phrasing of comments.',
     ),
   ),
+
+  /// A lint rule that enforces direct imports within the same package.
+  samePackageDirectImport(
+    LintRuleCode(
+      name: 'same_package_direct_import',
+      problemMessage:
+          'Imports within the same package should be direct imports.',
+      correctionMessage: 'Change to a direct import.',
+      description:
+          'A lint rule that enforces direct imports within the same package.',
+    ),
+  ),
   ;
 
   const EssentialLintRules(this.code);

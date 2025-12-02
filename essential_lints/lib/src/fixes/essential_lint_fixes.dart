@@ -74,6 +74,15 @@ enum EssentialLintFixes implements EnumFix {
       'Replace with BorderRadius.all',
     ),
   ),
+
+  /// Fix to use direct imports instead of exports within the same package.
+  samePackageDirectImportFix(
+    FixKind(
+      'dart.fix.samePackageDirectImport',
+      DartFixKindPriority.standard,
+      'Use direct import',
+    ),
+  ),
   ;
 
   const EssentialLintFixes(this.fixKind);

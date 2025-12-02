@@ -10,6 +10,7 @@ import 'package:analyzer/diagnostic/diagnostic.dart';
 import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
 import 'package:essential_lints/src/rules/rule.dart';
 import 'package:essential_lints/src/warnings/warning.dart';
+import 'package:meta/meta.dart';
 import 'package:test/test.dart';
 
 import 'base_edit_test_processor.dart';
@@ -126,6 +127,7 @@ abstract class FixTestProcessor extends BaseEditTestProcessor
   String get analysisRule => rule.diagnosticCode.name;
 
   @override
+  @mustBeOverridden
   AnalysisRule get rule;
 }
 
@@ -134,6 +136,7 @@ abstract class LintFixTestProcessor extends FixTestProcessor {
   EssentialLintFixes get fix;
 
   @override
+  @mustBeOverridden
   LintRule get rule;
 }
 
@@ -146,6 +149,7 @@ abstract class MultiWarningFixTestProcessor extends BaseEditTestProcessor
   EssentialLintWarningFixes get fix;
 
   @override
+  @mustBeOverridden
   MultiWarningRule get rule;
 }
 
@@ -154,5 +158,6 @@ abstract class WarningFixTestProcessor extends FixTestProcessor {
   EssentialLintWarningFixes get fix;
 
   @override
+  @mustBeOverridden
   AnalysisRule get rule;
 }

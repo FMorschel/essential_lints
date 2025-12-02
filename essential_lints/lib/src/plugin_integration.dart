@@ -19,6 +19,7 @@ import 'fixes/remove_expression.dart';
 import 'fixes/replace_with_border_radius_all.dart';
 import 'fixes/replace_with_from_border_side.dart';
 import 'fixes/replace_with_squared_box.dart';
+import 'fixes/same_package_direct_import.dart';
 import 'fixes/sort_enum_constants.dart';
 import 'fixes/use_padding_property.dart';
 import 'plugin.dart';
@@ -35,6 +36,7 @@ import 'rules/padding_over_container.dart';
 import 'rules/pending_listener.dart';
 import 'rules/prefer_explicitly_named_parameters.dart';
 import 'rules/returning_widgets.dart';
+import 'rules/same_package_direct_import.dart';
 import 'rules/standard_comment_style.dart';
 import 'rules/unnecessary_setstate.dart';
 import 'utils/extensions/logger.dart';
@@ -134,6 +136,10 @@ mixin FixesPluginIntegration {
         .replaceWithBorderRadiusAll => addFixTo(
           ReplaceWithBorderRadiusAllFix.new,
           [.borderRadiusAll],
+        ),
+        .samePackageDirectImportFix => addFixTo(
+          SamePackageDirectImportFix.new,
+          [.samePackageDirectImport],
         ),
       };
     }
@@ -235,6 +241,7 @@ mixin RulesPluginIntegration {
         .borderAll => BorderAllRule(),
         .borderRadiusAll => BorderRadiusAllRule(),
         .standardCommentStyle => StandardCommentStyleRule(),
+        .samePackageDirectImport => SamePackageDirectImportRule(),
       });
     }
     logger

@@ -25,6 +25,8 @@ import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:essential_lints/src/plugin_integration.dart';
 import 'package:test/test.dart';
 
+import 'built_in_rules.dart';
+
 abstract class BaseEditTestProcessor extends AnalysisRuleTest
     with
         _PrivateMixin,
@@ -32,7 +34,8 @@ abstract class BaseEditTestProcessor extends AnalysisRuleTest
         RulesPluginIntegration,
         FixesPluginIntegration,
         AssistsPluginIntegration,
-        WarningsPluginIntegration {
+        WarningsPluginIntegration,
+        BuiltInRules {
   static final channel = _FakeChannel();
 
   late String code;
@@ -91,6 +94,7 @@ abstract class BaseEditTestProcessor extends AnalysisRuleTest
   @override
   Future<void> setUp() async {
     rules.forEach(registry.Registry.ruleRegistry.registerLintRule);
+    builtInRules.forEach(registry.Registry.ruleRegistry.registerLintRule);
     warnings.forEach(registry.Registry.ruleRegistry.registerWarningRule);
     fix_generators.registeredFixGenerators.lintProducers.addAll(lintFixes);
     fix_generators.registeredFixGenerators.nonLintProducers.addAll(
