@@ -243,7 +243,23 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
           'A lint rule that checks for variable declarations that shadow other '
           'variables in the same scope.',
     ),
-  )
+  ),
+
+  /// A lint rule that discourages the use of optional positional parameters
+  /// in function declarations.
+  optionalPositionalParameters(
+    LintRuleCode(
+      name: 'optional_positional_parameters',
+      problemMessage:
+          'Avoid using optional positional parameters in function '
+          'declarations.',
+      correctionMessage:
+          'Use named parameters instead of optional positional parameters.',
+      description:
+          'A lint rule that discourages the use of optional positional '
+          'parameters in function declarations.',
+    ),
+  ),
   ;
 
   const EssentialLintRules(this.code);

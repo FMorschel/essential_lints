@@ -34,6 +34,7 @@ import 'rules/is_future.dart';
 import 'rules/last_getter.dart';
 import 'rules/new_instance_cascade.dart';
 import 'rules/numeric_constant_style.dart';
+import 'rules/optional_positional_parameters.dart';
 import 'rules/padding_over_container.dart';
 import 'rules/pending_listener.dart';
 import 'rules/prefer_explicitly_named_parameters.dart';
@@ -248,6 +249,7 @@ mixin RulesPluginIntegration {
         .newInstanceCascade => NewInstanceCascadeRule(),
         .isFuture => IsFutureRule(),
         .variableShadowing => VariableShadowingRule(),
+        .optionalPositionalParameters => OptionalPositionalParametersRule(),
       });
     }
     logger
