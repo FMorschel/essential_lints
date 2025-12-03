@@ -32,6 +32,7 @@ import 'rules/border_radius_all.dart';
 import 'rules/closure_incorrect_type.dart';
 import 'rules/completer_error_no_stack.dart';
 import 'rules/empty_container.dart';
+import 'rules/equal_statement.dart';
 import 'rules/essential_lint_rules.dart';
 import 'rules/first_getter.dart';
 import 'rules/is_future.dart';
@@ -264,6 +265,7 @@ mixin RulesPluginIntegration {
         .optionalPositionalParameters => OptionalPositionalParametersRule(),
         .closureIncorrectType => ClosureIncorrectTypeRule(),
         .completerErrorNoStack => CompleterErrorNoStackRule(),
+        .equalStatement => EqualStatementRule(),
       });
     }
     logger

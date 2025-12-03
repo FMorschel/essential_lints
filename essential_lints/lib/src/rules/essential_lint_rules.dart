@@ -289,6 +289,16 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
           'without providing a stack trace.',
     ),
   ),
+
+  /// A lint rule that detects equal statements in switch cases.
+  equalStatement(
+    LintRuleCode(
+      name: 'equal_statement',
+      problemMessage: 'Avoid using equal statements in switch cases.',
+      correctionMessage: 'Agregate {0} cases.',
+      description: 'A lint rule for equal statements under switch cases.',
+    ),
+  ),
   ;
 
   const EssentialLintRules(this.code);
