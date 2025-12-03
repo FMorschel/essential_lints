@@ -9,6 +9,7 @@ import 'package:logging/logging.dart';
 
 import 'assist/essential_lint_assists.dart';
 import 'assist/remove_useless_else.dart';
+import 'fixes/add_current_stack.dart';
 import 'fixes/add_missing_members.dart';
 import 'fixes/alphabetize_arguments.dart';
 import 'fixes/create_getter.dart';
@@ -29,6 +30,7 @@ import 'rules/alphabetize_enum_constants.dart';
 import 'rules/border_all.dart';
 import 'rules/border_radius_all.dart';
 import 'rules/closure_incorrect_type.dart';
+import 'rules/completer_error_no_stack.dart';
 import 'rules/empty_container.dart';
 import 'rules/essential_lint_rules.dart';
 import 'rules/first_getter.dart';
@@ -151,6 +153,10 @@ mixin FixesPluginIntegration {
           UseDefinedTypeFix.new,
           [.closureIncorrectType],
         ),
+        .addCurrentStack => addFixTo(
+          AddCurrentStackFix.new,
+          [.completerErrorNoStack],
+        ),
       };
     }
     logger.info('Mapped lint fixes');
@@ -257,6 +263,7 @@ mixin RulesPluginIntegration {
         .variableShadowing => VariableShadowingRule(),
         .optionalPositionalParameters => OptionalPositionalParametersRule(),
         .closureIncorrectType => ClosureIncorrectTypeRule(),
+        .completerErrorNoStack => CompleterErrorNoStackRule(),
       });
     }
     logger

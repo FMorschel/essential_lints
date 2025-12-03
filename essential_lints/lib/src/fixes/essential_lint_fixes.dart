@@ -93,6 +93,15 @@ enum EssentialLintFixes implements EnumFix {
       'Use defined type',
     ),
   ),
+
+  /// Fix to add current stack when completing a completer with an error.
+  addCurrentStack(
+    FixKind(
+      'dart.fix.addCurrentStack',
+      DartFixKindPriority.standard,
+      'Add current stack',
+    ),
+  ),
   ;
 
   const EssentialLintFixes(this.fixKind);

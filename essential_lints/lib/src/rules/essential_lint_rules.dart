@@ -274,6 +274,21 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
           'annotation.',
     ),
   ),
+
+  /// A lint rule that checks for the use of Completer.completeError without
+  /// providing a stack trace.
+  completerErrorNoStack(
+    LintRuleCode(
+      name: 'completer_error_no_stack',
+      problemMessage:
+          'Avoid using Completer.completeError without a stack trace.',
+      correctionMessage:
+          'Provide a stack trace when calling Completer.completeError.',
+      description:
+          'A lint rule that checks for the use of Completer.completeError '
+          'without providing a stack trace.',
+    ),
+  ),
   ;
 
   const EssentialLintRules(this.code);
