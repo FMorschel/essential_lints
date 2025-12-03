@@ -31,6 +31,7 @@ import 'rules/border_all.dart';
 import 'rules/border_radius_all.dart';
 import 'rules/closure_incorrect_type.dart';
 import 'rules/completer_error_no_stack.dart';
+import 'rules/duplicate_value.dart';
 import 'rules/empty_container.dart';
 import 'rules/equal_statement.dart';
 import 'rules/essential_lint_rules.dart';
@@ -266,6 +267,7 @@ mixin RulesPluginIntegration {
         .closureIncorrectType => ClosureIncorrectTypeRule(),
         .completerErrorNoStack => CompleterErrorNoStackRule(),
         .equalStatement => EqualStatementRule(),
+        .duplicateValue => DuplicateValueRule(),
       });
     }
     logger

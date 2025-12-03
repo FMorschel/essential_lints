@@ -53,3 +53,4 @@ Some of the rules are based on issues in the Dart SDK repository. These are:
 - closure_incorrect_type [based on this SDK issue](https://github.com/dart-lang/sdk/issues/59114)
 - completer_error_no_stack [based on this SDK issue](https://github.com/dart-lang/sdk/issues/59374)
 - equal_statement [based on this SDK issue](https://github.com/dart-lang/sdk/issues/59529)
+- duplicate_value [based on this SDK issue](https://github.com/dart-lang/sdk/issues/59530)

@@ -299,6 +299,19 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
       description: 'A lint rule for equal statements under switch cases.',
     ),
   ),
+
+  /// A lint rule that detects duplicate values in comparisons like `&&` and
+  /// `||`.
+  duplicateValue(
+    LintRuleCode(
+      name: 'duplicate_value',
+      problemMessage: 'Duplicate value detected.',
+      correctionMessage: 'Remove the duplicate value.',
+      description:
+          'A lint rule that detects duplicate values in comparisons like `&&` '
+          'and `||`.',
+    ),
+  ),
   ;
 
   const EssentialLintRules(this.code);
