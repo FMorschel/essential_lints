@@ -77,6 +77,17 @@ void f(void Function(int Function()) callback) {
     );
   }
 
+  Future<void> test_functionType_incorrect_oldStyle() async {
+    await assertDiagnostics(
+      '''
+void f(void callback(int Function())) {
+  f((num Function() f) {});
+}
+''',
+      [lint(45, 16)],
+    );
+  }
+
   Future<void> test_incorrectType() async {
     await assertDiagnostics(
       '''
@@ -86,5 +97,47 @@ void f(void Function(int) callback) {
 ''',
       [lint(43, 5)],
     );
+  }
+
+  Future<void> test_incorrectType_oldStyle() async {
+    await assertDiagnostics(
+      '''
+void f(void callback(int v)) {
+  f((num n) {});
+}
+''',
+      [lint(36, 5)],
+    );
+  }
+
+  Future<void> test_inheritedType() async {
+    await assertDiagnostics(
+      '''
+class A {
+  void foo(void Function(int) x) {}
+}
+
+class B extends A {
+  void foo(x) {
+    foo((num n) {});
+  }
+}
+''',
+      [lint(94, 5)],
+    );
+  }
+
+  Future<void> test_overridenType() async {
+    await assertNoDiagnostics('''
+class A {
+  void foo(void Function(int) x) {}
+}
+
+class B extends A {
+  void foo(void Function(num) x) {
+    foo((num n) {});
+  }
+}
+''');
   }
 }

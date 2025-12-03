@@ -1,11 +1,8 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/src/dart/ast/ast.dart'; // ignore: implementation_imports, not exported
-import 'package:analyzer/src/dart/element/type.dart'; // ignore: implementation_imports, not exported
-import 'package:analyzer/src/dart/element/type_provider.dart'; // ignore: implementation_imports, not exported
 
 import 'rule.dart';
 
@@ -54,12 +51,8 @@ class _ClosureIncorrectTypeVisitor extends SimpleAstVisitor<void> {
       if (actualParameter is! NormalFormalParameter) {
         continue;
       }
-      var actualParameterType = actualParameter.type(
-        context.typeProvider as TypeProviderImpl,
-      );
-      if (actualParameterType == null) {
-        continue;
-      }
+      var actualParameterType =
+          actualParameter.type ?? context.typeProvider.objectQuestionType;
       DartType expectedType;
       if (!parameter.isNamed) {
         expectedType = correspondingParameterType.formalParameters[index].type;
@@ -77,32 +70,5 @@ class _ClosureIncorrectTypeVisitor extends SimpleAstVisitor<void> {
 }
 
 extension on NormalFormalParameter {
-  DartType? type(TypeProviderImpl typeProvider) {
-    return switch (this) {
-      SimpleFormalParameter(:var type) => type?.type,
-      FunctionTypedFormalParameterImpl parameter => parameter.type(
-        typeProvider,
-      ),
-      _ => null,
-    };
-  }
-}
-
-extension on FunctionTypedFormalParameterImpl {
-  DartType type(TypeProviderImpl typeProvider) {
-    return FunctionTypeImpl(
-      typeParameters:
-          typeParameters?.typeParameters
-              .map((tp) => tp.declaredFragment!.element)
-              .toList() ??
-          const [],
-      parameters: parameters.parameters
-          .map((p) => p.declaredFragment!.element)
-          .toList(),
-      returnType: returnType?.type ?? typeProvider.objectQuestionType,
-      nullabilitySuffix: question == null
-          ? NullabilitySuffix.none
-          : NullabilitySuffix.question,
-    );
-  }
+  DartType? get type => declaredFragment?.element.type;
 }
