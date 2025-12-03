@@ -83,6 +83,16 @@ enum EssentialLintFixes implements EnumFix {
       'Use direct import',
     ),
   ),
+
+  /// Fix to change the type annotation of a closure parameter
+  /// to use the defined type.
+  useDefinedType(
+    FixKind(
+      'dart.fix.useDefinedType',
+      DartFixKindPriority.standard,
+      'Use defined type',
+    ),
+  ),
   ;
 
   const EssentialLintFixes(this.fixKind);

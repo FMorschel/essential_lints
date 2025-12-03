@@ -50,3 +50,4 @@ Some of the rules are based on issues in the Dart SDK repository. These are:
 - is_future [based on this SDK issue](https://github.com/dart-lang/sdk/issues/59355)
 - variable_shadowing [based on this SDK issue](https://github.com/dart-lang/sdk/issues/60560)
 - optional_positional_parameters [based on this SDK issue](https://github.com/dart-lang/sdk/issues/59097)
+- closure_incorrect_type [based on this SDK issue](https://github.com/dart-lang/sdk/issues/59114)

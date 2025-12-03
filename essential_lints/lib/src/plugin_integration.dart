@@ -21,12 +21,14 @@ import 'fixes/replace_with_from_border_side.dart';
 import 'fixes/replace_with_squared_box.dart';
 import 'fixes/same_package_direct_import.dart';
 import 'fixes/sort_enum_constants.dart';
+import 'fixes/use_defined_type.dart';
 import 'fixes/use_padding_property.dart';
 import 'plugin.dart';
 import 'rules/alphabetize_arguments.dart';
 import 'rules/alphabetize_enum_constants.dart';
 import 'rules/border_all.dart';
 import 'rules/border_radius_all.dart';
+import 'rules/closure_incorrect_type.dart';
 import 'rules/empty_container.dart';
 import 'rules/essential_lint_rules.dart';
 import 'rules/first_getter.dart';
@@ -145,6 +147,10 @@ mixin FixesPluginIntegration {
           SamePackageDirectImportFix.new,
           [.samePackageDirectImport],
         ),
+        .useDefinedType => addFixTo(
+          UseDefinedTypeFix.new,
+          [.closureIncorrectType],
+        ),
       };
     }
     logger.info('Mapped lint fixes');
@@ -250,6 +256,7 @@ mixin RulesPluginIntegration {
         .isFuture => IsFutureRule(),
         .variableShadowing => VariableShadowingRule(),
         .optionalPositionalParameters => OptionalPositionalParametersRule(),
+        .closureIncorrectType => ClosureIncorrectTypeRule(),
       });
     }
     logger

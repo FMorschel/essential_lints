@@ -260,6 +260,20 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
           'parameters in function declarations.',
     ),
   ),
+
+  /// A lint rule that checks for closures that have an incorrect type
+  /// annotation.
+  closureIncorrectType(
+    LintRuleCode(
+      name: 'closure_incorrect_type',
+      problemMessage: 'Closure parameter has an incorrect type annotation.',
+      correctionMessage:
+          'Adjust the type annotation to match the expected type.',
+      description:
+          'A lint rule that checks for closures that have an incorrect type '
+          'annotation.',
+    ),
+  ),
   ;
 
   const EssentialLintRules(this.code);
