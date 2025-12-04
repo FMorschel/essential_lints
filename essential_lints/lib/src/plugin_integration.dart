@@ -38,6 +38,7 @@ import 'rules/essential_lint_rules.dart';
 import 'rules/first_getter.dart';
 import 'rules/is_future.dart';
 import 'rules/last_getter.dart';
+import 'rules/mutable_tearoff.dart';
 import 'rules/new_instance_cascade.dart';
 import 'rules/numeric_constant_style.dart';
 import 'rules/optional_positional_parameters.dart';
@@ -268,6 +269,7 @@ mixin RulesPluginIntegration {
         .completerErrorNoStack => CompleterErrorNoStackRule(),
         .equalStatement => EqualStatementRule(),
         .duplicateValue => DuplicateValueRule(),
+        .mutableTearoff => MutableTearoffRule(),
       });
     }
     logger

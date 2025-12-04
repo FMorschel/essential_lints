@@ -312,6 +312,23 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
           'and `||`.',
     ),
   ),
+
+  /// A lint rule that detects tearing off mutable methods or getters.
+  mutableTearoff(
+    LintRuleCode(
+      name: 'mutable_tearoff',
+      problemMessage:
+          'Avoid tearing off mutable methods or getters to prevent '
+          'unintended side effects.',
+      correctionMessage:
+          'Do not tear off mutable methods or getters; consider using a '
+          'different approach.',
+      description:
+          'A lint rule that detects tearing off mutable methods or getters, '
+          'which can lead to unintended side effects if the underlying state '
+          'changes.',
+    ),
+  ),
   ;
 
   const EssentialLintRules(this.code);
