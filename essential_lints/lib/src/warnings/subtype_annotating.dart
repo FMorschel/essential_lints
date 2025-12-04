@@ -177,6 +177,27 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
     String gettersAndTypes(DartObject annotation) {
       if (annotation.toTypeValue() case var type?) {
         return 'an object of type ${type.getDisplayString()}';
+      } else if (annotation.constructorInvocation case var constructor?) {
+        return "'${constructor.constructor.displayName}("
+            '${constructor.positionalArguments // formatting trick
+            .map(gettersAndTypes).join(', ')}'
+            '${constructor.positionalArguments.isNotEmpty && // formatting trick
+                    constructor.namedArguments.isNotEmpty ? ', ' : ''}'
+            '${constructor.namedArguments.entries // formatting trick
+            .map((entry) => '${entry.key}: ${gettersAndTypes(entry.value)}')
+            // formatting trick
+            .join(', ')}'
+            ")'";
+      } else if (annotation.toDoubleValue() case var doubleValue?) {
+        return '$doubleValue';
+      } else if (annotation.toIntValue() case var intValue?) {
+        return '$intValue';
+      } else if (annotation.toStringValue() case var stringValue?) {
+        return "'$stringValue'";
+      } else if (annotation.toBoolValue() case var boolValue?) {
+        return '$boolValue';
+      } else if (annotation.isNull) {
+        return 'null';
       }
       return "'${annotation.variable?.displayName}'";
     }

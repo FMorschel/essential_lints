@@ -65,6 +65,52 @@ class Foo extends YourService {}
 ''');
   }
 
+  Future<void> test_deprecatedDifferentObject() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeAnnotating(annotations: [Deprecated('Use NewClass instead')])
+class BaseClass {}
+
+@Deprecated('Use NewClass instead 2')
+class MySubclass extends BaseClass {}
+''',
+      [
+        error(
+          rule.rule,
+          214,
+          10,
+          correctionContains: RegExp(r"Deprecated\('Use NewClass instead'\)"),
+        ),
+      ],
+    );
+  }
+
+  Future<void> test_deprecatedObject() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeAnnotating(annotations: [Deprecated('Use NewClass instead')])
+class BaseClass {}
+
+@Deprecated('Use NewClass instead')
+class MySubclass extends BaseClass {}
+''');
+  }
+
+  Future<void> test_deprecatedType() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeAnnotating(annotations: [Deprecated])
+class BaseClass {}
+
+@Deprecated('Use NewClass instead 2')
+class MySubclass extends BaseClass {}
+''');
+  }
+
   Future<void> test_enum() async {
     await assertDiagnostics(
       '''
