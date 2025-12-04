@@ -55,3 +55,4 @@ Some of the rules are based on issues in the Dart SDK repository. These are:
 - equal_statement [based on this SDK issue](https://github.com/dart-lang/sdk/issues/59529)
 - duplicate_value [based on this SDK issue](https://github.com/dart-lang/sdk/issues/59530)
 - mutable_tearoff [based on this SDK issue](https://github.com/dart-lang/sdk/issues/59510)
+- unnecessary_else_keyword [based on this SDK issue](https://github.com/dart-lang/sdk/issues/59148)

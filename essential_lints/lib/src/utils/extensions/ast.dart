@@ -98,3 +98,26 @@ extension AstExtension on AstNode {
     }
   }
 }
+
+/// Extension to determine if a statement always exits.
+extension StatementExt on Statement {
+  /// Returns `true` if the statement always exits (e.g., via return, throw,
+  /// or similar), otherwise returns `false`.
+  bool get alwaysExits {
+    return switch (this) {
+      Block(:var statements) =>
+        statements.isNotEmpty && statements.last.alwaysExits,
+      SwitchStatement(:var members) => members.every(
+        (c) => c.statements.isNotEmpty && c.statements.last.alwaysExits,
+      ),
+      ReturnStatement() => true,
+      ExpressionStatement(:var expression) => expression is ThrowExpression,
+      IfStatement(:var thenStatement, :var elseStatement) =>
+        thenStatement.alwaysExits &&
+            (elseStatement == null || elseStatement.alwaysExits),
+      _ =>
+        // Other statements are not considered to always exit.
+        false,
+    };
+  }
+}

@@ -4,21 +4,28 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
 
+import '../fixes/essential_lint_fixes.dart';
+import '../fixes/fix.dart';
+import '../utils/extensions/ast.dart';
 import 'assist.dart';
 import 'essential_lint_assists.dart';
 
 /// {@template swap_cases}
 /// Assist to remove useless else statements.
 /// {@endtemplate}
-class RemoveUselessElse extends ResolvedCorrectionProducer with Assist {
+class RemoveUselessElseAssist extends ResolvedCorrectionProducer
+    with Assist, LintFix {
   /// {@macro swap_cases}
-  RemoveUselessElse({required super.context});
+  RemoveUselessElseAssist({required super.context});
 
   @override
   CorrectionApplicability get applicability => .acrossSingleFile;
 
   @override
   EssentialLintAssists get assist => .removeUselessElse;
+
+  @override
+  EssentialLintFixes get fix => .removeUselessElse;
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
@@ -78,23 +85,6 @@ class RemoveUselessElse extends ResolvedCorrectionProducer with Assist {
         }
       }
     });
-  }
-}
-
-extension on Statement {
-  bool get alwaysExits {
-    return switch (this) {
-      Block(:var statements) =>
-        statements.isNotEmpty && statements.last.alwaysExits,
-      SwitchStatement(:var members) => members.every(
-        (c) => c.statements.isNotEmpty && c.statements.last.alwaysExits,
-      ),
-      ReturnStatement() => true,
-      ExpressionStatement(:var expression) => expression is ThrowExpression,
-      _ =>
-        // Other statements are not considered to always exit.
-        false,
-    };
   }
 }
 

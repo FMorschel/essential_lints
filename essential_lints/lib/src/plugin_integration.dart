@@ -48,6 +48,7 @@ import 'rules/returning_widgets.dart';
 import 'rules/same_package_direct_import.dart';
 import 'rules/standard_comment_style.dart';
 import 'rules/unnecessary_setstate.dart';
+import 'rules/useless_else.dart';
 import 'rules/variable_shadowing.dart';
 import 'utils/extensions/logger.dart';
 import 'warnings/essential_lint_warnings.dart';
@@ -77,7 +78,7 @@ mixin AssistsPluginIntegration {
     for (final assist in EssentialLintAssists.values) {
       switch (assist) {
         case EssentialLintAssists.removeUselessElse:
-          assists.add(RemoveUselessElse.new);
+          assists.add(RemoveUselessElseAssist.new);
       }
     }
     logger.info('Mapped assists');
@@ -160,6 +161,10 @@ mixin FixesPluginIntegration {
         .addCurrentStack => addFixTo(
           AddCurrentStackFix.new,
           [.completerErrorNoStack],
+        ),
+        .removeUselessElse => addFixTo(
+          RemoveUselessElseAssist.new,
+          [.uselessElse],
         ),
       };
     }
@@ -271,6 +276,7 @@ mixin RulesPluginIntegration {
         .equalStatement => EqualStatementRule(),
         .duplicateValue => DuplicateValueRule(),
         .mutableTearoff => MutableTearoffRule(),
+        .uselessElse => UselessElseRule(),
       });
     }
     logger

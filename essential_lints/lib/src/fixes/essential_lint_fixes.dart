@@ -102,6 +102,15 @@ enum EssentialLintFixes implements EnumFix {
       'Add current stack',
     ),
   ),
+
+  /// Fix to remove useless else statements.
+  removeUselessElse(
+    FixKind(
+      'dart.fix.removeUselessElse',
+      DartFixKindPriority.standard,
+      'Remove useless else',
+    ),
+  ),
   ;
 
   const EssentialLintFixes(this.fixKind);

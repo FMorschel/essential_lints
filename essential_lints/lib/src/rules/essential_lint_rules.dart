@@ -329,6 +329,18 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
           'changes.',
     ),
   ),
+
+  /// A lint rule that detects useless else statements.
+  uselessElse(
+    LintRuleCode(
+      name: 'useless_else',
+      problemMessage: 'Useless else statement detected.',
+      correctionMessage: 'Remove the useless else statement.',
+      description:
+          'A lint rule that detects and suggests to remove useless else '
+          'statements that are not necessary for control flow.',
+    ),
+  ),
   ;
 
   const EssentialLintRules(this.code);
