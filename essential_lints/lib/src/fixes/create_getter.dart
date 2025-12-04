@@ -9,7 +9,7 @@ import 'fix.dart';
 /// {@template create_getter_fix}
 /// A fix that creates a getter for a missing getter reference.
 /// {@endtemplate}
-class CreateGetterFix extends WarningFix {
+class CreateGetterFix extends ResolvedCorrectionProducer with WarningFix {
   /// {@macro create_getter_fix}
   CreateGetterFix({required super.context});
 

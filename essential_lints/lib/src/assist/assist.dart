@@ -4,12 +4,9 @@ import 'package:analyzer_plugin/utilities/assist/assist.dart';
 import 'essential_lint_assists.dart';
 
 /// {@template fix}
-/// The base class for all essential lint fixes.
+/// The base mixin for all essential lint fixes.
 /// {@endtemplate}
-abstract class Assist extends ResolvedCorrectionProducer {
-  /// {@macro fix}
-  Assist({required super.context});
-
+mixin Assist on ResolvedCorrectionProducer {
   @override
   CorrectionApplicability get applicability => .singleLocation;
 

@@ -3,21 +3,10 @@ import 'package:analyzer_plugin/utilities/fixes/fixes.dart';
 
 import 'essential_lint_fixes.dart';
 
-/// {@template fix}
+/// {@template lint_fix}
 /// The base class for all essential lint fixes.
 /// {@endtemplate}
-abstract class Fix extends ResolvedCorrectionProducer {
-  /// {@macro fix}
-  Fix({required super.context});
-}
-
-/// {@template fix}
-/// The base class for all essential lint fixes.
-/// {@endtemplate}
-abstract class LintFix extends Fix {
-  /// {@macro fix}
-  LintFix({required super.context});
-
+mixin LintFix on ResolvedCorrectionProducer {
   /// The essential lint fix associated with this correction producer.
   EssentialLintFixes get fix;
 
@@ -25,13 +14,10 @@ abstract class LintFix extends Fix {
   FixKind get fixKind => fix.fixKind;
 }
 
-/// {@template fix}
+/// {@template warning_fix}
 /// The base class for all essential lint fixes.
 /// {@endtemplate}
-abstract class WarningFix extends Fix {
-  /// {@macro fix}
-  WarningFix({required super.context});
-
+mixin WarningFix on ResolvedCorrectionProducer {
   /// The essential lint fix associated with this correction producer.
   EssentialLintWarningFixes get fix;
 

@@ -10,7 +10,7 @@ import 'fix.dart';
 /// {@template numeric_constant_style}
 /// A fix that formats double literals to adhere to a consistent style.
 /// {@endtemplate}
-class NumericConstantStyleFix extends LintFix {
+class NumericConstantStyleFix extends ResolvedCorrectionProducer with LintFix {
   /// {@macro numeric_constant_style}
   NumericConstantStyleFix({required super.context});
 

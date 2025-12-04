@@ -9,7 +9,8 @@ import 'fix.dart';
 /// {@template border_radius_all_fix}
 /// A fix that replaces BorderRadius.circular with BorderRadius.all.
 /// {@endtemplate}
-class ReplaceWithBorderRadiusAllFix extends LintFix {
+class ReplaceWithBorderRadiusAllFix extends ResolvedCorrectionProducer
+    with LintFix {
   /// {@macro border_radius_all_fix}
   ReplaceWithBorderRadiusAllFix({required super.context});
 

@@ -1,3 +1,4 @@
+import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
@@ -9,9 +10,12 @@ import 'essential_lint_assists.dart';
 /// {@template swap_cases}
 /// Assist to remove useless else statements.
 /// {@endtemplate}
-class RemoveUselessElse extends Assist {
+class RemoveUselessElse extends ResolvedCorrectionProducer with Assist {
   /// {@macro swap_cases}
   RemoveUselessElse({required super.context});
+
+  @override
+  CorrectionApplicability get applicability => .acrossSingleFile;
 
   @override
   EssentialLintAssists get assist => .removeUselessElse;

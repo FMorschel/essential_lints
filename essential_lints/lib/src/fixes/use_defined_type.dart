@@ -11,7 +11,7 @@ import 'fix.dart';
 /// A fix that changes the type annotation of a closure parameter
 /// to use the defined type.
 /// {@endtemplate}
-class UseDefinedTypeFix extends LintFix {
+class UseDefinedTypeFix extends ResolvedCorrectionProducer with LintFix {
   /// {@macro use_defined_type_fix}
   UseDefinedTypeFix({required super.context});
 

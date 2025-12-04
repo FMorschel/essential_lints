@@ -9,7 +9,7 @@ import 'fix.dart';
 /// {@template add_missing_members}
 /// A fix that adds missing members to a class or interface.
 /// {@endtemplate}
-class AddMissingMembersFix extends WarningFix {
+class AddMissingMembersFix extends ResolvedCorrectionProducer with WarningFix {
   /// {@macro add_missing_members}
   AddMissingMembersFix({required super.context});
 

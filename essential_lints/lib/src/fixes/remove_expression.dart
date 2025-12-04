@@ -12,7 +12,7 @@ import 'fix.dart';
 /// {@template remove_expression_fix}
 /// A fix that removes an expression from the code.
 /// {@endtemplate}
-class RemoveExpressionFix extends WarningFix {
+class RemoveExpressionFix extends ResolvedCorrectionProducer with WarningFix {
   /// {@macro remove_expression_fix}
   RemoveExpressionFix({required super.context});
 

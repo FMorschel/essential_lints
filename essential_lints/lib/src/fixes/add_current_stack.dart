@@ -9,7 +9,7 @@ import 'fix.dart';
 /// A fix that adds the current stack trace when completing a Completer with an
 /// error.
 /// {@endtemplate}
-class AddCurrentStackFix extends LintFix {
+class AddCurrentStackFix extends ResolvedCorrectionProducer with LintFix {
   /// {@macro add_current_stack_fix}
   AddCurrentStackFix({required super.context});
 

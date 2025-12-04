@@ -134,7 +134,7 @@ class A {
 }
 
 class B extends A {
-  void foo(void Function(num) x) {
+  void foo(covariant void Function(num) x) {
     foo((num n) {});
   }
 }

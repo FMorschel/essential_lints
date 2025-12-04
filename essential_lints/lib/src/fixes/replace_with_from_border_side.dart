@@ -9,7 +9,8 @@ import 'fix.dart';
 /// {@template replace_with_from_border_side_fix}
 /// A fix that replaces `Border.all` with `Border.fromBorderSide`.
 /// {@endtemplate}
-class ReplaceWithFromBorderSideFix extends LintFix {
+class ReplaceWithFromBorderSideFix extends ResolvedCorrectionProducer
+    with LintFix {
   /// {@macro replace_with_from_border_side_fix}
   ReplaceWithFromBorderSideFix({required super.context});
 

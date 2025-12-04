@@ -12,7 +12,8 @@ import 'fix.dart';
 /// A fix that replaces indirect imports within the same package with direct
 /// imports.
 /// {@endtemplate}
-class SamePackageDirectImportFix extends LintFix {
+class SamePackageDirectImportFix extends ResolvedCorrectionProducer
+    with LintFix {
   /// {@macro same_package_direct_import_fix}
   SamePackageDirectImportFix({required super.context});
 

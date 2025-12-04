@@ -10,7 +10,7 @@ import 'fix.dart';
 /// {@template alphabetize_arguments}
 /// A fix that alphabetizes arguments in function, method, or constructor calls.
 /// {@endtemplate}
-class AlphabetizeArgumentsFix extends LintFix {
+class AlphabetizeArgumentsFix extends ResolvedCorrectionProducer with LintFix {
   /// {@macro alphabetize_arguments}
   AlphabetizeArgumentsFix({required super.context});
 

@@ -14,7 +14,6 @@ import 'fixes/add_missing_members.dart';
 import 'fixes/alphabetize_arguments.dart';
 import 'fixes/create_getter.dart';
 import 'fixes/essential_lint_fixes.dart';
-import 'fixes/fix.dart';
 import 'fixes/numeric_constant_style.dart';
 import 'fixes/remove_expression.dart';
 import 'fixes/replace_with_border_radius_all.dart';
@@ -59,7 +58,9 @@ import 'warnings/warning.dart';
 
 /// A typedef for the base fix constructor.
 typedef FixGenerator =
-    Fix Function({required CorrectionProducerContext context});
+    ResolvedCorrectionProducer Function({
+      required CorrectionProducerContext context,
+    });
 
 /// Mixin to integrate plugin fixes.
 mixin AssistsPluginIntegration {

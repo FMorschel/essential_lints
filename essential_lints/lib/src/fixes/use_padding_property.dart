@@ -13,7 +13,7 @@ import 'fix.dart';
 /// A fix that converts a Container with wrapping Padding to use the
 /// padding property.
 /// {@endtemplate}
-class UsePaddingPropertyFix extends LintFix {
+class UsePaddingPropertyFix extends ResolvedCorrectionProducer with LintFix {
   /// {@macro use_padding_property_fix}
   UsePaddingPropertyFix({required super.context});
 

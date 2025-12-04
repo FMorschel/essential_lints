@@ -8,7 +8,7 @@ import 'fix.dart';
 /// {@template replace_with_squared_box_fix}
 /// A fix that replaces an empty Container with a SizedBox.shrink().
 /// {@endtemplate}
-class ReplaceWithSizedBoxFix extends LintFix {
+class ReplaceWithSizedBoxFix extends ResolvedCorrectionProducer with LintFix {
   /// {@macro replace_with_squared_box_fix}
   ReplaceWithSizedBoxFix({required super.context});
 

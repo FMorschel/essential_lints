@@ -9,7 +9,7 @@ import 'fix.dart';
 /// {@template sort_enum_constants_fix}
 /// A fix that sorts enum constants alphabetically.
 /// {@endtemplate}
-class SortEnumConstantsFix extends LintFix {
+class SortEnumConstantsFix extends ResolvedCorrectionProducer with LintFix {
   /// {@macro sort_enum_constants_fix}
   SortEnumConstantsFix({required super.context});
 
