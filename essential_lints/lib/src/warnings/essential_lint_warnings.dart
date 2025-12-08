@@ -115,20 +115,20 @@ enum GettersInMemberList with EnumDiagnostic, SubWarnings {
     ),
   ),
 
-  /// Empty member list name in GettersInMemberList annotation.
-  emptyMemberListName(
+  /// Invalid member list name in GettersInMemberList annotation.
+  invalidMemberListName(
     WarningCode(
       name: 'getters_in_member_list',
       problemMessage:
-          'The name of the member list in @GettersInMemberList cannot be '
-          'empty.',
+          'Invalid member list name: The name of the member list in the '
+          '@GettersInMemberList annotation must be a valid identifier.',
       correctionMessage:
           'Provide a valid member list name in the '
           '@GettersInMemberList annotation.',
       description:
           'A lint rule that ensures the name of the member list in the '
-          '@GettersInMemberList annotation is not empty.',
-      uniqueName: 'empty_member_list_name_getters_in_member_list',
+          '@GettersInMemberList annotation is a valid identifier.',
+      uniqueName: 'invalid_member_list_name_getters_in_member_list',
     ),
   ),
 

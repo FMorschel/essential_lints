@@ -72,6 +72,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
   static final Uri _annotationUri = .parse(
     'package:essential_lints_annotations/src/getters_in_member_list.dart',
   );
+  static final _validNamePattern = RegExp(r'^[a-zA-Z_$][a-zA-Z_$0-9]*$');
 
   final GettersInMemberListRule rule;
   final RuleContext context;
@@ -84,14 +85,14 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
         assert(false, 'The annotation should not be null here.');
         return;
       }
-      if (annotation.memberListName.isEmpty) {
+      if (!_validNamePattern.hasMatch(annotation.memberListName)) {
         rule.reportAtNode(
           node.arguments?.arguments
                   .firstWhereOrNull(_isMemberListName)
                   .whenTypeOrNull<NamedExpression>()
                   ?.expression ??
               node.name,
-          diagnosticCode: GettersInMemberList.emptyMemberListName,
+          diagnosticCode: GettersInMemberList.invalidMemberListName,
         );
       }
     }
@@ -108,7 +109,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
         .map(_mapKnownArguments)
         .nonNulls;
     for (final annotation in relevant) {
-      if (annotation.memberListName.isEmpty) {
+      if (!_validNamePattern.hasMatch(annotation.memberListName)) {
         continue;
       }
       var getterMember = element.getGetter(annotation.memberListName);

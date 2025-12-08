@@ -35,7 +35,7 @@ class A {}
 ''',
       [
         error(
-          GettersInMemberList.emptyMemberListName,
+          GettersInMemberList.invalidMemberListName,
           117,
           2,
         ),
@@ -262,6 +262,24 @@ abstract class A {
           correctionContains: RegExp(
             r"^(?=.*'value')(?!.*'otherValue').+$",
           ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> test_findsAnnotation_invalidName() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: '0 test')
+class A {}
+''',
+      [
+        error(
+          GettersInMemberList.invalidMemberListName,
+          117,
+          8,
         ),
       ],
     );
