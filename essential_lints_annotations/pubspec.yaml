@@ -1,0 +1,24 @@
+name: essential_lints_annotations
+description: Annotations for essential_lints package.
+version: 0.1.0
+
+repository: https://github.com/FMorschel/essential_lints
+issue_tracker: https://github.com/FMorschel/essential_lints/issues
+license: MIT
+
+environment:
+  sdk: ^3.10.0
+
+resolution: workspace
+
+# Recommended keywords help users find the package on pub.dev.
+keywords:
+  - dart
+  - analysis
+  - annotations
+  - meta
+
+dev_dependencies:
+  test: any
+dependencies:
+  meta: ^1.17.0

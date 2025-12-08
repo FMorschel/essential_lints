@@ -1,0 +1,163 @@
+import 'dart:async';
+
+import 'package:analysis_server_plugin/edit/dart/dart_fix_kind_priority.dart';
+import 'package:analysis_server_plugin/edit/fix/dart_fix_context.dart';
+import 'package:analysis_server_plugin/edit/fix/fix.dart';
+import 'package:analysis_server_plugin/src/correction/fix_processor.dart'
+    as fix_processor;
+import 'package:analyzer/analysis_rule/analysis_rule.dart';
+import 'package:analyzer/diagnostic/diagnostic.dart';
+import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
+import 'package:essential_lints/src/rules/rule.dart';
+import 'package:essential_lints/src/warnings/warning.dart';
+import 'package:meta/meta.dart';
+import 'package:test/test.dart';
+
+import 'base_edit_test_processor.dart';
+
+typedef DiagnosticFilter = bool Function(Diagnostic diagnostic);
+
+mixin EditTestProcessorMixin on BaseEditTestProcessor {
+  EnumFix get fix;
+
+  Future<void> assertHasFix(
+    String expected, {
+    DiagnosticFilter? filter,
+    String? target,
+    int? expectedNumberOfFixesForKind,
+    Pattern? matchFixMessage,
+    bool allowFixAllFixes = false,
+  }) async {
+    var diagnostic = _singleDiagnostic(filter: filter);
+    var fixes = await _computeFixes(diagnostic);
+    var fix = _parseFix(
+      fixes,
+      expectedNumberOfFixesForKind: expectedNumberOfFixesForKind,
+      matchFixMessage: matchFixMessage,
+      allowFixAllFixes: allowFixAllFixes,
+    );
+    expect(fix, hasLength(1));
+    matchesExpected(expected, change: fix.single.change, target: target);
+  }
+
+  Future<void> assertNoFix({DiagnosticFilter? filter}) async {
+    var diagnostic = _singleDiagnostic(filter: filter);
+    var fixes = await _computeFixes(diagnostic);
+    var fix = _parseFix(fixes);
+    expect(fix, isEmpty);
+  }
+
+  /// Computes fixes for the given [diagnostic] in [testUnit].
+  Future<List<Fix>> _computeFixes(Diagnostic diagnostic) async {
+    var libraryResult = testLibrary;
+    if (libraryResult == null) {
+      return const [];
+    }
+    var context = DartFixContext(
+      instrumentationService: instrumentationService,
+      workspace: workspace,
+      libraryResult: libraryResult,
+      unitResult: testUnit,
+      error: diagnostic,
+    );
+    return fix_processor.computeFixes(context);
+  }
+
+  List<Fix> _parseFix(
+    List<Fix> fixes, {
+    int? expectedNumberOfFixesForKind,
+    Pattern? matchFixMessage,
+    bool allowFixAllFixes = false,
+  }) {
+    fixes = fixes.where((fix) => fix.kind == this.fix.fixKind).toList();
+    if (expectedNumberOfFixesForKind != null) {
+      expect(
+        fixes,
+        hasLength(expectedNumberOfFixesForKind),
+        reason:
+            'Expected $expectedNumberOfFixesForKind fixes for kind $this.fix, '
+            'found ${fixes.length}.',
+      );
+    }
+    if (matchFixMessage != null) {
+      fixes = fixes
+          .where((fix) => fix.kind.message.contains(matchFixMessage))
+          .toList();
+      expect(
+        fixes,
+        isNotEmpty,
+        reason:
+            'Expected at least one fix matching message "$matchFixMessage", '
+            'found none.',
+      );
+    }
+    for (final fix in fixes) {
+      if (!allowFixAllFixes &&
+          fix.kind.priority == DartFixKindPriority.inFile) {
+        fail(
+          'A fix-all fix was found for the error: $this.fix '
+          'in the computed set of fixes:\n${fixes.join('\n')}',
+        );
+      }
+    }
+    return fixes;
+  }
+
+  Diagnostic _singleDiagnostic({DiagnosticFilter? filter}) {
+    var diagnostics = testUnit.diagnostics;
+    if (filter != null) {
+      diagnostics = diagnostics.where(filter).toList();
+    }
+    if (diagnostics.isEmpty) {
+      expect(diagnostics, hasLength(1));
+    }
+    if (diagnostics.length > 1) {
+      fail(
+        'Expected a single diagnostic, found ${diagnostics.length}:\n'
+        '${diagnostics.join('\n')}',
+      );
+    }
+    return diagnostics.first;
+  }
+}
+
+abstract class FixTestProcessor extends BaseEditTestProcessor
+    with EditTestProcessorMixin {
+  @override
+  String get analysisRule => rule.diagnosticCode.name;
+
+  @override
+  @mustBeOverridden
+  AnalysisRule get rule;
+}
+
+abstract class LintFixTestProcessor extends FixTestProcessor {
+  @override
+  EssentialLintFixes get fix;
+
+  @override
+  @mustBeOverridden
+  LintRule get rule;
+}
+
+abstract class MultiWarningFixTestProcessor extends BaseEditTestProcessor
+    with EditTestProcessorMixin {
+  @override
+  String get analysisRule => rule.rule.code.name;
+
+  @override
+  EssentialLintWarningFixes get fix;
+
+  @override
+  @mustBeOverridden
+  MultiWarningRule get rule;
+}
+
+abstract class WarningFixTestProcessor extends FixTestProcessor {
+  @override
+  EssentialLintWarningFixes get fix;
+
+  @override
+  @mustBeOverridden
+  AnalysisRule get rule;
+}

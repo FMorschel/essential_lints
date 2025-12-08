@@ -1,6 +1,6 @@
-name: essential_lints
-description: New lint rules for Dart/Flutter projects and related fixes.
-version: 0.0.1
+name: essential_dx
+description: A collection of essential Dart developer tools to improve the developer experience.
+publish_to: none
 
 repository: https://github.com/FMorschel/essential_lints
 documentation: https://github.com/FMorschel/essential_lints#readme
@@ -8,20 +8,14 @@ issue_tracker: https://github.com/FMorschel/essential_lints/issues
 license: MIT
 
 environment:
-  sdk: ^3.9.0
+  sdk: ^3.10.0
 
-# Recommended keywords help users find the package on pub.dev.
-keywords:
-  - lints
-  - dart
-  - analysis
-  - linters
-
-dependencies:
-  analysis_server_plugin: ^0.3.3
-  analyzer: ^8.4.0
+workspace:
+  - essential_lints
+  - essential_lints_annotations
 
 dev_dependencies:
-  analyzer_testing: ^0.1.4
+  analyzer_testing: ^0.1.5
   test: ^1.26.3
+  test_reflective_loader: ^0.4.0
   very_good_analysis: ^10.0.0

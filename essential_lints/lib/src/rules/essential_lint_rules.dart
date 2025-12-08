@@ -1,0 +1,442 @@
+import 'package:analyzer/error/error.dart';
+
+import '../warnings/essential_lint_warnings.dart';
+
+/// {@template enum_lint}
+/// A mixin for enums that provide a lint rule code.
+/// {@endtemplate}
+mixin EnumLint on EnumDiagnostic implements LintCode {
+  @override
+  LintRuleCode get code;
+}
+
+/// The list of all essential lint rules.
+enum EssentialLintRules with EnumDiagnostic, EnumLint {
+  /// Arguments should be in alphabetical order.
+  alphabetizeArguments(
+    LintRuleCode(
+      name: 'alphabetize_arguments',
+      problemMessage: 'Arguments should be in alphabetical order.',
+      correctionMessage: 'Reorder the arguments alphabetically.',
+      description:
+          'A lint rule that enforces alphabetical ordering of function '
+          'arguments.',
+    ),
+  ),
+
+  /// Prefer explicitly named parameters for better readability.
+  preferExplicitlyNamedParameter(
+    LintRuleCode(
+      name: 'prefer_explicitly_named_parameter',
+      problemMessage: 'Use explicitly named parameters for better readability.',
+      correctionMessage:
+          'Change to use explicitly named parameters in function type '
+          'declarations.',
+      description:
+          'A lint rule that encourages the use of explicitly named parameters '
+          'in function type declarations for improved code clarity and '
+          'completion.',
+    ),
+  ),
+
+  /// Double literals should follow the preferred format.
+  numericConstantStyle(
+    LintRuleCode(
+      name: 'numeric_constant_style',
+      problemMessage: 'Double literals should follow the preferred format.',
+      correctionMessage:
+          'Reformat the double literal to match the preferred style.',
+      description:
+          'A lint rule that enforces a consistent format for double literals '
+          'in the codebase.',
+    ),
+  ),
+
+  /// Prefer using the `last` getter to access the last element of a
+  /// list-like object.
+  lastGetter(
+    LintRuleCode(
+      name: 'last_getter',
+      problemMessage:
+          'Prefer using the `last` getter to access the last element of a '
+          'list-like object.',
+      correctionMessage: 'Replace the index access with the `last` getter.',
+      description:
+          'A lint rule that suggests using the `last` getter instead of '
+          'accessing the last element of a list-like object using length - 1 '
+          'index.',
+    ),
+  ),
+
+  /// Prefer using the `first` getter to access the first element of a
+  /// list-like object.
+  firstGetter(
+    LintRuleCode(
+      name: 'first_getter',
+      problemMessage:
+          'Prefer using the `first` getter to access the first element of a '
+          'list-like object.',
+      correctionMessage: 'Replace the index access with the `first` getter.',
+      description:
+          'A lint rule that suggests using the `first` getter instead of '
+          'accessing the first element of a list-like object using 0 index.',
+    ),
+  ),
+
+  /// Avoid returning Widgets from functions.
+  returningWidgets(
+    LintRuleCode(
+      name: 'returning_widgets',
+      problemMessage: 'Avoid returning Widgets from functions.',
+      correctionMessage: 'Prefer extracting the widget into a separate class.',
+      description:
+          'A lint rule that discourages returning Widgets from functions and '
+          'encourages extracting them into separate classes for better code '
+          'organization and reusability.',
+    ),
+  ),
+
+  /// Prefer using the padding property of Container instead of wrapping it with
+  /// a Padding widget.
+  paddingOverContainer(
+    LintRuleCode(
+      name: 'padding_over_container',
+      problemMessage:
+          'Prefer using the inner padding property from Container over '
+          'wrapping with padding.',
+      correctionMessage:
+          'Use the padding property of Container instead of wrapping it with '
+          'a Padding widget.',
+      description:
+          'A lint rule that suggests using the padding property of Container '
+          'instead of wrapping it with a Padding widget.',
+    ),
+  ),
+
+  /// Detects unnecessary calls to setState in Flutter widgets.
+  unnecessarySetstate(
+    LintRuleCode(
+      name: 'unnecessary_setstate',
+      problemMessage: 'Unnecessary calls to setState detected.',
+      correctionMessage: 'Remove the unnecessary call to setState.',
+      description:
+          'A lint rule that detects and flags unnecessary calls to setState '
+          'in State classes.',
+    ),
+  ),
+
+  /// A rule that detects empty container widgets in Flutter code.
+  emptyContainer(
+    LintRuleCode(
+      name: 'empty_container',
+      problemMessage: 'Empty Container widget detected.',
+      correctionMessage: 'Remove the empty Container widget.',
+      description:
+          'A lint rule that detects empty Container widgets in Flutter code.',
+    ),
+  ),
+
+  /// A rule that enforces alphabetical ordering of enum constants.
+  alphabetizeEnumConstants(
+    LintRuleCode(
+      name: 'alphabetize_enum_constants',
+      problemMessage: 'Enum constants should be in alphabetical order.',
+      correctionMessage: 'Reorder the enum constants alphabetically.',
+      description:
+          'A lint rule that enforces alphabetical ordering of enum constants.',
+    ),
+  ),
+
+  /// A lint rule that checks for the use of `Border.all` in Flutter widgets.
+  borderAll(
+    LintRuleCode(
+      name: 'border_all',
+      problemMessage: 'Avoid using Border.all in Flutter widgets.',
+      correctionMessage: 'Use Border.fromBorderSide instead of Border.all.',
+      description:
+          'A lint rule that checks for the use of Border.all in Flutter '
+          'widgets.',
+    ),
+  ),
+
+  /// A lint rule that checks for the use of BorderRadius.circular in
+  /// Flutter widgets.
+  borderRadiusAll(
+    LintRuleCode(
+      name: 'border_radius_all',
+      problemMessage: 'Avoid using BorderRadius.circular in Flutter widgets.',
+      correctionMessage:
+          'Use BorderRadius.all instead of BorderRadius.circular.',
+      description:
+          'A lint rule that checks for the use of BorderRadius.circular in '
+          'Flutter widgets.',
+    ),
+  ),
+
+  /// A rule that checks for proper phrasing of comments.
+  standardCommentStyle(
+    LintRuleCode(
+      name: 'standard_comment_style',
+      problemMessage: 'Comments should be phrased.',
+      correctionMessage:
+          'Format comments to end with proper punctuation and capitalization.',
+      description: 'A lint rule that checks for proper phrasing of comments.',
+    ),
+  ),
+
+  /// A lint rule that enforces direct imports within the same package.
+  samePackageDirectImport(
+    LintRuleCode(
+      name: 'same_package_direct_import',
+      problemMessage:
+          'Imports within the same package should be direct imports.',
+      correctionMessage: 'Change to a direct import.',
+      description:
+          'A lint rule that enforces direct imports within the same package.',
+    ),
+  ),
+
+  /// A lint rule that detects cascades being used on members that return new
+  /// instances.
+  newInstanceCascade(
+    LintRuleCode(
+      name: 'new_instance_cascade',
+      problemMessage:
+          'Avoid using cascades on members that return new instances.',
+      correctionMessage:
+          'Do not use cascades on members that return new instances.',
+      description:
+          'A lint rule that detects cascades being used on members that return '
+          'new instances.',
+    ),
+  ),
+
+  /// A lint rule that checks for usages of `is Future` type checks in
+  /// `FutureOr` instances that accept `Future` values.
+  isFuture(
+    LintRuleCode(
+      name: 'is_future',
+      problemMessage:
+          'Avoid using `is Future` type checks in `FutureOr` instances that '
+          'accept `Future` values.',
+      correctionMessage:
+          'Remove the `is Future` type check when working with `FutureOr` '
+          'instances.',
+      description:
+          'A lint rule that checks for usages of `is Future` type checks in '
+          '`FutureOr` instances that accept `Future` values.',
+    ),
+  ),
+
+  /// A lint rule that checks for variable declarations that shadow other
+  /// variables in the same scope.
+  variableShadowing(
+    LintRuleCode(
+      name: 'variable_shadowing',
+      problemMessage:
+          'Variable declarations should not shadow other variables in the '
+          'same scope.',
+      correctionMessage:
+          'Rename the variable to avoid shadowing another variable in the '
+          'same scope.',
+      description:
+          'A lint rule that checks for variable declarations that shadow other '
+          'variables in the same scope.',
+    ),
+  ),
+
+  /// A lint rule that discourages the use of optional positional parameters
+  /// in function declarations.
+  optionalPositionalParameters(
+    LintRuleCode(
+      name: 'optional_positional_parameters',
+      problemMessage:
+          'Avoid using optional positional parameters in function '
+          'declarations.',
+      correctionMessage:
+          'Use named parameters instead of optional positional parameters.',
+      description:
+          'A lint rule that discourages the use of optional positional '
+          'parameters in function declarations.',
+    ),
+  ),
+
+  /// A lint rule that checks for closures that have an incorrect type
+  /// annotation.
+  closureIncorrectType(
+    LintRuleCode(
+      name: 'closure_incorrect_type',
+      problemMessage: 'Closure parameter has an incorrect type annotation.',
+      correctionMessage:
+          'Adjust the type annotation to match the expected type.',
+      description:
+          'A lint rule that checks for closures that have an incorrect type '
+          'annotation.',
+    ),
+  ),
+
+  /// A lint rule that checks for the use of Completer.completeError without
+  /// providing a stack trace.
+  completerErrorNoStack(
+    LintRuleCode(
+      name: 'completer_error_no_stack',
+      problemMessage:
+          'Avoid using Completer.completeError without a stack trace.',
+      correctionMessage:
+          'Provide a stack trace when calling Completer.completeError.',
+      description:
+          'A lint rule that checks for the use of Completer.completeError '
+          'without providing a stack trace.',
+    ),
+  ),
+
+  /// A lint rule that detects equal statements in switch cases.
+  equalStatement(
+    LintRuleCode(
+      name: 'equal_statement',
+      problemMessage: 'Avoid using equal statements in switch cases.',
+      correctionMessage: 'Agregate {0} cases.',
+      description: 'A lint rule for equal statements under switch cases.',
+    ),
+  ),
+
+  /// A lint rule that detects duplicate values in comparisons like `&&` and
+  /// `||`.
+  duplicateValue(
+    LintRuleCode(
+      name: 'duplicate_value',
+      problemMessage: 'Duplicate value detected.',
+      correctionMessage: 'Remove the duplicate value.',
+      description:
+          'A lint rule that detects duplicate values in comparisons like `&&` '
+          'and `||`.',
+    ),
+  ),
+
+  /// A lint rule that detects tearing off mutable methods or getters.
+  mutableTearoff(
+    LintRuleCode(
+      name: 'mutable_tearoff',
+      problemMessage:
+          'Avoid tearing off mutable methods or getters to prevent '
+          'unintended side effects.',
+      correctionMessage:
+          'Do not tear off mutable methods or getters; consider using a '
+          'different approach.',
+      description:
+          'A lint rule that detects tearing off mutable methods or getters, '
+          'which can lead to unintended side effects if the underlying state '
+          'changes.',
+    ),
+  ),
+
+  /// A lint rule that detects useless else statements.
+  uselessElse(
+    LintRuleCode(
+      name: 'useless_else',
+      problemMessage: 'Useless else statement detected.',
+      correctionMessage: 'Remove the useless else statement.',
+      description:
+          'A lint rule that detects and suggests to remove useless else '
+          'statements that are not necessary for control flow.',
+    ),
+  ),
+  ;
+
+  const EssentialLintRules(this.code);
+
+  /// The diagnostic code associated with the lint rule.
+  @override
+  final LintRuleCode code;
+}
+
+/// The list of all essential lint rules.
+enum EssentialMultiLints<T extends SubLints> with EnumDiagnostic, EnumLint {
+  /// A lint rule that detects pending listeners and reminds developers to
+  /// remove them.
+  pendingListener<PendingListener>(
+    LintRuleCode(
+      name: 'pending_listener',
+      problemMessage: 'Pending listener detected.',
+      correctionMessage: 'Remove the pending listener.',
+      description:
+          'A lint rule that detects pending listeners and reminds developers '
+          'to remove them.',
+    ),
+  ),
+  ;
+
+  const EssentialMultiLints(this.code);
+
+  @override
+  final LintRuleCode code;
+}
+
+/// {@template lint_rule_code}
+/// A diagnostic code for a lint rule.
+/// {@endtemplate}
+class LintRuleCode extends WarningCode implements LintCode {
+  /// {@macro lint_rule_code}
+  const LintRuleCode({
+    required super.name,
+    required super.problemMessage,
+    required super.correctionMessage,
+    required super.description,
+    super.severity = .INFO,
+    super.hasPublishedDocs,
+    super.uniqueName,
+  }) : super(type: DiagnosticType.LINT);
+}
+
+/// {@template pending_listener}
+/// Sub-lints for the PendingListener lint rule.
+/// {@endtemplate}
+enum PendingListener with EnumDiagnostic, SubLints {
+  /// Closures used as listeners cannot be matched for removal.
+  closuresCannotBeMatched(
+    LintRuleCode(
+      name: 'closures_cannot_be_matched',
+      problemMessage:
+          'Closures used as listeners cannot be matched for '
+          'removal.',
+      correctionMessage:
+          'Avoid using closures as listeners to ensure they can be properly '
+          'removed.',
+      description:
+          'A sub-lint that highlights the use of closures as listeners, which '
+          'cannot be matched for removal later.',
+    ),
+  ),
+
+  /// Unnecessary calls to remove listeners that were never added.
+  unnecessaryRemove(
+    LintRuleCode(
+      name: 'unnecessary_remove',
+      problemMessage: 'Unnecessary listener removal detected.',
+      correctionMessage: 'Remove the unnecessary listener removal call.',
+      description:
+          'A sub-lint that detects unnecessary calls to remove listeners that '
+          'were never added.',
+    ),
+  ),
+  ;
+
+  const PendingListener(this.code);
+
+  @override
+  final EssentialMultiLints base = .pendingListener;
+
+  @override
+  final LintRuleCode code;
+}
+
+/// {@template sub_warnings}
+/// A grouping of sub-warnings under a base warning.
+/// {@endtemplate}
+mixin SubLints on EnumDiagnostic {
+  /// The base warning.
+  EssentialMultiLints get base;
+
+  @override
+  LintRuleCode get code;
+}
