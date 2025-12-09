@@ -18,7 +18,9 @@ keywords:
   - annotations
   - meta
 
-dev_dependencies:
-  test: any
 dependencies:
   meta: ^1.17.0
+
+dev_dependencies:
+  analyzer: any
+  test: any
