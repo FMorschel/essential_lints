@@ -41,6 +41,7 @@ class _InvalidMembersVisitor extends SimpleAstVisitor<void> {
   final InvalidMembersRule rule;
   final RuleContext context;
   late final DartType _type;
+  late final AstNode _node;
 
   @override
   void visitDotShorthandPropertyAccess(DotShorthandPropertyAccess node) {
@@ -48,10 +49,15 @@ class _InvalidMembersVisitor extends SimpleAstVisitor<void> {
     if (type == null) return;
     if (type.element case InterfaceElement(
       :var allSupertypes,
-      :var interfaces,
-    ) when allSupertypes.any(_isGroupType) || interfaces.any(_isGroupType)) {
+    ) when allSupertypes.any(_isGroupType)) {
       _type = type;
+      _node = node.propertyName;
+      node.parent?.accept(this);
     }
+  }
+
+  @override
+  void visitArgumentList(ArgumentList node) {
     node.parent?.accept(this);
   }
 
@@ -61,19 +67,24 @@ class _InvalidMembersVisitor extends SimpleAstVisitor<void> {
   ) {
     var typeElement = node.element?.enclosingElement;
     if (typeElement == null) return;
-    var invalidMembersAnnotations = typeElement.metadata.annotations.where(
-      _isInvalidMembers,
-    );
+    var invalidMembersAnnotations = typeElement.metadata.annotations
+        .where(
+          _isInvalidMembers,
+        )
+        .toList();
     for (final annotation in invalidMembersAnnotations) {
       var constantValue = annotation.computeConstantValue();
       if (constantValue == null) continue;
-      var invalidMembers = constantValue.getField('members');
+      var invalidMembers = constantValue.getField('invalidMembers');
       if (invalidMembers == null) continue;
       for (final member in [...?invalidMembers.toListValue()]) {
-        if (member.type case InterfaceType(
-          :var typeArguments,
-        ) when typeArguments.length == 1 && typeArguments.first == _type) {
-          rule.reportAtNode(node);
+        if (member.type
+            case InterfaceType(
+              :var typeArguments,
+            )
+            when typeArguments.length == 1 &&
+                context.typeSystem.isAssignableTo(_type, typeArguments.first)) {
+          rule.reportAtNode(_node);
         }
       }
     }
@@ -84,7 +95,7 @@ class _InvalidMembersVisitor extends SimpleAstVisitor<void> {
       return type?.element?.name == 'InvalidMembers' &&
           type?.element?.library?.uri ==
               .parse(
-                'package:_internal/src/annotations/invalid_members.dart',
+                'package:essential_lints_annotations/src/_internal/invalid_members.dart',
               );
     }
     return false;

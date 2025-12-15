@@ -32,15 +32,15 @@ void foo(SortDeclaration _) {
 
 @InvalidMembers([th<Methods>()])
 extension type A._(Public p) implements Public {
-  factory A(B _) => throw UnimplementedError();
-  factory A.another(A _) => throw UnimplementedError();
+  factory A(B _) => throw Exception();
+  factory A.another(A _) => throw Exception();
 }
 
 extension type const B._(Methods m) implements Methods {
   static const c = B._(SortDeclaration.methods as Methods);
 }
 ''',
-      [lint(142, 1)],
+      [lint(302, 1)],
     );
   }
 }
