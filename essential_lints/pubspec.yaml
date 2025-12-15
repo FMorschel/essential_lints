@@ -27,6 +27,8 @@ dependencies:
   meta: ^1.17.0
 
 dev_dependencies:
+  _internal_testing:
+    path: ../_internal_testing
   analyzer_testing: any
   test: any
   test_reflective_loader: any

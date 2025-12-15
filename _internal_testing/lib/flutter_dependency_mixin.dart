@@ -31,10 +31,11 @@
 // POSSIBILITY OF SUCH DAMAGE.
 // ```
 
+import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 
 mixin FlutterDependencyMixin on AnalysisRuleTest {
-  late final flutterFolder = newFolder('/packages/flutter');
+  late final Folder flutterFolder = newFolder('/packages/flutter');
 
   void createFlutterMock() {
     newFile(

@@ -13,9 +13,15 @@ environment:
 workspace:
   - essential_lints
   - essential_lints_annotations
+  - _internal_plugin
+  - _internal_testing
 
 dev_dependencies:
   analyzer_testing: ^0.1.5
   test: ^1.26.3
   test_reflective_loader: ^0.4.0
   very_good_analysis: ^10.0.0
+
+plugins:
+  _internal_plugin:
+    path: _internal_plugin/

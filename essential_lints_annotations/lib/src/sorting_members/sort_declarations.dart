@@ -1,74 +1,129 @@
+import 'package:meta/meta.dart';
+
+import '../../essential_lints_annotations.dart';
+import '../_internal/invalid_members.dart';
+import '../_internal/invalid_modifier.dart';
+
 part 'abstractable.dart';
 part 'constant.dart';
 part 'external_modifiable.dart';
+part 'factory_modifiable.dart';
 part 'final_modifiable.dart';
 part 'group.dart';
 part 'initializable.dart';
 part 'late_modifiable.dart';
 part 'member.dart';
 part 'modifiable.dart';
+part 'named_modifiable.dart';
 part 'nullable_modifiable.dart';
 part 'operator_modifiable.dart';
 part 'overridable.dart';
 part 'private_modifiable.dart';
 part 'public_modifiable.dart';
+part 'redirecting_modifiable.dart';
 part 'statical.dart';
+part 'unnamed_modifiable.dart';
 part 'variable.dart';
 
-/// A helper typedef for generating sort declarations.
-typedef SortDeclarationGenerator<I, O extends SortDeclaration> = O Function(I);
-
 /// Represents a sort declaration.
+@immutable
 sealed class SortDeclaration {
-  const SortDeclaration();
+  const SortDeclaration._();
 
-  /// {@macro overriden}
-  static const OverriddenGenerator overridden = Overridden.overriden;
+  /// {@macro abstract}
+  const factory SortDeclaration.abstract(Abstractable modifiable) = Abstract._;
+
+  /// {@macro overridden}
+  const factory SortDeclaration.overridden(Overridable modifiable) =
+      Overridden._;
 
   /// {@macro externalMembers}
-  static const ExternalMembersGenerator external = External.new;
+  const factory SortDeclaration.external(ExternalMembersModifiable modifiable) =
+      External._;
+
+  /// {@macro static}
+  const factory SortDeclaration.static(Statical modifiable) = Static._;
+
+  /// {@macro late_modifiable}
+  const factory SortDeclaration.late(LateModifiable modifiable) = Late._;
 
   /// {@macro operator}
-  static const OperatorGenerator operator = Operator.operator;
+  const factory SortDeclaration.operator([OperatorModifiable modifiable]) =
+      Operator._;
+
+  /// {@macro nullable}
+  const factory SortDeclaration.nullable(NullableMembersModifiable modifiable) =
+      Nullable._;
+
+  /// {@macro private}
+  const factory SortDeclaration.private(PrivateModifiable modifiable) =
+      Private._;
+
+  /// {@macro public}
+  const factory SortDeclaration.public(PublicModifiable modifiable) = Public._;
 
   /// {@macro initialized}
-  static const InitializableGenerator initialized =
-      InitializedModifier.initialized;
+  const factory SortDeclaration.initialized(InitializableStatical modifiable) =
+      Initialized._;
+
+  /// {@macro variable}
+  const factory SortDeclaration.var_(Variable modifiable) = Var._;
+
+  /// {@macro final}
+  const factory SortDeclaration.final_(FinalModifiable modifiable) = Final._;
+
+  /// {@macro const}
+  const factory SortDeclaration.const_(Constant modifiable) = Const._;
+
+  /// {@macro factory}
+  const factory SortDeclaration.factory_(FactoryModifiable modifiable) =
+      Factory._;
+
+  /// {@macro named}
+  const factory SortDeclaration.named(NamedModifiable modifiable) = Named._;
+
+  /// {@macro unnamed}
+  const factory SortDeclaration.unnamed(UnnamedModifiable modifiable) =
+      Unnamed._;
+
+  /// {@macro redirecting}
+  const factory SortDeclaration.redirecting(RedirectingModifiable modifiable) =
+      Redirecting._;
 
   /// The constructor generator.
-  static const MemberGenerator constructor = Constructor.constructor;
+  const factory SortDeclaration.constructor([Symbol? name]) = Constructor._;
 
   /// The field generator.
-  static const MemberGenerator field = Field.field;
+  const factory SortDeclaration.field(Symbol name) = Field._;
 
   /// The getter generator.
-  static const MemberGenerator getter = Getter.getter;
+  const factory SortDeclaration.getter(Symbol name) = Getter._;
 
   /// The method generator.
-  static const MemberGenerator method = Method.method;
+  const factory SortDeclaration.method(Symbol name) = Method._;
 
   /// The setter generator.
-  static const MemberGenerator setter = Setter.setter;
+  const factory SortDeclaration.setter(Symbol name) = Setter._;
 
   /// {@macro constructors}
-  static const SortDeclaration constructors = Constructors.constructors;
+  static const SortDeclaration constructors = Constructors._constructors;
 
   /// {@macro fields}
-  static const SortDeclaration fields = Fields.fields;
+  static const SortDeclaration fields = Fields._fields;
 
   /// {@macro fieldsGettersSetters}
   static const SortDeclaration fieldsGettersSetters =
-      FieldsGettersSetters.fieldsGettersSetters;
+      FieldsGettersSetters._fieldsGettersSetters;
 
   /// {@macro getters}
-  static const SortDeclaration getters = Getters.getters;
+  static const SortDeclaration getters = Getters._getters;
 
   /// {@macro gettersSetters}
-  static const SortDeclaration gettersSetters = GettersSetters.gettersSetters;
+  static const SortDeclaration gettersSetters = GettersSetters._gettersSetters;
 
   /// {@macro methods}
-  static const SortDeclaration methods = Methods.methods;
+  static const SortDeclaration methods = Methods._methods;
 
   /// {@macro setters}
-  static const SortDeclaration setters = Setters.setters;
+  static const SortDeclaration setters = Setters._setters;
 }

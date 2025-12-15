@@ -2,44 +2,83 @@ part of 'sort_declarations.dart';
 
 /// Represents external modifiable members.
 sealed class ExternalModifiable extends Modifiable {
-  const ExternalModifiable();
+  const ExternalModifiable._() : super._();
 }
 
 /// {@template externalMembers}
 /// Represents members that can be external and their modifiers.
 /// {@endtemplate}
 sealed class ExternalMembersModifiable extends ExternalModifiable {
-  const ExternalMembersModifiable();
+  /// {@macro factory}
+  const factory ExternalMembersModifiable.factory_(
+    FactoryModifiable modifiable,
+  ) = Factory._;
+
+  /// {@macro nullable}
+  const factory ExternalMembersModifiable.nullable(
+    NullableExternableModifiable modifiable,
+  ) = Nullable._;
 
   /// {@macro operator}
-  static const OperatorGenerator operator = Operator.operator;
+  const factory ExternalMembersModifiable.operator(
+    OperatorModifiable modifiable,
+  ) = Operator._;
+
+  /// {@macro public}
+  const factory ExternalMembersModifiable.public(PublicModifiable modifiable) =
+      Public._;
+
+  /// {@macro private}
+  const factory ExternalMembersModifiable.private(
+    PrivateModifiable modifiable,
+  ) = Private._;
+
+  /// {@macro static}
+  const factory ExternalMembersModifiable.unnamed(
+    UnnamedModifiable modifiable,
+  ) = Unnamed._;
 
   /// {@macro var}
-  static const VariableGenerator variable = Var.variable;
+  const factory ExternalMembersModifiable.var_(
+    VariableAbstractable modifiable,
+  ) = Var._;
+
+  /// {@macro final}
+  const factory ExternalMembersModifiable.final_(
+    FinalAbstractModifiable modifiable,
+  ) = Final._;
+
+  /// {@macro static}
+  const factory ExternalMembersModifiable.static(StaticalExternal modifiable) =
+      Static._;
+
+  /// {@macro named}
+  const factory ExternalMembersModifiable.named(NamedModifiable modifiable) =
+      Named._;
 
   /// {@macro constructors}
   static const ExternalMembersModifiable constructors =
-      Constructors.constructors;
+      Constructors._constructors;
 
   /// {@macro fields}
-  static const ExternalMembersModifiable fields = Fields.fields;
+  static const ExternalMembersModifiable fields = Fields._fields;
 
   /// {@macro fieldsGettersSetters}
   static const ExternalMembersModifiable fieldsGettersSetters =
-      FieldsGettersSetters.fieldsGettersSetters;
+      FieldsGettersSetters._fieldsGettersSetters;
 
   /// {@macro getters}
-  static const ExternalMembersModifiable getters = Getters.getters;
+  static const ExternalMembersModifiable getters = Getters._getters;
 
   /// {@macro gettersSetters}
   static const ExternalMembersModifiable gettersSetters =
-      GettersSetters.gettersSetters;
+      GettersSetters._gettersSetters;
 
   /// {@macro methods}
-  static const ExternalMembersModifiable methods = Methods.methods;
+  static const ExternalMembersModifiable methods = Methods._methods;
 
   /// {@macro setters}
-  static const ExternalMembersModifiable setters = Setters.setters;
+  static const ExternalMembersModifiable setters = Setters._setters;
 }
 
 /// {@template externalMembers}
@@ -47,55 +86,70 @@ sealed class ExternalMembersModifiable extends ExternalModifiable {
 /// {@endtemplate}
 sealed class ExternalInstanceModifiable extends ExternalModifiable
     implements Overridable {
-  const ExternalInstanceModifiable();
-
   /// {@macro operator}
-  static const OperatorGenerator operator = Operator.operator;
+  const factory ExternalInstanceModifiable.operator(
+    OperatorModifiable modifiable,
+  ) = Operator._;
 
   /// {@macro var}
-  static const VariableGenerator variable = Var.variable;
+  const factory ExternalInstanceModifiable.var_(
+    VariableAbstractable modifiable,
+  ) = Var._;
+
+  /// {@macro final}
+  const factory ExternalInstanceModifiable.final_(
+    FinalAbstractModifiable modifiable,
+  ) = Final._;
+
+  /// {@macro public}
+  const factory ExternalInstanceModifiable.public(
+    PublicStaticalModifiable modifiable,
+  ) = Public._;
+
+  /// {@macro private}
+  const factory ExternalInstanceModifiable.private(
+    PrivateStaticalModifiable modifiable,
+  ) = Private._;
+
+  /// {@macro nullable}
+  const factory ExternalInstanceModifiable.nullable(
+    NullableExternableModifiable modifiable,
+  ) = Nullable._;
 
   /// {@macro fields}
-  static const ExternalInstanceModifiable fields = Fields.fields;
+  static const ExternalInstanceModifiable fields = Fields._fields;
 
   /// {@macro fieldsGettersSetters}
   static const ExternalInstanceModifiable fieldsGettersSetters =
-      FieldsGettersSetters.fieldsGettersSetters;
+      FieldsGettersSetters._fieldsGettersSetters;
 
   /// {@macro getters}
-  static const ExternalInstanceModifiable getters = Getters.getters;
+  static const ExternalInstanceModifiable getters = Getters._getters;
 
   /// {@macro gettersSetters}
   static const ExternalInstanceModifiable gettersSetters =
-      GettersSetters.gettersSetters;
+      GettersSetters._gettersSetters;
 
   /// {@macro methods}
-  static const ExternalInstanceModifiable methods = Methods.methods;
+  static const ExternalInstanceModifiable methods = Methods._methods;
 
   /// {@macro setters}
-  static const ExternalInstanceModifiable setters = Setters.setters;
+  static const ExternalInstanceModifiable setters = Setters._setters;
 }
 
-/// A helper typedef for generating external modifiers.
-typedef ExternalGenerator<I extends ExternalModifiable, O extends External<I>> =
-    ModifierGenerator<I, O>;
-
-/// A helper typedef for generating external member modifiers.
-typedef ExternalMembersGenerator<
-  I extends ExternalMembersModifiable,
-  O extends External<I>
-> = ExternalGenerator<I, O>;
-
-/// A helper typedef for generating external member modifiers.
-typedef ExternalInstanceGenerator<
-  I extends ExternalInstanceModifiable,
-  O extends External<I>
-> = ExternalGenerator<I, O>;
-
-/// {@template externalMembers}
+/// {@template external}
 /// Represents external members.
 /// {@endtemplate}
-final class External<M extends ExternalModifiable> extends Modifier<M> {
-  /// {@macro externalMembers}
-  const External(super.modifiable);
+@InvalidModifiers([
+  th<Abstract>(),
+  th<Late>(),
+  th<Initialized>(),
+  th<Redirecting>(),
+  th<External>(),
+  th<Overridden>(),
+])
+final class External<M extends ExternalModifiable> extends Modifier<M>
+    implements Overridable {
+  /// {@macro external}
+  const External._(super.modifiable) : super._();
 }

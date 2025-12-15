@@ -4,23 +4,38 @@ part of 'sort_declarations.dart';
 /// Represents modifiers that can be applied to methods and methods themselves.
 /// {@endtemplate}
 sealed class OperatorModifiable extends Modifiable {
-  const OperatorModifiable();
+  /// {@macro nullable}
+  const factory OperatorModifiable.nullable(
+    NullableOperatorModifiable modifiable,
+  ) = Nullable._;
 
   /// {@macro methods}
-  static const OperatorModifiable methods = Methods.methods;
+  static const OperatorModifiable methods = Methods._methods;
 }
-
-/// A helper typedef for generating operator modifiers.
-typedef OperatorGenerator<I extends OperatorModifiable, O extends Operator<I>> =
-    ModifierGenerator<I, O>;
 
 /// {@template operator}
 /// Represents operator members.
 /// {@endtemplate}
-final class Operator<M extends OperatorModifiable> extends Modifier<M> {
+@InvalidMembers([
+  th<Fields>(),
+  th<Getters>(),
+  th<Setters>(),
+  th<GettersSetters>(),
+  th<FieldsGettersSetters>(),
+  th<Constructors>(),
+])
+@InvalidModifiers([
+  th<Static>(),
+  th<Private>(),
+  th<Public>(),
+  th<Operator>(),
+])
+final class Operator extends Modifier<OperatorModifiable>
+    implements
+        Overridable,
+        ExternalMembersModifiable,
+        ExternalInstanceModifiable,
+        Abstractable {
   /// {@macro operator}
-  const Operator(super.modifiable);
-
-  /// {@macro operator}
-  static const OperatorGenerator operator = Operator.new;
+  const Operator._([super.modifiable = OperatorModifiable.methods]) : super._();
 }

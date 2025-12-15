@@ -10,24 +10,67 @@ sealed class Variable extends Modifiable
         Abstractable,
         ExternalModifiable,
         Overridable {
-  const Variable();
+  /// {@macro public}
+  const factory Variable.public(PublicFieldModifiable modifiable) = Public._;
+
+  /// {@macro private}
+  const factory Variable.private(PrivateFieldModifiable modifiable) = Private._;
+
+  /// {@macro initialized}
+  const factory Variable.initialized(
+    InitializableStatical modifiable,
+  ) = Initialized._;
 
   /// {@macro fields}
-  static const Variable fields = Fields.fields;
+  static const Variable fields = Fields._fields;
 }
 
-/// A helper typedef for generating variable modifiers.
-typedef VariableGenerator<I extends Variable, O extends Var<I>> =
-    ModifierGenerator<I, O>;
+/// Represents variable members that are also abstractable.
+sealed class VariableAbstractable extends Variable implements Abstractable {
+  /// {@macro public}
+  const factory VariableAbstractable.public(
+    PublicFieldModifiable modifiable,
+  ) = Public._;
+
+  /// {@macro private}
+  const factory VariableAbstractable.private(
+    PrivateFieldModifiable modifiable,
+  ) = Private._;
+
+  /// {@macro fields}
+  static const VariableAbstractable fields = Fields._fields;
+}
 
 /// {@template var}
 /// Represents variable members.
 /// {@endtemplate}
+@InvalidMembers([
+  th<Constructors>(),
+  th<Getters>(),
+  th<Setters>(),
+  th<GettersSetters>(),
+  th<FieldsGettersSetters>(),
+  th<Methods>(),
+])
+@InvalidModifiers([
+  th<Const>(),
+  th<Final>(),
+  th<Late>(),
+  th<Abstract>(),
+  th<External>(),
+  th<Overridden>(),
+  th<Static>(),
+  th<Var>(),
+])
 final class Var<M extends Variable> extends Modifier<M>
-    implements ExternalInstanceModifiable {
+    implements
+        ExternalInstanceModifiable,
+        ExternalMembersModifiable,
+        Abstractable,
+        InitializableOverridable,
+        InitializableStatical,
+        LateModifiable,
+        StaticalExternal {
   /// {@macro var}
-  const Var(super.modifiable);
-
-  /// {@macro var}
-  static const VariableGenerator variable = Var.new;
+  const Var._(super.modifiable) : super._();
 }

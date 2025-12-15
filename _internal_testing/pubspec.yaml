@@ -1,0 +1,18 @@
+name: _internal_testing
+description: An internal testing package for essential_lints.
+version: 1.0.0
+
+publish_to: none
+
+resolution: workspace
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  analyzer: ^9.0.0
+  analyzer_testing: ^0.1.7
+
+dev_dependencies:
+  lints: any
+  test: any

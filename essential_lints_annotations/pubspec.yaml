@@ -23,4 +23,5 @@ dependencies:
 
 dev_dependencies:
   analyzer: any
+  path: any
   test: any

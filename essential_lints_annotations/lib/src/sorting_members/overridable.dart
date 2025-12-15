@@ -4,62 +4,72 @@ part of 'sort_declarations.dart';
 /// Represents overridable members.
 /// {@endtemplate}
 sealed class Overridable extends Modifiable {
-  const Overridable();
+  /// {@macro public}
+  const factory Overridable.public(PublicStaticalModifiable modifiable) =
+      Public._;
+
+  /// {@macro private}
+  const factory Overridable.private(PrivateStaticalModifiable modifiable) =
+      Private._;
+
+  /// {@macro nullable}
+  const factory Overridable.nullable(NullableMembersModifiable modifiable) =
+      Nullable._;
+
+  /// {@macro abstract}
+  const factory Overridable.abstract(Abstractable modifiable) = Abstract._;
 
   /// {@macro externalMembers}
-  static const ExternalInstanceGenerator external = External.new;
+  const factory Overridable.external(ExternalInstanceModifiable modifiable) =
+      External._;
 
   /// {@macro operator}
-  static const OperatorGenerator operator = Operator.operator;
-
-  /// {@macro abstractable}
-  static const AbstractGenerator abstract = Abstract.abstract;
+  const factory Overridable.operator(OperatorModifiable modifiable) =
+      Operator._;
 
   /// {@macro initializable}
-  static const InitializableGenerator initialized =
-      InitializedModifier.initialized;
-
-  /// {@macro static}
-  static const StaticGenerator static = Static.static;
+  const factory Overridable.initialized(InitializableOverridable modifiable) =
+      Initialized._;
 
   /// {@macro late_modifiable}
-  static const LateGenerator late = Late.late;
+  const factory Overridable.late(LateModifiable modifiable) = Late._;
 
   /// {@macro var}
-  static const VariableGenerator variable = Var.variable;
+  const factory Overridable.var_(Variable modifiable) = Var._;
+
+  /// {@macro final}
+  const factory Overridable.final_(FinalModifiable modifiable) = Final._;
 
   /// {@macro fields}
-  static const Overridable fields = Fields.fields;
+  static const Overridable fields = Fields._fields;
 
   /// {@macro fieldsGettersSetters}
   static const Overridable fieldsGettersSetters =
-      FieldsGettersSetters.fieldsGettersSetters;
+      FieldsGettersSetters._fieldsGettersSetters;
 
   /// {@macro getters}
-  static const Overridable getters = Getters.getters;
+  static const Overridable getters = Getters._getters;
 
   /// {@macro gettersSetters}
-  static const Overridable gettersSetters = GettersSetters.gettersSetters;
+  static const Overridable gettersSetters = GettersSetters._gettersSetters;
 
   /// {@macro methods}
-  static const Overridable methods = Methods.methods;
+  static const Overridable methods = Methods._methods;
 
   /// {@macro setters}
-  static const Overridable setters = Setters.setters;
+  static const Overridable setters = Setters._setters;
 }
 
-/// A helper typedef for generating overriden modifiers.
-typedef OverriddenGenerator<I extends Overridable, O extends Overridden<I>> =
-    ModifierGenerator<I, O>;
-
-/// {@template overriden}
-/// Represents overriden members.
+/// {@template overridden}
+/// Represents overridden members.
 /// {@endtemplate}
+@InvalidMembers([th<Constructors>()])
+@InvalidModifiers([
+  th<Static>(),
+  th<Overridden>(),
+])
 final class Overridden<M extends Overridable> extends Modifier<M>
     implements OperatorModifiable {
-  /// {@macro overriden}
-  const Overridden(super.modifiable);
-
-  /// {@macro overriden}
-  static const OverriddenGenerator overriden = Overridden.new;
+  /// {@macro overridden}
+  const Overridden._(super.modifiable) : super._();
 }

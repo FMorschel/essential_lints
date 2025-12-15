@@ -2,58 +2,40 @@ part of 'sort_declarations.dart';
 
 /// Groups of members.
 sealed class Group extends Modifiable implements ExternalMembersModifiable {
-  const Group();
-
-  /// {@macro constructors}
-  static const Group constructors = Constructors.constructors;
-
-  /// {@macro fields}
-  static const Group fields = Fields.fields;
-
-  /// {@macro fieldsGettersSetters}
-  static const Group fieldsGettersSetters =
-      FieldsGettersSetters.fieldsGettersSetters;
-
-  /// {@macro getters}
-  static const Group getters = Getters.getters;
-
-  /// {@macro gettersSetters}
-  static const Group gettersSetters = GettersSetters.gettersSetters;
-
-  /// {@macro methods}
-  static const Group methods = Methods.methods;
-
-  /// {@macro setters}
-  static const Group setters = Setters.setters;
+  const Group._() : super._();
 }
 
 /// {@template constructors}
 /// Represents all constructors.
 /// {@endtemplate}
-final class Constructors extends Group implements ConstantConstructors {
+final class Constructors extends Group
+    implements
+        Constant,
+        FactoryModifiable,
+        NamedModifiable,
+        RedirectingModifiable,
+        PrivateConstructorModifiable,
+        PublicConstructorModifiable,
+        UnnamedModifiable,
+        PublicConstantModifiable,
+        PrivateConstantModifiable {
   /// {@macro constructors}
-  const Constructors();
+  const Constructors._() : super._();
 
   /// {@macro constructors}
-  static const Constructors constructors = .new();
+  static const Constructors _constructors = ._();
 }
 
 /// {@template gettersSetters}
 /// Represents all getters and setters
 /// {@endtemplate}
 final class GettersSetters extends Group
-    implements FieldsMethodsGettersSetters {
+    implements FieldsMethodsGettersSetters, Abstractable {
   /// {@macro gettersSetters}
-  const GettersSetters();
+  const GettersSetters._() : super._();
 
   /// {@macro gettersSetters}
-  static const GettersSetters gettersSetters = .new();
-
-  /// {@macro getters}
-  static const GettersSetters getters = Getters.getters;
-
-  /// {@macro setters}
-  static const GettersSetters setters = Setters.setters;
+  static const GettersSetters _gettersSetters = ._();
 }
 
 /// {@template fieldsGettersSetters}
@@ -62,60 +44,30 @@ final class GettersSetters extends Group
 final class FieldsGettersSetters extends Group
     implements GettersSetters, FieldsMethodsGettersSetters {
   /// {@macro fieldsGettersSetters}
-  const FieldsGettersSetters();
-
-  /// {@macro fields}
-  static const FieldsGettersSetters fields = Fields.fields;
+  const FieldsGettersSetters._() : super._();
 
   /// {@macro fieldsGettersSetters}
-  static const FieldsGettersSetters fieldsGettersSetters = .new();
-
-  /// {@macro getters}
-  static const FieldsGettersSetters getters = Getters.getters;
-
-  /// {@macro setters}
-  static const FieldsGettersSetters setters = Setters.setters;
+  static const FieldsGettersSetters _fieldsGettersSetters = ._();
 }
 
 /// Groups fields and methods.
 sealed class FieldsMethods extends Group implements Abstractable {
-  const FieldsMethods();
-
-  /// {@macro fields}
-  static const FieldsMethods fields = Fields.fields;
-
-  /// {@macro methods}
-  static const FieldsMethods methods = Methods.methods;
+  const FieldsMethods._() : super._();
 }
 
 /// Groups fields, methods, getters, and setters.
 sealed class FieldsMethodsGettersSetters extends Group
     implements
         ExternalInstanceModifiable,
-        NullableModifiable,
+        NullableMembersModifiable,
         PrivateModifiable,
-        PublicModifiable {
-  const FieldsMethodsGettersSetters();
-
-  /// {@macro fieldsGettersSetters}
-  static const FieldsMethodsGettersSetters fieldsGettersSetters =
-      FieldsGettersSetters.fieldsGettersSetters;
-
-  /// {@macro fields}
-  static const FieldsMethodsGettersSetters fields = Fields.fields;
-
-  /// {@macro getters}
-  static const FieldsMethodsGettersSetters getters = Getters.getters;
-
-  /// {@macro gettersSetters}
-  static const FieldsMethodsGettersSetters gettersSetters =
-      GettersSetters.gettersSetters;
-
-  /// {@macro methods}
-  static const FieldsMethodsGettersSetters methods = Methods.methods;
-
-  /// {@macro setters}
-  static const FieldsMethodsGettersSetters setters = Setters.setters;
+        PublicModifiable,
+        PrivateStaticalModifiable,
+        PublicStaticalModifiable,
+        StaticalExternal,
+        NullableExternableModifiable,
+        PublicConstantModifiable {
+  const FieldsMethodsGettersSetters._() : super._();
 }
 
 /// {@template fields}
@@ -129,24 +81,36 @@ final class Fields extends Group
         Variable,
         ConstantVariables,
         FinalModifiable,
-        Initializable {
+        InitializableOverridable,
+        InitializableStatical,
+        NullableFieldModifiable,
+        PublicFieldModifiable,
+        PrivateFieldModifiable,
+        VariableAbstractable,
+        FinalAbstractModifiable,
+        NullableAbstractableFieldModifiable,
+        PrivateConstantModifiable {
   /// {@macro fields}
-  const Fields();
+  const Fields._() : super._();
 
   /// {@macro fields}
-  static const Fields fields = .new();
+  static const Fields _fields = ._();
 }
 
 /// {@template methods}
 /// Represents all methods.
 /// {@endtemplate}
 final class Methods extends Group
-    implements FieldsMethodsGettersSetters, FieldsMethods, OperatorModifiable {
+    implements
+        FieldsMethodsGettersSetters,
+        FieldsMethods,
+        OperatorModifiable,
+        NullableOperatorModifiable {
   /// {@macro methods}
-  const Methods();
+  const Methods._() : super._();
 
   /// {@macro methods}
-  static const Methods methods = .new();
+  static const Methods _methods = ._();
 }
 
 /// {@template getters}
@@ -158,10 +122,10 @@ final class Getters extends Group
         FieldsGettersSetters,
         GettersSetters {
   /// {@macro getters}
-  const Getters();
+  const Getters._() : super._();
 
   /// {@macro getters}
-  static const Getters getters = .new();
+  static const Getters _getters = ._();
 }
 
 /// {@template setters}
@@ -173,8 +137,8 @@ final class Setters extends Group
         FieldsGettersSetters,
         GettersSetters {
   /// {@macro setters}
-  const Setters();
+  const Setters._() : super._();
 
   /// {@macro setters}
-  static const Setters setters = .new();
+  static const Setters _setters = ._();
 }

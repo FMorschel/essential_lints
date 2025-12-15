@@ -1,33 +1,57 @@
 part of 'sort_declarations.dart';
 
-/// {@template abstractable}
 /// Represents abstractable members.
-/// {@endtemplate}
-class Abstractable extends Modifiable
+sealed class Abstractable extends Modifiable
     implements Overridable, OperatorModifiable {
-  /// {@macro abstractable}
-  const Abstractable();
+  /// {@macro public}
+  const factory Abstractable.public(PublicStaticalModifiable modifiable) =
+      Public._;
+
+  /// {@macro private}
+  const factory Abstractable.private(PrivateStaticalModifiable modifiable) =
+      Private._;
+
+  /// {@macro nullable}
+  const factory Abstractable.nullable(NullableMembersModifiable modifiable) =
+      Nullable._;
+
+  /// {@macro operator}
+  const factory Abstractable.operator(OperatorModifiable modifiable) =
+      Operator._;
 
   /// {@macro var}
-  static const VariableGenerator variable = Var.variable;
+  const factory Abstractable.var_(VariableAbstractable modifiable) = Var._;
+
+  /// {@macro final}
+  const factory Abstractable.final_(FinalAbstractModifiable modifiable) =
+      Final._;
 
   /// {@macro fields}
-  static const Abstractable fields = Fields.fields;
+  static const Abstractable fields = Fields._fields;
+
+  /// {@macro getters}
+  static const Abstractable getters = Getters._getters;
+
+  /// {@macro setters}
+  static const Abstractable setters = Setters._setters;
 
   /// {@macro methods}
-  static const Abstractable methods = Methods.methods;
+  static const Abstractable methods = Methods._methods;
 }
 
-/// A helper typedef for generating abstract modifiers.
-typedef AbstractGenerator = ModifierGenerator<Abstractable, Abstract>;
-
-/// {@template abstractable}
+/// {@template abstract}
 /// Represents abstract members.
 /// {@endtemplate}
-class Abstract<M extends Abstractable> extends Modifier<M> {
-  /// {@macro abstractable}
-  const Abstract(super.modifiable);
-
-  /// {@macro abstractable}
-  static const AbstractGenerator abstract = Abstract.new;
+@InvalidMembers([th<Constructors>()])
+@InvalidModifiers([
+  th<External>(),
+  th<Static>(),
+  th<Initialized>(),
+  th<Late>(),
+  th<Abstract>(),
+])
+class Abstract<M extends Abstractable> extends Modifier<M>
+    implements Overridable {
+  /// {@macro abstract}
+  const Abstract._(super.modifiable) : super._();
 }

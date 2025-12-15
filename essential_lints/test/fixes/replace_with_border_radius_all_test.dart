@@ -1,3 +1,4 @@
+import 'package:_internal_testing/flutter_dependency_mixin.dart';
 import 'package:analyzer/utilities/package_config_file_builder.dart';
 import 'package:analyzer_testing/utilities/utilities.dart';
 import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
@@ -6,7 +7,6 @@ import 'package:essential_lints/src/rules/rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import '../src/fix_test_processor.dart';
-import '../src/flutter_dependency_mixin.dart';
 
 void main() {
   defineReflectiveSuite(() {
