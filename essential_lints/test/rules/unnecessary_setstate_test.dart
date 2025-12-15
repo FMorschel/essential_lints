@@ -1,7 +1,5 @@
 import 'package:_internal_testing/flutter_dependency_mixin.dart';
-import 'package:analyzer/utilities/package_config_file_builder.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
-import 'package:analyzer_testing/utilities/utilities.dart';
 import 'package:essential_lints/src/rules/rule.dart';
 import 'package:essential_lints/src/rules/unnecessary_setstate.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
@@ -22,18 +20,8 @@ class UnnecessarySetstateTest extends LintTestProcessor
 
   @override
   void setUp() {
-    super.setUp();
     createFlutterMock();
-    newPackageConfigJsonFileFromBuilder(
-      testPackageRootPath,
-      PackageConfigFileBuilder()..add(
-        name: 'flutter',
-        rootPath: flutterFolder.path,
-      ),
-    );
-    pubspecYamlContent(
-      dependencies: ['flutter'],
-    );
+    super.setUp();
   }
 
   Future<void> test_inBuild() async {

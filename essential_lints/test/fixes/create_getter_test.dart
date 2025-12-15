@@ -23,8 +23,8 @@ class CreateGetterTest extends MultiWarningFixTestProcessor
 
   @override
   Future<void> setUp() async {
-    await super.setUp();
     await addAnnotationsDependency();
+    super.setUp();
   }
 
   Future<void> test_createGetter_containsMember() async {

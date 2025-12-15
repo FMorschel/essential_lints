@@ -1,7 +1,5 @@
 import 'package:_internal_testing/dependencies.dart';
 import 'package:_internal_testing/flutter_dependency_mixin.dart';
-import 'package:analyzer/utilities/package_config_file_builder.dart';
-import 'package:analyzer_testing/utilities/utilities.dart';
 import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
 import 'package:essential_lints/src/rules/empty_container.dart';
 import 'package:essential_lints/src/warnings/getters_in_member_list.dart';
@@ -27,19 +25,9 @@ class RemoveEmptyContainerExpressionTest extends WarningFixTestProcessor
   EmptyContainerRule get rule => EmptyContainerRule();
 
   @override
-  Future<void> setUp() async {
-    await super.setUp();
+  void setUp() {
     createFlutterMock();
-    newPackageConfigJsonFileFromBuilder(
-      testPackageRootPath,
-      PackageConfigFileBuilder()..add(
-        name: 'flutter',
-        rootPath: flutterFolder.path,
-      ),
-    );
-    pubspecYamlContent(
-      dependencies: ['flutter'],
-    );
+    super.setUp();
   }
 
   Future<void> test_removeExpression_assignment() async {
@@ -163,8 +151,8 @@ class RemoveExpressionTest extends MultiWarningFixTestProcessor
 
   @override
   Future<void> setUp() async {
-    await super.setUp();
     await addAnnotationsDependency();
+    super.setUp();
   }
 
   Future<void> test_removeExpression_first() async {

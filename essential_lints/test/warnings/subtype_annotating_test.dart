@@ -21,8 +21,8 @@ class SubtypeAnnotatingTest extends MultiWarningTestProcessor
 
   @override
   Future<void> setUp() async {
-    super.setUp();
     await addAnnotationsDependency();
+    super.setUp();
   }
 
   Future<void> test_allMissing() async {

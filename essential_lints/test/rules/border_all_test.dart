@@ -1,6 +1,4 @@
 import 'package:_internal_testing/flutter_dependency_mixin.dart';
-import 'package:analyzer/utilities/package_config_file_builder.dart';
-import 'package:analyzer_testing/utilities/utilities.dart';
 import 'package:essential_lints/src/rules/border_all.dart';
 import 'package:essential_lints/src/rules/rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
@@ -20,18 +18,8 @@ class BorderAllTest extends LintTestProcessor with FlutterDependencyMixin {
 
   @override
   void setUp() {
-    super.setUp();
     createFlutterMock();
-    newPackageConfigJsonFileFromBuilder(
-      testPackageRootPath,
-      PackageConfigFileBuilder()..add(
-        name: 'flutter',
-        rootPath: flutterFolder.path,
-      ),
-    );
-    pubspecYamlContent(
-      dependencies: ['flutter'],
-    );
+    super.setUp();
   }
 
   Future<void> test_borderAllUsage() async {
@@ -57,8 +45,7 @@ var border = Border.all(width: 2.0);
   }
 
   Future<void> test_otherConstructors() async {
-    await assertNoDiagnostics(
-      '''
+    await assertNoDiagnostics('''
 import 'package:flutter/widgets.dart';
 
 var border = Border();

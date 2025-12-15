@@ -21,8 +21,8 @@ class GettersInMemberListTest extends MultiWarningTestProcessor
 
   @override
   Future<void> setUp() async {
-    super.setUp();
     await addAnnotationsDependency();
+    super.setUp();
   }
 
   Future<void> test_findsAnnotation_emptyName() async {

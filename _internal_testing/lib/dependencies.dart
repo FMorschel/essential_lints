@@ -1,9 +1,7 @@
 import 'dart:isolate';
 
 import 'package:analyzer/file_system/physical_file_system.dart';
-import 'package:analyzer/utilities/package_config_file_builder.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
-import 'package:analyzer_testing/utilities/utilities.dart';
 
 mixin AnnotationsDependencyMixin on AnalysisRuleTest {
   Future<void> addAnnotationsDependency() async {
@@ -22,18 +20,9 @@ mixin AnnotationsDependencyMixin on AnalysisRuleTest {
         .getFile(resourceProvider.pathContext.normalize(fileUri.toFilePath()))
         .parent;
 
-    var annotationFolder = newFolder('/packages/essential_lints_annotations');
+    var annotationFolder = newFolder('/package/essential_lints_annotations');
     annotationLibSource.copyTo(annotationFolder);
 
-    newPackageConfigJsonFileFromBuilder(
-      testPackageRootPath,
-      PackageConfigFileBuilder()..add(
-        name: 'essential_lints_annotations',
-        rootPath: annotationFolder.toUri().toFilePath(),
-      ),
-    );
-    pubspecYamlContent(
-      dependencies: ['essential_lints_annotations'],
-    );
+    newPackage('essential_lints_annotations');
   }
 }

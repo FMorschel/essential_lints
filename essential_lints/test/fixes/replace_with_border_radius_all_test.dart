@@ -1,6 +1,4 @@
 import 'package:_internal_testing/flutter_dependency_mixin.dart';
-import 'package:analyzer/utilities/package_config_file_builder.dart';
-import 'package:analyzer_testing/utilities/utilities.dart';
 import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
 import 'package:essential_lints/src/rules/border_radius_all.dart';
 import 'package:essential_lints/src/rules/rule.dart';
@@ -24,19 +22,9 @@ class ReplaceWithBorderRadiusAllTest extends LintFixTestProcessor
   LintRule get rule => BorderRadiusAllRule();
 
   @override
-  Future<void> setUp() async {
-    await super.setUp();
+  void setUp() {
     createFlutterMock();
-    newPackageConfigJsonFileFromBuilder(
-      testPackageRootPath,
-      PackageConfigFileBuilder()..add(
-        name: 'flutter',
-        rootPath: flutterFolder.path,
-      ),
-    );
-    pubspecYamlContent(
-      dependencies: ['flutter'],
-    );
+    super.setUp();
   }
 
   Future<void> test_withParameters() async {

@@ -33,7 +33,6 @@ void foo(SortDeclaration _) {
 @InvalidMembers([th<Methods>()])
 extension type A._(Public p) implements Public {
   factory A(B _) => throw UnimplementedError();
-
   factory A.another(A _) => throw UnimplementedError();
 }
 
