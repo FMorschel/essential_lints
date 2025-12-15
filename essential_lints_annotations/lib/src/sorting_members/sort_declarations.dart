@@ -2,7 +2,7 @@ import 'package:meta/meta.dart';
 
 import '../../essential_lints_annotations.dart';
 import '../_internal/invalid_members.dart';
-import '../_internal/invalid_modifier.dart';
+import '../_internal/invalid_modifiers.dart';
 
 part 'abstractable.dart';
 part 'constant.dart';

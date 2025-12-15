@@ -40,20 +40,26 @@ class _InvalidMembersVisitor extends SimpleAstVisitor<void> {
 
   final InvalidMembersRule rule;
   final RuleContext context;
-  late final DartType _type;
-  late final AstNode _node;
+  DartType? _type;
+  AstNode? _node;
 
   @override
   void visitDotShorthandPropertyAccess(DotShorthandPropertyAccess node) {
-    var type = node.staticType;
-    if (type == null) return;
-    if (type.element case InterfaceElement(
+    if (_process(node.staticType)) {
+      _node = node.propertyName;
+      node.parent?.accept(this);
+      _type = null;
+    }
+  }
+
+  bool _process(DartType? type) {
+    if (type?.element case InterfaceElement(
       :var allSupertypes,
     ) when allSupertypes.any(_isGroupType)) {
       _type = type;
-      _node = node.propertyName;
-      node.parent?.accept(this);
+      return true;
     }
+    return false;
   }
 
   @override
@@ -65,12 +71,18 @@ class _InvalidMembersVisitor extends SimpleAstVisitor<void> {
   void visitDotShorthandConstructorInvocation(
     DotShorthandConstructorInvocation node,
   ) {
+    if (_type == null) {
+      if (_process(node.staticType)) {
+        _node = node.constructorName;
+        node.parent?.accept(this);
+        _type = null;
+      }
+      return;
+    }
     var typeElement = node.element?.enclosingElement;
     if (typeElement == null) return;
     var invalidMembersAnnotations = typeElement.metadata.annotations
-        .where(
-          _isInvalidMembers,
-        )
+        .where(_isInvalidMembers)
         .toList();
     for (final annotation in invalidMembersAnnotations) {
       var constantValue = annotation.computeConstantValue();
@@ -78,12 +90,12 @@ class _InvalidMembersVisitor extends SimpleAstVisitor<void> {
       var invalidMembers = constantValue.getField('invalidMembers');
       if (invalidMembers == null) continue;
       for (final member in [...?invalidMembers.toListValue()]) {
-        if (member.type
-            case InterfaceType(
-              :var typeArguments,
-            )
+        if (member.type case InterfaceType(:var typeArguments)
             when typeArguments.length == 1 &&
-                context.typeSystem.isAssignableTo(_type, typeArguments.first)) {
+                context.typeSystem.isAssignableTo(
+                  _type!,
+                  typeArguments.first,
+                )) {
           rule.reportAtNode(_node);
         }
       }

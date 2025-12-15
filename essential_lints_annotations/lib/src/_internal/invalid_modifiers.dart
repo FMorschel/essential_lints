@@ -9,8 +9,8 @@ import '../sorting_members/sort_declarations.dart';
 @Target({.classType, .extensionType})
 class InvalidModifiers {
   /// {@macro invalid_modifier}
-  const InvalidModifiers(this.modifiers);
+  const InvalidModifiers(this.invalidModifiers);
 
   /// The invalid modifier.
-  final List<TypeHolder<Modifier>> modifiers;
+  final List<TypeHolder<Modifier>> invalidModifiers;
 }
