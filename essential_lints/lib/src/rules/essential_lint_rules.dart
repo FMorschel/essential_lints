@@ -341,6 +341,20 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
           'statements that are not necessary for control flow.',
     ),
   ),
+
+  /// A lint rule that discourages assignment of boolean values in conditions.
+  booleanAssignment(
+    LintRuleCode(
+      name: 'boolean_assignment',
+      problemMessage: 'Avoid assigning boolean in conditions.',
+      correctionMessage:
+          'Refactor the code to use a condition instead of boolean assignment.',
+      description:
+          'A lint rule that discourages assignment of boolean values, '
+          'encouraging the use of conditions for better code clarity and '
+          'maintainability.',
+    ),
+  ),
   ;
 
   const EssentialLintRules(this.code);
