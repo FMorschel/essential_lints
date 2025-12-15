@@ -26,6 +26,7 @@ import 'fixes/use_padding_property.dart';
 import 'plugin.dart';
 import 'rules/alphabetize_arguments.dart';
 import 'rules/alphabetize_enum_constants.dart';
+import 'rules/boolean_assignment.dart';
 import 'rules/border_all.dart';
 import 'rules/border_radius_all.dart';
 import 'rules/closure_incorrect_type.dart';
@@ -277,6 +278,7 @@ mixin RulesPluginIntegration {
         .duplicateValue => DuplicateValueRule(),
         .mutableTearoff => MutableTearoffRule(),
         .uselessElse => UselessElseRule(),
+        .booleanAssignment => BooleanAssignmentRule(),
       });
     }
     logger

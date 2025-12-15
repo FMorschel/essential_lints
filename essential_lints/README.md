@@ -18,6 +18,7 @@ This package provides **20+ lint rules** organized into several categories:
 
 ### Type Safety & Correctness
 
+- **`boolean_assignment`** - Detects assignments where a condition was likely intended
 - **`closure_incorrect_type`** - Catches closures with incorrect type annotations
 - **`is_future`** - Warns about problematic `is Future` type checks in FutureOr contexts
 - **`variable_shadowing`** - Prevents variable declarations that shadow outer scope variables
@@ -68,6 +69,7 @@ plugins:
     diagnostics:
       - alphabetize_arguments
       - alphabetize_enum_constants
+      - boolean_assignment
       - border_all
       - border_radius_all
       - closure_incorrect_type
@@ -244,6 +246,7 @@ Several rules in this package are inspired by [dart_code_metrics](https://pub.de
 
 Other rules are based on feature requests and discussions in the [Dart SDK issue tracker](https://github.com/dart-lang/sdk/issues):
 
+- `boolean_assignment` - [dart-lang/sdk#60208](https://github.com/dart-lang/sdk/issues/60208)
 - `closure_incorrect_type` - [dart-lang/sdk#59114](https://github.com/dart-lang/sdk/issues/59114)
 - `completer_error_no_stack` - [dart-lang/sdk#59374](https://github.com/dart-lang/sdk/issues/59374)
 - `duplicate_value` - [dart-lang/sdk#59530](https://github.com/dart-lang/sdk/issues/59530)
