@@ -1,2 +1,3 @@
-A sample command-line application with an entrypoint in `bin/`, library code
-in `lib/`, and example unit test in `test/`.
+# Internal Testing Utilities
+
+This is an inernal package for exposing shared testing utilities.
