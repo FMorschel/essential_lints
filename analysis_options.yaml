@@ -12,3 +12,7 @@ analyzer:
     strict-casts: true
     strict-inference: true
     strict-raw-types: true
+
+plugins:
+  _internal_plugin:
+    path: _internal_plugin/
