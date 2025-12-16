@@ -14,17 +14,18 @@ import 'diagnostic.dart';
 class InvalidMembersRule extends MultiAnalysisRule with ConsiderMixin {
   InvalidMembersRule()
     : super(
-        name: 'invalid_members',
+        name: _diagnostic.name,
         description: 'Members that are invalid for a given modifier.',
       );
 
-  late DiagnosticCode diagnosticCode = InternalDiagnosticCode(
-    name: name,
+  static const _diagnostic = InternalDiagnosticCode(
+    name: 'invalid_members',
     problemMessage: 'This member is invalid {0}.',
     correctionMessage: 'Remove the invalid member.',
-    uniqueName: name,
     severity: .ERROR,
   );
+
+  final DiagnosticCode diagnosticCode = _diagnostic;
 
   @override
   List<DiagnosticCode> get diagnosticCodes => [

@@ -11,22 +11,27 @@ import 'package:essential_lints/src/utils/dart_object_to_string.dart';
 
 import 'diagnostic.dart';
 
-class AnnotateMembersWithRule extends AnalysisRule {
+class AnnotateMembersWithRule extends MultiAnalysisRule {
   AnnotateMembersWithRule()
     : super(
-        name: 'annotate_members_with',
+        name: _diagnostic.name,
         description:
             'Members that should be annotated with specific annotations.',
       );
 
-  @override
-  DiagnosticCode get diagnosticCode => InternalDiagnosticCode(
-    name: name,
+  static const _diagnostic = InternalDiagnosticCode(
+    name: 'annotate_members_with',
     problemMessage: "This member should be annotated with '{0}'.",
     correctionMessage: 'Add the required annotation.',
-    uniqueName: name,
     severity: .ERROR,
   );
+
+  final DiagnosticCode diagnosticCode = _diagnostic;
+
+  @override
+  List<DiagnosticCode> get diagnosticCodes => [
+    diagnosticCode,
+  ];
 
   @override
   void registerNodeProcessors(
@@ -126,16 +131,19 @@ class _AnnotateMembersWithVisitor extends GeneralizingAstVisitor<void> {
             rule.reportAtToken(
               name,
               arguments: [requiredAnnotationString],
+              diagnosticCode: rule.diagnosticCode,
             );
           } else if (node case ConstructorDeclaration(:var returnType)) {
             rule.reportAtNode(
               returnType,
               arguments: [requiredAnnotationString],
+              diagnosticCode: rule.diagnosticCode,
             );
           } else {
             rule.reportAtNode(
               node,
               arguments: [requiredAnnotationString],
+              diagnosticCode: rule.diagnosticCode,
             );
           }
         }

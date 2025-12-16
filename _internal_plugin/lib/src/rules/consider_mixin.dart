@@ -10,13 +10,14 @@ import 'package:analyzer/error/error.dart';
 import 'diagnostic.dart';
 
 mixin ConsiderMixin on MultiAnalysisRule {
-  DiagnosticCode multipleConsider = InternalDiagnosticCode(
+  static const _multipleConsider = InternalDiagnosticCode(
     name: 'multiple_consider',
     problemMessage: 'Multiple @Consider annotations found.',
     correctionMessage: 'Remove the extra @Consider annotations.',
-    uniqueName: 'multiple_consider',
     severity: .ERROR,
   );
+
+  final DiagnosticCode multipleConsider = _multipleConsider;
 
   bool isConsider(ElementAnnotation? element) {
     if (element?.computeConstantValue() case DartObject(:var type)) {
