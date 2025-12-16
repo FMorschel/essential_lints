@@ -3,30 +3,37 @@ part of 'sort_declarations.dart';
 /// {@template factory_modifiable}
 /// Represents factory modifiable members (constructors).
 /// {@endtemplate}
-sealed class FactoryModifiable extends Modifiable {
+@AnnotateMembersWith(Consider, onlyPublic: true)
+sealed class FactoryModifiable extends StaticalContext {
   /// {@macro redirecting}
+  @Consider<Redirecting>()
   const factory FactoryModifiable.redirecting(
     RedirectingModifiable modifiable,
   ) = Redirecting._;
 
   /// {@macro named}
+  @Consider<Named>()
   const factory FactoryModifiable.named(NamedModifiable modifiable) = Named._;
 
   /// {@macro public}
+  @Consider<Public>()
   const factory FactoryModifiable.public(
     PublicConstructorModifiable modifiable,
   ) = Public._;
 
   /// {@macro private}
+  @Consider<Private>()
   const factory FactoryModifiable.private(
     PrivateConstructorModifiable modifiable,
   ) = Private._;
 
   /// {@macro unnamed}
+  @Consider<Unnamed>()
   const factory FactoryModifiable.unnamed(UnnamedModifiable modifiable) =
       Unnamed._;
 
   /// {@macro constructors}
+  @Consider<Constructors>()
   static const FactoryModifiable constructors = Constructors._constructors;
 }
 

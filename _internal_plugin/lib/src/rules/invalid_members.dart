@@ -8,22 +8,29 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:analyzer/src/dart/ast/ast.dart';
 
+import 'consider_mixin.dart';
 import 'diagnostic.dart';
 
-class InvalidMembersRule extends AnalysisRule {
+class InvalidMembersRule extends MultiAnalysisRule with ConsiderMixin {
   InvalidMembersRule()
     : super(
         name: 'invalid_members',
         description: 'Members that are invalid for a given modifier.',
       );
 
-  @override
-  DiagnosticCode get diagnosticCode => InternalDiagnosticCode(
+  late DiagnosticCode diagnosticCode = InternalDiagnosticCode(
     name: name,
-    problemMessage: 'This member is invalid for the given modifier.',
+    problemMessage: 'This member is invalid {0}.',
+    correctionMessage: 'Remove the invalid member.',
     uniqueName: name,
     severity: .ERROR,
   );
+
+  @override
+  List<DiagnosticCode> get diagnosticCodes => [
+    diagnosticCode,
+    multipleConsider,
+  ];
 
   @override
   void registerNodeProcessors(
@@ -31,7 +38,13 @@ class InvalidMembersRule extends AnalysisRule {
     RuleContext context,
   ) {
     final visitor = _InvalidMembersVisitor(this, context);
-    registry.addDotShorthandPropertyAccess(this, visitor);
+    registry
+      ..addDotShorthandPropertyAccess(this, visitor)
+      ..addDotShorthandConstructorInvocation(this, visitor);
+    final considerAnnotationVisitor = ConsiderAnnotationVisitor(this, context);
+    registry
+      ..addConstructorDeclaration(this, considerAnnotationVisitor)
+      ..addFieldDeclaration(this, considerAnnotationVisitor);
   }
 }
 
@@ -45,7 +58,12 @@ class _InvalidMembersVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitDotShorthandPropertyAccess(DotShorthandPropertyAccess node) {
-    if (_process(node.staticType)) {
+    var element = node.propertyName.element;
+    element = element is PropertyAccessorElement ? element.variable : element;
+    var consider = element?.metadata.annotations
+        .where(rule.isConsider)
+        .firstOrNull;
+    if (_process(rule.parseType(consider) ?? node.staticType)) {
       _node = node.propertyName;
       node.parent?.accept(this);
       _type = null;
@@ -72,14 +90,17 @@ class _InvalidMembersVisitor extends SimpleAstVisitor<void> {
     DotShorthandConstructorInvocation node,
   ) {
     if (_type == null) {
-      if (_process(node.staticType)) {
+      var consider = node.constructorName.element?.metadata.annotations
+          .where(rule.isConsider)
+          .firstOrNull;
+      if (_process(rule.parseType(consider) ?? node.staticType)) {
         _node = node.constructorName;
         node.parent?.accept(this);
         _type = null;
       }
       return;
     }
-    var typeElement = node.element?.enclosingElement;
+    var typeElement = _typeElement(node);
     if (typeElement == null) return;
     var invalidMembersAnnotations = typeElement.metadata.annotations
         .where(_isInvalidMembers)
@@ -96,10 +117,27 @@ class _InvalidMembersVisitor extends SimpleAstVisitor<void> {
                   _type!,
                   typeArguments.first,
                 )) {
-          rule.reportAtNode(_node);
+          rule.reportAtNode(
+            _node,
+            diagnosticCode: rule.diagnosticCode,
+            arguments: [node.constructorName.name],
+          );
         }
       }
     }
+  }
+
+  Element? _typeElement(DotShorthandConstructorInvocation node) {
+    var typeElement =
+        rule
+            .parseType(
+              node.element?.metadata.annotations
+                  .where(rule.isConsider)
+                  .firstOrNull,
+            )
+            ?.element ??
+        node.element?.enclosingElement;
+    return typeElement;
   }
 
   bool _isInvalidMembers(ElementAnnotation element) {

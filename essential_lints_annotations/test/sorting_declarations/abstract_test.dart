@@ -49,11 +49,13 @@ void main() {
           expectSortDeclaration(
             const .abstract(.operator(.nullable(.methods))),
           );
+          expectSortDeclaration(const .abstract(.operator(.nullable())));
         });
         test('methods', () {
           expectSortDeclaration(
             const .abstract(.operator(.methods)),
           );
+          expectSortDeclaration(const .abstract(.operator()));
         });
       });
     });

@@ -1,51 +1,62 @@
 part of 'sort_declarations.dart';
 
 /// Represents final members.
-sealed class FinalModifiable extends Modifiable
+@AnnotateMembersWith(Consider, onlyPublic: true)
+sealed class FinalModifiable extends StaticalContext
     implements LateModifiable, Statical, ExternalModifiable, Overridable {
   /// {@macro initialized}
+  @Consider<Initialized>()
   const factory FinalModifiable.initialized(
     InitializableStatical modifiable,
   ) = Initialized._;
 
   /// {@macro public}
+  @Consider<Public>()
   const factory FinalModifiable.public(
     PublicFieldModifiable modifiable,
   ) = Public._;
 
   /// {@macro private}
+  @Consider<Private>()
   const factory FinalModifiable.private(
     PrivateFieldModifiable modifiable,
   ) = Private._;
 
   /// {@macro nullable}
+  @Consider<Nullable>()
   const factory FinalModifiable.nullable(
     NullableFieldModifiable modifiable,
   ) = Nullable._;
 
   /// {@macro fields}
+  @Consider<Fields>()
   static const FinalModifiable fields = Fields._fields;
 }
 
 /// Represents final members that are also abstractable.
+@AnnotateMembersWith(Consider, onlyPublic: true)
 sealed class FinalAbstractModifiable extends FinalModifiable
     implements Abstractable {
   /// {@macro public}
+  @Consider<Public>()
   const factory FinalAbstractModifiable.public(
     PublicFieldModifiable modifiable,
   ) = Public._;
 
   /// {@macro private}
+  @Consider<Private>()
   const factory FinalAbstractModifiable.private(
     PrivateFieldModifiable modifiable,
   ) = Private._;
 
   /// {@macro nullable}
+  @Consider<Nullable>()
   const factory FinalAbstractModifiable.nullable(
     NullableAbstractableFieldModifiable modifiable,
   ) = Nullable._;
 
   /// {@macro fields}
+  @Consider<Fields>()
   static const FinalAbstractModifiable fields = Fields._fields;
 }
 

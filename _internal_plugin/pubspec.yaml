@@ -13,8 +13,10 @@ environment:
 dependencies:
   analysis_server_plugin: ^0.3.4
   analyzer: ^9.0.0
-  essential_lints: any
-  essential_lints_annotations: any
+  essential_lints:
+    path: ../essential_lints
+  essential_lints_annotations:
+    path: ../essential_lints_annotations
   meta: ^1.17.0
 
 dev_dependencies:

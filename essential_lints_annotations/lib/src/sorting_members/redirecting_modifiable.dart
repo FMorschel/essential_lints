@@ -3,26 +3,32 @@ part of 'sort_declarations.dart';
 /// {@template redirecting_modifiable}
 /// Represents redirecting modifiable members (constructors).
 /// {@endtemplate}
-sealed class RedirectingModifiable extends Modifiable {
+@AnnotateMembersWith(Consider, onlyPublic: true)
+sealed class RedirectingModifiable extends StaticalContext {
   /// {@macro private}
+  @Consider<Private>()
   const factory RedirectingModifiable.private(
     PrivateConstructorModifiable modifiable,
   ) = Private._;
 
   /// {@macro public}
+  @Consider<Public>()
   const factory RedirectingModifiable.public(
     PublicConstructorModifiable modifiable,
   ) = Public._;
 
   /// {@macro named}
+  @Consider<Named>()
   const factory RedirectingModifiable.named(NamedModifiable modifiable) =
       Named._;
 
   /// {@macro unnamed}
+  @Consider<Unnamed>()
   const factory RedirectingModifiable.unnamed(UnnamedModifiable modifiable) =
       Unnamed._;
 
   /// {@macro constructors}
+  @Consider<Constructors>()
   static const RedirectingModifiable constructors = Constructors._constructors;
 }
 

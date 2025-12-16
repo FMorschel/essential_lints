@@ -585,11 +585,15 @@ void main() {
           expectSortDeclaration(
             const .overridden(.external(.operator(.methods))),
           );
+          expectSortDeclaration(const .overridden(.external(.operator())));
         });
         group('Nullable', () {
           test('methods', () {
             expectSortDeclaration(
               const .overridden(.external(.operator(.nullable(.methods)))),
+            );
+            expectSortDeclaration(
+              const .overridden(.external(.operator(.nullable()))),
             );
           });
         });
@@ -914,11 +918,17 @@ void main() {
           expectSortDeclaration(
             const .overridden(.abstract(.operator(.methods))),
           );
+          expectSortDeclaration(
+            const .overridden(.abstract(.operator())),
+          );
         });
         group('Nullable', () {
           test('methods', () {
             expectSortDeclaration(
               const .overridden(.abstract(.operator(.nullable(.methods)))),
+            );
+            expectSortDeclaration(
+              const .overridden(.abstract(.operator(.nullable()))),
             );
           });
         });
@@ -1000,12 +1010,14 @@ void main() {
     group('Operator', () {
       test('methods', () {
         expectSortDeclaration(const .overridden(.operator(.methods)));
+        expectSortDeclaration(const .overridden(.operator()));
       });
       group('Nullable', () {
         test('methods', () {
           expectSortDeclaration(
             const .overridden(.operator(.nullable(.methods))),
           );
+          expectSortDeclaration(const .overridden(.operator(.nullable())));
         });
       });
     });

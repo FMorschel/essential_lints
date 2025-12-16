@@ -1,10 +1,14 @@
 import 'dart:isolate';
 
+import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
+import 'package:analyzer_testing/src/analysis_rule/pub_package_resolution.dart';
 
 mixin AnnotationsDependencyMixin on AnalysisRuleTest {
-  Future<void> addAnnotationsDependency() async {
+  late Folder annotationLibSource;
+
+  Future<PackageBuilder> addAnnotationsDependency() async {
     var uri = Uri.parse(
       'package:essential_lints_annotations/essential_lints_annotations.dart',
     );
@@ -16,13 +20,13 @@ mixin AnnotationsDependencyMixin on AnalysisRuleTest {
       );
     }
     var resourceProvider = PhysicalResourceProvider.INSTANCE;
-    var annotationLibSource = resourceProvider
+    annotationLibSource = resourceProvider
         .getFile(resourceProvider.pathContext.normalize(fileUri.toFilePath()))
         .parent;
 
     var annotationFolder = newFolder('/package/essential_lints_annotations');
     annotationLibSource.copyTo(annotationFolder);
 
-    newPackage('essential_lints_annotations');
+    return newPackage('essential_lints_annotations');
   }
 }

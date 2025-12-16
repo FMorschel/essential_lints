@@ -1,5 +1,6 @@
 import 'package:_internal_plugin/src/rules/invalid_modifiers.dart';
 import 'package:_internal_testing/dependencies.dart';
+import 'package:analyzer/src/error/codes.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
@@ -19,53 +20,31 @@ class InvalidMembersTest extends AnalysisRuleTest
     super.setUp();
   }
 
-  Future<void> test_shorthandAccess() async {
+  Future<void> test_consider() async {
     await assertDiagnostics(
       '''
-import 'package:essential_lints_annotations/essential_lints_annotations.dart';
-import 'package:essential_lints_annotations/src/_internal/invalid_modifiers.dart';
 import 'package:essential_lints_annotations/src/sorting_members/sort_declarations.dart';
 
 void foo(SortDeclaration _) {
-  foo(A.another(.new(.b)));
-}
-
-@InvalidModifiers([th<Private>()])
-extension type A._(Public p) implements Public {
-  factory A(B _) => throw Exception();
-  factory A.another(A _) => throw Exception();
-}
-
-extension type const B._(Private m) implements Private {
-  static const b = B._(SortDeclaration.private(.fields) as Private);
+  foo(.test(.test2(.tests)));
 }
 ''',
-      [lint(304, 1)],
+      [error(HintCode.deprecatedMemberUseWithMessage, 127, 4), lint(133, 5)],
     );
   }
 
-  Future<void> test_shorthandConstructorInvocation() async {
+  Future<void> test_noConsider() async {
     await assertDiagnostics(
       '''
-import 'package:essential_lints_annotations/essential_lints_annotations.dart';
-import 'package:essential_lints_annotations/src/_internal/invalid_modifiers.dart';
 import 'package:essential_lints_annotations/src/sorting_members/sort_declarations.dart';
 
 void foo(SortDeclaration _) {
-  foo(A.another(.new(.new())));
-}
-
-@InvalidModifiers([th<Private>()])
-extension type A._(Public p) implements Public {
-  factory A(B _) => throw Exception();
-  factory A.another(A _) => throw Exception();
-}
-
-extension type const B._(Private m) implements Private {
-  B(): m = SortDeclaration.private(.fields) as Private;
+  foo(.test(.test(.tests)));
 }
 ''',
-      [lint(304, 3)],
+      [
+        error(HintCode.deprecatedMemberUseWithMessage, 127, 4),
+      ],
     );
   }
 }

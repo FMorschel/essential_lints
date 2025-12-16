@@ -1,7 +1,8 @@
 part of 'sort_declarations.dart';
 
 /// Groups of members.
-sealed class Group extends Modifiable implements ExternalMembersModifiable {
+final class Group extends StaticalContext
+    implements ExternalMembersModifiable {
   const Group._() : super._();
 }
 
@@ -30,7 +31,7 @@ final class Constructors extends Group
 /// Represents all getters and setters
 /// {@endtemplate}
 final class GettersSetters extends Group
-    implements FieldsMethodsGettersSetters, Abstractable {
+    implements Abstractable, Getters, Setters {
   /// {@macro gettersSetters}
   const GettersSetters._() : super._();
 
@@ -42,7 +43,7 @@ final class GettersSetters extends Group
 /// Represents all fields, getters, and setters.
 /// {@endtemplate}
 final class FieldsGettersSetters extends Group
-    implements GettersSetters, FieldsMethodsGettersSetters {
+    implements Fields, Getters, Setters {
   /// {@macro fieldsGettersSetters}
   const FieldsGettersSetters._() : super._();
 
@@ -51,22 +52,14 @@ final class FieldsGettersSetters extends Group
 }
 
 /// Groups fields and methods.
-sealed class FieldsMethods extends Group implements Abstractable {
+final class FieldsMethods extends Group
+    implements Abstractable, Fields, Methods {
   const FieldsMethods._() : super._();
 }
 
 /// Groups fields, methods, getters, and setters.
-sealed class FieldsMethodsGettersSetters extends Group
-    implements
-        ExternalInstanceModifiable,
-        NullableMembersModifiable,
-        PrivateModifiable,
-        PublicModifiable,
-        PrivateStaticalModifiable,
-        PublicStaticalModifiable,
-        StaticalExternal,
-        NullableExternableModifiable,
-        PublicConstantModifiable {
+final class FieldsMethodsGettersSetters extends Group
+    implements Fields, Methods, Getters, Setters {
   const FieldsMethodsGettersSetters._() : super._();
 }
 
@@ -75,9 +68,6 @@ sealed class FieldsMethodsGettersSetters extends Group
 /// {@endtemplate}
 final class Fields extends Group
     implements
-        FieldsMethodsGettersSetters,
-        FieldsMethods,
-        FieldsGettersSetters,
         Variable,
         ConstantVariables,
         FinalModifiable,
@@ -89,7 +79,8 @@ final class Fields extends Group
         VariableAbstractable,
         FinalAbstractModifiable,
         NullableAbstractableFieldModifiable,
-        PrivateConstantModifiable {
+        PrivateConstantModifiable,
+        _InstanciableMembers {
   /// {@macro fields}
   const Fields._() : super._();
 
@@ -102,10 +93,9 @@ final class Fields extends Group
 /// {@endtemplate}
 final class Methods extends Group
     implements
-        FieldsMethodsGettersSetters,
-        FieldsMethods,
         OperatorModifiable,
-        NullableOperatorModifiable {
+        NullableOperatorModifiable,
+        _InstanciableMembers {
   /// {@macro methods}
   const Methods._() : super._();
 
@@ -116,11 +106,7 @@ final class Methods extends Group
 /// {@template getters}
 /// Represents all getters.
 /// {@endtemplate}
-final class Getters extends Group
-    implements
-        FieldsMethodsGettersSetters,
-        FieldsGettersSetters,
-        GettersSetters {
+final class Getters extends Group implements _InstanciableMembers {
   /// {@macro getters}
   const Getters._() : super._();
 
@@ -131,14 +117,25 @@ final class Getters extends Group
 /// {@template setters}
 /// Represents all setters.
 /// {@endtemplate}
-final class Setters extends Group
-    implements
-        FieldsMethodsGettersSetters,
-        FieldsGettersSetters,
-        GettersSetters {
+final class Setters extends Group implements _InstanciableMembers {
   /// {@macro setters}
   const Setters._() : super._();
 
   /// {@macro setters}
   static const Setters _setters = ._();
+}
+
+final class _InstanciableMembers extends Group
+    implements
+        ExternalInstanceModifiable,
+        NullableMembersModifiable,
+        PrivateModifiable,
+        PublicModifiable,
+        PrivateStaticalModifiable,
+        PublicStaticalModifiable,
+        StaticalExternal,
+        NullableExternableModifiable,
+        PublicConstantModifiable,
+        Abstractable {
+  const _InstanciableMembers._() : super._();
 }

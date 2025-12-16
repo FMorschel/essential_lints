@@ -1,0 +1,18 @@
+// ignore_for_file: deprecated_member_use_from_same_package testing
+
+import 'package:test/test.dart';
+
+import 'expect_sort_declaration.dart';
+
+void main() {
+  group('Test', () {
+    test('tests', () {
+      expectSortDeclaration(const .test(.tests));
+      // ignore: _internal_plugin/invalid_members test
+      expectSortDeclaration(const .test(.tests2));
+      expectSortDeclaration(const .test(.test(.tests)));
+      // ignore: _internal_plugin/invalid_modifiers, _internal_plugin/invalid_members test
+      expectSortDeclaration(const .test(.test2(.tests2)));
+    });
+  });
+}

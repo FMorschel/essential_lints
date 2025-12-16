@@ -3,7 +3,8 @@ part of 'sort_declarations.dart';
 /// {@template variable}
 /// Represents variable members.
 /// {@endtemplate}
-sealed class Variable extends Modifiable
+@AnnotateMembersWith(Consider, onlyPublic: true)
+sealed class Variable extends StaticalContext
     implements
         LateModifiable,
         Statical,
@@ -11,33 +12,41 @@ sealed class Variable extends Modifiable
         ExternalModifiable,
         Overridable {
   /// {@macro public}
+  @Consider<Public>()
   const factory Variable.public(PublicFieldModifiable modifiable) = Public._;
 
   /// {@macro private}
+  @Consider<Private>()
   const factory Variable.private(PrivateFieldModifiable modifiable) = Private._;
 
   /// {@macro initialized}
+  @Consider<Initialized>()
   const factory Variable.initialized(
     InitializableStatical modifiable,
   ) = Initialized._;
 
   /// {@macro fields}
+  @Consider<Fields>()
   static const Variable fields = Fields._fields;
 }
 
 /// Represents variable members that are also abstractable.
+@AnnotateMembersWith(Consider, onlyPublic: true)
 sealed class VariableAbstractable extends Variable implements Abstractable {
   /// {@macro public}
+  @Consider<Public>()
   const factory VariableAbstractable.public(
     PublicFieldModifiable modifiable,
   ) = Public._;
 
   /// {@macro private}
+  @Consider<Private>()
   const factory VariableAbstractable.private(
     PrivateFieldModifiable modifiable,
   ) = Private._;
 
   /// {@macro fields}
+  @Consider<Fields>()
   static const VariableAbstractable fields = Fields._fields;
 }
 

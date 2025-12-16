@@ -1,10 +1,12 @@
 part of 'sort_declarations.dart';
 
 /// Represents unnamed members.
-sealed class UnnamedModifiable extends Modifiable {
+@AnnotateMembersWith(Consider, onlyPublic: true)
+sealed class UnnamedModifiable extends StaticalContext {
   const UnnamedModifiable._() : super._();
 
   /// {@macro constructors}
+  @Consider<Constructors>()
   static const UnnamedModifiable constructors = Constructors._constructors;
 }
 

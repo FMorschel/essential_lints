@@ -7,12 +7,14 @@ void main() {
     group('operator', () {
       test('methods', () {
         expectSortDeclaration(const .external(.operator(.methods)));
+        expectSortDeclaration(const .external(.operator()));
       });
       group('Nullable', () {
         test('methods', () {
           expectSortDeclaration(
             const .external(.operator(.nullable(.methods))),
           );
+          expectSortDeclaration(const .external(.operator(.nullable())));
         });
       });
     });

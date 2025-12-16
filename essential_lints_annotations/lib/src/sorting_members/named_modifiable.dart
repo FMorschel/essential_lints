@@ -3,17 +3,21 @@ part of 'sort_declarations.dart';
 /// {@template named_modifiable}
 /// Represents named modifiable members (constructors).
 /// {@endtemplate}
-sealed class NamedModifiable extends Modifiable {
+@AnnotateMembersWith(Consider, onlyPublic: true)
+sealed class NamedModifiable extends StaticalContext {
   /// {@macro private}
+  @Consider<Private>()
   const factory NamedModifiable.private(
     PrivateConstructorModifiable modifiable,
   ) = Private._;
 
   /// {@macro public}
+  @Consider<Public>()
   const factory NamedModifiable.public(PublicConstructorModifiable modifiable) =
       Public._;
 
   /// {@macro constructors}
+  @Consider<Constructors>()
   static const NamedModifiable constructors = Constructors._constructors;
 }
 

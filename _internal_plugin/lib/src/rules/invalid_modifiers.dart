@@ -8,22 +8,29 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart';
 
+import 'consider_mixin.dart';
 import 'diagnostic.dart';
 
-class InvalidModifiersRule extends AnalysisRule {
+class InvalidModifiersRule extends MultiAnalysisRule with ConsiderMixin {
   InvalidModifiersRule()
     : super(
         name: 'invalid_modifiers',
         description: 'Modifiers that are invalid for a given modifier.',
       );
 
-  @override
-  DiagnosticCode get diagnosticCode => InternalDiagnosticCode(
+  late DiagnosticCode diagnosticCode = InternalDiagnosticCode(
     name: name,
-    problemMessage: 'This modifier is invalid for the given modifier.',
+    problemMessage: 'This modifier is invalid for {0}.',
+    correctionMessage: 'Remove the invalid modifier.',
     uniqueName: name,
     severity: .ERROR,
   );
+
+  @override
+  List<DiagnosticCode> get diagnosticCodes => [
+    diagnosticCode,
+    multipleConsider,
+  ];
 
   @override
   void registerNodeProcessors(
@@ -34,6 +41,10 @@ class InvalidModifiersRule extends AnalysisRule {
     registry
       ..addDotShorthandPropertyAccess(this, visitor)
       ..addDotShorthandConstructorInvocation(this, visitor);
+    final considerAnnotationVisitor = ConsiderAnnotationVisitor(this, context);
+    registry
+      ..addConstructorDeclaration(this, considerAnnotationVisitor)
+      ..addFieldDeclaration(this, considerAnnotationVisitor);
   }
 }
 
@@ -47,7 +58,10 @@ class _InvalidModifiersVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitDotShorthandPropertyAccess(DotShorthandPropertyAccess node) {
-    if (_process(node.staticType)) {
+    var consider = node.propertyName.element?.metadata.annotations
+        .where(rule.isConsider)
+        .firstOrNull;
+    if (_process(rule.parseType(consider) ?? node.staticType)) {
       _node = node.propertyName;
       node.parent?.accept(this);
       _type = null;
@@ -74,14 +88,17 @@ class _InvalidModifiersVisitor extends SimpleAstVisitor<void> {
     DotShorthandConstructorInvocation node,
   ) {
     if (_type == null) {
-      if (_process(node.staticType)) {
+      var consider = node.constructorName.element?.metadata.annotations
+          .where(rule.isConsider)
+          .firstOrNull;
+      if (_process(rule.parseType(consider) ?? node.staticType)) {
         _node = node.constructorName;
         node.parent?.accept(this);
         _type = null;
       }
       return;
     }
-    var typeElement = node.element?.enclosingElement;
+    var typeElement = _typeElement(node);
     if (typeElement == null) return;
     var invalidModifiersAnnotations = typeElement.metadata.annotations
         .where(_isInvalidModifiers)
@@ -98,10 +115,27 @@ class _InvalidModifiersVisitor extends SimpleAstVisitor<void> {
                   _type!,
                   typeArguments.first,
                 )) {
-          rule.reportAtNode(_node);
+          rule.reportAtNode(
+            _node,
+            diagnosticCode: rule.diagnosticCode,
+            arguments: [node.constructorName.name],
+          );
         }
       }
     }
+  }
+
+  Element? _typeElement(DotShorthandConstructorInvocation node) {
+    var typeElement =
+        rule
+            .parseType(
+              node.element?.metadata.annotations
+                  .where(rule.isConsider)
+                  .firstOrNull,
+            )
+            ?.element ??
+        node.element?.enclosingElement;
+    return typeElement;
   }
 
   bool _isInvalidModifiers(ElementAnnotation element) {

@@ -3,13 +3,16 @@ part of 'sort_declarations.dart';
 /// {@template methodModifiers}
 /// Represents modifiers that can be applied to methods and methods themselves.
 /// {@endtemplate}
-sealed class OperatorModifiable extends Modifiable {
+@AnnotateMembersWith(Consider, onlyPublic: true)
+sealed class OperatorModifiable extends StaticalContext {
   /// {@macro nullable}
-  const factory OperatorModifiable.nullable(
+  @Consider<Nullable>()
+  const factory OperatorModifiable.nullable([
     NullableOperatorModifiable modifiable,
-  ) = Nullable._;
+  ]) = Nullable._operator;
 
   /// {@macro methods}
+  @Consider<Methods>()
   static const OperatorModifiable methods = Methods._methods;
 }
 

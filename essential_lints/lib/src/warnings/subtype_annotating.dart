@@ -7,6 +7,7 @@ import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
 
+import '../utils/dart_object_to_string.dart';
 import '../utils/extensions/list.dart';
 import 'essential_lint_warnings.dart';
 import 'warning.dart';
@@ -90,7 +91,7 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
       node.name,
       node.declaredFragment?.element,
       node.metadata,
-      abstract: node.abstractKeyword != null,
+      abstract: node.abstractKeyword != null || node.sealedKeyword != null,
     );
     super.visitClassDeclaration(node);
   }
@@ -132,11 +133,11 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
     var type = annotation.computeConstantValue();
     if (type == null) return .empty;
     var annotations = [...?type.getField('annotations')?.toListValue()];
-    var onlyConcrete = type.getField('onlyConcrete')?.toBoolValue() ?? false;
+    var onlyConcrete = type.getField('option');
 
     return _SubtypeNamingAnnotation(
       annotations: annotations,
-      onlyConcrete: onlyConcrete,
+      option: onlyConcrete,
     );
   }
 
@@ -174,64 +175,11 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
       return false;
     }
 
-    String dartObjectToString(DartObject? dartObject) {
-      if (dartObject == null || dartObject.isNull) {
-        return 'null';
-      } else if (dartObject.toTypeValue() case var type?) {
-        return type.getDisplayString();
-      } else if (dartObject.constructorInvocation case var constructor?) {
-        return "'${constructor.constructor.displayName}("
-            '${constructor.positionalArguments // formatting trick
-            .map(dartObjectToString).join(', ')}'
-            '${constructor.positionalArguments.isNotEmpty && // formatting trick
-                    constructor.namedArguments.isNotEmpty ? ', ' : ''}'
-            '${constructor.namedArguments.entries // formatting trick
-            .map((entry) => '${entry.key}: ${dartObjectToString(entry.value)}')
-            // formatting trick
-            .join(', ')}'
-            ")'";
-      } else if (dartObject.toDoubleValue() case var doubleValue?) {
-        return '$doubleValue';
-      } else if (dartObject.toIntValue() case var intValue?) {
-        return '$intValue';
-      } else if (dartObject.toStringValue() case var stringValue?) {
-        return "'$stringValue'";
-      } else if (dartObject.toBoolValue() case var boolValue?) {
-        return '$boolValue';
-      } else if (dartObject.variable case var variable?) {
-        return variable.displayName;
-      } else if (dartObject.toListValue() case var listValue?) {
-        return '[${listValue.map(dartObjectToString).commaSeparated}]';
-      } else if (dartObject.toSymbolValue() case var symbol?) {
-        return symbol;
-      } else if (dartObject.toMapValue() case var mapValue?) {
-        var entries = mapValue.entries
-            .map(
-              (entry) =>
-                  '${dartObjectToString(entry.key)}: '
-                  '${dartObjectToString(entry.value)}',
-            )
-            .commaSeparated;
-        return '{$entries}';
-      } else if (dartObject.toSetValue() case var setValue?) {
-        return '{${setValue.map(dartObjectToString).commaSeparated}}';
-      } else if (dartObject.toRecordValue() case var recordValue?) {
-        var positional = recordValue.positional
-            .map(dartObjectToString)
-            .commaSeparated;
-        var named = recordValue.named.entries
-            .map((entry) => '${entry.key}: ${dartObjectToString(entry.value)}')
-            .commaSeparated;
-        return '(${[
-          if (positional.isNotEmpty) positional,
-          if (named.isNotEmpty) named,
-        ].commaSeparated})';
-      }
-      return dartObject.toString();
-    }
-
     for (final annotation in annotations) {
-      if (annotation.onlyConcrete && abstract) {
+      if (annotation.option?.variable?.name == 'onlyConcrete' && abstract) {
+        continue;
+      } else if (annotation.option?.variable?.name == 'onlyAbstract' &&
+          !abstract) {
         continue;
       }
       var missingAnnotations = annotation.annotations.whereNot(existing);
@@ -251,14 +199,14 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
 class _SubtypeNamingAnnotation {
   const _SubtypeNamingAnnotation({
     required this.annotations,
-    required this.onlyConcrete,
+    required this.option,
   });
 
   static _SubtypeNamingAnnotation empty = const .new(
     annotations: [],
-    onlyConcrete: false,
+    option: null,
   );
 
   final List<DartObject> annotations;
-  final bool onlyConcrete;
+  final DartObject? option;
 }
