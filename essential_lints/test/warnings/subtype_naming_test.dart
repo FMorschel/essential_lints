@@ -170,12 +170,12 @@ class MyClassImpl extends MyClass {}
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@SubtypeNaming(prefix: 'My', onlyConcrete: false)
+@SubtypeNaming(prefix: 'My')
 class MyClass {}
 
 abstract class OtherClass extends MyClass {}
 ''',
-      [error(rule.rule, 163, 10)],
+      [error(rule.rule, 142, 10)],
     );
   }
 
@@ -183,10 +183,11 @@ abstract class OtherClass extends MyClass {}
     await assertNoDiagnostics('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@SubtypeNaming(prefix: 'My', onlyConcrete: true)
+@SubtypeNaming(prefix: 'My', option: .onlyConcrete)
 class MyClass {}
 
 abstract class MyOtherClass extends MyClass {}
+sealed class OtherClass extends MyClass {}
 ''');
   }
 
@@ -195,13 +196,39 @@ abstract class MyOtherClass extends MyClass {}
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@SubtypeNaming(prefix: 'My', onlyConcrete: true)
+@SubtypeNaming(prefix: 'My', option: .onlyConcrete)
 class MyClass {}
 
 class OtherClass extends MyClass {}
 ''',
-      [error(rule.rule, 153, 10)],
+      [error(rule.rule, 156, 10)],
     );
+  }
+
+  Future<void> test_onlyAbstract_abstract() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeNaming(prefix: 'My', option: .onlyAbstract)
+class MyClass {}
+
+abstract class OtherClass extends MyClass {}
+sealed class OtherClass2 extends MyClass {}
+''',
+      [lint(165, 10), lint(208, 11)],
+    );
+  }
+
+  Future<void> test_onlyAbstract_concrete() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeNaming(prefix: 'My', option: .onlyAbstract)
+class MyClass {}
+
+class OtherClass extends MyClass {}
+''');
   }
 
   Future<void> test_validUsage() async {

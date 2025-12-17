@@ -3,6 +3,7 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 
 import 'essential_lint_warnings.dart';
@@ -38,20 +39,20 @@ class _SubtypeNamingAnnotation {
     required this.prefix,
     required this.suffix,
     required this.containing,
-    required this.onlyConcrete,
+    required this.option,
   });
 
   static _SubtypeNamingAnnotation empty = const .new(
     prefix: null,
     suffix: null,
     containing: null,
-    onlyConcrete: false,
+    option: null,
   );
 
   final String? prefix;
   final String? suffix;
   final String? containing;
-  final bool onlyConcrete;
+  final DartObject? option;
 }
 
 class _SubtypeNamingVisitor extends SimpleAstVisitor<void> {
@@ -87,7 +88,7 @@ class _SubtypeNamingVisitor extends SimpleAstVisitor<void> {
     _verifySuperTypes(
       node.name,
       node.declaredFragment?.element,
-      abstract: node.abstractKeyword != null,
+      abstract: node.abstractKeyword != null || node.sealedKeyword != null,
     );
     super.visitClassDeclaration(node);
   }
@@ -131,13 +132,13 @@ class _SubtypeNamingVisitor extends SimpleAstVisitor<void> {
     var prefix = type.getField('prefix')?.toStringValue();
     var suffix = type.getField('suffix')?.toStringValue();
     var containing = type.getField('containing')?.toStringValue();
-    var onlyConcrete = type.getField('onlyConcrete')?.toBoolValue() ?? false;
+    var option = type.getField('option');
 
     return _SubtypeNamingAnnotation(
       prefix: prefix,
       suffix: suffix,
       containing: containing,
-      onlyConcrete: onlyConcrete,
+      option: option,
     );
   }
 
@@ -163,7 +164,10 @@ class _SubtypeNamingVisitor extends SimpleAstVisitor<void> {
       );
     }
     for (final annotation in annotations) {
-      if (annotation.onlyConcrete && abstract) {
+      if (annotation.option?.variable?.name == 'onlyConcrete' && abstract) {
+        continue;
+      } else if (annotation.option?.variable?.name == 'onlyAbstract' &&
+          !abstract) {
         continue;
       }
       var typeName = name.lexeme;

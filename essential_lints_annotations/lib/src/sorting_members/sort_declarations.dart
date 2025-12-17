@@ -1,6 +1,4 @@
 // ignore: prefer_relative_imports test
-import 'package:essential_lints_annotations/src/getters_in_member_list.dart';
-// ignore: prefer_relative_imports test
 import 'package:essential_lints_annotations/src/subtype_annotating.dart';
 import 'package:meta/meta.dart';
 
@@ -8,6 +6,7 @@ import '../_internal/annotate_members_with.dart';
 import '../_internal/consider.dart';
 import '../_internal/invalid_members.dart';
 import '../_internal/invalid_modifiers.dart';
+import '../utils/type_holder.dart';
 
 part 'abstractable.dart';
 part 'constant.dart';

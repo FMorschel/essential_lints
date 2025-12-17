@@ -31,14 +31,32 @@ import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
 @SortingMembers({
   .unnamed(.constructors),
-  .named(.constructors),
+  .constructors,
 })
 class A {
   A.named();
   A();
 }
 ''',
-      [error(rule.diagnosticCode, 178, 1)],
+      [error(rule.diagnosticCode, 170, 1)],
+    );
+  }
+
+  Future<void> test_unnamedConstructorLast() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers({
+  .constructors,
+  .unnamed(.constructors),
+})
+class A {
+  A();
+  A.named();
+}
+''',
+      [error(rule.diagnosticCode, 166, 5)],
     );
   }
 }

@@ -2,16 +2,18 @@
 
 import 'package:meta/meta_meta.dart';
 
-/// A type alias for [TypeHolder].
-///
-/// This is to simplify the syntax when creating instances of [TypeHolder].
-// ignore: camel_case_types
-typedef th<T> = TypeHolder<T>;
+import 'utils/type_holder.dart';
 
 /// {@template getters_in_member_list}
-/// Annotations for the `getters-in-member-list` lint rule.
+/// Annotations for the `getters_in_member_list` lint rule.
 /// {@endtemplate}
-@Target({TargetKind.classType})
+@Target({
+  .classType,
+  .mixinType,
+  .extensionType,
+  .extension,
+  .enumType,
+})
 class GettersInMemberList {
   /// {@macro getters_in_member_list}
   const GettersInMemberList({
@@ -40,15 +42,4 @@ class GettersInMemberList {
 
   /// Whether to check for fields.
   final bool fields;
-}
-
-/// {@template type_holder}
-/// A type holder to be used in [GettersInMemberList.types].
-///
-/// We suggest using the type alias [th] to create instances of this class. This
-/// way you have less characters to write.
-/// {@endtemplate}
-class TypeHolder<T> {
-  /// {@macro type_holder}
-  const TypeHolder();
 }
