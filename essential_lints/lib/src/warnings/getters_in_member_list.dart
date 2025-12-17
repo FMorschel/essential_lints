@@ -72,7 +72,6 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
   static final Uri _annotationUri = .parse(
     'package:essential_lints_annotations/src/getters_in_member_list.dart',
   );
-  static final _validNamePattern = RegExp(r'^[a-zA-Z_$][a-zA-Z_$0-9]*$');
 
   final GettersInMemberListRule rule;
   final RuleContext context;
@@ -85,7 +84,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
         assert(false, 'The annotation should not be null here.');
         return;
       }
-      if (!_validNamePattern.hasMatch(annotation.memberListName)) {
+      if (annotation.memberListName.isEmpty) {
         rule.reportAtNode(
           node.arguments?.arguments
                   .firstWhereOrNull(_isMemberListName)
@@ -109,15 +108,16 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
         .map(_mapKnownArguments)
         .nonNulls;
     for (final annotation in relevant) {
-      if (!_validNamePattern.hasMatch(annotation.memberListName)) {
+      var memberListName = annotation.memberListName;
+      if (annotation.memberListName.isEmpty) {
         continue;
       }
-      var getterMember = element.getGetter(annotation.memberListName);
+      var getterMember = element.getGetter(memberListName);
       if (getterMember == null || getterMember.isStatic) {
         rule.reportAtToken(
           node.name,
           diagnosticCode: GettersInMemberList.missingList,
-          arguments: [annotation.memberListName],
+          arguments: [memberListName],
         );
         continue;
       }
@@ -312,14 +312,14 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
 
     var type = annotation?.computeConstantValue();
     if (type == null) return .empty;
-    var memberListName = type.getField('memberListName')?.toStringValue();
+    var memberListNameString = type.getField('memberListName')?.toSymbolValue();
     var getters = type.getField('getters')?.toBoolValue();
     var fields = type.getField('fields')?.toBoolValue();
     var types = type.getField('types')?.toListValue();
     var superTypes = type.getField('superTypes')?.toListValue();
 
     return _GettersInMemberListAnnotation(
-      memberListName: memberListName ?? '',
+      memberListName: memberListNameString ?? '',
       getters: getters ?? true,
       fields: fields ?? false,
       types: [...?types?.map((e) => e.type.singleTypeArgument).nonNulls],

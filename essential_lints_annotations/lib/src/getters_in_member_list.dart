@@ -25,7 +25,7 @@ class GettersInMemberList {
   });
 
   /// The name of the member list to check.
-  final String memberListName;
+  final Symbol memberListName;
 
   /// The types of members to check.
   ///
