@@ -1,8 +1,17 @@
+import 'package:meta/meta_meta.dart';
+
 import 'sorting_members/sort_declarations.dart';
 
 /// {@template sorting_members}
 /// Annotation for sorting members.
 /// {@endtemplate}
+@Target({
+  .classType,
+  .mixinType,
+  .extensionType,
+  .extension,
+  .enumType,
+})
 class SortingMembers {
   /// {@macro sorting_members}
   const SortingMembers(this.declarations);

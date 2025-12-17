@@ -2,13 +2,16 @@ import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/error/error.dart';
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 import 'package:meta/meta.dart';
 
-import 'essential_lint_warnings.dart';
+import 'essential_lint_warnings.dart'
+    show EssentialLintWarnings, EssentialMultiWarnings, SubWarnings;
 
 /// {@template rule}
 /// The base class for all essential multi-warnings rules.
 /// {@endtemplate}
+@SubtypeNaming(suffix: 'Rule')
 abstract class MultiWarningRule<T extends SubWarnings>
     extends MultiAnalysisRule {
   /// {@macro rule}
@@ -41,6 +44,7 @@ abstract class MultiWarningRule<T extends SubWarnings>
 /// {@template rule}
 /// The base class for all essential warning rules.
 /// {@endtemplate}
+@SubtypeNaming(suffix: 'Rule')
 abstract class WarningRule extends AnalysisRule {
   /// {@macro rule}
   WarningRule(this.rule)
@@ -50,7 +54,7 @@ abstract class WarningRule extends AnalysisRule {
       );
 
   /// The essential warning rule associated with this analysis rule.
-  final EssentialMultiWarnings rule;
+  final EssentialLintWarnings rule;
 
   @override
   DiagnosticCode get diagnosticCode => rule.code;

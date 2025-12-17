@@ -8,10 +8,14 @@ import 'package:analyzer/src/test_utilities/test_code_format.dart'
     as test_code_format;
 import 'package:essential_lints/src/assist/essential_lint_assists.dart';
 import 'package:essential_lints/src/rules/essential_lint_rules.dart';
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 import 'package:test/test.dart';
+import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import 'base_edit_test_processor.dart';
 
+@SubtypeNaming(suffix: 'Test')
+@SubtypeAnnotating(annotations: [reflectiveTest], option: .onlyConcrete)
 abstract class AssistTestProcessor extends BaseEditTestProcessor {
   EssentialLintAssists get assistKind;
 

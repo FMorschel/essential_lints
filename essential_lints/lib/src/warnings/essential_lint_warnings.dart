@@ -45,6 +45,30 @@ mixin EnumDiagnostic implements DiagnosticCode {
   String? get url => code.url;
 }
 
+/// The list of all essential lint warnings.
+enum EssentialLintWarnings with EnumDiagnostic {
+  /// Members of a class should be sorted in a specific order.
+  sortingMembers(
+    WarningCode(
+      name: 'sorting_members',
+      problemMessage:
+          'The members of this class are not sorted according to the '
+          'required order.',
+      correctionMessage:
+          'Sort the members of the class to follow the required order.',
+      description:
+          'A rule that ensures the members of a class are sorted in a '
+          'specific order.',
+    ),
+  ),
+  ;
+
+  const EssentialLintWarnings(this.code);
+
+  @override
+  final WarningCode code;
+}
+
 /// The list of all essential lint rules.
 enum EssentialMultiWarnings<T extends SubWarnings> with EnumDiagnostic {
   /// Getters should be included in member lists.

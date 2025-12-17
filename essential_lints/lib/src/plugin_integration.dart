@@ -54,6 +54,7 @@ import 'rules/variable_shadowing.dart';
 import 'utils/extensions/logger.dart';
 import 'warnings/essential_lint_warnings.dart';
 import 'warnings/getters_in_member_list.dart';
+import 'warnings/sorting_members.dart';
 import 'warnings/subtype_annotating.dart';
 import 'warnings/subtype_naming.dart';
 import 'warnings/warning.dart';
@@ -79,7 +80,7 @@ mixin AssistsPluginIntegration {
     for (final assist in EssentialLintAssists.values) {
       switch (assist) {
         case EssentialLintAssists.removeUselessElse:
-          assists.add(RemoveUselessElseAssist.new);
+          assists.add(RemoveUselessElseAssistFix.new);
       }
     }
     logger.info('Mapped assists');
@@ -164,7 +165,7 @@ mixin FixesPluginIntegration {
           [.completerErrorNoStack],
         ),
         .removeUselessElse => addFixTo(
-          RemoveUselessElseAssist.new,
+          RemoveUselessElseAssistFix.new,
           [.uselessElse],
         ),
       };
@@ -321,8 +322,8 @@ mixin WarningsPluginIntegration {
   );
 
   /// Returns the list of registered warnings.
-  Set<MultiWarningRule> get warnings {
-    logger.info('Mapping warning rules');
+  Set<MultiWarningRule> get multiWarnings {
+    logger.info('Mapping multi warning rules');
     final rules = <MultiWarningRule>{};
     // Single instance to satisfy exhaustive switch requirement.
     for (final rule in EssentialMultiWarnings.values) {
@@ -332,6 +333,20 @@ mixin WarningsPluginIntegration {
         .subtypeAnnotating => SubtypeAnnotatingRule(),
       });
     }
+    logger.info('Mapped multi warning rules');
+    return rules;
+  }
+
+  /// Returns the list of registered warnings.
+  Set<WarningRule> get warnings {
+    logger.info('Mapping warning rules');
+    final rules = <WarningRule>{};
+    // Single instance to satisfy exhaustive switch requirement.
+    for (final rule in EssentialLintWarnings.values) {
+      rules.add(switch (rule) {
+        .sortingMembers => SortingMembersRule(),
+      });
+    }
     logger.info('Mapped warning rules');
     return rules;
   }
@@ -339,7 +354,7 @@ mixin WarningsPluginIntegration {
   /// Registers all lint rules with the given registry.
   void registerWarnings(PluginRegistry registry) {
     logger.info('Registering warning rules');
-    for (final rule in warnings) {
+    for (final rule in [...multiWarnings, ...warnings]) {
       try {
         registry.registerWarningRule(rule);
         // ignore: avoid_catches_without_on_clauses, handles integration
