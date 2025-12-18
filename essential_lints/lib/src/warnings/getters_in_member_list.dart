@@ -304,9 +304,6 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
   }
 
   bool _isGettersInMemberListAnnotation(ElementAnnotation? annotation) {
-    if (annotation?.element is! ConstructorElement) {
-      return false;
-    }
     var element = annotation?.computeConstantValue()?.type?.element;
     return element?.library?.uri == _annotationUri &&
         element?.name == _annotationName;
