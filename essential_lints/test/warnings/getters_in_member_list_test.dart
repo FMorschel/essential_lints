@@ -443,4 +443,62 @@ class A {
       [lint(194, 7)],
     );
   }
+
+  Future<void> test_staticOnly() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: #members, membersOption: .static)
+class A {
+  A(this.value);
+  final int value;
+
+  static const int staticValue = 0;
+
+  List<Object?> get members => [staticValue];
+}
+''');
+  }
+
+  Future<void> test_staticOnly_diagnostic() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: #members, membersOption: .static)
+class A {
+  static const int staticValue = 0;
+
+  List<Object?> get members => [];
+}
+''',
+      [lint(218, 7, correctionContains: 'staticValue')],
+    );
+  }
+
+  Future<void> test_staticAndInstance() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: #members, membersOption: .all)
+class A {
+  int? value;
+
+  static const int staticValue = 0;
+
+  List<Object?> get members => [];
+}
+''',
+      [
+        lint(
+          230,
+          7,
+          correctionContains: RegExp(
+            r"^(?=.*'staticValue')(?=.*'value').+$",
+          ),
+        ),
+      ],
+    );
+  }
 }

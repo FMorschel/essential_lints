@@ -22,6 +22,7 @@ class GettersInMemberList {
     this.fields = true,
     this.types = const <TypeHolder<Object?>>[],
     this.superTypes = const <TypeHolder<Object?>>[],
+    this.membersOption = .instance,
   });
 
   /// The name of the member list to check.
@@ -42,4 +43,21 @@ class GettersInMemberList {
 
   /// Whether to check for fields.
   final bool fields;
+
+  /// The members option to check.
+  final MembersOption membersOption;
+}
+
+/// {@template members_options}
+/// Options for members to check.
+/// {@endtemplate}
+enum MembersOption {
+  /// Check only instance members.
+  instance,
+
+  /// Check only static members.
+  static,
+
+  /// Check both instance and static members.
+  all,
 }

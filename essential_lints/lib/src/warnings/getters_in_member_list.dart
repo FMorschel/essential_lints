@@ -3,6 +3,7 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
@@ -41,6 +42,7 @@ class _GettersInMemberListAnnotation {
     required this.fields,
     required this.types,
     required this.superTypes,
+    required this.membersOption,
   });
 
   static const _GettersInMemberListAnnotation empty = .new(
@@ -49,6 +51,7 @@ class _GettersInMemberListAnnotation {
     fields: false,
     types: [],
     superTypes: [],
+    membersOption: null,
   );
 
   final String memberListName;
@@ -56,12 +59,16 @@ class _GettersInMemberListAnnotation {
   final List<DartType> superTypes;
   final bool getters;
   final bool fields;
+  final DartObject? membersOption;
 
   String get gettersAndFieldsDescription => getters && !fields
       ? 'getters'
       : !getters && fields
       ? 'fields'
       : 'getters/fields';
+
+  bool get static => membersOption?.variable?.name != 'instance';
+  bool get instance => membersOption?.variable?.name != 'static';
 }
 
 class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
@@ -252,7 +259,8 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
     }
 
     bool valid(GetterElement element) {
-      if (element.isStatic ||
+      if ((!annotation.static && element.isStatic) ||
+          (!annotation.instance && !element.isStatic) ||
           !annotation.getters && element.variable.isSynthetic ||
           !annotation.fields && !element.variable.isSynthetic ||
           annotation.types.isNotEmpty &&
@@ -317,6 +325,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
     var fields = type.getField('fields')?.toBoolValue();
     var types = type.getField('types')?.toListValue();
     var superTypes = type.getField('superTypes')?.toListValue();
+    var membersOption = type.getField('membersOption');
 
     return _GettersInMemberListAnnotation(
       memberListName: memberListNameString ?? '',
@@ -326,6 +335,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
       superTypes: [
         ...?superTypes?.map((e) => e.type.singleTypeArgument).nonNulls,
       ],
+      membersOption: membersOption,
     );
   }
 }
