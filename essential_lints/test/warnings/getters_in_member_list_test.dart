@@ -537,4 +537,30 @@ class A {
       ],
     );
   }
+
+  Future<void> test_variable() async {
+    await assertNoDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+const a = GettersInMemberList(memberListName: #members);
+
+@a
+class A {
+  List<Object?> get members => [];
+}
+''');
+  }
+
+  Future<void> test_variable_missingList() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+const a = GettersInMemberList(memberListName: #_members);
+
+@a
+class A {}
+''', [lint(148, 1)]);
+  }
 }

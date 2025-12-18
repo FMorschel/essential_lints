@@ -319,9 +319,6 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
   _GettersInMemberListAnnotation? _mapKnownArguments(
     ElementAnnotation? annotation,
   ) {
-    var element = annotation?.element;
-    if (element is! ConstructorElement) return .empty;
-
     var type = annotation?.computeConstantValue();
     if (type == null) return .empty;
     var memberListNameString = type.getField('memberListName')?.toSymbolValue();
