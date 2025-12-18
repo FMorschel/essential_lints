@@ -69,6 +69,9 @@ class _GettersInMemberListAnnotation {
 
   bool get static => membersOption?.variable?.name != 'instance';
   bool get instance => membersOption?.variable?.name != 'static';
+
+  bool get instanceOnly => instance && !static;
+  bool get staticOnly => static && !instance;
 }
 
 class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
@@ -120,11 +123,15 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
         continue;
       }
       var getterMember = element.getGetter(memberListName);
-      if (getterMember == null || getterMember.isStatic) {
+      if (getterMember == null ||
+          getterMember.isStatic && annotation.instanceOnly) {
         rule.reportAtToken(
           node.name,
           diagnosticCode: GettersInMemberList.missingList,
-          arguments: [memberListName],
+          arguments: [
+            memberListName,
+            if (annotation.instance) 'an instance' else '',
+          ],
         );
         continue;
       }

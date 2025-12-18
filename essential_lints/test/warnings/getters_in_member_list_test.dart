@@ -283,6 +283,7 @@ class A {
           GettersInMemberList.missingList,
           133,
           1,
+          correctionContains: 'an instance',
         ),
       ],
     );
@@ -377,6 +378,7 @@ class A {
           GettersInMemberList.missingList,
           133,
           1,
+          correctionContains: 'an instance',
         ),
       ],
     );
@@ -497,6 +499,40 @@ class A {
           correctionContains: RegExp(
             r"^(?=.*'staticValue')(?=.*'value').+$",
           ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> test_staticList() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: #members, membersOption: .static)
+class A {
+  static const int staticValue = 0;
+
+  static List<Object?> get members => [staticValue];
+}
+''');
+  }
+
+  Future<void> test_staticList_missing() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: #members, membersOption: .static)
+class A {
+  static const int staticValue = 0;
+}
+''',
+      [
+        error(
+          GettersInMemberList.missingList,
+          157,
+          1,
+          correctionContains: RegExp(r'^(?!.*an instance).+$'),
         ),
       ],
     );

@@ -127,11 +127,11 @@ enum GettersInMemberList with EnumDiagnostic, SubWarnings {
     WarningCode(
       name: 'getters_in_member_list',
       problemMessage:
-          "The class needs an instance member called '{0}' to list the "
+          "The class needs a{1} member called '{0}' to list the "
           'members.',
       correctionMessage:
-          "Include the missing member '{0}' or turn the static member into an "
-          'instance member.',
+          "Include the missing member '{0}' or turn the static member into "
+          'a{1} member.',
       description:
           'A lint rule that ensures getters/fields list instance member is '
           'declared.',
