@@ -1,114 +1,123 @@
 part of 'sort_declarations.dart';
 
 /// Represents final members.
-@AnnotateMembersWith(Consider, onlyPublic: true)
+@_gettersInMemberList
 sealed class PublicModifiable extends StaticalContext {
   const PublicModifiable._() : super._();
 
   /// {@macro fields}
-  @Consider<Fields>()
-  static const PublicModifiable fields = Fields._fields;
+  static const Fields fields = Fields._fields;
 
   /// {@macro fieldsGettersSetters}
-  @Consider<FieldsGettersSetters>()
-  static const PublicModifiable fieldsGettersSetters =
+  static const FieldsGettersSetters fieldsGettersSetters =
       FieldsGettersSetters._fieldsGettersSetters;
 
   /// {@macro getters}
-  @Consider<Getters>()
-  static const PublicModifiable getters = Getters._getters;
+  static const Getters getters = Getters._getters;
 
   /// {@macro gettersSetters}
-  @Consider<GettersSetters>()
-  static const PublicModifiable gettersSetters = GettersSetters._gettersSetters;
+  static const GettersSetters gettersSetters = GettersSetters._gettersSetters;
 
   /// {@macro methods}
-  @Consider<Methods>()
-  static const PublicModifiable methods = Methods._methods;
+  static const Methods methods = Methods._methods;
 
   /// {@macro setters}
-  @Consider<Setters>()
-  static const PublicModifiable setters = Setters._setters;
+  static const Setters setters = Setters._setters;
 
   /// {@macro constructors}
-  @Consider<Constructors>()
-  static const PublicConstructorModifiable constructors =
-      Constructors._constructors;
+  static const Constructors constructors = Constructors._constructors;
+
+  // ignore: unused_element member list
+  static List<PublicModifiable> get _members => [
+    constructors,
+    fields,
+    fieldsGettersSetters,
+    getters,
+    gettersSetters,
+    setters,
+    methods,
+  ];
 }
 
 /// Represents public constant members.
-@AnnotateMembersWith(Consider, onlyPublic: true)
+@_gettersInMemberList
 sealed class PublicConstantModifiable extends PublicModifiable {
   const PublicConstantModifiable._() : super._();
 
   /// {@macro fields}
-  @Consider<Fields>()
-  static const PublicConstantModifiable fields = Fields._fields;
+  static const Fields fields = Fields._fields;
 
   /// {@macro constructors}
-  @Consider<Constructors>()
-  static const PublicConstantModifiable constructors =
-      Constructors._constructors;
+  static const Constructors constructors = Constructors._constructors;
+
+  // ignore: unused_element member list
+  static List<PublicConstantModifiable> get _members => [constructors, fields];
 }
 
 /// Represents public field members.
-@AnnotateMembersWith(Consider, onlyPublic: true)
+@_gettersInMemberList
 sealed class PublicFieldModifiable extends PublicModifiable {
   const PublicFieldModifiable._() : super._();
 
   /// {@macro fields}
-  @Consider<Fields>()
-  static const PublicFieldModifiable fields = Fields._fields;
+  static const Fields fields = Fields._fields;
+
+  // ignore: unused_element member list
+  static List<PublicFieldModifiable> get _members => [fields];
 }
 
 /// Represents public statical members.
-@AnnotateMembersWith(Consider, onlyPublic: true)
+@_gettersInMemberList
 sealed class PublicStaticalModifiable extends PublicModifiable
     implements Statical {
   const PublicStaticalModifiable._() : super._();
 
   /// {@macro fields}
-  @Consider<Fields>()
-  static const PublicStaticalModifiable fields = Fields._fields;
+  static const Fields fields = Fields._fields;
 
   /// {@macro fieldsGettersSetters}
-  @Consider<FieldsGettersSetters>()
-  static const PublicStaticalModifiable fieldsGettersSetters =
+  static const FieldsGettersSetters fieldsGettersSetters =
       FieldsGettersSetters._fieldsGettersSetters;
 
   /// {@macro getters}
-  @Consider<Getters>()
-  static const PublicStaticalModifiable getters = Getters._getters;
+  static const Getters getters = Getters._getters;
 
   /// {@macro gettersSetters}
-  @Consider<GettersSetters>()
-  static const PublicStaticalModifiable gettersSetters =
-      GettersSetters._gettersSetters;
+  static const GettersSetters gettersSetters = GettersSetters._gettersSetters;
 
   /// {@macro methods}
-  @Consider<Methods>()
-  static const PublicStaticalModifiable methods = Methods._methods;
+  static const Methods methods = Methods._methods;
 
   /// {@macro setters}
-  @Consider<Setters>()
-  static const PublicStaticalModifiable setters = Setters._setters;
+  static const Setters setters = Setters._setters;
+
+  // ignore: unused_element member list
+  static List<PublicStaticalModifiable> get _members => [
+    fields,
+    fieldsGettersSetters,
+    getters,
+    gettersSetters,
+    setters,
+    methods,
+  ];
 }
 
 /// Represents public constructors.
-@AnnotateMembersWith(Consider, onlyPublic: true)
+@_gettersInMemberList
 sealed class PublicConstructorModifiable extends PublicModifiable {
   const PublicConstructorModifiable._() : super._();
 
   /// {@macro constructors}
-  @Consider<Constructors>()
-  static const PublicConstructorModifiable constructors =
-      Constructors._constructors;
+  static const Constructors constructors = Constructors._constructors;
+
+  // ignore: unused_element member list
+  static List<PublicConstructorModifiable> get _members => [constructors];
 }
 
 /// {@template public}
 /// Represents public members.
 /// {@endtemplate}
-@InvalidModifiers([
+@InvalidModifiers({
   th<Private>(),
   th<Operator>(),
   th<Public>(),
@@ -126,26 +135,40 @@ sealed class PublicConstructorModifiable extends PublicModifiable {
   th<Abstract>(),
   th<Initialized>(),
   th<Redirecting>(),
-])
-@InvalidMembers(<TypeHolder<Group>>[])
+})
+@InvalidMembers(<TypeHolder<Group>>{})
+@MutuallyExclusive(#visibility)
 final class Public<M extends PublicModifiable> extends Modifier<M>
     implements
         NamedModifiable,
         RedirectingModifiable,
-        FactoryModifiable,
+        FactoryConstructorModifiable,
         ExternalMembersModifiable,
         InitializableStatical,
         NullableMembersModifiable,
         FinalModifiable,
         InitializableOverridable,
         ConstantVariables,
-        ExternalInstanceModifiable,
         NullableFieldModifiable,
         VariableAbstractable,
         FinalAbstractModifiable,
         NullableAbstractableFieldModifiable,
         StaticalExternal,
-        NullableExternableModifiable {
+        NullableExternableModifiable,
+        TypedFieldModifiable,
+        TypedAbstractableFieldModifiable,
+        TypedExternableModifiable,
+        TypedMembersModifiable,
+        DynamicFieldModifiable,
+        DynamicAbstractableFieldModifiable,
+        DynamicExternableModifiable,
+        DynamicMembersModifiable,
+        InstanciableMembers,
+        OverridableMembers,
+        InstanciableExternal,
+        OverridableExternal,
+        FactoryExternalModifiable,
+        NewExternalModifiable {
   /// {@macro public}
   const Public._(super.modifiable) : super._();
 }

@@ -19,27 +19,6 @@ void main() {
         expectSortDeclaration(const .initialized(.private(.fields)));
       });
     });
-    group('Nullable', () {
-      group('Public', () {
-        test('fields', () {
-          expectSortDeclaration(
-            const .initialized(.nullable(.public(.fields))),
-          );
-        });
-      });
-      group('Private', () {
-        test('fields', () {
-          expectSortDeclaration(
-            const .initialized(.nullable(.private(.fields))),
-          );
-        });
-      });
-      group('members', () {
-        test('fields', () {
-          expectSortDeclaration(const .initialized(.nullable(.fields)));
-        });
-      });
-    });
     group('Const', () {
       test('fields', () {
         expectSortDeclaration(const .const_(.initialized(.fields)));

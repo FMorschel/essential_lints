@@ -3,63 +3,70 @@ part of 'sort_declarations.dart';
 /// {@template late_modifiable}
 /// Represents late modifiable members.
 /// {@endtemplate}
-@AnnotateMembersWith(Consider, onlyPublic: true)
+@_gettersInMemberList
 sealed class LateModifiable extends StaticalContext
-    implements Statical, Overridable {
+    implements Statical, NewMemberModifiable {
   /// {@macro var}
-  @Consider<Var>()
   const factory LateModifiable.var_(Variable modifiable) = Var._;
 
   /// {@macro final}
-  @Consider<Final>()
   const factory LateModifiable.final_(FinalModifiable modifiable) = Final._;
 
   /// {@macro public}
-  @Consider<Public>()
   const factory LateModifiable.public(PublicFieldModifiable modifiable) =
       Public._;
 
   /// {@macro private}
-  @Consider<Private>()
   const factory LateModifiable.private(PrivateFieldModifiable modifiable) =
       Private._;
 
   /// {@macro nullable}
-  @Consider<Nullable>()
   const factory LateModifiable.nullable(NullableFieldModifiable modifiable) =
       Nullable._;
 
+  /// {@macro typed}
+  const factory LateModifiable.typed(TypedFieldModifiable modifiable) = Typed._;
+
+  /// {@macro dynamic}
+  const factory LateModifiable.dynamic(DynamicFieldModifiable modifiable) =
+      Dynamic._;
+
   /// {@macro initialized}
-  @Consider<Initialized>()
   const factory LateModifiable.initialized(InitializableStatical modifiable) =
       Initialized._;
 
   /// {@macro fields}
-  @Consider<Fields>()
-  static const LateModifiable fields = Fields._fields;
+  static const Fields fields = Fields._fields;
+
+  // ignore: unused_element member list
+  static List<LateModifiable> get _members => [fields];
 }
 
 /// {@template late}
 /// Represents late members.
 /// {@endtemplate}
-@InvalidMembers([
+@InvalidMembers({
   th<Constructors>(),
   th<Getters>(),
   th<Setters>(),
   th<GettersSetters>(),
   th<FieldsGettersSetters>(),
   th<Methods>(),
-])
-@InvalidModifiers([
+})
+@InvalidModifiers({
   th<Abstract>(),
   th<External>(),
   th<Const>(),
   th<Late>(),
   th<Overridden>(),
   th<Static>(),
-])
+})
 final class Late<M extends LateModifiable> extends Modifier<M>
-    implements Statical, Overridable, StaticalExternal {
+    implements
+        Statical,
+        NewMemberModifiable,
+        InstanciableMembers,
+        OverridableMembers {
   /// {@macro late}
   const Late._(super.modifiable) : super._();
 }

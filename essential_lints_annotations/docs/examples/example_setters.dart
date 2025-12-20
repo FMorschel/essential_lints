@@ -16,199 +16,199 @@ abstract class Base {
 // Instance Setters (36 patterns)
 // ============================================================================
 
-// 1. set foo(int value) {} - (public) + setters
+// 1. set foo(int value) {} - instance + typed + public + setters
 class Setter1 {
   set foo(int value) {}
 }
 
-// 2. set foo(int value) {} - setters
+// 2. set foo(int value) {} - instance + typed + setters
 class Setter2 {
   set foo(int value) {}
 }
 
-// 3. set _foo(int value) {} - private + setters
+// 3. set _foo(int value) {} - instance + typed + private + setters
 class Setter3 {
   set _foo(int value) {}
 }
 
-// 4. set foo(int? value) {} - nullable + (public) + setters
+// 4. set foo(int? value) {} - instance + typed + nullable + public + setters
 class Setter4 {
   set foo(int? value) {}
 }
 
-// 5. set foo(int? value) {} - nullable + setters
+// 5. set foo(int? value) {} - instance + typed + nullable + setters
 class Setter5 {
   set foo(int? value) {}
 }
 
-// 6. set _foo(int? value) {} - nullable + private + setters
+// 6. set _foo(int? value) {} - instance + typed + nullable + private + setters
 class Setter6 {
   set _foo(int? value) {}
 }
 
-// 7. set foo(int value); - abstract + (public) + setters
+// 7. set foo(int value); - instance + typed + abstract + public + setters
 abstract class Setter7 {
   set foo(int value);
 }
 
-// 8. set foo(int value); - abstract + setters
+// 8. set foo(int value); - instance + typed + abstract + setters
 abstract class Setter8 {
   set foo(int value);
 }
 
-// 9. set _foo(int value); - abstract + private + setters
+// 9. set _foo(int value); - instance + typed + abstract + private + setters
 abstract class Setter9 {
   set _foo(int value);
 }
 
-// 10. set foo(int? value); - abstract + nullable + (public) + setters
+// 10. set foo(int? value); - instance + typed + abstract + nullable + public + setters
 abstract class Setter10 {
   set foo(int? value);
 }
 
-// 11. set foo(int? value); - abstract + nullable + setters
+// 11. set foo(int? value); - instance + typed + abstract + nullable + setters
 abstract class Setter11 {
   set foo(int? value);
 }
 
-// 12. set _foo(int? value); - abstract + nullable + private + setters
+// 12. set _foo(int? value); - instance + typed + abstract + nullable + private + setters
 abstract class Setter12 {
   set _foo(int? value);
 }
 
-// 13. external set foo(int value); - external + (public) + setters
+// 13. external set foo(int value); - external + instance + typed + public + setters
 class Setter13 {
   external set foo(int value);
 }
 
-// 14. external set foo(int value); - external + setters
+// 14. external set foo(int value); - external + instance + typed + setters
 class Setter14 {
   external set foo(int value);
 }
 
-// 15. external set _foo(int value); - external + private + setters
+// 15. external set _foo(int value); - external + instance + typed + private + setters
 class Setter15 {
   external set _foo(int value);
 }
 
-// 16. external set foo(int? value); - external + nullable + (public) + setters
+// 16. external set foo(int? value); - external + instance + typed + nullable + public + setters
 class Setter16 {
   external set foo(int? value);
 }
 
-// 17. external set foo(int? value); - external + nullable + setters
+// 17. external set foo(int? value); - external + instance + typed + nullable + setters
 class Setter17 {
   external set foo(int? value);
 }
 
-// 18. external set _foo(int? value); - external + nullable + private + setters
+// 18. external set _foo(int? value); - external + instance + typed + nullable + private + setters
 class Setter18 {
   external set _foo(int? value);
 }
 
-// 19. @override set foo(int value) {} - overridden + (public) + setters
+// 19. @override set foo(int value) {} - instance + overridden + typed + public + setters
 abstract class Setter19 extends Base {
   @override
   set foo(int value) {}
 }
 
-// 20. @override set foo(int value) {} - overridden + setters
+// 20. @override set foo(int value) {} - instance + overridden + typed + setters
 abstract class Setter20 extends Base {
   @override
   set foo(int value) {}
 }
 
-// 21. @override set _foo(int value) {} - overridden + private + setters
+// 21. @override set _foo(int value) {} - instance + overridden + typed + private + setters
 abstract class Setter21 extends Base {
   @override
   set _foo(int value) {}
 }
 
-// 22. @override set foo(int? value) {} - overridden + nullable + (public) + setters
+// 22. @override set foo(int? value) {} - instance + overridden + typed + nullable + public + setters
 abstract class Setter22 extends Base {
   @override
   set fooNullable(int? value) {}
 }
 
-// 23. @override set foo(int? value) {} - overridden + nullable + setters
+// 23. @override set foo(int? value) {} - instance + overridden + typed + nullable + setters
 abstract class Setter23 extends Base {
   @override
   set fooNullable(int? value) {}
 }
 
-// 24. @override set _foo(int? value) {} - overridden + nullable + private + setters
+// 24. @override set _foo(int? value) {} - instance + overridden + typed + nullable + private + setters
 abstract class Setter24 extends Base {
   @override
   set _fooNullable(int? value) {}
 }
 
-// 25. @override external set foo(int value); - overridden + external + (public) + setters
+// 25. @override external set foo(int value); - external + instance + overridden + typed + public + setters
 abstract class Setter25 extends Base {
   @override
   external set fooExternal(int value);
 }
 
-// 26. @override external set foo(int value); - overridden + external + setters
+// 26. @override external set foo(int value); - external + instance + overridden + typed + setters
 abstract class Setter26 extends Base {
   @override
   external set fooExternal(int value);
 }
 
-// 27. @override external set _foo(int value); - overridden + external + private + setters
+// 27. @override external set _foo(int value); - external + instance + overridden + typed + private + setters
 abstract class Setter27 extends Base {
   @override
   external set _fooExternal(int value);
 }
 
-// 28. @override external set foo(int? value); - overridden + external + nullable + (public) + setters
+// 28. @override external set foo(int? value); - external + instance + overridden + typed + nullable + public + setters
 abstract class Setter28 extends Base {
   @override
   external set fooExternalNullable(int? value);
 }
 
-// 29. @override external set foo(int? value); - overridden + external + nullable + setters
+// 29. @override external set foo(int? value); - external + instance + overridden + typed + nullable + setters
 abstract class Setter29 extends Base {
   @override
   external set fooExternalNullable(int? value);
 }
 
-// 30. @override external set _foo(int? value); - overridden + external + nullable + private + setters
+// 30. @override external set _foo(int? value); - external + instance + overridden + typed + nullable + private + setters
 abstract class Setter30 extends Base {
   @override
   external set _fooExternalNullable(int? value);
 }
 
-// 31. @override set foo(int value); - overridden + abstract + (public) + setters
+// 31. @override set foo(int value); - instance + overridden + typed + abstract + public + setters
 abstract class Setter31 extends Base {
   @override
   set foo(int value);
 }
 
-// 32. @override set foo(int value); - overridden + abstract + setters
+// 32. @override set foo(int value); - instance + overridden + typed + abstract + setters
 abstract class Setter32 extends Base {
   @override
   set foo(int value);
 }
 
-// 33. @override set _foo(int value); - overridden + abstract + private + setters
+// 33. @override set _foo(int value); - instance + overridden + typed + abstract + private + setters
 abstract class Setter33 extends Base {
   @override
   set _foo(int value);
 }
 
-// 34. @override set foo(int? value); - overridden + abstract + nullable + (public) + setters
+// 34. @override set foo(int? value); - instance + overridden + typed + abstract + nullable + public + setters
 abstract class Setter34 extends Base {
   @override
   set fooNullable(int? value);
 }
 
-// 35. @override set foo(int? value); - overridden + abstract + nullable + setters
+// 35. @override set foo(int? value); - instance + overridden + typed + abstract + nullable + setters
 abstract class Setter35 extends Base {
   @override
   set fooNullable(int? value);
 }
 
-// 36. @override set _foo(int? value); - overridden + abstract + nullable + private + setters
+// 36. @override set _foo(int? value); - instance + overridden + typed + abstract + nullable + private + setters
 abstract class Setter36 extends Base {
   @override
   set _fooNullable(int? value);
@@ -218,62 +218,62 @@ abstract class Setter36 extends Base {
 // Static Setters (12 patterns)
 // ============================================================================
 
-// 37. static set foo(int value) {} - static + (public) + setters
+// 37. static set foo(int value) {} - static + typed + public + setters
 class Setter37 {
   static set foo(int value) {}
 }
 
-// 38. static set foo(int value) {} - static + setters
+// 38. static set foo(int value) {} - static + typed + setters
 class Setter38 {
   static set foo(int value) {}
 }
 
-// 39. static set _foo(int value) {} - static + private + setters
+// 39. static set _foo(int value) {} - static + typed + private + setters
 class Setter39 {
   static set _foo(int value) {}
 }
 
-// 40. static set foo(int? value) {} - static + nullable + (public) + setters
+// 40. static set foo(int? value) {} - static + typed + nullable + public + setters
 class Setter40 {
   static set foo(int? value) {}
 }
 
-// 41. static set foo(int? value) {} - static + nullable + setters
+// 41. static set foo(int? value) {} - static + typed + nullable + setters
 class Setter41 {
   static set foo(int? value) {}
 }
 
-// 42. static set _foo(int? value) {} - static + nullable + private + setters
+// 42. static set _foo(int? value) {} - static + typed + nullable + private + setters
 class Setter42 {
   static set _foo(int? value) {}
 }
 
-// 43. external static set foo(int value); - external + static + (public) + setters
+// 43. external static set foo(int value); - external + static + typed + public + setters
 class Setter43 {
   external static set foo(int value);
 }
 
-// 44. external static set foo(int value); - external + static + setters
+// 44. external static set foo(int value); - external + static + typed + setters
 class Setter44 {
   external static set foo(int value);
 }
 
-// 45. external static set _foo(int value); - external + static + private + setters
+// 45. external static set _foo(int value); - external + static + typed + private + setters
 class Setter45 {
   external static set _foo(int value);
 }
 
-// 46. external static set foo(int? value); - external + static + nullable + (public) + setters
+// 46. external static set foo(int? value); - external + static + typed + nullable + public + setters
 class Setter46 {
   external static set foo(int? value);
 }
 
-// 47. external static set foo(int? value); - external + static + nullable + setters
+// 47. external static set foo(int? value); - external + static + typed + nullable + setters
 class Setter47 {
   external static set foo(int? value);
 }
 
-// 48. external static set _foo(int? value); - external + static + nullable + private + setters
+// 48. external static set _foo(int? value); - external + static + typed + nullable + private + setters
 class Setter48 {
   external static set _foo(int? value);
 }

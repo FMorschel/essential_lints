@@ -11,6 +11,6 @@ class InvalidMembers {
   /// {@macro invalid_members}
   const InvalidMembers(this.invalidMembers);
 
-  /// The list of invalid members.
-  final List<TypeHolder<Group>> invalidMembers;
+  /// The set of invalid members.
+  final Set<TypeHolder<Group>> invalidMembers;
 }

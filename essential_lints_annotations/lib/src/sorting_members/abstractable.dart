@@ -1,68 +1,87 @@
 part of 'sort_declarations.dart';
 
 /// Represents abstractable members.
-@AnnotateMembersWith(Consider, onlyPublic: true)
+@_gettersInMemberList
 sealed class Abstractable extends StaticalContext
-    implements Overridable, OperatorModifiable {
+    implements NewMemberModifiable, OperatorModifiable {
   /// {@macro public}
-  @Consider<Public>()
   const factory Abstractable.public(PublicStaticalModifiable modifiable) =
       Public._;
 
   /// {@macro private}
-  @Consider<Private>()
   const factory Abstractable.private(PrivateStaticalModifiable modifiable) =
       Private._;
 
   /// {@macro nullable}
-  @Consider<Nullable>()
-  const factory Abstractable.nullable(NullableMembersModifiable modifiable) =
+  const factory Abstractable.nullable(NullableExternableModifiable modifiable) =
       Nullable._;
 
+  /// {@macro typed}
+  const factory Abstractable.typed(TypedExternableModifiable modifiable) =
+      Typed._;
+
+  /// {@macro dynamic}
+  const factory Abstractable.dynamic(
+    DynamicExternableModifiable modifiable,
+  ) = Dynamic._;
+
   /// {@macro operator}
-  @Consider<Operator>()
   const factory Abstractable.operator([OperatorModifiable modifiable]) =
       Operator._;
 
   /// {@macro var}
-  @Consider<Variable>()
   const factory Abstractable.var_(VariableAbstractable modifiable) = Var._;
 
   /// {@macro final}
-  @Consider<Final>()
   const factory Abstractable.final_(FinalAbstractModifiable modifiable) =
       Final._;
 
   /// {@macro fields}
-  @Consider<Fields>()
-  static const Abstractable fields = Fields._fields;
+  static const Fields fields = Fields._fields;
+
+  /// {@macro fieldsGettersSetters}
+  static const FieldsGettersSetters fieldsGettersSetters =
+      FieldsGettersSetters._fieldsGettersSetters;
 
   /// {@macro getters}
-  @Consider<Getters>()
-  static const Abstractable getters = Getters._getters;
+  static const Getters getters = Getters._getters;
 
   /// {@macro setters}
-  @Consider<Setters>()
-  static const Abstractable setters = Setters._setters;
+  static const Setters setters = Setters._setters;
+
+  /// {@macro gettersSetters}
+  static const GettersSetters gettersSetters = GettersSetters._gettersSetters;
 
   /// {@macro methods}
-  @Consider<Methods>()
-  static const Abstractable methods = Methods._methods;
+  static const Methods methods = Methods._methods;
+
+  // ignore: unused_element member list
+  static List<Abstractable> get _members => [
+    fields,
+    getters,
+    setters,
+    methods,
+    fieldsGettersSetters,
+    gettersSetters,
+  ];
 }
 
 /// {@template abstract}
 /// Represents abstract members.
 /// {@endtemplate}
-@InvalidMembers([th<Constructors>()])
-@InvalidModifiers([
+@InvalidMembers({th<Constructors>()})
+@InvalidModifiers({
   th<External>(),
   th<Static>(),
   th<Initialized>(),
   th<Late>(),
   th<Abstract>(),
-])
+})
 final class Abstract<M extends Abstractable> extends Modifier<M>
-    implements Overridable {
+    implements
+        NewMemberModifiable,
+        InstanciableMembers,
+        OverridableMembers {
   /// {@macro abstract}
   const Abstract._(super.modifiable) : super._();
 }

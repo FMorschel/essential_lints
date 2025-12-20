@@ -31,7 +31,7 @@ class CreateGetterTest extends MultiWarningFixTestProcessor
     await resolveTestCode('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A();
 }
@@ -39,7 +39,7 @@ class A {
     await assertHasFix('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A();
   List<Object?> get members => [];
@@ -51,13 +51,13 @@ class A {
     await resolveTestCode('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {}
 ''');
     await assertHasFix('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   List<Object?> get members => [];
 }
@@ -68,14 +68,14 @@ class A {
     await resolveTestCode('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
 }
 ''');
     await assertHasFix('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   List<Object?> get members => [];
 }
@@ -86,7 +86,7 @@ class A {
     await resolveTestCode('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   static List<Object?> get members => [];
 }

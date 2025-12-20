@@ -1,118 +1,149 @@
 part of 'sort_declarations.dart';
 
 /// Represents statical members.
-@AnnotateMembersWith(Consider, onlyPublic: true)
+@_gettersInMemberList
 sealed class Statical extends StaticalContext implements OperatorModifiable {
   /// {@macro initialized}
-  @Consider<Initialized>()
   const factory Statical.initialized(InitializableStatical modifiable) =
       Initialized._;
 
   /// {@macro nullable}
-  @Consider<Nullable>()
   const factory Statical.nullable(NullableMembersModifiable modifiable) =
       Nullable._;
 
+  /// {@macro typed}
+  const factory Statical.typed(TypedMembersModifiable modifiable) = Typed._;
+
+  /// {@macro dynamic}
+  const factory Statical.dynamic(DynamicMembersModifiable modifiable) =
+      Dynamic._;
+
   /// {@macro late_modifiable}
-  @Consider<Late>()
   const factory Statical.late(LateModifiable modifiable) = Late._;
 
   /// {@macro var}
-  @Consider<Var>()
   const factory Statical.var_(Variable modifiable) = Var._;
 
   /// {@macro final}
-  @Consider<Final>()
   const factory Statical.final_(FinalModifiable modifiable) = Final._;
 
   /// {@macro const}
-  @Consider<Const>()
   const factory Statical.const_(ConstantVariables modifiable) = Const._;
 
   /// {@macro private}
-  @Consider<Private>()
   const factory Statical.private(PrivateStaticalModifiable modifiable) =
       Private._;
 
   /// {@macro public}
-  @Consider<Public>()
   const factory Statical.public(PublicStaticalModifiable modifiable) = Public._;
 
   /// {@macro fields}
-  @Consider<Fields>()
-  static const Statical fields = Fields._fields;
+  static const Fields fields = Fields._fields;
+
+  /// {@macro fieldsGettersSetters}
+  static const FieldsGettersSetters fieldsGettersSetters =
+      FieldsGettersSetters._fieldsGettersSetters;
 
   /// {@macro methods}
-  @Consider<Methods>()
-  static const Statical methods = Methods._methods;
+  static const Methods methods = Methods._methods;
 
   /// {@macro getters}
-  @Consider<Getters>()
-  static const Statical getters = Getters._getters;
+  static const Getters getters = Getters._getters;
+
+  /// {@macro gettersSetters}
+  static const GettersSetters gettersSetters = GettersSetters._gettersSetters;
 
   /// {@macro setters}
-  @Consider<Setters>()
-  static const Statical setters = Setters._setters;
+  static const Setters setters = Setters._setters;
+
+  // ignore: unused_element member list
+  static List<Statical> get _members => [
+    fields,
+    fieldsGettersSetters,
+    getters,
+    gettersSetters,
+    setters,
+    methods,
+  ];
 }
 
 /// Represents statical members that are external.
-@AnnotateMembersWith(Consider, onlyPublic: true)
+@_gettersInMemberList
 sealed class StaticalExternal extends Statical {
   /// {@macro nullable}
-  @Consider<Nullable>()
   const factory StaticalExternal.nullable(
-    NullableMembersModifiable modifiable,
+    NullableExternableModifiable modifiable,
   ) = Nullable._;
 
+  /// {@macro typed}
+  const factory StaticalExternal.typed(TypedExternableModifiable modifiable) =
+      Typed._;
+
+  /// {@macro dynamic}
+  const factory StaticalExternal.dynamic(
+    DynamicExternableModifiable modifiable,
+  ) = Dynamic._;
+
   /// {@macro var}
-  @Consider<Var>()
   const factory StaticalExternal.var_(VariableAbstractable modifiable) = Var._;
 
   /// {@macro final}
-  @Consider<Final>()
   const factory StaticalExternal.final_(FinalAbstractModifiable modifiable) =
       Final._;
 
   /// {@macro private}
-  @Consider<Private>()
   const factory StaticalExternal.private(PrivateStaticalModifiable modifiable) =
       Private._;
 
   /// {@macro public}
-  @Consider<Public>()
   const factory StaticalExternal.public(PublicStaticalModifiable modifiable) =
       Public._;
 
   /// {@macro fields}
-  @Consider<Fields>()
-  static const StaticalExternal fields = Fields._fields;
+  static const Fields fields = Fields._fields;
+
+  /// {@macro fieldsGettersSetters}
+  static const FieldsGettersSetters fieldsGettersSetters =
+      FieldsGettersSetters._fieldsGettersSetters;
 
   /// {@macro methods}
-  @Consider<Methods>()
-  static const StaticalExternal methods = Methods._methods;
+  static const Methods methods = Methods._methods;
 
   /// {@macro getters}
-  @Consider<Getters>()
-  static const StaticalExternal getters = Getters._getters;
+  static const Getters getters = Getters._getters;
+
+  /// {@macro gettersSetters}
+  static const GettersSetters gettersSetters = GettersSetters._gettersSetters;
 
   /// {@macro setters}
-  @Consider<Setters>()
-  static const StaticalExternal setters = Setters._setters;
+  static const Setters setters = Setters._setters;
+
+  // ignore: unused_element member list
+  static List<StaticalExternal> get _members => [
+    fields,
+    fieldsGettersSetters,
+    getters,
+    gettersSetters,
+    setters,
+    methods,
+  ];
 }
 
 /// {@template static}
 /// Represents static members.
 /// {@endtemplate}
-@InvalidMembers([th<Constructors>()])
-@InvalidModifiers([
+@InvalidMembers({th<Constructors>()})
+@InvalidModifiers({
   th<Overridden>(),
   th<Abstract>(),
   th<Operator>(),
   th<Static>(),
+  th<Instance>(),
   th<External>(),
-])
+})
+@MutuallyExclusive(#context)
 final class Static<M extends Statical> extends Modifier<M>
-    implements OperatorModifiable, Overridable, ExternalMembersModifiable {
+    implements ExternalMembersModifiable {
   /// {@macro static}
   const Static._(super.modifiable) : super._();
 }

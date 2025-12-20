@@ -38,25 +38,6 @@ void main() {
           expectSortDeclaration(const .var_(.initialized(.private(.fields))));
         });
       });
-      group('Nullable', () {
-        test('fields', () {
-          expectSortDeclaration(const .var_(.initialized(.nullable(.fields))));
-        });
-        group('Public', () {
-          test('fields', () {
-            expectSortDeclaration(
-              const .var_(.initialized(.nullable(.public(.fields)))),
-            );
-          });
-        });
-        group('Private', () {
-          test('fields', () {
-            expectSortDeclaration(
-              const .var_(.initialized(.nullable(.private(.fields)))),
-            );
-          });
-        });
-      });
     });
   });
 }

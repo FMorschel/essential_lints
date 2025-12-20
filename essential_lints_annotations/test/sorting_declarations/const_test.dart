@@ -45,27 +45,6 @@ void main() {
           expectSortDeclaration(const .const_(.initialized(.private(.fields))));
         });
       });
-      group('Nullable', () {
-        test('fields', () {
-          expectSortDeclaration(
-            const .const_(.initialized(.nullable(.fields))),
-          );
-        });
-        group('Public', () {
-          test('fields', () {
-            expectSortDeclaration(
-              const .const_(.initialized(.nullable(.public(.fields)))),
-            );
-          });
-        });
-        group('Private', () {
-          test('fields', () {
-            expectSortDeclaration(
-              const .const_(.initialized(.nullable(.private(.fields)))),
-            );
-          });
-        });
-      });
     });
     group('Unnamed', () {
       test('constructors', () {

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:analysis_server_plugin/plugin.dart';
 import 'package:analysis_server_plugin/registry.dart';
+import 'package:essential_lints/src/warnings/getters_in_member_list.dart';
 import 'package:essential_lints/src/warnings/subtype_annotating.dart';
 import 'package:essential_lints/src/warnings/subtype_naming.dart';
 
@@ -16,6 +17,7 @@ class InternalPlugin extends Plugin {
   @override
   FutureOr<void> register(PluginRegistry registry) {
     registry
+      ..registerWarningRule(GettersInMemberListRule())
       ..registerWarningRule(SubtypeAnnotatingRule())
       ..registerWarningRule(SubtypeNamingRule())
       ..registerWarningRule(AnnotateMembersWithRule())

@@ -8,7 +8,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 
-import 'src/current_package_path.dart';
+import '../src/current_package_path.dart';
 
 /// Represents a static member (field, getter, or method) of a class.
 class StaticMember {

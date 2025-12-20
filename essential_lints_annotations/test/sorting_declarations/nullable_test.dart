@@ -85,27 +85,6 @@ void main() {
           );
         });
       });
-      group('Nullable', () {
-        test('fields', () {
-          expectSortDeclaration(
-            const .nullable(.initialized(.nullable(.fields))),
-          );
-        });
-        group('Public', () {
-          test('fields', () {
-            expectSortDeclaration(
-              const .nullable(.initialized(.nullable(.public(.fields)))),
-            );
-          });
-        });
-        group('Private', () {
-          test('fields', () {
-            expectSortDeclaration(
-              const .nullable(.initialized(.nullable(.private(.fields)))),
-            );
-          });
-        });
-      });
     });
   });
 }

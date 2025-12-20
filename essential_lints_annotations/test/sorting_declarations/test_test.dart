@@ -7,12 +7,14 @@ import 'expect_sort_declaration.dart';
 void main() {
   group('Test', () {
     test('tests', () {
-      expectSortDeclaration(const .test(.tests));
       // ignore: _internal_plugin/invalid_members test
-      expectSortDeclaration(const .test(.tests2));
+      expectSortDeclaration(const .test(.tests));
+      // ignore: _internal_plugin/invalid_modifiers, _internal_plugin/invalid_members test
       expectSortDeclaration(const .test(.test(.tests)));
       // ignore: _internal_plugin/invalid_modifiers, _internal_plugin/invalid_members test
-      expectSortDeclaration(const .test(.test2(.tests2)));
+      expectSortDeclaration(const .test(.wrapper(.tests)));
+      // ignore: _internal_plugin/invalid_modifiers, _internal_plugin/invalid_members test
+      expectSortDeclaration(const .test(.wrapper(.test(.tests))));
     });
   });
 }

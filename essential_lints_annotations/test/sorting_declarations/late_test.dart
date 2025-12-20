@@ -38,25 +38,6 @@ void main() {
           expectSortDeclaration(const .late(.initialized(.private(.fields))));
         });
       });
-      group('Nullable', () {
-        test('fields', () {
-          expectSortDeclaration(const .late(.initialized(.nullable(.fields))));
-        });
-        group('Public', () {
-          test('fields', () {
-            expectSortDeclaration(
-              const .late(.initialized(.nullable(.public(.fields)))),
-            );
-          });
-        });
-        group('Private', () {
-          test('fields', () {
-            expectSortDeclaration(
-              const .late(.initialized(.nullable(.private(.fields)))),
-            );
-          });
-        });
-      });
     });
     group('Nullable', () {
       group('Public', () {
@@ -107,6 +88,132 @@ void main() {
       test('fields', () {
         expectSortDeclaration(const .late(.final_(.fields)));
       });
+      group('Dynamic', () {
+        test('fields', () {
+          expectSortDeclaration(const .late(.final_(.dynamic(.fields))));
+        });
+        group('Private', () {
+          test('fields', () {
+            expectSortDeclaration(
+              const .late(.final_(.dynamic(.private(.fields)))),
+            );
+          });
+        });
+        group('Public', () {
+          test('fields', () {
+            expectSortDeclaration(
+              const .late(.final_(.dynamic(.public(.fields)))),
+            );
+          });
+        });
+        group('Initialized', () {
+          test('fields', () {
+            expectSortDeclaration(
+              const .late(.final_(.dynamic(.initialized(.fields)))),
+            );
+          });
+          group('Private', () {
+            test('fields', () {
+              expectSortDeclaration(
+                const .late(.final_(.dynamic(.initialized(.private(.fields))))),
+              );
+            });
+          });
+          group('Public', () {
+            test('fields', () {
+              expectSortDeclaration(
+                const .late(.final_(.dynamic(.initialized(.public(.fields))))),
+              );
+            });
+          });
+        });
+      });
+      group('Typed', () {
+        test('fields', () {
+          expectSortDeclaration(const .late(.final_(.typed(.fields))));
+        });
+        group('Private', () {
+          test('fields', () {
+            expectSortDeclaration(
+              const .late(.final_(.typed(.private(.fields)))),
+            );
+          });
+        });
+        group('Public', () {
+          test('fields', () {
+            expectSortDeclaration(
+              const .late(.final_(.typed(.public(.fields)))),
+            );
+          });
+        });
+        group('Nullable', () {
+          test('fields', () {
+            expectSortDeclaration(
+              const .late(.final_(.typed(.nullable(.fields)))),
+            );
+          });
+          group('Private', () {
+            test('fields', () {
+              expectSortDeclaration(
+                const .late(.final_(.typed(.nullable(.private(.fields))))),
+              );
+            });
+          });
+          group('Public', () {
+            test('fields', () {
+              expectSortDeclaration(
+                const .late(.final_(.typed(.nullable(.public(.fields))))),
+              );
+            });
+          });
+          group('Initialized', () {
+            test('fields', () {
+              expectSortDeclaration(
+                const .late(.final_(.typed(.nullable(.initialized(.fields))))),
+              );
+            });
+            group('Private', () {
+              test('fields', () {
+                expectSortDeclaration(
+                  const .late(
+                    .final_(.typed(.nullable(.initialized(.private(.fields))))),
+                  ),
+                );
+              });
+            });
+            group('Public', () {
+              test('fields', () {
+                expectSortDeclaration(
+                  const .late(
+                    .final_(.typed(.nullable(.initialized(.public(.fields))))),
+                  ),
+                );
+              });
+            });
+          });
+        });
+        group('Initialized', () {
+          test('fields', () {
+            expectSortDeclaration(
+              const .late(.final_(.typed(.initialized(.fields)))),
+            );
+          });
+          group('Private', () {
+            test('fields', () {
+              expectSortDeclaration(
+                const .late(.final_(.typed(.initialized(.private(.fields))))),
+              );
+            });
+          });
+          group('Public', () {
+            test('fields', () {
+              expectSortDeclaration(
+                const .late(.final_(.typed(.initialized(.public(.fields))))),
+              );
+            });
+          });
+        });
+      });
       group('Public', () {
         test('fields', () {
           expectSortDeclaration(const .late(.final_(.public(.fields))));
@@ -135,29 +242,6 @@ void main() {
             expectSortDeclaration(
               const .late(.final_(.initialized(.private(.fields)))),
             );
-          });
-        });
-        group('Nullable', () {
-          test('fields', () {
-            expectSortDeclaration(
-              const .late(.final_(.initialized(.nullable(.fields)))),
-            );
-          });
-          group('Public', () {
-            test('fields', () {
-              expectSortDeclaration(
-                const .late(.final_(.initialized(.nullable(.public(.fields))))),
-              );
-            });
-          });
-          group('Private', () {
-            test('fields', () {
-              expectSortDeclaration(
-                const .late(
-                  .final_(.initialized(.nullable(.private(.fields)))),
-                ),
-              );
-            });
           });
         });
       });
@@ -205,37 +289,6 @@ void main() {
               );
             });
           });
-          group('Nullable', () {
-            test('fields', () {
-              expectSortDeclaration(
-                const .late(
-                  .final_(.nullable(.initialized(.nullable(.fields)))),
-                ),
-              );
-            });
-            group('Public', () {
-              test('fields', () {
-                expectSortDeclaration(
-                  const .late(
-                    .final_(
-                      .nullable(.initialized(.nullable(.public(.fields)))),
-                    ),
-                  ),
-                );
-              });
-            });
-            group('Private', () {
-              test('fields', () {
-                expectSortDeclaration(
-                  const .late(
-                    .final_(
-                      .nullable(.initialized(.nullable(.private(.fields)))),
-                    ),
-                  ),
-                );
-              });
-            });
-          });
         });
       });
     });
@@ -271,25 +324,130 @@ void main() {
             );
           });
         });
-        group('Nullable', () {
+      });
+    });
+    group('Dynamic', () {
+      test('fields', () {
+        expectSortDeclaration(const .late(.dynamic(.fields)));
+      });
+      group('Private', () {
+        test('fields', () {
+          expectSortDeclaration(
+            const .late(.dynamic(.private(.fields))),
+          );
+        });
+      });
+      group('Public', () {
+        test('fields', () {
+          expectSortDeclaration(
+            const .late(.dynamic(.public(.fields))),
+          );
+        });
+      });
+      group('Initialized', () {
+        test('fields', () {
+          expectSortDeclaration(
+            const .late(.dynamic(.initialized(.fields))),
+          );
+        });
+        group('Private', () {
           test('fields', () {
             expectSortDeclaration(
-              const .late(.var_(.initialized(.nullable(.fields)))),
+              const .late(.dynamic(.initialized(.private(.fields)))),
             );
           });
-          group('Public', () {
-            test('fields', () {
-              expectSortDeclaration(
-                const .late(.var_(.initialized(.nullable(.public(.fields))))),
-              );
-            });
+        });
+        group('Public', () {
+          test('fields', () {
+            expectSortDeclaration(
+              const .late(.dynamic(.initialized(.public(.fields)))),
+            );
+          });
+        });
+      });
+    });
+    group('Typed', () {
+      test('fields', () {
+        expectSortDeclaration(const .late(.typed(.fields)));
+      });
+      group('Private', () {
+        test('fields', () {
+          expectSortDeclaration(
+            const .late(.typed(.private(.fields))),
+          );
+        });
+      });
+      group('Public', () {
+        test('fields', () {
+          expectSortDeclaration(
+            const .late(.typed(.public(.fields))),
+          );
+        });
+      });
+      group('Nullable', () {
+        test('fields', () {
+          expectSortDeclaration(
+            const .late(.typed(.nullable(.fields))),
+          );
+        });
+        group('Private', () {
+          test('fields', () {
+            expectSortDeclaration(
+              const .late(.typed(.nullable(.private(.fields)))),
+            );
+          });
+        });
+        group('Public', () {
+          test('fields', () {
+            expectSortDeclaration(
+              const .late(.typed(.nullable(.public(.fields)))),
+            );
+          });
+        });
+        group('Initialized', () {
+          test('fields', () {
+            expectSortDeclaration(
+              const .late(.typed(.nullable(.initialized(.fields)))),
+            );
           });
           group('Private', () {
             test('fields', () {
               expectSortDeclaration(
-                const .late(.var_(.initialized(.nullable(.private(.fields))))),
+                const .late(
+                  .typed(.nullable(.initialized(.private(.fields)))),
+                ),
               );
             });
+          });
+          group('Public', () {
+            test('fields', () {
+              expectSortDeclaration(
+                const .late(
+                  .typed(.nullable(.initialized(.public(.fields)))),
+                ),
+              );
+            });
+          });
+        });
+      });
+      group('Initialized', () {
+        test('fields', () {
+          expectSortDeclaration(
+            const .late(.typed(.initialized(.fields))),
+          );
+        });
+        group('Private', () {
+          test('fields', () {
+            expectSortDeclaration(
+              const .late(.typed(.initialized(.private(.fields)))),
+            );
+          });
+        });
+        group('Public', () {
+          test('fields', () {
+            expectSortDeclaration(
+              const .late(.typed(.initialized(.public(.fields)))),
+            );
           });
         });
       });

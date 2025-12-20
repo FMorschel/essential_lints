@@ -5,11 +5,13 @@ sealed class Modifiable extends SortDeclaration {
   const Modifiable._() : super._();
 }
 
+const _gettersInMemberList = GettersInMemberList(
+  memberListName: #_members,
+  membersOption: .static,
+);
+
 /// Class representing statical context for [Modifier]s.
-@SubtypeAnnotating(
-  annotations: [AnnotateMembersWith(Consider, onlyPublic: true)],
-  option: .onlyAbstract,
-)
+@SubtypeAnnotating(annotations: [_gettersInMemberList], option: .onlyAbstract)
 sealed class StaticalContext extends Modifiable {
   const StaticalContext._() : super._();
 }

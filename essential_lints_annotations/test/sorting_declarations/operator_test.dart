@@ -20,5 +20,23 @@ void main() {
         expectSortDeclaration(const .operator(.nullable()));
       });
     });
+    group('Dynamic', () {
+      test('methods', () {
+        expectSortDeclaration(const .operator(.dynamic(.methods)));
+        expectSortDeclaration(const .operator(.dynamic()));
+      });
+      group('Typed', () {
+        test('methods', () {
+          expectSortDeclaration(const .operator(.typed(.methods)));
+          expectSortDeclaration(const .operator(.typed()));
+        });
+        group('Nullable', () {
+          test('methods', () {
+            expectSortDeclaration(const .operator(.typed(.nullable(.methods))));
+            expectSortDeclaration(const .operator(.typed(.nullable())));
+          });
+        });
+      });
+    });
   });
 }

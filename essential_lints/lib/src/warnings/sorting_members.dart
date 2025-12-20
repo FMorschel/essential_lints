@@ -2,9 +2,11 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
 import 'warning.dart';
@@ -47,7 +49,26 @@ class _MemberVisitor extends RecursiveAstVisitor<void> {
     var validator = validatorFromAnnotation.validators[current];
 
     if (validator.isValid(node, element)) {
-      // Member matches current validator - stay on same validator
+      // Member matches current validator
+      // Check ALL validators for a more specific match
+      for (var i = 0; i < validatorFromAnnotation.validators.length; i++) {
+        if (i == current) continue; // Skip current validator
+        var otherValidator = validatorFromAnnotation.validators[i];
+        if (otherValidator.isValid(node, element) &&
+            otherValidator.isMoreSpecificThan(validator)) {
+          // There's a more specific validator elsewhere
+          if (i > current) {
+            // More specific validator is ahead - jump to it
+            current = i;
+            return;
+          } else {
+            // More specific validator is behind - member is out of order
+            _reportAt(node, element);
+            return;
+          }
+        }
+      }
+      // No more specific validator found - this is the right match
       return;
     }
 
@@ -201,52 +222,85 @@ class _ValidatorFromAnnotation {
       );
     }
     var declarations = constantValue.getField('declarations')?.toSetValue();
-    var validators = <_MemberTypeValidator>[];
+    var validators = <_ListMemberTypeValidator>[];
     for (final declaration in {...?declarations}) {
       var list = <_MemberTypeValidator>[];
-      var typeName = declaration.type?.element?.lookupName;
+      DartObject? current = declaration;
+      String? typeName;
+      While:
       do {
+        typeName = current?.type?.element?.lookupName;
         switch (typeName) {
           case 'Field':
             list.add(const _FieldMemberTypeValidator());
             list.add(
               _ExpectedNamedMemberTypeValidator(
                 expectedName:
-                    declaration.getField('name')?.toSymbolValue() ?? '',
+                    current
+                        ?.constructorInvocation
+                        ?.positionalArguments
+                        .firstOrNull
+                        ?.toSymbolValue() ??
+                    '',
               ),
             );
+            break While;
           case 'Constructor':
             list.add(const _ConstructorMemberTypeValidator());
             list.add(
               _ExpectedNamedMemberTypeValidator(
                 expectedName:
-                    declaration.getField('name')?.toSymbolValue() ?? '',
+                    current
+                        ?.constructorInvocation
+                        ?.positionalArguments
+                        .firstOrNull
+                        ?.toSymbolValue() ??
+                    '',
               ),
             );
+            break While;
           case 'Method':
             list.add(const _MethodMemberTypeValidator());
             list.add(
               _ExpectedNamedMemberTypeValidator(
                 expectedName:
-                    declaration.getField('name')?.toSymbolValue() ?? '',
+                    current
+                        ?.constructorInvocation
+                        ?.positionalArguments
+                        .firstOrNull
+                        ?.toSymbolValue() ??
+                    '',
               ),
             );
+            break While;
           case 'Getter':
             list.add(const _GetterMemberTypeValidator());
             list.add(
               _ExpectedNamedMemberTypeValidator(
                 expectedName:
-                    declaration.getField('name')?.toSymbolValue() ?? '',
+                    current
+                        ?.constructorInvocation
+                        ?.positionalArguments
+                        .firstOrNull
+                        ?.toSymbolValue() ??
+                    '',
               ),
             );
+            break While;
           case 'Setter':
             list.add(const _SetterMemberTypeValidator());
             list.add(
               _ExpectedNamedMemberTypeValidator(
                 expectedName:
-                    declaration.getField('name')?.toSymbolValue() ?? '',
+                    current
+                        ?.constructorInvocation
+                        ?.positionalArguments
+                        .firstOrNull
+                        ?.toSymbolValue() ??
+                    '',
               ),
             );
+            break While;
           case 'Fields':
             list.add(const _FieldMemberTypeValidator());
           case 'Constructors':
@@ -292,11 +346,11 @@ class _ValidatorFromAnnotation {
           case 'Var':
             list.add(const _VarMemberTypeValidator());
           default:
-            assert(false, 'Unknown member type: $declaration');
+            assert(false, 'Unknown member type: $typeName');
         }
-        var member = declaration.getField('modifiable');
-        typeName = member?.type?.element?.lookupName;
-      } while (typeName != null);
+        current =
+            current?.constructorInvocation?.positionalArguments.firstOrNull;
+      } while (current != null);
       validators.add(_ListMemberTypeValidator(validators: list));
     }
     return _ValidatorFromAnnotation._(
@@ -306,7 +360,7 @@ class _ValidatorFromAnnotation {
   }
 
   final ElementAnnotation annotation;
-  final List<_MemberTypeValidator> validators;
+  final List<_ListMemberTypeValidator> validators;
 }
 
 @immutable
@@ -330,6 +384,21 @@ class _ListMemberTypeValidator extends _MemberTypeValidator {
         return false;
       }
     }
+    return true;
+  }
+
+  /// Returns true if this validator is more specific than [other].
+  /// A validator is more specific if it has all validators from [other]
+  /// plus additional ones (making it more restrictive).
+  bool isMoreSpecificThan(_ListMemberTypeValidator other) {
+    // If this has fewer or equal validators, it can't be more specific
+    if (validators.length <= other.validators.length) return false;
+
+    // Check if all validators from other exist in this list
+    for (final otherValidator in other.validators.reversed) {
+      if (validators.none((v) => v == otherValidator)) return false;
+    }
+
     return true;
   }
 }

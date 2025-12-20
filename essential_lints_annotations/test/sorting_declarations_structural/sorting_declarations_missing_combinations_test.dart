@@ -11,14 +11,18 @@ import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 
-import 'src/current_package_path.dart';
+import '../src/current_package_path.dart';
 
 @immutable
-final class _Nested {
+final class _Nested implements Comparable<_Nested> {
   const _Nested(this.element, [this.child]);
 
   final Element element;
   final _Nested? child;
+
+  int get length => 1 + (child?.length ?? 0);
+
+  String get name => element.name ?? 'unknown';
 
   @override
   String toString() {
@@ -50,6 +54,20 @@ final class _Nested {
     element.enclosingElement?.name,
     child,
   );
+
+  @override
+  int compareTo(_Nested other) {
+    if (name != other.name) {
+      return name.compareTo(other.name);
+    }
+    if (other.child case var otherChild?) {
+      return child?.compareTo(otherChild) ?? 1;
+    }
+    if (length != other.length) {
+      return length.compareTo(other.length);
+    }
+    return child == null ? 0 : -1;
+  }
 }
 
 /// Recursively builds all possible combinations by following factory
@@ -198,120 +216,137 @@ Set<_Nested> _extractTestedCombinations(
   return allCombinations;
 }
 
-void main() {
-  late AnalysisContextCollection collection;
-  late ResolvedLibraryResult sortDeclarationsResult;
-  late List<ResolvedLibraryResult> testResults;
-  late Set<_Nested> allCombinations;
-  late Set<_Nested> testedCombinations;
+Future<void> main() async {
+  // Load all the data upfront
+  final currentPackageDir = await currentPackage();
+  final sortDeclarationsPath = path.normalize(
+    path.join(
+      currentPackageDir.path,
+      'lib',
+      'src',
+      'sorting_members',
+      'sort_declarations.dart',
+    ),
+  );
+  final testDirPath = path.normalize(
+    path.join(
+      currentPackageDir.path,
+      'test',
+      'sorting_declarations',
+    ),
+  );
 
-  setUpAll(() async {
-    final currentPackageDir = await currentPackage();
-    final sortDeclarationsPath = path.normalize(
-      path.join(
-        currentPackageDir.path,
-        'lib',
-        'src',
-        'sorting_members',
-        'sort_declarations.dart',
-      ),
-    );
-    final testDirPath = path.normalize(
-      path.join(
-        currentPackageDir.path,
-        'test',
-        'sorting_declarations',
-      ),
-    );
+  // Analyze sort_declarations.dart
+  final collection = AnalysisContextCollection(
+    includedPaths: [sortDeclarationsPath, testDirPath],
+  );
 
-    // Analyze sort_declarations.dart
-    collection = AnalysisContextCollection(
-      includedPaths: [sortDeclarationsPath, testDirPath],
-    );
+  final context = collection.contextFor(sortDeclarationsPath);
+  final result = await context.currentSession.getResolvedLibrary(
+    sortDeclarationsPath,
+  );
 
-    final context = collection.contextFor(sortDeclarationsPath);
-    final result = await context.currentSession.getResolvedLibrary(
-      sortDeclarationsPath,
-    );
+  if (result is! ResolvedLibraryResult) {
+    throw StateError('Failed to resolve sort_declarations library: $result');
+  }
+  final sortDeclarationsResult = result;
 
-    if (result is! ResolvedLibraryResult) {
-      throw StateError('Failed to resolve sort_declarations library: $result');
+  // Build class elements map
+  final classElements = <String, InterfaceElement>{};
+  for (final classElement in sortDeclarationsResult.element.classes) {
+    final name = classElement.name;
+    if (name != null) {
+      classElements[name] = classElement;
     }
-    sortDeclarationsResult = result;
+  }
 
-    // Build class elements map
-    final classElements = <String, InterfaceElement>{};
-    for (final classElement in sortDeclarationsResult.element.classes) {
-      final name = classElement.name;
-      if (name != null) {
-        classElements[name] = classElement;
-      }
+  // Generate all possible combinations
+  final allCombinations = _buildAllCombinations(classElements);
+
+  // Analyze all test files
+  final testResults = <ResolvedLibraryResult>[];
+
+  // List all .dart files in the testDirPath
+  final testDir = Directory(testDirPath);
+  final testFiles = [
+    ...await testDir
+        .list()
+        .where(
+          (entity) => entity is File && entity.path.endsWith('_test.dart'),
+        )
+        .map((entity) => path.normalize(entity.path))
+        .toList(),
+  ];
+
+  for (final testFile in testFiles) {
+    final testPath = path.join(testDirPath, testFile);
+    final testResult = await context.currentSession.getResolvedLibrary(
+      testPath,
+    );
+    if (testResult is ResolvedLibraryResult) {
+      testResults.add(testResult);
     }
+  }
 
-    // Generate all possible combinations
-    allCombinations = _buildAllCombinations(classElements);
+  // Extract tested combinations
+  final testedCombinations = _extractTestedCombinations(testResults);
 
-    // Analyze all test files
-    testResults = [];
+  // Group untested combinations by top-level element
+  final untested = allCombinations.difference(testedCombinations);
+  final topLevelGroups = <String>{};
+  final untestedGroupedByTopLevel = <String, List<_Nested>>{};
 
-    // List all .dart files in the testDirPath
-    final testDir = Directory(testDirPath);
-    final testFiles = [
-      ...await testDir
-          .list()
-          .where(
-            (entity) => entity is File && entity.path.endsWith('_test.dart'),
-          )
-          .map((entity) => path.normalize(entity.path))
-          .toList(),
-    ];
+  for (final nested in allCombinations) {
+    final topLevelName = nested.name;
+    topLevelGroups.add(topLevelName);
+  }
+  var topLevelNames = topLevelGroups.toList()..sort();
 
-    for (final testFile in testFiles) {
-      final testPath = path.join(testDirPath, testFile);
-      final testResult = await context.currentSession.getResolvedLibrary(
-        testPath,
-      );
-      if (testResult is ResolvedLibraryResult) {
-        testResults.add(testResult);
-      }
-    }
+  for (final nested in untested) {
+    final topLevelName = nested.name;
+    untestedGroupedByTopLevel.putIfAbsent(topLevelName, () => []).add(nested);
+  }
 
-    // Extract tested combinations
-    testedCombinations = _extractTestedCombinations(testResults);
-  });
-
+  // Now register the tests
   tearDownAll(() async {
     await collection.dispose();
   });
 
-  group('Comprehensive combination coverage', () {
-    test('All possible combinations should be tested', () {
-      // Find untested combinations
-      final untested = allCombinations.difference(testedCombinations);
+  test('Summary', () {
+    print('\n${'=' * 70}');
+    print('COMBINATION COVERAGE SUMMARY:');
+    print('=' * 70);
+    print('Total combinations: ${allCombinations.length}');
+    print('Tested combinations: ${testedCombinations.length}');
+    print('Untested combinations: ${untested.length}');
+    print('=' * 70 + '\n');
+    expect(untested, hasLength(0));
+  });
 
-      if (untested.isNotEmpty) {
-        print('\n${'=' * 70}');
-        print('UNTESTED COMBINATIONS (${untested.length}):');
-        print('=' * 70);
-        final sorted = untested.map((n) => n.toString()).toList()..sort();
-        for (final combo in sorted) {
+  // Create a separate test for each top-level element that has untested combos
+  for (final topLevelName in topLevelNames) {
+    test('.$topLevelName combinations should be tested', () {
+      final combinations =
+          (untestedGroupedByTopLevel[topLevelName]?..sort()) ?? const [];
+
+      if (combinations.isNotEmpty) {
+        print(
+          '\nUntested .$topLevelName combinations '
+          '(${combinations.length}):',
+        );
+        for (final combo in combinations) {
           print('  $combo');
         }
-        print('=' * 70);
-        print('\nTotal combinations: ${allCombinations.length}');
-        print('Tested combinations: ${testedCombinations.length}');
-        print('Untested combinations: ${untested.length}');
-        print('=' * 70 + '\n');
+        print('');
       }
 
-      // Fail if there are untested combinations
       expect(
-        untested,
+        combinations,
         isEmpty,
         reason:
-            'Found ${untested.length} untested combinations. '
-            'See output above for details.',
+            'Found ${combinations.length} untested '
+            '.$topLevelName combinations.',
       );
     });
-  });
+  }
 }

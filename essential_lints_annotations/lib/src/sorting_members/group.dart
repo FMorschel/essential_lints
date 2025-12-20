@@ -1,8 +1,7 @@
 part of 'sort_declarations.dart';
 
 /// Groups of members.
-final class Group extends StaticalContext
-    implements ExternalMembersModifiable {
+final class Group extends StaticalContext implements ExternalMembersModifiable {
   const Group._() : super._();
 }
 
@@ -12,7 +11,8 @@ final class Group extends StaticalContext
 final class Constructors extends Group
     implements
         Constant,
-        FactoryModifiable,
+        FactoryConstructorModifiable,
+        FactoryExternalModifiable,
         NamedModifiable,
         RedirectingModifiable,
         PrivateConstructorModifiable,
@@ -30,6 +30,7 @@ final class Constructors extends Group
 /// {@template gettersSetters}
 /// Represents all getters and setters
 /// {@endtemplate}
+@MemberGroup(#gettersSetters, participant: false)
 final class GettersSetters extends Group
     implements Abstractable, Getters, Setters {
   /// {@macro gettersSetters}
@@ -42,6 +43,7 @@ final class GettersSetters extends Group
 /// {@template fieldsGettersSetters}
 /// Represents all fields, getters, and setters.
 /// {@endtemplate}
+@MemberGroup(#fieldsGettersSetters, participant: false)
 final class FieldsGettersSetters extends Group
     implements Fields, Getters, Setters {
   /// {@macro fieldsGettersSetters}
@@ -66,6 +68,7 @@ final class FieldsMethodsGettersSetters extends Group
 /// {@template fields}
 /// Represents all fields
 /// {@endtemplate}
+@MemberGroup(#fieldsGettersSetters)
 final class Fields extends Group
     implements
         Variable,
@@ -80,6 +83,8 @@ final class Fields extends Group
         FinalAbstractModifiable,
         NullableAbstractableFieldModifiable,
         PrivateConstantModifiable,
+        TypedAbstractableFieldModifiable,
+        DynamicAbstractableFieldModifiable,
         _InstanciableMembers {
   /// {@macro fields}
   const Fields._() : super._();
@@ -95,7 +100,9 @@ final class Methods extends Group
     implements
         OperatorModifiable,
         NullableOperatorModifiable,
-        _InstanciableMembers {
+        _InstanciableMembers,
+        TypedOperatorModifiable,
+        DynamicOperatorModifiable {
   /// {@macro methods}
   const Methods._() : super._();
 
@@ -106,6 +113,8 @@ final class Methods extends Group
 /// {@template getters}
 /// Represents all getters.
 /// {@endtemplate}
+@MemberGroup(#gettersSetters)
+@MemberGroup(#fieldsGettersSetters)
 final class Getters extends Group implements _InstanciableMembers {
   /// {@macro getters}
   const Getters._() : super._();
@@ -117,6 +126,8 @@ final class Getters extends Group implements _InstanciableMembers {
 /// {@template setters}
 /// Represents all setters.
 /// {@endtemplate}
+@MemberGroup(#gettersSetters)
+@MemberGroup(#fieldsGettersSetters)
 final class Setters extends Group implements _InstanciableMembers {
   /// {@macro setters}
   const Setters._() : super._();
@@ -127,7 +138,6 @@ final class Setters extends Group implements _InstanciableMembers {
 
 final class _InstanciableMembers extends Group
     implements
-        ExternalInstanceModifiable,
         NullableMembersModifiable,
         PrivateModifiable,
         PublicModifiable,
@@ -136,6 +146,15 @@ final class _InstanciableMembers extends Group
         StaticalExternal,
         NullableExternableModifiable,
         PublicConstantModifiable,
-        Abstractable {
+        Abstractable,
+        TypedMembersModifiable,
+        TypedExternableModifiable,
+        DynamicMembersModifiable,
+        DynamicExternableModifiable,
+        InstanciableMembers,
+        InstanciableExternal,
+        OverridableMembers,
+        OverridableExternal,
+        NewExternalModifiable {
   const _InstanciableMembers._() : super._();
 }

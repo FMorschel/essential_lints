@@ -1,27 +1,29 @@
 part of 'sort_declarations.dart';
 
 /// Represents unnamed members.
-@AnnotateMembersWith(Consider, onlyPublic: true)
+@_gettersInMemberList
 sealed class UnnamedModifiable extends StaticalContext {
   const UnnamedModifiable._() : super._();
 
   /// {@macro constructors}
-  @Consider<Constructors>()
-  static const UnnamedModifiable constructors = Constructors._constructors;
+  static const Constructors constructors = Constructors._constructors;
+
+  // ignore: unused_element member list
+  static List<UnnamedModifiable> get _members => [constructors];
 }
 
 /// {@template unnamed}
 /// Represents unnamed members.
 /// {@endtemplate}
-@InvalidMembers([
+@InvalidMembers({
   th<Fields>(),
   th<Getters>(),
   th<Setters>(),
   th<GettersSetters>(),
   th<FieldsGettersSetters>(),
   th<Methods>(),
-])
-@InvalidModifiers([
+})
+@InvalidModifiers({
   th<Private>(),
   th<Public>(),
   th<Named>(),
@@ -29,14 +31,15 @@ sealed class UnnamedModifiable extends StaticalContext {
   th<Factory>(),
   th<Const>(),
   th<External>(),
-])
+})
+@MutuallyExclusive(#named)
 final class Unnamed<M extends UnnamedModifiable> extends Modifier<M>
     implements
-        NamedModifiable,
         RedirectingModifiable,
-        FactoryModifiable,
+        FactoryConstructorModifiable,
         ExternalMembersModifiable,
-        Constant {
+        Constant,
+        FactoryExternalModifiable {
   /// {@macro unnamed}
   const Unnamed._(super.modifiable) : super._();
 }

@@ -1,77 +1,96 @@
 part of 'sort_declarations.dart';
 
 /// Represents final members.
-@AnnotateMembersWith(Consider, onlyPublic: true)
+@_gettersInMemberList
 sealed class FinalModifiable extends StaticalContext
-    implements LateModifiable, Statical, ExternalModifiable, Overridable {
+    implements
+        LateModifiable,
+        Statical,
+        ExternalModifiable,
+        NewMemberModifiable {
   /// {@macro initialized}
-  @Consider<Initialized>()
   const factory FinalModifiable.initialized(
     InitializableStatical modifiable,
   ) = Initialized._;
 
   /// {@macro public}
-  @Consider<Public>()
   const factory FinalModifiable.public(
     PublicFieldModifiable modifiable,
   ) = Public._;
 
   /// {@macro private}
-  @Consider<Private>()
   const factory FinalModifiable.private(
     PrivateFieldModifiable modifiable,
   ) = Private._;
 
   /// {@macro nullable}
-  @Consider<Nullable>()
   const factory FinalModifiable.nullable(
     NullableFieldModifiable modifiable,
   ) = Nullable._;
 
+  /// {@macro typed}
+  const factory FinalModifiable.typed(TypedFieldModifiable modifiable) =
+      Typed._;
+
+  /// {@macro dynamic}
+  const factory FinalModifiable.dynamic(DynamicFieldModifiable modifiable) =
+      Dynamic._;
+
   /// {@macro fields}
-  @Consider<Fields>()
-  static const FinalModifiable fields = Fields._fields;
+  static const Fields fields = Fields._fields;
+
+  // ignore: unused_element member list
+  static List<FinalModifiable> get _members => [fields];
 }
 
 /// Represents final members that are also abstractable.
-@AnnotateMembersWith(Consider, onlyPublic: true)
+@_gettersInMemberList
 sealed class FinalAbstractModifiable extends FinalModifiable
     implements Abstractable {
   /// {@macro public}
-  @Consider<Public>()
   const factory FinalAbstractModifiable.public(
     PublicFieldModifiable modifiable,
   ) = Public._;
 
   /// {@macro private}
-  @Consider<Private>()
   const factory FinalAbstractModifiable.private(
     PrivateFieldModifiable modifiable,
   ) = Private._;
 
   /// {@macro nullable}
-  @Consider<Nullable>()
   const factory FinalAbstractModifiable.nullable(
     NullableAbstractableFieldModifiable modifiable,
   ) = Nullable._;
 
+  /// {@macro typed}
+  const factory FinalAbstractModifiable.typed(
+    TypedAbstractableFieldModifiable modifiable,
+  ) = Typed._;
+
+  /// {@macro dynamic}
+  const factory FinalAbstractModifiable.dynamic(
+    DynamicAbstractableFieldModifiable modifiable,
+  ) = Dynamic._;
+
   /// {@macro fields}
-  @Consider<Fields>()
-  static const FinalAbstractModifiable fields = Fields._fields;
+  static const Fields fields = Fields._fields;
+
+  // ignore: unused_element member list
+  static List<FinalAbstractModifiable> get _members => [fields];
 }
 
 /// {@template final}
 /// Represents final members.
 /// {@endtemplate}
-@InvalidMembers([
+@InvalidMembers({
   th<Constructors>(),
   th<Getters>(),
   th<Setters>(),
   th<GettersSetters>(),
   th<FieldsGettersSetters>(),
   th<Methods>(),
-])
-@InvalidModifiers([
+})
+@InvalidModifiers({
   th<Const>(),
   th<Var>(),
   th<Final>(),
@@ -80,16 +99,19 @@ sealed class FinalAbstractModifiable extends FinalModifiable
   th<External>(),
   th<Overridden>(),
   th<Static>(),
-])
+})
+@MutuallyExclusive(#finality)
 final class Final<M extends FinalModifiable> extends Modifier<M>
     implements
-        ExternalInstanceModifiable,
         ExternalMembersModifiable,
         Abstractable,
-        InitializableOverridable,
-        InitializableStatical,
         LateModifiable,
-        StaticalExternal {
+        StaticalExternal,
+        InstanciableMembers,
+        OverridableMembers,
+        OverridableExternal,
+        InstanciableExternal,
+        NewExternalModifiable {
   /// {@macro final}
   const Final._(super.modifiable) : super._();
 }
