@@ -1,157 +1,121 @@
-import 'dart:io';
+// ignore_for_file: avoid_print
 
-import 'package:analyzer/dart/analysis/analysis_context.dart';
-import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
-import 'package:analyzer/dart/analysis/results.dart';
-import 'package:analyzer/dart/element/element.dart';
+import 'dart:isolate';
+
+import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
+import 'package:dartdoc/dartdoc.dart';
+import 'package:dartdoc/src/model/package.dart';
 import 'package:test/test.dart';
 
-void main() {
-  test('all exposed declarations have non-empty doc comments', () async {
-    final packageRoot = _findPackageRoot();
-    final libPath = '$packageRoot${Platform.pathSeparator}lib';
-    final mainLibraryPath =
-        '$libPath${Platform.pathSeparator}essential_lints_annotations.dart';
+Future<void> main() async {
+  final packageRoot = await _findPackageRoot();
+  Package? defaultPackage;
 
-    final collection = AnalysisContextCollection(
-      includedPaths: [libPath],
-      resourceProvider: PhysicalResourceProvider.INSTANCE,
+  setUpAll(() async {
+    // Find the package root directory
+    final packageRootPath = packageRoot.path;
+
+    // Parse dartdoc options with the package root as input directory
+    var config = parseOptions(
+      pubPackageMetaProvider,
+      ['--input', packageRootPath],
     );
 
-    final context = collection.contextFor(mainLibraryPath);
-
-    // Get the main library to find all exported declarations
-    final mainResult = await context.currentSession.getResolvedLibrary(
-      mainLibraryPath,
-    );
-    if (mainResult is! ResolvedLibraryResult) {
-      fail('Failed to resolve main library');
+    if (config == null) {
+      fail('Failed to parse dartdoc options');
     }
 
-    // Get all exported element names
-    final exportedNames = mainResult.element.exportNamespace.definedNames2;
+    // Create package builder
+    final packageConfigProvider = PhysicalPackageConfigProvider();
+    final packageBuilder = PubPackageBuilder(
+      config,
+      pubPackageMetaProvider,
+      packageConfigProvider,
+    );
 
-    final missingDocComments = <Element>[];
+    // Build package graph without generating documentation
+    var packageGraph = await packageBuilder.buildPackageGraph();
 
-    // Check each exported element and its members for doc comments
-    for (final entry in exportedNames.entries) {
-      final element = entry.value;
+    defaultPackage = packageGraph.defaultPackage;
+    print('Built package graph for: ${defaultPackage?.name}');
+  });
 
-      // Check the element itself
-      _checkElementDocumentation(element, context, missingDocComments);
-
-      // Check members of the element if it's a container
-      _checkMembersRecursively(element, context, missingDocComments);
+  test('all exposed declarations have non-empty doc comments', () {
+    if (defaultPackage == null) {
+      fail('Package was not initialized');
     }
 
-    expect(
-      missingDocComments,
-      isEmpty,
-      reason:
-          'The following exposed declarations are missing non-empty '
-          'doc comments:\n'
-          '${missingDocComments.map(
-            (e) => _elementDisplay(e, context),
-          ).join('\n')}',
-    );
+    final libraries = defaultPackage!.libraries;
+    if (libraries.isEmpty) {
+      fail('No libraries found in the default package');
+    }
+
+    final missingDocs = <String>[];
+
+    for (final library in libraries) {
+      if (!library.isPublic) continue;
+      // Check classes
+      for (final class_ in library.classes) {
+        if (!class_.isPublic) continue;
+
+        if (class_.documentation.trim().isEmpty) {
+          missingDocs.add('Class ${class_.name}');
+        }
+
+        // Check constructors
+        for (final constructor in class_.constructors) {
+          if (!constructor.isPublic) continue;
+          if (constructor.documentation.trim().isEmpty) {
+            missingDocs.add(
+              'Constructor ${class_.name}.${constructor.name}',
+            );
+          }
+        }
+
+        // Check methods
+        for (final method in class_.declaredMethods) {
+          if (!method.isPublic) continue;
+          if (method.documentation.trim().isEmpty) {
+            missingDocs.add('Method ${class_.name}.${method.name}');
+          }
+        }
+
+        // Check fields
+        for (final field in class_.declaredFields) {
+          if (!field.isPublic) continue;
+          if (field.documentation.trim().isEmpty) {
+            missingDocs.add('Field ${class_.name}.${field.name}');
+          }
+        }
+      }
+    }
+
+    if (missingDocs.isNotEmpty) {
+      fail(
+        'The following declarations are missing documentation:\n'
+        '${missingDocs.map((e) => '  - $e').join('\n')}',
+      );
+    }
   });
 }
 
-String _elementDisplay(Element element, AnalysisContext context) {
-  final library = element.library;
-  final uri = library?.uri;
-  final location = uri != null
-      ? (context.currentSession.uriConverter.uriToPath(uri) ?? uri.toString())
-      : 'unknown';
-  final name = element.name;
-  return '$name (in $location)';
-}
-
-/// Checks if an element has proper documentation.
-void _checkElementDocumentation(
-  Element element,
-  AnalysisContext context,
-  List<Element> missingDocComments,
-) {
-  // Skip private elements
-  if (element.isPrivate ||
-      element is ConstructorElement &&
-          element.isGenerative &&
-          element.enclosingElement is EnumElement) {
-    return;
-  }
-
-  final docComment = element.documentationComment;
-
-  // Check if doc comment is missing or empty when trimmed
-  if (docComment == null || docComment.trim().isEmpty) {
-    missingDocComments.add(element);
-  }
-}
-
-/// Recursively checks all public members of an element.
-void _checkMembersRecursively(
-  Element element,
-  AnalysisContext context,
-  List<Element> missingDocComments,
-) {
-  // Check class and mixin members
-  if (element is InterfaceElement) {
-    // Fields (includes getters/setters)
-    for (final field in element.fields) {
-      if (field.isPublic && !field.isSynthetic) {
-        _checkElementDocumentation(field, context, missingDocComments);
-      }
-    }
-
-    // Methods
-    for (final method in element.methods) {
-      if (method.isPublic) {
-        _checkElementDocumentation(method, context, missingDocComments);
-      }
-    }
-
-    // Constructors
-    for (final constructor in element.constructors) {
-      if (constructor.isPublic) {
-        _checkElementDocumentation(constructor, context, missingDocComments);
-      }
-    }
-  }
-}
-
-/// Finds the package root directory by looking for pubspec.yaml.
-String _findPackageRoot() {
-  var current = Directory.current;
-
-  // If we're running from the test directory, go up
-  while (!File(
-        '${current.path}${Platform.pathSeparator}pubspec.yaml',
-      ).existsSync() ||
-      !current.path.endsWith('essential_lints_annotations')) {
-    final parent = current.parent;
-    if (parent.path == current.path) {
-      // Reached filesystem root
-      throw StateError(
-        'Could not find essential_lints_annotations package root',
-      );
-    }
-    current = parent;
-  }
-
-  // Check if we're in the annotations package
-  if (current.path.endsWith('essential_lints_annotations')) {
-    return current.path;
-  }
-
-  // Try to find it as a subdirectory
-  final annotationsDir = Directory(
-    '${current.path}${Platform.pathSeparator}essential_lints_annotations',
+Future<Folder> _findPackageRoot() async {
+  var uri = Uri.parse(
+    'package:essential_lints_annotations/essential_lints_annotations.dart',
   );
-  if (annotationsDir.existsSync()) {
-    return annotationsDir.path;
-  }
+  var fileUri = await Isolate.resolvePackageUri(uri);
 
-  throw StateError('Could not find essential_lints_annotations package root');
+  if (fileUri == null) {
+    throw StateError(
+      'Could not resolve package URI for essential_lints_annotations.',
+    );
+  }
+  var resourceProvider = PhysicalResourceProvider.INSTANCE;
+
+  // Get the lib directory, then go up one level to package root
+  var libFile = resourceProvider.getFile(
+    resourceProvider.pathContext.normalize(fileUri.toFilePath()),
+  );
+  return libFile.parent.parent;
 }
