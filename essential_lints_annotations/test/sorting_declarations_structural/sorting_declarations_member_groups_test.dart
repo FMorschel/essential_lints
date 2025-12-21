@@ -319,7 +319,6 @@ void main() {
                 missingParticipants.isNotEmpty) {
               // Info only - some participants missing but not all
               // This is allowed and won't cause the test to fail
-              // ignore: avoid_print
               print(
                 'INFO: $className has some participants of #$groupId '
                 'but not all:\n'

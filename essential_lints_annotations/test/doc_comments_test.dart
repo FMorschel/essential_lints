@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'dart:isolate';
 
 import 'package:analyzer/file_system/file_system.dart';

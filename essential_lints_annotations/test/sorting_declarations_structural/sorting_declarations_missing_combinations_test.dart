@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print displaying information
-
 import 'dart:io';
 
 import 'package:analyzer/dart/analysis/analysis_context_collection.dart';

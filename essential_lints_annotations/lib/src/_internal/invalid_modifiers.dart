@@ -1,7 +1,7 @@
 import 'package:meta/meta_meta.dart';
 
-import '../../essential_lints_annotations.dart';
 import '../sorting_members/sort_declarations.dart';
+import '../utils/type_holder.dart';
 
 /// {@template invalid_modifier}
 /// A class representing invalid modifiers for a member group.
