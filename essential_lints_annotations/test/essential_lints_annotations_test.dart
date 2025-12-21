@@ -6,9 +6,11 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:test/test.dart';
 
+import 'src/current_package_path.dart';
+
 void main() {
   test('all public declarations in src are exported', () async {
-    final packageRoot = _findPackageRoot();
+    final packageRoot = await currentPackage();
     final libPath = '$packageRoot${Platform.pathSeparator}lib';
     final srcPath = '$libPath${Platform.pathSeparator}src';
     final mainLibraryPath =
@@ -60,41 +62,6 @@ void main() {
           '${notExported.join(', ')}',
     );
   });
-}
-
-/// Finds the package root directory by looking for pubspec.yaml.
-String _findPackageRoot() {
-  var current = Directory.current;
-
-  // If we're running from the test directory, go up
-  while (!File(
-        '${current.path}${Platform.pathSeparator}pubspec.yaml',
-      ).existsSync() ||
-      !current.path.endsWith('essential_lints_annotations')) {
-    final parent = current.parent;
-    if (parent.path == current.path) {
-      // Reached filesystem root
-      throw StateError(
-        'Could not find essential_lints_annotations package root',
-      );
-    }
-    current = parent;
-  }
-
-  // Check if we're in the annotations package
-  if (current.path.endsWith('essential_lints_annotations')) {
-    return current.path;
-  }
-
-  // Try to find it as a subdirectory
-  final annotationsDir = Directory(
-    '${current.path}${Platform.pathSeparator}essential_lints_annotations',
-  );
-  if (annotationsDir.existsSync()) {
-    return annotationsDir.path;
-  }
-
-  throw StateError('Could not find essential_lints_annotations package root');
 }
 
 /// Returns all public declaration names from a library element.
