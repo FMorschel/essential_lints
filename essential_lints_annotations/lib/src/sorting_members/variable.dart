@@ -4,23 +4,24 @@ part of 'sort_declarations.dart';
 /// Represents variable members.
 /// {@endtemplate}
 @_gettersInMemberList
-sealed class Variable extends StaticalContext
+sealed class Variable extends _StaticalContext
     implements
         LateModifiable,
         Statical,
         Abstractable,
-        ExternalModifiable,
+        _ExternalModifiable,
         NewMemberModifiable {
   /// {@macro public}
-  const factory Variable.public(PublicFieldModifiable modifiable) = Public._;
+  const factory Variable.public(PublicFieldModifiable modifiable) = _Public._;
 
   /// {@macro private}
-  const factory Variable.private(PrivateFieldModifiable modifiable) = Private._;
+  const factory Variable.private(PrivateFieldModifiable modifiable) =
+      _Private._;
 
   /// {@macro initialized}
   const factory Variable.initialized(
     InitializableStatical modifiable,
-  ) = Initialized._;
+  ) = _Initialized._;
 
   /// {@macro fields}
   static const Fields fields = Fields._fields;
@@ -35,12 +36,12 @@ sealed class VariableAbstractable extends Variable implements Abstractable {
   /// {@macro public}
   const factory VariableAbstractable.public(
     PublicFieldModifiable modifiable,
-  ) = Public._;
+  ) = _Public._;
 
   /// {@macro private}
   const factory VariableAbstractable.private(
     PrivateFieldModifiable modifiable,
-  ) = Private._;
+  ) = _Private._;
 
   /// {@macro fields}
   static const Fields fields = Fields._fields;
@@ -49,9 +50,6 @@ sealed class VariableAbstractable extends Variable implements Abstractable {
   static List<VariableAbstractable> get _members => [fields];
 }
 
-/// {@template var}
-/// Represents variable members.
-/// {@endtemplate}
 @InvalidMembers({
   th<Constructors>(),
   th<Getters>(),
@@ -61,27 +59,26 @@ sealed class VariableAbstractable extends Variable implements Abstractable {
   th<Methods>(),
 })
 @InvalidModifiers({
-  th<Const>(),
-  th<Final>(),
-  th<Late>(),
-  th<Abstract>(),
-  th<External>(),
-  th<Overridden>(),
-  th<Static>(),
-  th<Var>(),
+  th<_Const>(),
+  th<_Final>(),
+  th<_Late>(),
+  th<_Abstract>(),
+  th<_External>(),
+  th<_Overridden>(),
+  th<_Static>(),
+  th<_Var>(),
 })
 @MutuallyExclusive(#finality)
-final class Var<M extends Variable> extends Modifier<M>
+final class _Var<M extends Variable> extends Modifier<M>
     implements
         ExternalMembersModifiable,
         Abstractable,
         LateModifiable,
         StaticalExternal,
-        InstanciableMembers,
+        InstantiableMembers,
         OverridableMembers,
         OverridableExternal,
-        InstanciableExternal,
+        InstantiableExternal,
         NewExternalModifiable {
-  /// {@macro vari}
-  const Var._(super.modifiable) : super._();
+  const _Var._(super.modifiable) : super._();
 }

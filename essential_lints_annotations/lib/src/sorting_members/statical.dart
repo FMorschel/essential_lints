@@ -2,40 +2,41 @@ part of 'sort_declarations.dart';
 
 /// Represents statical members.
 @_gettersInMemberList
-sealed class Statical extends StaticalContext implements OperatorModifiable {
+sealed class Statical extends _StaticalContext implements OperatorModifiable {
   /// {@macro initialized}
   const factory Statical.initialized(InitializableStatical modifiable) =
-      Initialized._;
+      _Initialized._;
 
   /// {@macro nullable}
   const factory Statical.nullable(NullableMembersModifiable modifiable) =
-      Nullable._;
+      _Nullable._;
 
   /// {@macro typed}
-  const factory Statical.typed(TypedMembersModifiable modifiable) = Typed._;
+  const factory Statical.typed(TypedMembersModifiable modifiable) = _Typed._;
 
   /// {@macro dynamic}
   const factory Statical.dynamic(DynamicMembersModifiable modifiable) =
-      Dynamic._;
+      _Dynamic._;
 
   /// {@macro late_modifiable}
-  const factory Statical.late(LateModifiable modifiable) = Late._;
+  const factory Statical.late(LateModifiable modifiable) = _Late._;
 
   /// {@macro var}
-  const factory Statical.var_(Variable modifiable) = Var._;
+  const factory Statical.var_(Variable modifiable) = _Var._;
 
   /// {@macro final}
-  const factory Statical.final_(FinalModifiable modifiable) = Final._;
+  const factory Statical.final_(FinalModifiable modifiable) = _Final._;
 
   /// {@macro const}
-  const factory Statical.const_(ConstantVariables modifiable) = Const._;
+  const factory Statical.const_(ConstantVariables modifiable) = _Const._;
 
   /// {@macro private}
   const factory Statical.private(PrivateStaticalModifiable modifiable) =
-      Private._;
+      _Private._;
 
   /// {@macro public}
-  const factory Statical.public(PublicStaticalModifiable modifiable) = Public._;
+  const factory Statical.public(PublicStaticalModifiable modifiable) =
+      _Public._;
 
   /// {@macro fields}
   static const Fields fields = Fields._fields;
@@ -73,31 +74,31 @@ sealed class StaticalExternal extends Statical {
   /// {@macro nullable}
   const factory StaticalExternal.nullable(
     NullableExternableModifiable modifiable,
-  ) = Nullable._;
+  ) = _Nullable._;
 
   /// {@macro typed}
   const factory StaticalExternal.typed(TypedExternableModifiable modifiable) =
-      Typed._;
+      _Typed._;
 
   /// {@macro dynamic}
   const factory StaticalExternal.dynamic(
     DynamicExternableModifiable modifiable,
-  ) = Dynamic._;
+  ) = _Dynamic._;
 
   /// {@macro var}
-  const factory StaticalExternal.var_(VariableAbstractable modifiable) = Var._;
+  const factory StaticalExternal.var_(VariableAbstractable modifiable) = _Var._;
 
   /// {@macro final}
   const factory StaticalExternal.final_(FinalAbstractModifiable modifiable) =
-      Final._;
+      _Final._;
 
   /// {@macro private}
   const factory StaticalExternal.private(PrivateStaticalModifiable modifiable) =
-      Private._;
+      _Private._;
 
   /// {@macro public}
   const factory StaticalExternal.public(PublicStaticalModifiable modifiable) =
-      Public._;
+      _Public._;
 
   /// {@macro fields}
   static const Fields fields = Fields._fields;
@@ -129,21 +130,17 @@ sealed class StaticalExternal extends Statical {
   ];
 }
 
-/// {@template static}
-/// Represents static members.
-/// {@endtemplate}
 @InvalidMembers({th<Constructors>()})
 @InvalidModifiers({
-  th<Overridden>(),
-  th<Abstract>(),
-  th<Operator>(),
-  th<Static>(),
-  th<Instance>(),
-  th<External>(),
+  th<_Overridden>(),
+  th<_Abstract>(),
+  th<_Operator>(),
+  th<_Static>(),
+  th<_Instance>(),
+  th<_External>(),
 })
 @MutuallyExclusive(#context)
-final class Static<M extends Statical> extends Modifier<M>
+final class _Static<M extends Statical> extends Modifier<M>
     implements ExternalMembersModifiable {
-  /// {@macro static}
-  const Static._(super.modifiable) : super._();
+  const _Static._(super.modifiable) : super._();
 }

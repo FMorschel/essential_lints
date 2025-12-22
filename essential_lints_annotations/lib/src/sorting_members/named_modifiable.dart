@@ -4,15 +4,15 @@ part of 'sort_declarations.dart';
 /// Represents named modifiable members (constructors).
 /// {@endtemplate}
 @_gettersInMemberList
-sealed class NamedModifiable extends StaticalContext {
+sealed class NamedModifiable extends _StaticalContext {
   /// {@macro private}
   const factory NamedModifiable.private(
     PrivateConstructorModifiable modifiable,
-  ) = Private._;
+  ) = _Private._;
 
   /// {@macro public}
   const factory NamedModifiable.public(PublicConstructorModifiable modifiable) =
-      Public._;
+      _Public._;
 
   /// {@macro constructors}
   static const Constructors constructors = Constructors._constructors;
@@ -21,9 +21,6 @@ sealed class NamedModifiable extends StaticalContext {
   static List<NamedModifiable> get _members => [constructors];
 }
 
-/// {@template named}
-/// Represents named constructors.
-/// {@endtemplate}
 @InvalidMembers({
   th<Fields>(),
   th<Getters>(),
@@ -33,20 +30,19 @@ sealed class NamedModifiable extends StaticalContext {
   th<Methods>(),
 })
 @InvalidModifiers({
-  th<Unnamed>(),
-  th<Named>(),
-  th<Factory>(),
-  th<Const>(),
-  th<External>(),
+  th<_Unnamed>(),
+  th<_Named>(),
+  th<_Factory>(),
+  th<_Const>(),
+  th<_External>(),
 })
 @MutuallyExclusive(#named)
-final class Named<M extends NamedModifiable> extends Modifier<M>
+final class _Named<M extends NamedModifiable> extends Modifier<M>
     implements
         ExternalMembersModifiable,
         Constant,
         FactoryConstructorModifiable,
         RedirectingModifiable,
         FactoryExternalModifiable {
-  /// {@macro named}
-  const Named._(super.modifiable) : super._();
+  const _Named._(super.modifiable) : super._();
 }

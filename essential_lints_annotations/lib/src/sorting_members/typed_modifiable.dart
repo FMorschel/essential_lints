@@ -1,33 +1,33 @@
 part of 'sort_declarations.dart';
 
 /// Class representing typed sort declarations.
-final class TypedModifiable extends StaticalContext {
-  const TypedModifiable._() : super._();
+final class _TypedModifiable extends _StaticalContext {
+  const _TypedModifiable._() : super._();
 }
 
 /// Represents typed fields.
 @_gettersInMemberList
-sealed class TypedFieldModifiable extends TypedModifiable
+sealed class TypedFieldModifiable extends _TypedModifiable
     implements ConstantVariables {
   /// {@macro public}
   const factory TypedFieldModifiable.public(
     PublicFieldModifiable modifiable,
-  ) = Public._;
+  ) = _Public._;
 
   /// {@macro private}
   const factory TypedFieldModifiable.private(
     PrivateFieldModifiable modifiable,
-  ) = Private._;
+  ) = _Private._;
 
   /// {@macro initialized}
   const factory TypedFieldModifiable.initialized(
     InitializableStatical modifiable,
-  ) = Initialized._;
+  ) = _Initialized._;
 
   /// {@macro nullable}
   const factory TypedFieldModifiable.nullable(
     NullableFieldModifiable modifiable,
-  ) = Nullable._;
+  ) = _Nullable._;
 
   /// {@macro fields}
   static const Fields fields = Fields._fields;
@@ -43,17 +43,17 @@ sealed class TypedAbstractableFieldModifiable extends TypedFieldModifiable
   /// {@macro public}
   const factory TypedAbstractableFieldModifiable.public(
     PublicFieldModifiable modifiable,
-  ) = Public._;
+  ) = _Public._;
 
   /// {@macro private}
   const factory TypedAbstractableFieldModifiable.private(
     PrivateFieldModifiable modifiable,
-  ) = Private._;
+  ) = _Private._;
 
   /// {@macro nullable}
   const factory TypedAbstractableFieldModifiable.nullable(
     NullableAbstractableFieldModifiable modifiable,
-  ) = Nullable._;
+  ) = _Nullable._;
 
   /// {@macro fields}
   static const Fields fields = Fields._fields;
@@ -64,21 +64,21 @@ sealed class TypedAbstractableFieldModifiable extends TypedFieldModifiable
 
 /// Represents typed externable members.
 @_gettersInMemberList
-sealed class TypedExternableModifiable extends TypedModifiable {
+sealed class TypedExternableModifiable extends _TypedModifiable {
   /// {@macro public}
   const factory TypedExternableModifiable.public(
     PublicStaticalModifiable modifiable,
-  ) = Public._;
+  ) = _Public._;
 
   /// {@macro private}
   const factory TypedExternableModifiable.private(
     PrivateStaticalModifiable modifiable,
-  ) = Private._;
+  ) = _Private._;
 
   /// {@macro nullable}
   const factory TypedExternableModifiable.nullable(
     NullableExternableModifiable modifiable,
-  ) = Nullable._;
+  ) = _Nullable._;
 
   /// {@macro fields}
   static const Fields fields = Fields._fields;
@@ -112,27 +112,27 @@ sealed class TypedExternableModifiable extends TypedModifiable {
 
 /// Represents all member that can be typed.
 @_gettersInMemberList
-sealed class TypedMembersModifiable extends TypedModifiable
+sealed class TypedMembersModifiable extends _TypedModifiable
     implements Statical {
   /// {@macro public}
   const factory TypedMembersModifiable.public(
     PublicStaticalModifiable modifiable,
-  ) = Public._;
+  ) = _Public._;
 
   /// {@macro private}
   const factory TypedMembersModifiable.private(
     PrivateStaticalModifiable modifiable,
-  ) = Private._;
+  ) = _Private._;
 
   /// {@macro initialized}
   const factory TypedMembersModifiable.initialized(
     InitializableStatical modifiable,
-  ) = Initialized._;
+  ) = _Initialized._;
 
   /// {@macro nullable}
   const factory TypedMembersModifiable.nullable(
     NullableMembersModifiable modifiable,
-  ) = Nullable._;
+  ) = _Nullable._;
 
   /// {@macro fields}
   static const Fields fields = Fields._fields;
@@ -166,11 +166,11 @@ sealed class TypedMembersModifiable extends TypedModifiable
 
 /// Represents typed operator members.
 @_gettersInMemberList
-sealed class TypedOperatorModifiable extends TypedModifiable {
+sealed class TypedOperatorModifiable extends _TypedModifiable {
   /// {@macro nullable}
   const factory TypedOperatorModifiable.nullable([
     NullableOperatorModifiable modifiable,
-  ]) = Nullable._operator;
+  ]) = _Nullable._operator;
 
   /// {@macro methods}
   static const Methods methods = Methods._methods;
@@ -179,37 +179,33 @@ sealed class TypedOperatorModifiable extends TypedModifiable {
   static List<TypedOperatorModifiable> get _members => [methods];
 }
 
-/// {@template typed}
-/// Represents typed members.
-/// {@endtemplate}
 @InvalidMembers({th<Constructors>()})
 @InvalidModifiers({
-  th<Late>(),
-  th<Abstract>(),
-  th<External>(),
-  th<Overridden>(),
-  th<Static>(),
-  th<Const>(),
-  th<Var>(),
-  th<Final>(),
-  th<Typed>(),
+  th<_Late>(),
+  th<_Abstract>(),
+  th<_External>(),
+  th<_Overridden>(),
+  th<_Static>(),
+  th<_Const>(),
+  th<_Var>(),
+  th<_Final>(),
+  th<_Typed>(),
 })
 @MutuallyExclusive(#typeAnnotation)
-final class Typed extends Modifier<TypedModifiable>
+final class _Typed extends Modifier<_TypedModifiable>
     implements
         FinalModifiable,
         ExternalMembersModifiable,
         ConstantVariables,
         FinalAbstractModifiable,
         StaticalExternal,
-        InstanciableMembers,
+        InstantiableMembers,
         OverridableMembers,
         OverridableExternal,
-        InstanciableExternal,
+        InstantiableExternal,
         NewExternalModifiable {
-  /// {@macro typed}
-  const Typed._(super.modifiable) : super._();
-  const Typed._operator([
+  const _Typed._(super.modifiable) : super._();
+  const _Typed._operator([
     TypedOperatorModifiable super.modifiable = TypedOperatorModifiable.methods,
   ]) : super._();
 }

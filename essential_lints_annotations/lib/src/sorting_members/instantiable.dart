@@ -2,70 +2,70 @@ part of 'sort_declarations.dart';
 
 /// Class representing instance sort declarations.
 @_gettersInMemberList
-sealed class Instanciable extends StaticalContext {
-  const Instanciable._() : super._();
+sealed class _Instantiable extends _StaticalContext {
+  const _Instantiable._() : super._();
 
   // ignore: unused_element member list
-  static List<Instanciable> get _members => const [];
+  static List<_Instantiable> get _members => const [];
 }
 
 /// Represents instance members.
 @_gettersInMemberList
-sealed class InstanciableMembers extends Instanciable {
+sealed class InstantiableMembers extends _Instantiable {
   /// {@macro public}
-  const factory InstanciableMembers.public(
+  const factory InstantiableMembers.public(
     PublicStaticalModifiable modifiable,
-  ) = Public._;
+  ) = _Public._;
 
   /// {@macro private}
-  const factory InstanciableMembers.private(
+  const factory InstantiableMembers.private(
     PrivateStaticalModifiable modifiable,
-  ) = Private._;
+  ) = _Private._;
 
   /// {@macro nullable}
-  const factory InstanciableMembers.nullable(
+  const factory InstantiableMembers.nullable(
     NullableMembersModifiable modifiable,
-  ) = Nullable._;
+  ) = _Nullable._;
 
   /// {@macro typed}
-  const factory InstanciableMembers.typed(TypedMembersModifiable modifiable) =
-      Typed._;
+  const factory InstantiableMembers.typed(TypedMembersModifiable modifiable) =
+      _Typed._;
 
   /// {@macro dynamic}
-  const factory InstanciableMembers.dynamic(
+  const factory InstantiableMembers.dynamic(
     DynamicMembersModifiable modifiable,
-  ) = Dynamic._;
+  ) = _Dynamic._;
 
   /// {@macro abstract}
-  const factory InstanciableMembers.abstract(Abstractable modifiable) =
-      Abstract._;
+  const factory InstantiableMembers.abstract(Abstractable modifiable) =
+      _Abstract._;
 
   /// {@macro operator}
-  const factory InstanciableMembers.operator([OperatorModifiable modifiable]) =
-      Operator._;
+  const factory InstantiableMembers.operator([OperatorModifiable modifiable]) =
+      _Operator._;
 
-  /// {@macro initializable}
-  const factory InstanciableMembers.initialized(
+  /// {@macro initialized}
+  const factory InstantiableMembers.initialized(
     InitializableOverridable modifiable,
-  ) = Initialized._;
+  ) = _Initialized._;
 
   /// {@macro late_modifiable}
-  const factory InstanciableMembers.late(LateModifiable modifiable) = Late._;
+  const factory InstantiableMembers.late(LateModifiable modifiable) = _Late._;
 
   /// {@macro var}
-  const factory InstanciableMembers.var_(Variable modifiable) = Var._;
+  const factory InstantiableMembers.var_(Variable modifiable) = _Var._;
 
   /// {@macro final}
-  const factory InstanciableMembers.final_(FinalModifiable modifiable) =
-      Final._;
+  const factory InstantiableMembers.final_(FinalModifiable modifiable) =
+      _Final._;
 
   /// {@macro overridden}
-  const factory InstanciableMembers.overridden(OverridableMembers modifiable) =
-      Overridden._;
+  const factory InstantiableMembers.overridden(OverridableMembers modifiable) =
+      _Overridden._;
 
   /// {@macro new}
-  const factory InstanciableMembers.new_(NewMemberModifiable modifiable) =
-      New._;
+  const factory InstantiableMembers.new_(NewMemberModifiable modifiable) =
+      _New._;
 
   /// {@macro fields}
   static const Fields fields = Fields._fields;
@@ -87,7 +87,7 @@ sealed class InstanciableMembers extends Instanciable {
   static const Setters setters = Setters._setters;
 
   // ignore: unused_element member list
-  static List<InstanciableMembers> get _members => [
+  static List<InstantiableMembers> get _members => [
     fields,
     fieldsGettersSetters,
     getters,
@@ -99,53 +99,53 @@ sealed class InstanciableMembers extends Instanciable {
 
 /// Class representing instance sort declarations.
 @_gettersInMemberList
-sealed class InstanciableExternal extends Instanciable {
+sealed class InstantiableExternal extends _Instantiable {
   /// {@macro public}
-  const factory InstanciableExternal.public(
+  const factory InstantiableExternal.public(
     PublicStaticalModifiable modifiable,
-  ) = Public._;
+  ) = _Public._;
 
   /// {@macro private}
-  const factory InstanciableExternal.private(
+  const factory InstantiableExternal.private(
     PrivateStaticalModifiable modifiable,
-  ) = Private._;
+  ) = _Private._;
 
   /// {@macro nullable}
-  const factory InstanciableExternal.nullable(
+  const factory InstantiableExternal.nullable(
     NullableExternableModifiable modifiable,
-  ) = Nullable._;
+  ) = _Nullable._;
 
   /// {@macro typed}
-  const factory InstanciableExternal.typed(
+  const factory InstantiableExternal.typed(
     TypedExternableModifiable modifiable,
-  ) = Typed._;
+  ) = _Typed._;
 
   /// {@macro dynamic}
-  const factory InstanciableExternal.dynamic(
+  const factory InstantiableExternal.dynamic(
     DynamicExternableModifiable modifiable,
-  ) = Dynamic._;
+  ) = _Dynamic._;
 
   /// {@macro operator}
-  const factory InstanciableExternal.operator([OperatorModifiable modifiable]) =
-      Operator._;
+  const factory InstantiableExternal.operator([OperatorModifiable modifiable]) =
+      _Operator._;
 
   /// {@macro var}
-  const factory InstanciableExternal.var_(VariableAbstractable modifiable) =
-      Var._;
+  const factory InstantiableExternal.var_(VariableAbstractable modifiable) =
+      _Var._;
 
   /// {@macro final}
-  const factory InstanciableExternal.final_(
+  const factory InstantiableExternal.final_(
     FinalAbstractModifiable modifiable,
-  ) = Final._;
+  ) = _Final._;
 
   /// {@macro overridden}
-  const factory InstanciableExternal.overridden(
+  const factory InstantiableExternal.overridden(
     OverridableExternal modifiable,
-  ) = Overridden._;
+  ) = _Overridden._;
 
   /// {@macro new}
-  const factory InstanciableExternal.new_(NewExternalModifiable modifiable) =
-      New._;
+  const factory InstantiableExternal.new_(NewExternalModifiable modifiable) =
+      _New._;
 
   /// {@macro fields}
   static const Fields fields = Fields._fields;
@@ -167,7 +167,7 @@ sealed class InstanciableExternal extends Instanciable {
   static const Setters setters = Setters._setters;
 
   // ignore: unused_element member list
-  static List<InstanciableExternal> get _members => [
+  static List<InstantiableExternal> get _members => [
     fields,
     fieldsGettersSetters,
     getters,
@@ -177,18 +177,14 @@ sealed class InstanciableExternal extends Instanciable {
   ];
 }
 
-/// {@template instance}
-/// Represents instance members.
-/// {@endtemplate}
 @InvalidMembers({th<Constructors>()})
 @InvalidModifiers({
-  th<Static>(),
-  th<Instance>(),
-  th<External>(),
+  th<_Static>(),
+  th<_Instance>(),
+  th<_External>(),
 })
 @MutuallyExclusive(#context)
-final class Instance extends Modifier<Instanciable>
+final class _Instance extends Modifier<_Instantiable>
     implements ExternalMembersModifiable {
-  /// {@macro instance}
-  const Instance._(super.modifiable) : super._();
+  const _Instance._(super.modifiable) : super._();
 }

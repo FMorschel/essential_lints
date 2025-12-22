@@ -1,8 +1,8 @@
 part of 'sort_declarations.dart';
 
-/// Represents final members.
+/// Represents public members.
 @_gettersInMemberList
-sealed class PublicModifiable extends StaticalContext {
+sealed class PublicModifiable extends _StaticalContext {
   const PublicModifiable._() : super._();
 
   /// {@macro fields}
@@ -114,31 +114,28 @@ sealed class PublicConstructorModifiable extends PublicModifiable {
   static List<PublicConstructorModifiable> get _members => [constructors];
 }
 
-/// {@template public}
-/// Represents public members.
-/// {@endtemplate}
 @InvalidModifiers({
-  th<Private>(),
-  th<Operator>(),
-  th<Public>(),
-  th<Factory>(),
-  th<Const>(),
-  th<External>(),
-  th<Unnamed>(),
-  th<Named>(),
-  th<Late>(),
-  th<Final>(),
-  th<Var>(),
-  th<Nullable>(),
-  th<Overridden>(),
-  th<Static>(),
-  th<Abstract>(),
-  th<Initialized>(),
-  th<Redirecting>(),
+  th<_Private>(),
+  th<_Operator>(),
+  th<_Public>(),
+  th<_Factory>(),
+  th<_Const>(),
+  th<_External>(),
+  th<_Unnamed>(),
+  th<_Named>(),
+  th<_Late>(),
+  th<_Final>(),
+  th<_Var>(),
+  th<_Nullable>(),
+  th<_Overridden>(),
+  th<_Static>(),
+  th<_Abstract>(),
+  th<_Initialized>(),
+  th<_Redirecting>(),
 })
 @InvalidMembers(<TypeHolder<Group>>{})
 @MutuallyExclusive(#visibility)
-final class Public<M extends PublicModifiable> extends Modifier<M>
+final class _Public<M extends PublicModifiable> extends Modifier<M>
     implements
         NamedModifiable,
         RedirectingModifiable,
@@ -163,12 +160,12 @@ final class Public<M extends PublicModifiable> extends Modifier<M>
         DynamicAbstractableFieldModifiable,
         DynamicExternableModifiable,
         DynamicMembersModifiable,
-        InstanciableMembers,
+        InstantiableMembers,
         OverridableMembers,
-        InstanciableExternal,
+        InstantiableExternal,
         OverridableExternal,
         FactoryExternalModifiable,
         NewExternalModifiable {
   /// {@macro public}
-  const Public._(super.modifiable) : super._();
+  const _Public._(super.modifiable) : super._();
 }

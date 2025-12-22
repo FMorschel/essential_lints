@@ -66,7 +66,7 @@ Future<void> main() async {
           if (!constructor.isPublic) continue;
           if (constructor.documentation.trim().isEmpty) {
             missingDocs.add(
-              'Constructor ${class_.name}.${constructor.name}',
+              'Constructor ${constructor.name}',
             );
           }
         }

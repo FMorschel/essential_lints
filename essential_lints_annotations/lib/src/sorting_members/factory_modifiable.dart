@@ -4,8 +4,8 @@ part of 'sort_declarations.dart';
 /// Represents factory modifiable members (constructors).
 /// {@endtemplate}
 @_gettersInMemberList
-sealed class FactoryModifiable extends StaticalContext {
-  const FactoryModifiable._() : super._();
+sealed class _FactoryModifiable extends _StaticalContext {
+  const _FactoryModifiable._() : super._();
 
   // ignore: unused_element member list
   static List<ExternalMembersModifiable> get _members => [];
@@ -13,25 +13,25 @@ sealed class FactoryModifiable extends StaticalContext {
 
 /// Represents factory external modifiable members.
 @_gettersInMemberList
-sealed class FactoryExternalModifiable extends FactoryModifiable {
+sealed class FactoryExternalModifiable extends _FactoryModifiable {
   /// {@macro named}
   const factory FactoryExternalModifiable.named(NamedModifiable modifiable) =
-      Named._;
+      _Named._;
 
   /// {@macro public}
   const factory FactoryExternalModifiable.public(
     PublicConstructorModifiable modifiable,
-  ) = Public._;
+  ) = _Public._;
 
   /// {@macro private}
   const factory FactoryExternalModifiable.private(
     PrivateConstructorModifiable modifiable,
-  ) = Private._;
+  ) = _Private._;
 
   /// {@macro unnamed}
   const factory FactoryExternalModifiable.unnamed(
     UnnamedModifiable modifiable,
-  ) = Unnamed._;
+  ) = _Unnamed._;
 
   /// {@macro constructors}
   static const Constructors constructors = Constructors._constructors;
@@ -42,30 +42,30 @@ sealed class FactoryExternalModifiable extends FactoryModifiable {
 
 /// Represents factory constructor modifiable members.
 @_gettersInMemberList
-sealed class FactoryConstructorModifiable extends FactoryModifiable {
+sealed class FactoryConstructorModifiable extends _FactoryModifiable {
   /// {@macro redirecting}
   const factory FactoryConstructorModifiable.redirecting(
     RedirectingModifiable modifiable,
-  ) = Redirecting._;
+  ) = _Redirecting._;
 
   /// {@macro named}
   const factory FactoryConstructorModifiable.named(NamedModifiable modifiable) =
-      Named._;
+      _Named._;
 
   /// {@macro public}
   const factory FactoryConstructorModifiable.public(
     PublicConstructorModifiable modifiable,
-  ) = Public._;
+  ) = _Public._;
 
   /// {@macro private}
   const factory FactoryConstructorModifiable.private(
     PrivateConstructorModifiable modifiable,
-  ) = Private._;
+  ) = _Private._;
 
   /// {@macro unnamed}
   const factory FactoryConstructorModifiable.unnamed(
     UnnamedModifiable modifiable,
-  ) = Unnamed._;
+  ) = _Unnamed._;
 
   /// {@macro constructors}
   static const Constructors constructors = Constructors._constructors;
@@ -74,9 +74,6 @@ sealed class FactoryConstructorModifiable extends FactoryModifiable {
   static List<FactoryConstructorModifiable> get _members => [constructors];
 }
 
-/// {@template factory}
-/// Represents factory constructors.
-/// {@endtemplate}
 @InvalidMembers({
   th<Fields>(),
   th<Getters>(),
@@ -86,10 +83,9 @@ sealed class FactoryConstructorModifiable extends FactoryModifiable {
   th<Methods>(),
 })
 @InvalidModifiers({
-  th<Factory>(),
+  th<_Factory>(),
 })
-final class Factory<M extends FactoryModifiable> extends Modifier<M>
+final class _Factory<M extends _FactoryModifiable> extends Modifier<M>
     implements Constant, ExternalMembersModifiable {
-  /// {@macro factory}
-  const Factory._(super.modifiable) : super._();
+  const _Factory._(super.modifiable) : super._();
 }

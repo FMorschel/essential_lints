@@ -4,20 +4,20 @@ part of 'sort_declarations.dart';
 /// Represents modifiers that can be applied to methods and methods themselves.
 /// {@endtemplate}
 @_gettersInMemberList
-sealed class OperatorModifiable extends StaticalContext {
+sealed class OperatorModifiable extends _StaticalContext {
   /// {@macro nullable}
   const factory OperatorModifiable.nullable([
     NullableOperatorModifiable modifiable,
-  ]) = Nullable._operator;
+  ]) = _Nullable._operator;
 
   /// {@macro typed}
   const factory OperatorModifiable.typed([TypedOperatorModifiable modifiable]) =
-      Typed._operator;
+      _Typed._operator;
 
   /// {@macro dynamic}
   const factory OperatorModifiable.dynamic([
     DynamicOperatorModifiable modifiable,
-  ]) = Dynamic._operator;
+  ]) = _Dynamic._operator;
 
   /// {@macro methods}
   static const Methods methods = Methods._methods;
@@ -26,9 +26,6 @@ sealed class OperatorModifiable extends StaticalContext {
   static List<ExternalMembersModifiable> get _members => [methods];
 }
 
-/// {@template operator}
-/// Represents operator members.
-/// {@endtemplate}
 @InvalidMembers({
   th<Fields>(),
   th<Getters>(),
@@ -38,21 +35,21 @@ sealed class OperatorModifiable extends StaticalContext {
   th<Constructors>(),
 })
 @InvalidModifiers({
-  th<Static>(),
-  th<Private>(),
-  th<Public>(),
-  th<Operator>(),
+  th<_Static>(),
+  th<_Private>(),
+  th<_Public>(),
+  th<_Operator>(),
 })
-final class Operator extends Modifier<OperatorModifiable>
+final class _Operator extends Modifier<OperatorModifiable>
     implements
         NewMemberModifiable,
         ExternalMembersModifiable,
         Abstractable,
-        InstanciableMembers,
+        InstantiableMembers,
         OverridableMembers,
         OverridableExternal,
-        InstanciableExternal,
+        InstantiableExternal,
         NewExternalModifiable {
-  /// {@macro operator}
-  const Operator._([super.modifiable = OperatorModifiable.methods]) : super._();
+  const _Operator._([super.modifiable = OperatorModifiable.methods])
+    : super._();
 }

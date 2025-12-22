@@ -1,28 +1,28 @@
 part of 'sort_declarations.dart';
 
 /// Class representing dynamic sort declarations.
-final class DynamicModifiable extends StaticalContext {
-  const DynamicModifiable._() : super._();
+final class _DynamicModifiable extends _StaticalContext {
+  const _DynamicModifiable._() : super._();
 }
 
 /// Represents dynamic fields.
 @_gettersInMemberList
-sealed class DynamicFieldModifiable extends DynamicModifiable
+sealed class DynamicFieldModifiable extends _DynamicModifiable
     implements ConstantVariables {
   /// {@macro public}
   const factory DynamicFieldModifiable.public(
     PublicFieldModifiable modifiable,
-  ) = Public._;
+  ) = _Public._;
 
   /// {@macro private}
   const factory DynamicFieldModifiable.private(
     PrivateFieldModifiable modifiable,
-  ) = Private._;
+  ) = _Private._;
 
   /// {@macro initialized}
   const factory DynamicFieldModifiable.initialized(
     InitializableStatical modifiable,
-  ) = Initialized._;
+  ) = _Initialized._;
 
   /// {@macro fields}
   static const Fields fields = Fields._fields;
@@ -38,12 +38,12 @@ sealed class DynamicAbstractableFieldModifiable extends DynamicFieldModifiable
   /// {@macro public}
   const factory DynamicAbstractableFieldModifiable.public(
     PublicFieldModifiable modifiable,
-  ) = Public._;
+  ) = _Public._;
 
   /// {@macro private}
   const factory DynamicAbstractableFieldModifiable.private(
     PrivateFieldModifiable modifiable,
-  ) = Private._;
+  ) = _Private._;
 
   /// {@macro fields}
   static const Fields fields = Fields._fields;
@@ -54,16 +54,16 @@ sealed class DynamicAbstractableFieldModifiable extends DynamicFieldModifiable
 
 /// Represents dynamic externable members.
 @_gettersInMemberList
-sealed class DynamicExternableModifiable extends DynamicModifiable {
+sealed class DynamicExternableModifiable extends _DynamicModifiable {
   /// {@macro public}
   const factory DynamicExternableModifiable.public(
     PublicStaticalModifiable modifiable,
-  ) = Public._;
+  ) = _Public._;
 
   /// {@macro private}
   const factory DynamicExternableModifiable.private(
     PrivateStaticalModifiable modifiable,
-  ) = Private._;
+  ) = _Private._;
 
   /// {@macro fields}
   static const Fields fields = Fields._fields;
@@ -97,22 +97,22 @@ sealed class DynamicExternableModifiable extends DynamicModifiable {
 
 /// Represents all member that can be dynamic.
 @_gettersInMemberList
-sealed class DynamicMembersModifiable extends DynamicModifiable
+sealed class DynamicMembersModifiable extends _DynamicModifiable
     implements Statical {
   /// {@macro public}
   const factory DynamicMembersModifiable.public(
     PublicStaticalModifiable modifiable,
-  ) = Public._;
+  ) = _Public._;
 
   /// {@macro private}
   const factory DynamicMembersModifiable.private(
     PrivateStaticalModifiable modifiable,
-  ) = Private._;
+  ) = _Private._;
 
   /// {@macro initialized}
   const factory DynamicMembersModifiable.initialized(
     InitializableStatical modifiable,
-  ) = Initialized._;
+  ) = _Initialized._;
 
   /// {@macro fields}
   static const Fields fields = Fields._fields;
@@ -146,7 +146,7 @@ sealed class DynamicMembersModifiable extends DynamicModifiable
 
 /// Represents dynamic operator members.
 @_gettersInMemberList
-sealed class DynamicOperatorModifiable extends DynamicModifiable {
+sealed class DynamicOperatorModifiable extends _DynamicModifiable {
   const DynamicOperatorModifiable._() : super._();
 
   /// {@macro methods}
@@ -156,38 +156,34 @@ sealed class DynamicOperatorModifiable extends DynamicModifiable {
   static List<DynamicOperatorModifiable> get _members => [methods];
 }
 
-/// {@template dynamic}
-/// Represents dynamic members.
-/// {@endtemplate}
 @InvalidMembers({th<Constructors>()})
 @InvalidModifiers({
-  th<Late>(),
-  th<Abstract>(),
-  th<External>(),
-  th<Overridden>(),
-  th<Static>(),
-  th<Const>(),
-  th<Var>(),
-  th<Final>(),
-  th<Nullable>(),
-  th<Dynamic>(),
+  th<_Late>(),
+  th<_Abstract>(),
+  th<_External>(),
+  th<_Overridden>(),
+  th<_Static>(),
+  th<_Const>(),
+  th<_Var>(),
+  th<_Final>(),
+  th<_Nullable>(),
+  th<_Dynamic>(),
 })
 @MutuallyExclusive(#typeAnnotation)
-final class Dynamic extends Modifier<DynamicModifiable>
+final class _Dynamic extends Modifier<_DynamicModifiable>
     implements
         FinalModifiable,
         ExternalMembersModifiable,
         ConstantVariables,
         StaticalExternal,
-        InstanciableMembers,
+        InstantiableMembers,
         OverridableMembers,
         OverridableExternal,
-        InstanciableExternal,
+        InstantiableExternal,
         FinalAbstractModifiable,
         NewExternalModifiable {
-  /// {@macro dynamic}
-  const Dynamic._(super.modifiable) : super._();
-  const Dynamic._operator([
+  const _Dynamic._(super.modifiable) : super._();
+  const _Dynamic._operator([
     DynamicOperatorModifiable super.modifiable =
         DynamicOperatorModifiable.methods,
   ]) : super._();

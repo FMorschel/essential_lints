@@ -2,8 +2,8 @@ part of 'sort_declarations.dart';
 
 /// Represents external modifiable members.
 @_gettersInMemberList
-sealed class ExternalModifiable extends StaticalContext {
-  const ExternalModifiable._() : super._();
+sealed class _ExternalModifiable extends _StaticalContext {
+  const _ExternalModifiable._() : super._();
 
   // ignore: unused_element member list
   static List<DynamicExternableModifiable> get _members => const [];
@@ -13,78 +13,78 @@ sealed class ExternalModifiable extends StaticalContext {
 /// Represents members that can be external and their modifiers.
 /// {@endtemplate}
 @_gettersInMemberList
-sealed class ExternalMembersModifiable extends ExternalModifiable {
+sealed class ExternalMembersModifiable extends _ExternalModifiable {
   /// {@macro factory}
   const factory ExternalMembersModifiable.factory_(
     FactoryExternalModifiable modifiable,
-  ) = Factory._;
+  ) = _Factory._;
 
   /// {@macro nullable}
   const factory ExternalMembersModifiable.nullable(
     NullableExternableModifiable modifiable,
-  ) = Nullable._;
+  ) = _Nullable._;
 
   /// {@macro typed}
   const factory ExternalMembersModifiable.typed(
     TypedExternableModifiable modifiable,
-  ) = Typed._;
+  ) = _Typed._;
 
   /// {@macro dynamic}
   const factory ExternalMembersModifiable.dynamic(
     DynamicExternableModifiable modifiable,
-  ) = Dynamic._;
+  ) = _Dynamic._;
 
   /// {@macro operator}
   const factory ExternalMembersModifiable.operator([
     OperatorModifiable modifiable,
-  ]) = Operator._;
+  ]) = _Operator._;
 
   /// {@macro public}
   const factory ExternalMembersModifiable.public(PublicModifiable modifiable) =
-      Public._;
+      _Public._;
 
   /// {@macro private}
   const factory ExternalMembersModifiable.private(
     PrivateModifiable modifiable,
-  ) = Private._;
+  ) = _Private._;
 
-  /// {@macro static}
+  /// {@macro unnamed}
   const factory ExternalMembersModifiable.unnamed(
     UnnamedModifiable modifiable,
-  ) = Unnamed._;
+  ) = _Unnamed._;
 
   /// {@macro var}
   const factory ExternalMembersModifiable.var_(
     VariableAbstractable modifiable,
-  ) = Var._;
+  ) = _Var._;
 
   /// {@macro final}
   const factory ExternalMembersModifiable.final_(
     FinalAbstractModifiable modifiable,
-  ) = Final._;
+  ) = _Final._;
 
   /// {@macro static}
   const factory ExternalMembersModifiable.static(StaticalExternal modifiable) =
-      Static._;
+      _Static._;
 
   /// {@macro named}
   const factory ExternalMembersModifiable.named(NamedModifiable modifiable) =
-      Named._;
+      _Named._;
 
   /// {@macro overridden}
   const factory ExternalMembersModifiable.overridden(
     OverridableExternal modifiable,
-  ) = Overridden._;
+  ) = _Overridden._;
 
   /// {@macro new}
   const factory ExternalMembersModifiable.new_(
     NewExternalModifiable modifiable,
-  ) = New._;
+  ) = _New._;
 
   /// {@macro instance}
   const factory ExternalMembersModifiable.instance(
-    InstanciableExternal modifiable,
-  ) = Instance._;
+    InstantiableExternal modifiable,
+  ) = _Instance._;
 
   /// {@macro constructors}
   static const Constructors constructors = Constructors._constructors;
@@ -120,18 +120,14 @@ sealed class ExternalMembersModifiable extends ExternalModifiable {
   ];
 }
 
-/// {@template external}
-/// Represents external members.
-/// {@endtemplate}
 @InvalidModifiers({
-  th<Abstract>(),
-  th<Late>(),
-  th<Initialized>(),
-  th<Redirecting>(),
-  th<External>(),
+  th<_Abstract>(),
+  th<_Late>(),
+  th<_Initialized>(),
+  th<_Redirecting>(),
+  th<_External>(),
 })
 @InvalidMembers(<TypeHolder<Group>>{})
-final class External<M extends ExternalModifiable> extends Modifier<M> {
-  /// {@macro external}
-  const External._(super.modifiable) : super._();
+final class _External<M extends _ExternalModifiable> extends Modifier<M> {
+  const _External._(super.modifiable) : super._();
 }

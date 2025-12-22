@@ -1,65 +1,64 @@
 part of 'sort_declarations.dart';
 
+@_gettersInMemberList
+sealed class _NewModifiable extends _StaticalContext {
+  const _NewModifiable._() : super._();
+
+  // ignore: unused_element member list
+  static List<_NewModifiable> get _members => const [];
+}
+
 /// {@template new_modifiable}
 /// Represents new members (not-overridden).
 /// {@endtemplate}
 @_gettersInMemberList
-sealed class NewModifiable extends StaticalContext {
-  const NewModifiable._() : super._();
-
-  // ignore: unused_element member list
-  static List<NewModifiable> get _members => const [];
-}
-
-/// {@macro new_modifiable}
-@_gettersInMemberList
-sealed class NewMemberModifiable extends NewModifiable {
+sealed class NewMemberModifiable extends _NewModifiable {
   /// {@macro public}
   const factory NewMemberModifiable.public(
     PublicStaticalModifiable modifiable,
-  ) = Public._;
+  ) = _Public._;
 
   /// {@macro private}
   const factory NewMemberModifiable.private(
     PrivateStaticalModifiable modifiable,
-  ) = Private._;
+  ) = _Private._;
 
   /// {@macro nullable}
   const factory NewMemberModifiable.nullable(
     NullableMembersModifiable modifiable,
-  ) = Nullable._;
+  ) = _Nullable._;
 
   /// {@macro typed}
   const factory NewMemberModifiable.typed(TypedMembersModifiable modifiable) =
-      Typed._;
+      _Typed._;
 
   /// {@macro dynamic}
   const factory NewMemberModifiable.dynamic(
     DynamicMembersModifiable modifiable,
-  ) = Dynamic._;
+  ) = _Dynamic._;
 
   /// {@macro abstract}
   const factory NewMemberModifiable.abstract(Abstractable modifiable) =
-      Abstract._;
+      _Abstract._;
 
   /// {@macro operator}
   const factory NewMemberModifiable.operator([OperatorModifiable modifiable]) =
-      Operator._;
+      _Operator._;
 
-  /// {@macro initializable}
+  /// {@macro initialized}
   const factory NewMemberModifiable.initialized(
     InitializableOverridable modifiable,
-  ) = Initialized._;
+  ) = _Initialized._;
 
   /// {@macro late_modifiable}
-  const factory NewMemberModifiable.late(LateModifiable modifiable) = Late._;
+  const factory NewMemberModifiable.late(LateModifiable modifiable) = _Late._;
 
   /// {@macro var}
-  const factory NewMemberModifiable.var_(Variable modifiable) = Var._;
+  const factory NewMemberModifiable.var_(Variable modifiable) = _Var._;
 
   /// {@macro final}
   const factory NewMemberModifiable.final_(FinalModifiable modifiable) =
-      Final._;
+      _Final._;
 
   /// {@macro fields}
   static const Fields fields = Fields._fields;
@@ -93,45 +92,45 @@ sealed class NewMemberModifiable extends NewModifiable {
 
 /// {@macro new_modifiable}
 @_gettersInMemberList
-sealed class NewExternalModifiable extends NewModifiable {
+sealed class NewExternalModifiable extends _NewModifiable {
   /// {@macro public}
   const factory NewExternalModifiable.public(
     PublicStaticalModifiable modifiable,
-  ) = Public._;
+  ) = _Public._;
 
   /// {@macro private}
   const factory NewExternalModifiable.private(
     PrivateStaticalModifiable modifiable,
-  ) = Private._;
+  ) = _Private._;
 
   /// {@macro nullable}
   const factory NewExternalModifiable.nullable(
     NullableExternableModifiable modifiable,
-  ) = Nullable._;
+  ) = _Nullable._;
 
   /// {@macro typed}
   const factory NewExternalModifiable.typed(
     TypedExternableModifiable modifiable,
-  ) = Typed._;
+  ) = _Typed._;
 
   /// {@macro dynamic}
   const factory NewExternalModifiable.dynamic(
     DynamicExternableModifiable modifiable,
-  ) = Dynamic._;
+  ) = _Dynamic._;
 
   /// {@macro operator}
   const factory NewExternalModifiable.operator([
     OperatorModifiable modifiable,
-  ]) = Operator._;
+  ]) = _Operator._;
 
   /// {@macro var}
   const factory NewExternalModifiable.var_(VariableAbstractable modifiable) =
-      Var._;
+      _Var._;
 
   /// {@macro final}
   const factory NewExternalModifiable.final_(
     FinalAbstractModifiable modifiable,
-  ) = Final._;
+  ) = _Final._;
 
   /// {@macro fields}
   static const Fields fields = Fields._fields;
@@ -163,21 +162,17 @@ sealed class NewExternalModifiable extends NewModifiable {
   ];
 }
 
-/// {@template new}
-/// Represents new members (non-overridden).
-/// {@endtemplate}
 @InvalidMembers({th<Constructors>()})
 @InvalidModifiers({
-  th<Static>(),
-  th<Overridden>(),
-  th<New>(),
+  th<_Static>(),
+  th<_Overridden>(),
+  th<_New>(),
 })
 @MutuallyExclusive(#overriding)
-final class New<M extends NewModifiable> extends Modifier<M>
+final class _New<M extends _NewModifiable> extends Modifier<M>
     implements
-        InstanciableMembers,
+        InstantiableMembers,
         ExternalMembersModifiable,
-        InstanciableExternal {
-  /// {@macro new}
-  const New._(super.modifiable) : super._();
+        InstantiableExternal {
+  const _New._(super.modifiable) : super._();
 }

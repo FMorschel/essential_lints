@@ -4,24 +4,24 @@ part of 'sort_declarations.dart';
 /// Represents redirecting modifiable members (constructors).
 /// {@endtemplate}
 @_gettersInMemberList
-sealed class RedirectingModifiable extends StaticalContext {
+sealed class RedirectingModifiable extends _StaticalContext {
   /// {@macro private}
   const factory RedirectingModifiable.private(
     PrivateConstructorModifiable modifiable,
-  ) = Private._;
+  ) = _Private._;
 
   /// {@macro public}
   const factory RedirectingModifiable.public(
     PublicConstructorModifiable modifiable,
-  ) = Public._;
+  ) = _Public._;
 
   /// {@macro named}
   const factory RedirectingModifiable.named(NamedModifiable modifiable) =
-      Named._;
+      _Named._;
 
   /// {@macro unnamed}
   const factory RedirectingModifiable.unnamed(UnnamedModifiable modifiable) =
-      Unnamed._;
+      _Unnamed._;
 
   /// {@macro constructors}
   static const Constructors constructors = Constructors._constructors;
@@ -30,9 +30,6 @@ sealed class RedirectingModifiable extends StaticalContext {
   static List<RedirectingModifiable> get _members => [constructors];
 }
 
-/// {@template redirecting}
-/// Represents redirecting constructors.
-/// {@endtemplate}
 @InvalidMembers({
   th<Fields>(),
   th<Getters>(),
@@ -42,13 +39,12 @@ sealed class RedirectingModifiable extends StaticalContext {
   th<Methods>(),
 })
 @InvalidModifiers({
-  th<External>(),
-  th<Redirecting>(),
-  th<Factory>(),
-  th<Const>(),
+  th<_External>(),
+  th<_Redirecting>(),
+  th<_Factory>(),
+  th<_Const>(),
 })
-final class Redirecting<M extends RedirectingModifiable> extends Modifier<M>
+final class _Redirecting<M extends RedirectingModifiable> extends Modifier<M>
     implements FactoryConstructorModifiable {
-  /// {@macro redirecting}
-  const Redirecting._(super.modifiable) : super._();
+  const _Redirecting._(super.modifiable) : super._();
 }

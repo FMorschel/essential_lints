@@ -2,7 +2,7 @@ part of 'sort_declarations.dart';
 
 /// Represents private members.
 @_gettersInMemberList
-sealed class PrivateModifiable extends StaticalContext {
+sealed class PrivateModifiable extends _StaticalContext {
   const PrivateModifiable._() : super._();
 
   /// {@macro fields}
@@ -39,7 +39,7 @@ sealed class PrivateModifiable extends StaticalContext {
   ];
 }
 
-/// Represents public constant members.
+/// Represents private constant members.
 @_gettersInMemberList
 sealed class PrivateConstantModifiable extends PrivateModifiable {
   const PrivateConstantModifiable._() : super._();
@@ -114,31 +114,28 @@ sealed class PrivateConstructorModifiable extends PrivateModifiable {
   static List<PrivateConstructorModifiable> get _members => [constructors];
 }
 
-/// {@template private}
-/// Represents private members.
-/// {@endtemplate}
 @InvalidModifiers({
-  th<Public>(),
-  th<Operator>(),
-  th<Private>(),
-  th<Factory>(),
-  th<Const>(),
-  th<External>(),
-  th<Unnamed>(),
-  th<Named>(),
-  th<Late>(),
-  th<Final>(),
-  th<Var>(),
-  th<Nullable>(),
-  th<Overridden>(),
-  th<Static>(),
-  th<Abstract>(),
-  th<Initialized>(),
-  th<Redirecting>(),
+  th<_Public>(),
+  th<_Operator>(),
+  th<_Private>(),
+  th<_Factory>(),
+  th<_Const>(),
+  th<_External>(),
+  th<_Unnamed>(),
+  th<_Named>(),
+  th<_Late>(),
+  th<_Final>(),
+  th<_Var>(),
+  th<_Nullable>(),
+  th<_Overridden>(),
+  th<_Static>(),
+  th<_Abstract>(),
+  th<_Initialized>(),
+  th<_Redirecting>(),
 })
 @InvalidMembers(<TypeHolder<Group>>{})
 @MutuallyExclusive(#visibility)
-final class Private<M extends PrivateModifiable> extends Modifier<M>
+final class _Private<M extends PrivateModifiable> extends Modifier<M>
     implements
         NamedModifiable,
         RedirectingModifiable,
@@ -163,12 +160,12 @@ final class Private<M extends PrivateModifiable> extends Modifier<M>
         DynamicAbstractableFieldModifiable,
         DynamicExternableModifiable,
         DynamicMembersModifiable,
-        InstanciableMembers,
+        InstantiableMembers,
         OverridableMembers,
         OverridableExternal,
-        InstanciableExternal,
+        InstantiableExternal,
         FactoryExternalModifiable,
         NewExternalModifiable {
   /// {@macro private}
-  const Private._(super.modifiable) : super._();
+  const _Private._(super.modifiable) : super._();
 }

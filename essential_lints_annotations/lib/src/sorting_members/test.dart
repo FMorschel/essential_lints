@@ -5,28 +5,27 @@ part of 'sort_declarations.dart';
 /// This is used to test nested modifier detection.
 /// This wrapper does NOT restrict Test, to demonstrate the nesting issue.
 /// {@endtemplate}
-@visibleForTesting
 @InvalidMembers({})
-@InvalidModifiers({th<TestWrapper>()})
+@InvalidModifiers({th<_TestWrapper>()})
 @Deprecated('Only used for testing')
-final class TestWrapper extends Modifier<Testable> implements Testable {
+final class _TestWrapper extends Modifier<Testable> implements Testable {
   @Deprecated('Only used for testing')
   /// {@macro wrapper}
-  const TestWrapper._(super.modifiable) : super._();
+  const _TestWrapper._(super.modifiable) : super._();
 }
 
 /// Testable modifiable member.
 @visibleForTesting
 @_gettersInMemberList
 @Deprecated('Only used for testing')
-sealed class Testable extends StaticalContext {
+sealed class Testable extends _StaticalContext {
   /// {@macro test}
   @Deprecated('Only used for testing')
-  const factory Testable.test(Testable modifiable) = Test._;
+  const factory Testable.test(Testable modifiable) = _Test._;
 
   /// {@macro wrapper}
   @Deprecated('Only used for testing')
-  const factory Testable.wrapper(Testable modifiable) = TestWrapper._;
+  const factory Testable.wrapper(Testable modifiable) = _TestWrapper._;
 
   /// {@macro tests}
   @Deprecated('Only used for testing')
@@ -51,15 +50,10 @@ final class Tests extends Group implements Testable {
   static const Tests _tests = Tests._();
 }
 
-/// {@template test}
-/// Represents a test modifier.
-/// {@endtemplate}
-@visibleForTesting
 @InvalidMembers({th<Tests>()})
-@InvalidModifiers({th<Test>()})
+@InvalidModifiers({th<_Test>()})
 @Deprecated('Only used for testing')
-final class Test extends Modifier<Testable> implements Testable {
+final class _Test extends Modifier<Testable> implements Testable {
   @Deprecated('Only used for testing')
-  /// {@macro test}
-  const Test._(super.modifiable) : super._();
+  const _Test._(super.modifiable) : super._();
 }

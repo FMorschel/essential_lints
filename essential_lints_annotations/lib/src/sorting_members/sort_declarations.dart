@@ -14,7 +14,7 @@ part 'factory_modifiable.dart';
 part 'final_modifiable.dart';
 part 'group.dart';
 part 'initializable.dart';
-part 'instanciable.dart';
+part 'instantiable.dart';
 part 'late_modifiable.dart';
 part 'member.dart';
 part 'modifiable.dart';
@@ -32,108 +32,281 @@ part 'typed_modifiable.dart';
 part 'unnamed_modifiable.dart';
 part 'variable.dart';
 
-/// Represents a sort declaration.
+/// {@template sortDeclaration}
+/// Represents a sort declaration for member ordering in the `@SortingMembers`
+/// annotation.
+///
+/// Sort declarations define patterns that class members should match, allowing
+/// fine-grained control over member ordering based on modifiers, types, and
+/// names. Declarations use Dart's enhanced enum-style syntax with leading dots.
+///
+/// ## Usage Examples
+///
+/// ### Member Groups
+///
+/// Match all members of a specific type:
+///
+/// ```dart
+/// @SortingMembers({
+///   .fields,          // All fields
+///   .constructors,    // All constructors
+///   .methods,         // All methods
+///   .getters,         // All getters
+///   .setters,         // All setters
+/// })
+/// class Example {}
+/// ```
+///
+/// ### Modifiers
+///
+/// Apply modifiers to create specific patterns:
+///
+/// ```dart
+/// @SortingMembers({
+///   .public(.fields),    // Public fields
+///   .private(.fields),   // Private fields
+///   .static(.methods),   // Static methods
+///   .final_(.fields),    // Final fields
+/// })
+/// class Example {}
+/// ```
+///
+/// ### Specific Members
+///
+/// Target individual members by name:
+///
+/// ```dart
+/// @SortingMembers({
+///   .field(#id),           // Specific field named 'id'
+///   .constructor(),        // Unnamed constructor
+///   .constructor(#named),  // Named constructor
+///   .method(#toString),    // Specific method
+/// })
+/// class Example {}
+/// ```
+///
+/// ### Combining Modifiers
+///
+/// Chain modifiers for more specific patterns:
+///
+/// ```dart
+/// @SortingMembers({
+///   .public(.static(.const_(.fields))),  // Public static const fields
+///   .private(.late(.var_(.fields))),     // Private late var fields
+///   .abstract(.methods),                  // Abstract methods
+/// })
+/// class Example {}
+/// ```
+/// {@endtemplate}
 @immutable
 sealed class SortDeclaration {
   const SortDeclaration._();
 
-  /// {@macro abstract}
-  const factory SortDeclaration.abstract(Abstractable modifiable) = Abstract._;
+  /// {@template abstract}
+  /// Represents abstract members.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
+  const factory SortDeclaration.abstract(Abstractable modifiable) = _Abstract._;
 
-  /// {@macro overridden}
+  /// {@template overridden}
+  /// Represents overridden members.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
   const factory SortDeclaration.overridden(OverridableMembers modifiable) =
-      Overridden._;
+      _Overridden._;
 
-  /// {@macro new}
-  const factory SortDeclaration.new_(NewMemberModifiable modifiable) = New._;
+  /// {@template new}
+  /// Represents new members (non-overridden).
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
+  const factory SortDeclaration.new_(NewMemberModifiable modifiable) = _New._;
 
-  /// {@macro instance}
-  const factory SortDeclaration.instance(InstanciableMembers modifiable) =
-      Instance._;
+  /// {@template instance}
+  /// Represents instance members.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
+  const factory SortDeclaration.instance(InstantiableMembers modifiable) =
+      _Instance._;
 
-  /// {@macro externalMembers}
+  /// {@template external}
+  /// Represents external members.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
   const factory SortDeclaration.external(ExternalMembersModifiable modifiable) =
-      External._;
+      _External._;
 
-  /// {@macro static}
-  const factory SortDeclaration.static(Statical modifiable) = Static._;
+  /// {@template static}
+  /// Represents static members.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
+  const factory SortDeclaration.static(Statical modifiable) = _Static._;
 
-  /// {@macro late_modifiable}
-  const factory SortDeclaration.late(LateModifiable modifiable) = Late._;
+  /// {@template late}
+  /// Represents late members.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
+  const factory SortDeclaration.late(LateModifiable modifiable) = _Late._;
 
-  /// {@macro operator}
+  /// {@template operator}
+  /// Represents operator members.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
   const factory SortDeclaration.operator([OperatorModifiable modifiable]) =
-      Operator._;
+      _Operator._;
 
-  /// {@macro nullable}
+  /// {@template nullable}
+  /// Represents nullable members.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
   const factory SortDeclaration.nullable(NullableMembersModifiable modifiable) =
-      Nullable._;
+      _Nullable._;
 
-  /// {@macro typed}
+  /// {@template typed}
+  /// Represents typed members.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
   const factory SortDeclaration.typed(TypedMembersModifiable modifiable) =
-      Typed._;
+      _Typed._;
 
-  /// {@macro dynamic}
+  /// {@template dynamic}
+  /// Represents dynamic members.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
   const factory SortDeclaration.dynamic(DynamicMembersModifiable modifiable) =
-      Dynamic._;
+      _Dynamic._;
 
-  /// {@macro private}
+  /// {@template private}
+  /// Represents private members.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
   const factory SortDeclaration.private(PrivateModifiable modifiable) =
-      Private._;
+      _Private._;
 
-  /// {@macro public}
-  const factory SortDeclaration.public(PublicModifiable modifiable) = Public._;
+  /// {@template public}
+  /// Represents public members.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
+  const factory SortDeclaration.public(PublicModifiable modifiable) = _Public._;
 
-  /// {@macro initialized}
+  /// {@template initialized}
+  /// Represents initialized members.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
   const factory SortDeclaration.initialized(InitializableStatical modifiable) =
-      Initialized._;
+      _Initialized._;
 
-  /// {@macro variable}
-  const factory SortDeclaration.var_(Variable modifiable) = Var._;
+  /// {@template var}
+  /// Represents variable members.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
+  const factory SortDeclaration.var_(Variable modifiable) = _Var._;
 
-  /// {@macro final}
-  const factory SortDeclaration.final_(FinalModifiable modifiable) = Final._;
+  /// {@template final}
+  /// Represents final members.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
+  const factory SortDeclaration.final_(FinalModifiable modifiable) = _Final._;
 
-  /// {@macro const}
-  const factory SortDeclaration.const_(Constant modifiable) = Const._;
+  /// {@template const}
+  /// Represents constant members.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
+  const factory SortDeclaration.const_(Constant modifiable) = _Const._;
 
-  /// {@macro factory}
+  /// {@template factory}
+  /// Represents factory constructors.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
   const factory SortDeclaration.factory_(
     FactoryConstructorModifiable modifiable,
-  ) = Factory._;
+  ) = _Factory._;
 
-  /// {@macro named}
-  const factory SortDeclaration.named(NamedModifiable modifiable) = Named._;
+  /// {@template named}
+  /// Represents named constructors.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
+  const factory SortDeclaration.named(NamedModifiable modifiable) = _Named._;
 
-  /// {@macro unnamed}
+  /// {@template unnamed}
+  /// Represents unnamed members.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
   const factory SortDeclaration.unnamed(UnnamedModifiable modifiable) =
-      Unnamed._;
+      _Unnamed._;
 
-  /// {@macro redirecting}
+  /// {@template redirecting}
+  /// Represents redirecting constructors.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
   const factory SortDeclaration.redirecting(RedirectingModifiable modifiable) =
-      Redirecting._;
+      _Redirecting._;
 
-  /// The constructor generator.
-  const factory SortDeclaration.constructor([Symbol? name]) = Constructor._;
+  /// {@template constructor}
+  /// Represents a constructor
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
+  const factory SortDeclaration.constructor([Symbol? name]) = _Constructor._;
 
-  /// The field generator.
-  const factory SortDeclaration.field(Symbol name) = Field._;
+  /// {@template field}
+  /// Represents a field.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
+  const factory SortDeclaration.field(Symbol name) = _Field._;
 
-  /// The getter generator.
-  const factory SortDeclaration.getter(Symbol name) = Getter._;
+  /// {@template getter}
+  /// Represents a getter.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
+  const factory SortDeclaration.getter(Symbol name) = _Getter._;
 
-  /// The method generator.
-  const factory SortDeclaration.method(Symbol name) = Method._;
+  /// {@template method}
+  /// Represents a method.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
+  const factory SortDeclaration.method(Symbol name) = _Method._;
 
-  /// The setter generator.
-  const factory SortDeclaration.setter(Symbol name) = Setter._;
+  /// {@template setter}
+  /// Represents a setter.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
+  const factory SortDeclaration.setter(Symbol name) = _Setter._;
 
-  /// {@macro test}
+  /// {@template test}
+  /// Represents a test modifier.
+  ///
+  /// {@macro sortDeclaration}
+  /// {@endtemplate}
   @Deprecated(
     'This is not intended for general use. Only for testing purposes.',
   )
   @visibleForTesting
-  const factory SortDeclaration.test(Testable modifiable) = Test._;
+  const factory SortDeclaration.test(Testable modifiable) = _Test._;
 
   /// {@macro constructors}
   static const Constructors constructors = Constructors._constructors;

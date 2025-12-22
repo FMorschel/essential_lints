@@ -2,39 +2,39 @@ part of 'sort_declarations.dart';
 
 /// Represents abstractable members.
 @_gettersInMemberList
-sealed class Abstractable extends StaticalContext
+sealed class Abstractable extends _StaticalContext
     implements NewMemberModifiable, OperatorModifiable {
   /// {@macro public}
   const factory Abstractable.public(PublicStaticalModifiable modifiable) =
-      Public._;
+      _Public._;
 
   /// {@macro private}
   const factory Abstractable.private(PrivateStaticalModifiable modifiable) =
-      Private._;
+      _Private._;
 
   /// {@macro nullable}
   const factory Abstractable.nullable(NullableExternableModifiable modifiable) =
-      Nullable._;
+      _Nullable._;
 
   /// {@macro typed}
   const factory Abstractable.typed(TypedExternableModifiable modifiable) =
-      Typed._;
+      _Typed._;
 
   /// {@macro dynamic}
   const factory Abstractable.dynamic(
     DynamicExternableModifiable modifiable,
-  ) = Dynamic._;
+  ) = _Dynamic._;
 
   /// {@macro operator}
   const factory Abstractable.operator([OperatorModifiable modifiable]) =
-      Operator._;
+      _Operator._;
 
   /// {@macro var}
-  const factory Abstractable.var_(VariableAbstractable modifiable) = Var._;
+  const factory Abstractable.var_(VariableAbstractable modifiable) = _Var._;
 
   /// {@macro final}
   const factory Abstractable.final_(FinalAbstractModifiable modifiable) =
-      Final._;
+      _Final._;
 
   /// {@macro fields}
   static const Fields fields = Fields._fields;
@@ -66,22 +66,16 @@ sealed class Abstractable extends StaticalContext
   ];
 }
 
-/// {@template abstract}
-/// Represents abstract members.
-/// {@endtemplate}
 @InvalidMembers({th<Constructors>()})
 @InvalidModifiers({
-  th<External>(),
-  th<Static>(),
-  th<Initialized>(),
-  th<Late>(),
-  th<Abstract>(),
+  th<_External>(),
+  th<_Static>(),
+  th<_Initialized>(),
+  th<_Late>(),
+  th<_Abstract>(),
 })
-final class Abstract<M extends Abstractable> extends Modifier<M>
-    implements
-        NewMemberModifiable,
-        InstanciableMembers,
-        OverridableMembers {
+final class _Abstract<M extends Abstractable> extends Modifier<M>
+    implements NewMemberModifiable, InstantiableMembers, OverridableMembers {
   /// {@macro abstract}
-  const Abstract._(super.modifiable) : super._();
+  const _Abstract._(super.modifiable) : super._();
 }
