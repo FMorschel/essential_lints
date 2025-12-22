@@ -76,6 +76,26 @@ class ConstructorReferenceCollector extends RecursiveAstVisitor<void> {
     }
     super.visitRedirectingConstructorInvocation(node);
   }
+
+  @override
+  void visitDotShorthandInvocation(DotShorthandInvocation node) {
+    final element = node.memberName.element;
+    if (element is ConstructorElement) {
+      constructors.add(element);
+    }
+    super.visitDotShorthandInvocation(node);
+  }
+
+  @override
+  void visitDotShorthandConstructorInvocation(
+    DotShorthandConstructorInvocation node,
+  ) {
+    final element = node.element;
+    if (element != null) {
+      constructors.add(element);
+    }
+    super.visitDotShorthandConstructorInvocation(node);
+  }
 }
 
 void main() {
@@ -121,7 +141,7 @@ void main() {
     // Collect constructor references from both the library and the test file
     final collector = ConstructorReferenceCollector();
 
-    // Collect from the library itself (for tearoffs like `.new()`)
+    // Collect from the library itself (for tearoffs like `.new`)
     for (final unit in sortDeclarationsResult.units) {
       unit.unit.visitChildren(collector);
     }
@@ -218,7 +238,7 @@ void main() {
       bool isModifiableOrSortDeclaration(InterfaceElement element) {
         if (element.name == 'SortDeclaration') return true;
         for (final t in element.allSupertypes) {
-          if (t.element.name == 'Modifiable') {
+          if (t.element.name == '_Modifiable') {
             return true;
           }
         }
@@ -235,7 +255,7 @@ void main() {
         if (isModifiableOrSortDeclaration(classElement)) continue;
 
         for (final constructor in classElement.constructors) {
-          if (!constructor.isSynthetic) {
+          if (!constructor.isSynthetic && constructor.isPublic) {
             final isReferenced = referencedConstructors.contains(constructor);
             if (!isReferenced) {
               final name = constructor.name;

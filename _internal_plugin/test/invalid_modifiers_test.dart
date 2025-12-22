@@ -36,7 +36,12 @@ void foo(SortDeclaration _) {
   foo(.test(.test(.tests)));
 }
 ''',
-      [error(HintCode.deprecatedMemberUseWithMessage, 127, 4), lint(133, 4)],
+      [
+        error(HintCode.deprecatedMemberUseWithMessage, 127, 4),
+        error(HintCode.deprecatedMemberUseWithMessage, 133, 4),
+        lint(133, 4),
+        error(HintCode.deprecatedMemberUseWithMessage, 139, 5),
+      ],
     );
   }
 
@@ -49,7 +54,13 @@ void foo(SortDeclaration _) {
   foo(.test(.wrapper(.test(.tests))));
 }
 ''',
-      [error(HintCode.deprecatedMemberUseWithMessage, 127, 4), lint(142, 4)],
+      [
+        error(HintCode.deprecatedMemberUseWithMessage, 127, 4),
+        error(HintCode.deprecatedMemberUseWithMessage, 133, 7),
+        error(HintCode.deprecatedMemberUseWithMessage, 142, 4),
+        lint(142, 4),
+        error(HintCode.deprecatedMemberUseWithMessage, 148, 5),
+      ],
     );
   }
 }
