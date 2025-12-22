@@ -166,10 +166,10 @@ void main() {
   late Set<Element> directlyTestedElements;
 
   setUpAll(() async {
-    var currentPackageDir = await essentialLintsAnnotationsPackage();
+    var packageDirectory = await essentialLintsAnnotationsPackage();
     final sortDeclarationsPath = path.normalize(
       path.join(
-        currentPackageDir.path,
+        packageDirectory.path,
         'lib',
         'src',
         'sorting_members',
@@ -180,7 +180,9 @@ void main() {
     // Find all test files in the sorting_declarations folder
     final testDirPath = path.normalize(
       path.join(
-        currentPackageDir.path,
+        (await packageDir(
+          'package:_essential_lints_annotations_test/placehoder.dart',
+        )).path,
         'test',
         'sorting_declarations',
       ),

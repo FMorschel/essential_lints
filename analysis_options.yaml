@@ -6,6 +6,7 @@ linter:
     parameter_assignments: false
     prefer_relative_imports: true
     prefer_final_locals: false
+    unnecessary_await_in_return: false
 
 analyzer:
   language:
