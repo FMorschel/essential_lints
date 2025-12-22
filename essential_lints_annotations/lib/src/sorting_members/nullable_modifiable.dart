@@ -1,17 +1,13 @@
 part of 'sort_declarations.dart';
 
 /// Represents nullable members.
-@_gettersInMemberList
-sealed class _NullableModifiable extends _StaticalContext {
+/*final*/ class _NullableModifiable extends _StaticalContext {
   const _NullableModifiable._() : super._();
-
-  // ignore: unused_element member list
-  static List<_NullableModifiable> get _members => const [];
 }
 
 /// Represents nullable fields.
 @_gettersInMemberList
-sealed class NullableFieldModifiable extends _NullableModifiable
+/*sealed*/ abstract class NullableFieldModifiable extends _NullableModifiable
     implements ConstantVariables {
   /// {@macro public}
   const factory NullableFieldModifiable.public(
@@ -37,8 +33,8 @@ sealed class NullableFieldModifiable extends _NullableModifiable
 
 /// Represents nullable fields that are also abstractable.
 @_gettersInMemberList
-sealed class NullableAbstractableFieldModifiable extends NullableFieldModifiable
-    implements Abstractable {
+/*sealed*/ abstract class NullableAbstractableFieldModifiable
+    extends NullableFieldModifiable implements Abstractable {
   /// {@macro public}
   const factory NullableAbstractableFieldModifiable.public(
     PublicFieldModifiable modifiable,
@@ -58,7 +54,8 @@ sealed class NullableAbstractableFieldModifiable extends NullableFieldModifiable
 
 /// Represents nullable externable members.
 @_gettersInMemberList
-sealed class NullableExternableModifiable extends _NullableModifiable {
+/*sealed*/ abstract class NullableExternableModifiable
+    extends _NullableModifiable {
   /// {@macro public}
   const factory NullableExternableModifiable.public(
     PublicStaticalModifiable modifiable,
@@ -90,18 +87,18 @@ sealed class NullableExternableModifiable extends _NullableModifiable {
 
   // ignore: unused_element member list
   static List<NullableExternableModifiable> get _members => [
-    fields,
-    fieldsGettersSetters,
-    getters,
-    gettersSetters,
-    setters,
-    methods,
-  ];
+        fields,
+        fieldsGettersSetters,
+        getters,
+        gettersSetters,
+        setters,
+        methods,
+      ];
 }
 
 /// Represents all member that can be nullable.
 @_gettersInMemberList
-sealed class NullableMembersModifiable extends _NullableModifiable
+/*sealed*/ abstract class NullableMembersModifiable extends _NullableModifiable
     implements Statical {
   /// {@macro public}
   const factory NullableMembersModifiable.public(
@@ -139,18 +136,19 @@ sealed class NullableMembersModifiable extends _NullableModifiable
 
   // ignore: unused_element member list
   static List<NullableMembersModifiable> get _members => [
-    fields,
-    fieldsGettersSetters,
-    getters,
-    gettersSetters,
-    setters,
-    methods,
-  ];
+        fields,
+        fieldsGettersSetters,
+        getters,
+        gettersSetters,
+        setters,
+        methods,
+      ];
 }
 
 /// Represents nullable operator members.
 @_gettersInMemberList
-sealed class NullableOperatorModifiable extends _NullableModifiable {
+/*sealed*/ abstract class NullableOperatorModifiable
+    extends _NullableModifiable {
   const NullableOperatorModifiable._() : super._();
 
   /// {@macro methods}
@@ -172,7 +170,7 @@ sealed class NullableOperatorModifiable extends _NullableModifiable {
   th<_Final>(),
   th<_Nullable>(),
 })
-final class _Nullable extends Modifier<_NullableModifiable>
+/*final*/ class _Nullable extends Modifier<_NullableModifiable>
     implements
         FinalModifiable,
         ExternalMembersModifiable,

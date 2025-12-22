@@ -2,7 +2,7 @@ part of 'sort_declarations.dart';
 
 /// Represents private members.
 @_gettersInMemberList
-sealed class PrivateModifiable extends _StaticalContext {
+/*sealed*/ abstract class PrivateModifiable extends _StaticalContext {
   const PrivateModifiable._() : super._();
 
   /// {@macro fields}
@@ -29,19 +29,19 @@ sealed class PrivateModifiable extends _StaticalContext {
 
   // ignore: unused_element member list
   static List<PrivateModifiable> get _members => [
-    constructors,
-    fields,
-    fieldsGettersSetters,
-    getters,
-    gettersSetters,
-    setters,
-    methods,
-  ];
+        constructors,
+        fields,
+        fieldsGettersSetters,
+        getters,
+        gettersSetters,
+        setters,
+        methods,
+      ];
 }
 
 /// Represents private constant members.
 @_gettersInMemberList
-sealed class PrivateConstantModifiable extends PrivateModifiable {
+/*sealed*/ abstract class PrivateConstantModifiable extends PrivateModifiable {
   const PrivateConstantModifiable._() : super._();
 
   /// {@macro fields}
@@ -56,7 +56,7 @@ sealed class PrivateConstantModifiable extends PrivateModifiable {
 
 /// Represents private field members.
 @_gettersInMemberList
-sealed class PrivateFieldModifiable extends PrivateModifiable {
+/*sealed*/ abstract class PrivateFieldModifiable extends PrivateModifiable {
   const PrivateFieldModifiable._() : super._();
 
   /// {@macro fields}
@@ -68,7 +68,7 @@ sealed class PrivateFieldModifiable extends PrivateModifiable {
 
 /// Represents private statical members.
 @_gettersInMemberList
-sealed class PrivateStaticalModifiable extends PrivateModifiable
+/*sealed*/ abstract class PrivateStaticalModifiable extends PrivateModifiable
     implements Statical {
   const PrivateStaticalModifiable._() : super._();
 
@@ -93,18 +93,19 @@ sealed class PrivateStaticalModifiable extends PrivateModifiable
 
   // ignore: unused_element member list
   static List<PrivateStaticalModifiable> get _members => [
-    fields,
-    fieldsGettersSetters,
-    getters,
-    gettersSetters,
-    setters,
-    methods,
-  ];
+        fields,
+        fieldsGettersSetters,
+        getters,
+        gettersSetters,
+        setters,
+        methods,
+      ];
 }
 
 /// Represents private constructors.
 @_gettersInMemberList
-sealed class PrivateConstructorModifiable extends PrivateModifiable {
+/*sealed*/ abstract class PrivateConstructorModifiable
+    extends PrivateModifiable {
   const PrivateConstructorModifiable._() : super._();
 
   /// {@macro constructors}
@@ -135,7 +136,7 @@ sealed class PrivateConstructorModifiable extends PrivateModifiable {
 })
 @InvalidMembers(<TypeHolder<Group>>{})
 @MutuallyExclusive(#visibility)
-final class _Private<M extends PrivateModifiable> extends Modifier<M>
+/*final*/ class _Private<M extends PrivateModifiable> extends Modifier<M>
     implements
         NamedModifiable,
         RedirectingModifiable,

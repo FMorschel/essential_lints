@@ -11,7 +11,7 @@ void main() {
   late ResolvedLibraryResult sortDeclarationsResult;
 
   setUpAll(() async {
-    var currentPackageDir = await currentPackage();
+    var currentPackageDir = await essentialLintsAnnotationsPackage();
     final sortDeclarationsPath = path.normalize(
       path.join(
         currentPackageDir.path,
@@ -77,9 +77,7 @@ void main() {
             if (isParticipant) {
               memberGroups.putIfAbsent(symbolValue, () => {}).add(className);
             } else {
-              nonParticipants
-                  .putIfAbsent(symbolValue, () => {})
-                  .add(className);
+              nonParticipants.putIfAbsent(symbolValue, () => {}).add(className);
             }
           }
         }
@@ -232,9 +230,7 @@ void main() {
           }
         }
         for (final entry in nonParticipants.entries) {
-          classToGroups
-              .putIfAbsent(entry.value, () => {})
-              .add(entry.key);
+          classToGroups.putIfAbsent(entry.value, () => {}).add(entry.key);
         }
 
         // Second pass: For each StaticalContext class, check static fields
@@ -245,7 +241,8 @@ void main() {
           if (className == null) continue;
 
           // Check if this class directly extends StaticalContext
-          final extendsStaticalContext = classElement.supertype != null &&
+          final extendsStaticalContext =
+              classElement.supertype != null &&
               classElement.supertype!.element.name == 'StaticalContext';
 
           if (!extendsStaticalContext) continue;
@@ -284,13 +281,16 @@ void main() {
             final nonParticipant = nonParticipants[groupId];
 
             // Check which participants are referenced
-            final referencedParticipants =
-                participants.intersection(referencedMembers);
-            final missingParticipants =
-                participants.difference(referencedMembers);
+            final referencedParticipants = participants.intersection(
+              referencedMembers,
+            );
+            final missingParticipants = participants.difference(
+              referencedMembers,
+            );
 
             // Check if non-participant is referenced
-            final hasNonParticipant = nonParticipant != null &&
+            final hasNonParticipant =
+                nonParticipant != null &&
                 referencedMembers.contains(nonParticipant);
 
             // Rule 1: All participants present but non-participant missing

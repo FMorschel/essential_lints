@@ -2,7 +2,7 @@ part of 'sort_declarations.dart';
 
 /// Represents final members.
 @_gettersInMemberList
-sealed class FinalModifiable extends _StaticalContext
+/*sealed*/ abstract class FinalModifiable extends _StaticalContext
     implements
         LateModifiable,
         Statical,
@@ -45,7 +45,7 @@ sealed class FinalModifiable extends _StaticalContext
 
 /// Represents final members that are also abstractable.
 @_gettersInMemberList
-sealed class FinalAbstractModifiable extends FinalModifiable
+/*sealed*/ abstract class FinalAbstractModifiable extends FinalModifiable
     implements Abstractable {
   /// {@macro public}
   const factory FinalAbstractModifiable.public(
@@ -98,7 +98,7 @@ sealed class FinalAbstractModifiable extends FinalModifiable
   th<_Static>(),
 })
 @MutuallyExclusive(#finality)
-final class _Final<M extends FinalModifiable> extends Modifier<M>
+/*final*/ class _Final<M extends FinalModifiable> extends Modifier<M>
     implements
         ExternalMembersModifiable,
         Abstractable,

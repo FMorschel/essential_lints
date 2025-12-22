@@ -10,7 +10,7 @@ import 'src/current_package_path.dart';
 
 void main() {
   test('all public declarations in src are exported', () async {
-    final packageRoot = await currentPackage();
+    final packageRoot = await essentialLintsAnnotationsPackage();
     final libPath = '${packageRoot.path}${Platform.pathSeparator}lib';
     final srcPath = '$libPath${Platform.pathSeparator}src';
     final mainLibraryPath =

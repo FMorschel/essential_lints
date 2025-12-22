@@ -2,7 +2,8 @@ part of 'sort_declarations.dart';
 
 /// Represents statical members.
 @_gettersInMemberList
-sealed class Statical extends _StaticalContext implements OperatorModifiable {
+/*sealed*/ abstract class Statical extends _StaticalContext
+    implements OperatorModifiable {
   /// {@macro initialized}
   const factory Statical.initialized(InitializableStatical modifiable) =
       _Initialized._;
@@ -59,18 +60,18 @@ sealed class Statical extends _StaticalContext implements OperatorModifiable {
 
   // ignore: unused_element member list
   static List<Statical> get _members => [
-    fields,
-    fieldsGettersSetters,
-    getters,
-    gettersSetters,
-    setters,
-    methods,
-  ];
+        fields,
+        fieldsGettersSetters,
+        getters,
+        gettersSetters,
+        setters,
+        methods,
+      ];
 }
 
 /// Represents statical members that are external.
 @_gettersInMemberList
-sealed class StaticalExternal extends Statical {
+/*sealed*/ abstract class StaticalExternal extends Statical {
   /// {@macro nullable}
   const factory StaticalExternal.nullable(
     NullableExternableModifiable modifiable,
@@ -121,13 +122,13 @@ sealed class StaticalExternal extends Statical {
 
   // ignore: unused_element member list
   static List<StaticalExternal> get _members => [
-    fields,
-    fieldsGettersSetters,
-    getters,
-    gettersSetters,
-    setters,
-    methods,
-  ];
+        fields,
+        fieldsGettersSetters,
+        getters,
+        gettersSetters,
+        setters,
+        methods,
+      ];
 }
 
 @InvalidMembers({th<Constructors>()})
@@ -140,7 +141,7 @@ sealed class StaticalExternal extends Statical {
   th<_External>(),
 })
 @MutuallyExclusive(#context)
-final class _Static<M extends Statical> extends Modifier<M>
+/*final*/ class _Static<M extends Statical> extends Modifier<M>
     implements ExternalMembersModifiable {
   const _Static._(super.modifiable) : super._();
 }

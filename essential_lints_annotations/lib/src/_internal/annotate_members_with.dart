@@ -5,10 +5,10 @@ import 'package:meta/meta_meta.dart';
 /// annotations.
 /// {@endtemplate}
 @Target({
-  .classType,
-  .mixinType,
-  .extensionType,
-  .enumType,
+  TargetKind.classType,
+  TargetKind.mixinType,
+  TargetKind.extensionType,
+  TargetKind.enumType,
 })
 class AnnotateMembersWith {
   /// {@macro annotate_members_with}

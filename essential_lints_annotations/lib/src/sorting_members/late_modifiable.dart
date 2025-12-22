@@ -4,7 +4,7 @@ part of 'sort_declarations.dart';
 /// Represents late modifiable members.
 /// {@endtemplate}
 @_gettersInMemberList
-sealed class LateModifiable extends _StaticalContext
+/*sealed*/ abstract class LateModifiable extends _StaticalContext
     implements Statical, NewMemberModifiable {
   /// {@macro var}
   const factory LateModifiable.var_(Variable modifiable) = _Var._;
@@ -59,7 +59,7 @@ sealed class LateModifiable extends _StaticalContext
   th<_Overridden>(),
   th<_Static>(),
 })
-final class _Late<M extends LateModifiable> extends Modifier<M>
+/*final*/ class _Late<M extends LateModifiable> extends Modifier<M>
     implements
         Statical,
         NewMemberModifiable,

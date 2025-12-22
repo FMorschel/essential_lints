@@ -1,13 +1,13 @@
 part of 'sort_declarations.dart';
 
 /// Class representing dynamic sort declarations.
-final class _DynamicModifiable extends _StaticalContext {
+/*final*/ class _DynamicModifiable extends _StaticalContext {
   const _DynamicModifiable._() : super._();
 }
 
 /// Represents dynamic fields.
 @_gettersInMemberList
-sealed class DynamicFieldModifiable extends _DynamicModifiable
+/*sealed*/ abstract class DynamicFieldModifiable extends _DynamicModifiable
     implements ConstantVariables {
   /// {@macro public}
   const factory DynamicFieldModifiable.public(
@@ -33,8 +33,8 @@ sealed class DynamicFieldModifiable extends _DynamicModifiable
 
 /// Represents dynamic fields that are also abstractable.
 @_gettersInMemberList
-sealed class DynamicAbstractableFieldModifiable extends DynamicFieldModifiable
-    implements Abstractable {
+/*sealed*/ abstract class DynamicAbstractableFieldModifiable
+    extends DynamicFieldModifiable implements Abstractable {
   /// {@macro public}
   const factory DynamicAbstractableFieldModifiable.public(
     PublicFieldModifiable modifiable,
@@ -54,7 +54,8 @@ sealed class DynamicAbstractableFieldModifiable extends DynamicFieldModifiable
 
 /// Represents dynamic externable members.
 @_gettersInMemberList
-sealed class DynamicExternableModifiable extends _DynamicModifiable {
+/*sealed*/ abstract class DynamicExternableModifiable
+    extends _DynamicModifiable {
   /// {@macro public}
   const factory DynamicExternableModifiable.public(
     PublicStaticalModifiable modifiable,
@@ -86,18 +87,18 @@ sealed class DynamicExternableModifiable extends _DynamicModifiable {
 
   // ignore: unused_element member list
   static List<DynamicExternableModifiable> get _members => [
-    fields,
-    fieldsGettersSetters,
-    getters,
-    gettersSetters,
-    setters,
-    methods,
-  ];
+        fields,
+        fieldsGettersSetters,
+        getters,
+        gettersSetters,
+        setters,
+        methods,
+      ];
 }
 
 /// Represents all member that can be dynamic.
 @_gettersInMemberList
-sealed class DynamicMembersModifiable extends _DynamicModifiable
+/*sealed*/ abstract class DynamicMembersModifiable extends _DynamicModifiable
     implements Statical {
   /// {@macro public}
   const factory DynamicMembersModifiable.public(
@@ -135,18 +136,18 @@ sealed class DynamicMembersModifiable extends _DynamicModifiable
 
   // ignore: unused_element member list
   static List<DynamicMembersModifiable> get _members => [
-    fields,
-    fieldsGettersSetters,
-    getters,
-    gettersSetters,
-    setters,
-    methods,
-  ];
+        fields,
+        fieldsGettersSetters,
+        getters,
+        gettersSetters,
+        setters,
+        methods,
+      ];
 }
 
 /// Represents dynamic operator members.
 @_gettersInMemberList
-sealed class DynamicOperatorModifiable extends _DynamicModifiable {
+/*sealed*/ abstract class DynamicOperatorModifiable extends _DynamicModifiable {
   const DynamicOperatorModifiable._() : super._();
 
   /// {@macro methods}
@@ -170,7 +171,7 @@ sealed class DynamicOperatorModifiable extends _DynamicModifiable {
   th<_Dynamic>(),
 })
 @MutuallyExclusive(#typeAnnotation)
-final class _Dynamic extends Modifier<_DynamicModifiable>
+/*final*/ class _Dynamic extends Modifier<_DynamicModifiable>
     implements
         FinalModifiable,
         ExternalMembersModifiable,

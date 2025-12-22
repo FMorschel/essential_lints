@@ -8,8 +8,9 @@ part of 'sort_declarations.dart';
 @InvalidMembers({})
 @InvalidModifiers({th<_TestWrapper>()})
 @Deprecated('Only used for testing')
-final class _TestWrapper extends Modifier<Testable> implements Testable {
+/*final*/ class _TestWrapper extends Modifier<Testable> implements Testable {
   @Deprecated('Only used for testing')
+
   /// {@macro wrapper}
   const _TestWrapper._(super.modifiable) : super._();
 }
@@ -18,7 +19,7 @@ final class _TestWrapper extends Modifier<Testable> implements Testable {
 @visibleForTesting
 @_gettersInMemberList
 @Deprecated('Only used for testing')
-sealed class Testable extends _StaticalContext {
+/*sealed*/ abstract class Testable extends _StaticalContext {
   /// {@macro test}
   @Deprecated('Only used for testing')
   const factory Testable.test(Testable modifiable) = _Test._;
@@ -41,8 +42,9 @@ sealed class Testable extends _StaticalContext {
 /// {@endtemplate}
 @visibleForTesting
 @Deprecated('Only used for testing')
-final class Tests extends Group implements Testable {
+/*final*/ class Tests extends Group implements Testable {
   @Deprecated('Only used for testing')
+
   /// {@macro tests}
   const Tests._() : super._();
 
@@ -53,7 +55,7 @@ final class Tests extends Group implements Testable {
 @InvalidMembers({th<Tests>()})
 @InvalidModifiers({th<_Test>()})
 @Deprecated('Only used for testing')
-final class _Test extends Modifier<Testable> implements Testable {
+/*final*/ class _Test extends Modifier<Testable> implements Testable {
   @Deprecated('Only used for testing')
   const _Test._(super.modifiable) : super._();
 }

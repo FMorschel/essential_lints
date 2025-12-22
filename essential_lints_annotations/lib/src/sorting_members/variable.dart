@@ -4,7 +4,7 @@ part of 'sort_declarations.dart';
 /// Represents variable members.
 /// {@endtemplate}
 @_gettersInMemberList
-sealed class Variable extends _StaticalContext
+/*sealed*/ abstract class Variable extends _StaticalContext
     implements
         LateModifiable,
         Statical,
@@ -32,7 +32,8 @@ sealed class Variable extends _StaticalContext
 
 /// Represents variable members that are also abstractable.
 @_gettersInMemberList
-sealed class VariableAbstractable extends Variable implements Abstractable {
+/*sealed*/ abstract class VariableAbstractable extends Variable
+    implements Abstractable {
   /// {@macro public}
   const factory VariableAbstractable.public(
     PublicFieldModifiable modifiable,
@@ -69,7 +70,7 @@ sealed class VariableAbstractable extends Variable implements Abstractable {
   th<_Var>(),
 })
 @MutuallyExclusive(#finality)
-final class _Var<M extends Variable> extends Modifier<M>
+/*final*/ class _Var<M extends Variable> extends Modifier<M>
     implements
         ExternalMembersModifiable,
         Abstractable,

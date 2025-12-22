@@ -17,7 +17,7 @@ class SubtypeNaming {
     this.prefix,
     this.suffix,
     this.containing,
-    this.option = .all,
+    this.option = SubtypeOption.all,
   });
 
   /// The required prefix for the subtype name.

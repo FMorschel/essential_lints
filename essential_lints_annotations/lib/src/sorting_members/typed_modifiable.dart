@@ -1,13 +1,13 @@
 part of 'sort_declarations.dart';
 
 /// Class representing typed sort declarations.
-final class _TypedModifiable extends _StaticalContext {
+/*final*/ class _TypedModifiable extends _StaticalContext {
   const _TypedModifiable._() : super._();
 }
 
 /// Represents typed fields.
 @_gettersInMemberList
-sealed class TypedFieldModifiable extends _TypedModifiable
+/*sealed*/ abstract class TypedFieldModifiable extends _TypedModifiable
     implements ConstantVariables {
   /// {@macro public}
   const factory TypedFieldModifiable.public(
@@ -38,8 +38,8 @@ sealed class TypedFieldModifiable extends _TypedModifiable
 
 /// Represents typed fields that are also abstractable.
 @_gettersInMemberList
-sealed class TypedAbstractableFieldModifiable extends TypedFieldModifiable
-    implements Abstractable {
+/*sealed*/ abstract class TypedAbstractableFieldModifiable
+    extends TypedFieldModifiable implements Abstractable {
   /// {@macro public}
   const factory TypedAbstractableFieldModifiable.public(
     PublicFieldModifiable modifiable,
@@ -64,7 +64,7 @@ sealed class TypedAbstractableFieldModifiable extends TypedFieldModifiable
 
 /// Represents typed externable members.
 @_gettersInMemberList
-sealed class TypedExternableModifiable extends _TypedModifiable {
+/*sealed*/ abstract class TypedExternableModifiable extends _TypedModifiable {
   /// {@macro public}
   const factory TypedExternableModifiable.public(
     PublicStaticalModifiable modifiable,
@@ -101,18 +101,18 @@ sealed class TypedExternableModifiable extends _TypedModifiable {
 
   // ignore: unused_element member list
   static List<TypedExternableModifiable> get _members => [
-    fields,
-    fieldsGettersSetters,
-    getters,
-    gettersSetters,
-    setters,
-    methods,
-  ];
+        fields,
+        fieldsGettersSetters,
+        getters,
+        gettersSetters,
+        setters,
+        methods,
+      ];
 }
 
 /// Represents all member that can be typed.
 @_gettersInMemberList
-sealed class TypedMembersModifiable extends _TypedModifiable
+/*sealed*/ abstract class TypedMembersModifiable extends _TypedModifiable
     implements Statical {
   /// {@macro public}
   const factory TypedMembersModifiable.public(
@@ -155,18 +155,18 @@ sealed class TypedMembersModifiable extends _TypedModifiable
 
   // ignore: unused_element member list
   static List<TypedMembersModifiable> get _members => [
-    fields,
-    fieldsGettersSetters,
-    getters,
-    gettersSetters,
-    setters,
-    methods,
-  ];
+        fields,
+        fieldsGettersSetters,
+        getters,
+        gettersSetters,
+        setters,
+        methods,
+      ];
 }
 
 /// Represents typed operator members.
 @_gettersInMemberList
-sealed class TypedOperatorModifiable extends _TypedModifiable {
+/*sealed*/ abstract class TypedOperatorModifiable extends _TypedModifiable {
   /// {@macro nullable}
   const factory TypedOperatorModifiable.nullable([
     NullableOperatorModifiable modifiable,
@@ -192,7 +192,7 @@ sealed class TypedOperatorModifiable extends _TypedModifiable {
   th<_Typed>(),
 })
 @MutuallyExclusive(#typeAnnotation)
-final class _Typed extends Modifier<_TypedModifiable>
+/*final*/ class _Typed extends Modifier<_TypedModifiable>
     implements
         FinalModifiable,
         ExternalMembersModifiable,

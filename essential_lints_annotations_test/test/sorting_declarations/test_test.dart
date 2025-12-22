@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use_from_same_package testing
+// ignore_for_file: deprecated_member_use testing
 
 import 'package:test/test.dart';
 

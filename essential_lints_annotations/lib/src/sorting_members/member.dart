@@ -1,7 +1,7 @@
 part of 'sort_declarations.dart';
 
 /// Represents a member.
-sealed class _Member extends SortDeclaration {
+/*sealed*/ abstract class _Member extends SortDeclaration {
   const _Member._(this.name) : super._();
 
   /// The name of the member.
@@ -9,7 +9,7 @@ sealed class _Member extends SortDeclaration {
 }
 
 /// Represents a member.
-sealed class _NonConstructorMember extends _Member {
+/*sealed*/ abstract class _NonConstructorMember extends _Member {
   const _NonConstructorMember._(this.name) : super._(name);
 
   /// The name of the member.
@@ -18,22 +18,22 @@ sealed class _NonConstructorMember extends _Member {
   final Symbol name;
 }
 
-final class _Constructor extends _Member {
+/*final*/ class _Constructor extends _Member {
   const _Constructor._([super.name]) : super._();
 }
 
-final class _Field extends _NonConstructorMember {
+/*final*/ class _Field extends _NonConstructorMember {
   const _Field._(super.name) : super._();
 }
 
-final class _Getter extends _NonConstructorMember {
+/*final*/ class _Getter extends _NonConstructorMember {
   const _Getter._(super.name) : super._();
 }
 
-final class _Method extends _NonConstructorMember {
+/*final*/ class _Method extends _NonConstructorMember {
   const _Method._(super.name) : super._();
 }
 
-final class _Setter extends _NonConstructorMember {
+/*final*/ class _Setter extends _NonConstructorMember {
   const _Setter._(super.name) : super._();
 }

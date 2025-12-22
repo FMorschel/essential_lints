@@ -6,7 +6,7 @@ part of 'sort_declarations.dart';
 ///
 /// Groups initializable members.
 @_gettersInMemberList
-sealed class _Initializable extends _StaticalContext {
+/*sealed*/ abstract class _Initializable extends _StaticalContext {
   const _Initializable._() : super._();
 
   // ignore: unused_element member list
@@ -15,7 +15,7 @@ sealed class _Initializable extends _StaticalContext {
 
 /// Groups initializable overridable members.
 @_gettersInMemberList
-sealed class InitializableOverridable extends _Initializable
+/*sealed*/ abstract class InitializableOverridable extends _Initializable
     implements NewMemberModifiable {
   /// {@macro private}
   const factory InitializableOverridable.private(
@@ -36,7 +36,8 @@ sealed class InitializableOverridable extends _Initializable
 
 /// Groups initializable static members.
 @_gettersInMemberList
-sealed class InitializableStatical extends _Initializable implements Statical {
+/*sealed*/ abstract class InitializableStatical extends _Initializable
+    implements Statical {
   /// {@macro public}
   const factory InitializableStatical.public(PublicFieldModifiable modifiable) =
       _Public._;
@@ -69,7 +70,7 @@ sealed class InitializableStatical extends _Initializable implements Statical {
   th<_Overridden>(),
   th<_Static>(),
 })
-final class _Initialized<M extends _Initializable> extends Modifier<M>
+/*final*/ class _Initialized<M extends _Initializable> extends Modifier<M>
     implements
         Statical,
         NewMemberModifiable,

@@ -7,9 +7,7 @@ issue_tracker: https://github.com/FMorschel/essential_lints/issues
 license: MIT
 
 environment:
-  sdk: ^3.10.0
-
-resolution: workspace
+  sdk: ">=2.19.0 <4.0.0"
 
 # Recommended keywords help users find the package on pub.dev.
 keywords:
@@ -19,13 +17,7 @@ keywords:
   - meta
 
 dependencies:
-  meta: ^1.17.0
+  meta: ^1.11.0
 
 dev_dependencies:
-  analyzer: any
-  dartdoc:
-    git:
-      url: https://github.com/dart-lang/dartdoc/
-      ref: 3f1f09cddec561faaa61ba3dc767b813f6d6c699
-  path: any
-  test: any
+  very_good_analysis: ^10.0.0

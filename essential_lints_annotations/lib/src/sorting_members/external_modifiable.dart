@@ -1,19 +1,16 @@
 part of 'sort_declarations.dart';
 
 /// Represents external modifiable members.
-@_gettersInMemberList
-sealed class _ExternalModifiable extends _StaticalContext {
+/*final*/ class _ExternalModifiable extends _StaticalContext {
   const _ExternalModifiable._() : super._();
-
-  // ignore: unused_element member list
-  static List<DynamicExternableModifiable> get _members => const [];
 }
 
 /// {@template externalMembers}
 /// Represents members that can be external and their modifiers.
 /// {@endtemplate}
 @_gettersInMemberList
-sealed class ExternalMembersModifiable extends _ExternalModifiable {
+/*sealed*/ abstract class ExternalMembersModifiable
+    extends _ExternalModifiable {
   /// {@macro factory}
   const factory ExternalMembersModifiable.factory_(
     FactoryExternalModifiable modifiable,
@@ -110,14 +107,14 @@ sealed class ExternalMembersModifiable extends _ExternalModifiable {
 
   // ignore: unused_element member list
   static List<ExternalMembersModifiable> get _members => [
-    constructors,
-    fields,
-    fieldsGettersSetters,
-    getters,
-    gettersSetters,
-    setters,
-    methods,
-  ];
+        constructors,
+        fields,
+        fieldsGettersSetters,
+        getters,
+        gettersSetters,
+        setters,
+        methods,
+      ];
 }
 
 @InvalidModifiers({
@@ -128,6 +125,6 @@ sealed class ExternalMembersModifiable extends _ExternalModifiable {
   th<_External>(),
 })
 @InvalidMembers(<TypeHolder<Group>>{})
-final class _External<M extends _ExternalModifiable> extends Modifier<M> {
+/*final*/ class _External<M extends _ExternalModifiable> extends Modifier<M> {
   const _External._(super.modifiable) : super._();
 }

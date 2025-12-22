@@ -2,7 +2,7 @@ part of 'sort_declarations.dart';
 
 /// Represents constant members.
 @_gettersInMemberList
-sealed class Constant extends _StaticalContext {
+/*sealed*/ abstract class Constant extends _StaticalContext {
   /// {@macro named}
   const factory Constant.named(NamedModifiable modifiable) = _Named._;
 
@@ -37,7 +37,7 @@ sealed class Constant extends _StaticalContext {
 
 /// Represents constant fields.
 @_gettersInMemberList
-sealed class ConstantVariables extends Constant
+/*sealed*/ abstract class ConstantVariables extends Constant
     implements
         LateModifiable,
         Statical,
@@ -95,6 +95,7 @@ sealed class ConstantVariables extends Constant
   th<_Overridden>(),
 })
 @MutuallyExclusive(#finality, optional: true)
-final class _Const<M extends Constant> extends Modifier<M> implements Statical {
+/*final*/ class _Const<M extends Constant> extends Modifier<M>
+    implements Statical {
   const _Const._(super.modifiable) : super._();
 }

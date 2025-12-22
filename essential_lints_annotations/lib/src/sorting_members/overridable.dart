@@ -1,18 +1,14 @@
 part of 'sort_declarations.dart';
 
-@_gettersInMemberList
-sealed class _Overridable extends _StaticalContext {
+/*final*/ class _Overridable extends _StaticalContext {
   const _Overridable._() : super._();
-
-  // ignore: unused_element member list
-  static List<_Overridable> get _members => const [];
 }
 
 /// {@template overridable}
 /// Represents overridable members.
 /// {@endtemplate}
 @_gettersInMemberList
-sealed class OverridableMembers extends _Overridable {
+/*sealed*/ abstract class OverridableMembers extends _Overridable {
   /// {@macro public}
   const factory OverridableMembers.public(PublicStaticalModifiable modifiable) =
       _Public._;
@@ -80,18 +76,18 @@ sealed class OverridableMembers extends _Overridable {
 
   // ignore: unused_element member list
   static List<OverridableMembers> get _members => [
-    fields,
-    fieldsGettersSetters,
-    getters,
-    gettersSetters,
-    setters,
-    methods,
-  ];
+        fields,
+        fieldsGettersSetters,
+        getters,
+        gettersSetters,
+        setters,
+        methods,
+      ];
 }
 
 /// {@macro overridable}
 @_gettersInMemberList
-sealed class OverridableExternal extends _Overridable {
+/*sealed*/ abstract class OverridableExternal extends _Overridable {
   /// {@macro public}
   const factory OverridableExternal.public(
     PublicStaticalModifiable modifiable,
@@ -150,13 +146,13 @@ sealed class OverridableExternal extends _Overridable {
 
   // ignore: unused_element member list
   static List<OverridableExternal> get _members => [
-    fields,
-    fieldsGettersSetters,
-    getters,
-    gettersSetters,
-    setters,
-    methods,
-  ];
+        fields,
+        fieldsGettersSetters,
+        getters,
+        gettersSetters,
+        setters,
+        methods,
+      ];
 }
 
 @InvalidMembers({th<Constructors>()})
@@ -168,7 +164,7 @@ sealed class OverridableExternal extends _Overridable {
   th<_External>(),
 })
 @MutuallyExclusive(#overriding)
-final class _Overridden<M extends _Overridable> extends Modifier<M>
+/*final*/ class _Overridden<M extends _Overridable> extends Modifier<M>
     implements
         InstantiableMembers,
         ExternalMembersModifiable,

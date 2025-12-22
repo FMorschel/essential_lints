@@ -4,7 +4,7 @@ part of 'sort_declarations.dart';
 /// Represents redirecting modifiable members (constructors).
 /// {@endtemplate}
 @_gettersInMemberList
-sealed class RedirectingModifiable extends _StaticalContext {
+/*sealed*/ abstract class RedirectingModifiable extends _StaticalContext {
   /// {@macro private}
   const factory RedirectingModifiable.private(
     PrivateConstructorModifiable modifiable,
@@ -44,7 +44,7 @@ sealed class RedirectingModifiable extends _StaticalContext {
   th<_Factory>(),
   th<_Const>(),
 })
-final class _Redirecting<M extends RedirectingModifiable> extends Modifier<M>
-    implements FactoryConstructorModifiable {
+/*final*/ class _Redirecting<M extends RedirectingModifiable>
+    extends Modifier<M> implements FactoryConstructorModifiable {
   const _Redirecting._(super.modifiable) : super._();
 }

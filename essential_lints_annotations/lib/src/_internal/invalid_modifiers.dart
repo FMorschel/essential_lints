@@ -6,7 +6,7 @@ import '../utils/type_holder.dart';
 /// {@template invalid_modifier}
 /// A class representing invalid modifiers for a member group.
 /// {@endtemplate}
-@Target({.classType, .extensionType})
+@Target({TargetKind.classType, TargetKind.extensionType})
 class InvalidModifiers {
   /// {@macro invalid_modifier}
   const InvalidModifiers(this.invalidModifiers);

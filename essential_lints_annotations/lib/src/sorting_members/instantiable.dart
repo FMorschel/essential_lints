@@ -1,17 +1,13 @@
 part of 'sort_declarations.dart';
 
 /// Class representing instance sort declarations.
-@_gettersInMemberList
-sealed class _Instantiable extends _StaticalContext {
+/*final*/ class _Instantiable extends _StaticalContext {
   const _Instantiable._() : super._();
-
-  // ignore: unused_element member list
-  static List<_Instantiable> get _members => const [];
 }
 
 /// Represents instance members.
 @_gettersInMemberList
-sealed class InstantiableMembers extends _Instantiable {
+/*sealed*/ abstract class InstantiableMembers extends _Instantiable {
   /// {@macro public}
   const factory InstantiableMembers.public(
     PublicStaticalModifiable modifiable,
@@ -88,18 +84,18 @@ sealed class InstantiableMembers extends _Instantiable {
 
   // ignore: unused_element member list
   static List<InstantiableMembers> get _members => [
-    fields,
-    fieldsGettersSetters,
-    getters,
-    gettersSetters,
-    setters,
-    methods,
-  ];
+        fields,
+        fieldsGettersSetters,
+        getters,
+        gettersSetters,
+        setters,
+        methods,
+      ];
 }
 
 /// Class representing instance sort declarations.
 @_gettersInMemberList
-sealed class InstantiableExternal extends _Instantiable {
+/*sealed*/ abstract class InstantiableExternal extends _Instantiable {
   /// {@macro public}
   const factory InstantiableExternal.public(
     PublicStaticalModifiable modifiable,
@@ -168,13 +164,13 @@ sealed class InstantiableExternal extends _Instantiable {
 
   // ignore: unused_element member list
   static List<InstantiableExternal> get _members => [
-    fields,
-    fieldsGettersSetters,
-    getters,
-    gettersSetters,
-    setters,
-    methods,
-  ];
+        fields,
+        fieldsGettersSetters,
+        getters,
+        gettersSetters,
+        setters,
+        methods,
+      ];
 }
 
 @InvalidMembers({th<Constructors>()})
@@ -184,7 +180,7 @@ sealed class InstantiableExternal extends _Instantiable {
   th<_External>(),
 })
 @MutuallyExclusive(#context)
-final class _Instance extends Modifier<_Instantiable>
+/*final*/ class _Instance extends Modifier<_Instantiable>
     implements ExternalMembersModifiable {
   const _Instance._(super.modifiable) : super._();
 }

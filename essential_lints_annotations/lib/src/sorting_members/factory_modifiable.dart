@@ -3,17 +3,13 @@ part of 'sort_declarations.dart';
 /// {@template factory_modifiable}
 /// Represents factory modifiable members (constructors).
 /// {@endtemplate}
-@_gettersInMemberList
-sealed class _FactoryModifiable extends _StaticalContext {
+/*final*/ class _FactoryModifiable extends _StaticalContext {
   const _FactoryModifiable._() : super._();
-
-  // ignore: unused_element member list
-  static List<ExternalMembersModifiable> get _members => [];
 }
 
 /// Represents factory external modifiable members.
 @_gettersInMemberList
-sealed class FactoryExternalModifiable extends _FactoryModifiable {
+/*sealed*/ abstract class FactoryExternalModifiable extends _FactoryModifiable {
   /// {@macro named}
   const factory FactoryExternalModifiable.named(NamedModifiable modifiable) =
       _Named._;
@@ -42,7 +38,8 @@ sealed class FactoryExternalModifiable extends _FactoryModifiable {
 
 /// Represents factory constructor modifiable members.
 @_gettersInMemberList
-sealed class FactoryConstructorModifiable extends _FactoryModifiable {
+/*sealed*/ abstract class FactoryConstructorModifiable
+    extends _FactoryModifiable {
   /// {@macro redirecting}
   const factory FactoryConstructorModifiable.redirecting(
     RedirectingModifiable modifiable,
@@ -85,7 +82,7 @@ sealed class FactoryConstructorModifiable extends _FactoryModifiable {
 @InvalidModifiers({
   th<_Factory>(),
 })
-final class _Factory<M extends _FactoryModifiable> extends Modifier<M>
+/*final*/ class _Factory<M extends _FactoryModifiable> extends Modifier<M>
     implements Constant, ExternalMembersModifiable {
   const _Factory._(super.modifiable) : super._();
 }

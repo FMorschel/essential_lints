@@ -99,7 +99,7 @@ part 'variable.dart';
 /// ```
 /// {@endtemplate}
 @immutable
-sealed class SortDeclaration {
+/*sealed*/ abstract class SortDeclaration {
   const SortDeclaration._();
 
   /// {@template abstract}

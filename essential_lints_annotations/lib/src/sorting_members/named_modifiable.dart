@@ -4,7 +4,7 @@ part of 'sort_declarations.dart';
 /// Represents named modifiable members (constructors).
 /// {@endtemplate}
 @_gettersInMemberList
-sealed class NamedModifiable extends _StaticalContext {
+/*sealed*/ abstract class NamedModifiable extends _StaticalContext {
   /// {@macro private}
   const factory NamedModifiable.private(
     PrivateConstructorModifiable modifiable,
@@ -37,7 +37,7 @@ sealed class NamedModifiable extends _StaticalContext {
   th<_External>(),
 })
 @MutuallyExclusive(#named)
-final class _Named<M extends NamedModifiable> extends Modifier<M>
+/*final*/ class _Named<M extends NamedModifiable> extends Modifier<M>
     implements
         ExternalMembersModifiable,
         Constant,

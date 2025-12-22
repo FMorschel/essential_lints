@@ -2,7 +2,7 @@ part of 'sort_declarations.dart';
 
 /// Represents unnamed members.
 @_gettersInMemberList
-sealed class UnnamedModifiable extends _StaticalContext {
+/*sealed*/ abstract class UnnamedModifiable extends _StaticalContext {
   const UnnamedModifiable._() : super._();
 
   /// {@macro constructors}
@@ -30,7 +30,7 @@ sealed class UnnamedModifiable extends _StaticalContext {
   th<_External>(),
 })
 @MutuallyExclusive(#named)
-final class _Unnamed<M extends UnnamedModifiable> extends Modifier<M>
+/*final*/ class _Unnamed<M extends UnnamedModifiable> extends Modifier<M>
     implements
         RedirectingModifiable,
         FactoryConstructorModifiable,

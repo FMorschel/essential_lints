@@ -2,7 +2,7 @@ part of 'sort_declarations.dart';
 
 /// Represents abstractable members.
 @_gettersInMemberList
-sealed class Abstractable extends _StaticalContext
+/*sealed*/ abstract class Abstractable extends _StaticalContext
     implements NewMemberModifiable, OperatorModifiable {
   /// {@macro public}
   const factory Abstractable.public(PublicStaticalModifiable modifiable) =
@@ -57,13 +57,13 @@ sealed class Abstractable extends _StaticalContext
 
   // ignore: unused_element member list
   static List<Abstractable> get _members => [
-    fields,
-    getters,
-    setters,
-    methods,
-    fieldsGettersSetters,
-    gettersSetters,
-  ];
+        fields,
+        getters,
+        setters,
+        methods,
+        fieldsGettersSetters,
+        gettersSetters,
+      ];
 }
 
 @InvalidMembers({th<Constructors>()})
@@ -74,7 +74,7 @@ sealed class Abstractable extends _StaticalContext
   th<_Late>(),
   th<_Abstract>(),
 })
-final class _Abstract<M extends Abstractable> extends Modifier<M>
+/*final*/ class _Abstract<M extends Abstractable> extends Modifier<M>
     implements NewMemberModifiable, InstantiableMembers, OverridableMembers {
   /// {@macro abstract}
   const _Abstract._(super.modifiable) : super._();

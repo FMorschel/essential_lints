@@ -8,11 +8,11 @@ import 'utils/type_holder.dart';
 /// Annotations for the `getters_in_member_list` lint rule.
 /// {@endtemplate}
 @Target({
-  .classType,
-  .mixinType,
-  .extensionType,
-  .extension,
-  .enumType,
+  TargetKind.classType,
+  TargetKind.mixinType,
+  TargetKind.extensionType,
+  TargetKind.extension,
+  TargetKind.enumType,
 })
 class GettersInMemberList {
   /// {@macro getters_in_member_list}
@@ -22,7 +22,7 @@ class GettersInMemberList {
     this.fields = true,
     this.types = const <TypeHolder<Object?>>[],
     this.superTypes = const <TypeHolder<Object?>>[],
-    this.membersOption = .instance,
+    this.membersOption = MembersOption.instance,
   });
 
   /// The name of the member list to check.

@@ -2,7 +2,7 @@ part of 'sort_declarations.dart';
 
 /// Represents public members.
 @_gettersInMemberList
-sealed class PublicModifiable extends _StaticalContext {
+/*sealed*/ abstract class PublicModifiable extends _StaticalContext {
   const PublicModifiable._() : super._();
 
   /// {@macro fields}
@@ -29,19 +29,19 @@ sealed class PublicModifiable extends _StaticalContext {
 
   // ignore: unused_element member list
   static List<PublicModifiable> get _members => [
-    constructors,
-    fields,
-    fieldsGettersSetters,
-    getters,
-    gettersSetters,
-    setters,
-    methods,
-  ];
+        constructors,
+        fields,
+        fieldsGettersSetters,
+        getters,
+        gettersSetters,
+        setters,
+        methods,
+      ];
 }
 
 /// Represents public constant members.
 @_gettersInMemberList
-sealed class PublicConstantModifiable extends PublicModifiable {
+/*sealed*/ abstract class PublicConstantModifiable extends PublicModifiable {
   const PublicConstantModifiable._() : super._();
 
   /// {@macro fields}
@@ -56,7 +56,7 @@ sealed class PublicConstantModifiable extends PublicModifiable {
 
 /// Represents public field members.
 @_gettersInMemberList
-sealed class PublicFieldModifiable extends PublicModifiable {
+/*sealed*/ abstract class PublicFieldModifiable extends PublicModifiable {
   const PublicFieldModifiable._() : super._();
 
   /// {@macro fields}
@@ -68,7 +68,7 @@ sealed class PublicFieldModifiable extends PublicModifiable {
 
 /// Represents public statical members.
 @_gettersInMemberList
-sealed class PublicStaticalModifiable extends PublicModifiable
+/*sealed*/ abstract class PublicStaticalModifiable extends PublicModifiable
     implements Statical {
   const PublicStaticalModifiable._() : super._();
 
@@ -93,18 +93,18 @@ sealed class PublicStaticalModifiable extends PublicModifiable
 
   // ignore: unused_element member list
   static List<PublicStaticalModifiable> get _members => [
-    fields,
-    fieldsGettersSetters,
-    getters,
-    gettersSetters,
-    setters,
-    methods,
-  ];
+        fields,
+        fieldsGettersSetters,
+        getters,
+        gettersSetters,
+        setters,
+        methods,
+      ];
 }
 
 /// Represents public constructors.
 @_gettersInMemberList
-sealed class PublicConstructorModifiable extends PublicModifiable {
+/*sealed*/ abstract class PublicConstructorModifiable extends PublicModifiable {
   const PublicConstructorModifiable._() : super._();
 
   /// {@macro constructors}
@@ -135,7 +135,7 @@ sealed class PublicConstructorModifiable extends PublicModifiable {
 })
 @InvalidMembers(<TypeHolder<Group>>{})
 @MutuallyExclusive(#visibility)
-final class _Public<M extends PublicModifiable> extends Modifier<M>
+/*final*/ class _Public<M extends PublicModifiable> extends Modifier<M>
     implements
         NamedModifiable,
         RedirectingModifiable,

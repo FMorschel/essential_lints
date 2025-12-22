@@ -11,7 +11,7 @@ void main() {
   late ResolvedLibraryResult sortDeclarationsResult;
 
   setUpAll(() async {
-    var currentPackageDir = await currentPackage();
+    var currentPackageDir = await essentialLintsAnnotationsPackage();
     final sortDeclarationsPath = path.normalize(
       path.join(
         currentPackageDir.path,
@@ -128,29 +128,35 @@ void main() {
             final optionalInGroup = optionalMembers[groupId] ?? {};
 
             if (redirectedMembers.length < allGroupMembers.length) {
-              final redirectedNames =
-                  redirectedMembers.map((e) => e.name).toSet();
+              final redirectedNames = redirectedMembers
+                  .map((e) => e.name)
+                  .toSet();
 
               // Get required members (all non-optional members)
-              final requiredMembers =
-                  allGroupMembers.difference(optionalInGroup);
+              final requiredMembers = allGroupMembers.difference(
+                optionalInGroup,
+              );
               final requiredNames = requiredMembers.map((e) => e.name).toSet();
 
               // Check if any optional member is present
-              final hasOptional =
-                  redirectedMembers.any(optionalInGroup.contains);
+              final hasOptional = redirectedMembers.any(
+                optionalInGroup.contains,
+              );
 
               if (hasOptional) {
                 // If optional member(s) are present, all required members
                 // must also be present
-                final missingRequired =
-                    requiredNames.difference(redirectedNames);
+                final missingRequired = requiredNames.difference(
+                  redirectedNames,
+                );
 
                 if (missingRequired.isNotEmpty) {
-                  final optionalNames =
-                      optionalInGroup.map((e) => e.name).toSet();
-                  final presentOptional =
-                      redirectedNames.intersection(optionalNames);
+                  final optionalNames = optionalInGroup
+                      .map((e) => e.name)
+                      .toSet();
+                  final presentOptional = redirectedNames.intersection(
+                    optionalNames,
+                  );
 
                   violations.add(
                     '${classElement.name} has optional member(s) but is '
@@ -163,8 +169,9 @@ void main() {
               } else {
                 // No optional members present
                 // Check if all present members are required
-                final missingRequired =
-                    requiredNames.difference(redirectedNames);
+                final missingRequired = requiredNames.difference(
+                  redirectedNames,
+                );
 
                 if (missingRequired.isNotEmpty) {
                   // Some required members are missing

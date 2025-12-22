@@ -1,18 +1,14 @@
 part of 'sort_declarations.dart';
 
-@_gettersInMemberList
-sealed class _NewModifiable extends _StaticalContext {
+/*final*/ class _NewModifiable extends _StaticalContext {
   const _NewModifiable._() : super._();
-
-  // ignore: unused_element member list
-  static List<_NewModifiable> get _members => const [];
 }
 
 /// {@template new_modifiable}
 /// Represents new members (not-overridden).
 /// {@endtemplate}
 @_gettersInMemberList
-sealed class NewMemberModifiable extends _NewModifiable {
+/*sealed*/ abstract class NewMemberModifiable extends _NewModifiable {
   /// {@macro public}
   const factory NewMemberModifiable.public(
     PublicStaticalModifiable modifiable,
@@ -81,18 +77,18 @@ sealed class NewMemberModifiable extends _NewModifiable {
 
   // ignore: unused_element member list
   static List<NewMemberModifiable> get _members => [
-    fields,
-    fieldsGettersSetters,
-    getters,
-    gettersSetters,
-    setters,
-    methods,
-  ];
+        fields,
+        fieldsGettersSetters,
+        getters,
+        gettersSetters,
+        setters,
+        methods,
+      ];
 }
 
 /// {@macro new_modifiable}
 @_gettersInMemberList
-sealed class NewExternalModifiable extends _NewModifiable {
+/*sealed*/ abstract class NewExternalModifiable extends _NewModifiable {
   /// {@macro public}
   const factory NewExternalModifiable.public(
     PublicStaticalModifiable modifiable,
@@ -153,13 +149,13 @@ sealed class NewExternalModifiable extends _NewModifiable {
 
   // ignore: unused_element member list
   static List<NewExternalModifiable> get _members => [
-    fields,
-    fieldsGettersSetters,
-    getters,
-    gettersSetters,
-    setters,
-    methods,
-  ];
+        fields,
+        fieldsGettersSetters,
+        getters,
+        gettersSetters,
+        setters,
+        methods,
+      ];
 }
 
 @InvalidMembers({th<Constructors>()})
@@ -169,7 +165,7 @@ sealed class NewExternalModifiable extends _NewModifiable {
   th<_New>(),
 })
 @MutuallyExclusive(#overriding)
-final class _New<M extends _NewModifiable> extends Modifier<M>
+/*final*/ class _New<M extends _NewModifiable> extends Modifier<M>
     implements
         InstantiableMembers,
         ExternalMembersModifiable,

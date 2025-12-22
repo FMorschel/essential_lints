@@ -6,11 +6,11 @@ import 'sorting_members/sort_declarations.dart';
 /// Annotation for sorting members.
 /// {@endtemplate}
 @Target({
-  .classType,
-  .mixinType,
-  .extensionType,
-  .extension,
-  .enumType,
+  TargetKind.classType,
+  TargetKind.mixinType,
+  TargetKind.extensionType,
+  TargetKind.extension,
+  TargetKind.enumType,
 })
 class SortingMembers {
   /// {@macro sorting_members}

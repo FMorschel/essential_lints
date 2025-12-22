@@ -7,7 +7,7 @@ import 'package:meta/meta_meta.dart';
 /// Other modifiers can exist without this one, but if this one exists,
 /// all other non-optional modifiers in the group must also exist.
 /// {@endtemplate}
-@Target({.classType})
+@Target({TargetKind.classType})
 class MutuallyExclusive {
   /// {@macro mutually_exclusive}
   const MutuallyExclusive(this.id, {this.optional = false});

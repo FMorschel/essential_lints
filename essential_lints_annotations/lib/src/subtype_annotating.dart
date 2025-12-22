@@ -15,7 +15,7 @@ class SubtypeAnnotating {
   /// {@macro subtype_naming}
   const SubtypeAnnotating({
     required this.annotations,
-    this.option = .all,
+    this.option = SubtypeOption.all,
   });
 
   /// The required annotations for the subtype.

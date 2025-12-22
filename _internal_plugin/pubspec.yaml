@@ -1,7 +1,10 @@
 name: _internal_plugin
 description: An internal plugin package for essential_lints.
-
 version: 1.0.0
+
+repository: https://github.com/FMorschel/essential_lints
+issue_tracker: https://github.com/FMorschel/essential_lints/issues
+license: MIT
 
 publish_to: none
 

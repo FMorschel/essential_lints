@@ -216,7 +216,7 @@ Set<_Nested> _extractTestedCombinations(
 
 Future<void> main() async {
   // Load all the data upfront
-  final currentPackageDir = await currentPackage();
+  final currentPackageDir = await essentialLintsAnnotationsPackage();
   final sortDeclarationsPath = path.normalize(
     path.join(
       currentPackageDir.path,

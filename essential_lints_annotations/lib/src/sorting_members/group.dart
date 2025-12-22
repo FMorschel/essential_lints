@@ -1,7 +1,7 @@
 part of 'sort_declarations.dart';
 
 /// Groups of members.
-final class Group extends _StaticalContext
+/*final*/ class Group extends _StaticalContext
     implements ExternalMembersModifiable {
   const Group._() : super._();
 }
@@ -11,7 +11,7 @@ final class Group extends _StaticalContext
 ///
 /// {@macro sortDeclaration}
 /// {@endtemplate}
-final class Constructors extends Group
+/*final*/ class Constructors extends Group
     implements
         Constant,
         FactoryConstructorModifiable,
@@ -27,7 +27,7 @@ final class Constructors extends Group
   const Constructors._() : super._();
 
   /// {@macro constructors}
-  static const Constructors _constructors = ._();
+  static const Constructors _constructors = Constructors._();
 }
 
 /// {@template gettersSetters}
@@ -36,13 +36,13 @@ final class Constructors extends Group
 /// {@macro sortDeclaration}
 /// {@endtemplate}
 @MemberGroup(#gettersSetters, participant: false)
-final class GettersSetters extends Group
+/*final*/ class GettersSetters extends Group
     implements Abstractable, Getters, Setters {
   /// {@macro gettersSetters}
   const GettersSetters._() : super._();
 
   /// {@macro gettersSetters}
-  static const GettersSetters _gettersSetters = ._();
+  static const GettersSetters _gettersSetters = GettersSetters._();
 }
 
 /// {@template fieldsGettersSetters}
@@ -51,13 +51,14 @@ final class GettersSetters extends Group
 /// {@macro sortDeclaration}
 /// {@endtemplate}
 @MemberGroup(#fieldsGettersSetters, participant: false)
-final class FieldsGettersSetters extends Group
+/*final*/ class FieldsGettersSetters extends Group
     implements Fields, Getters, Setters {
   /// {@macro fieldsGettersSetters}
   const FieldsGettersSetters._() : super._();
 
   /// {@macro fieldsGettersSetters}
-  static const FieldsGettersSetters _fieldsGettersSetters = ._();
+  static const FieldsGettersSetters _fieldsGettersSetters =
+      FieldsGettersSetters._();
 }
 
 /// {@template fields}
@@ -66,7 +67,7 @@ final class FieldsGettersSetters extends Group
 /// {@macro sortDeclaration}
 /// {@endtemplate}
 @MemberGroup(#fieldsGettersSetters)
-final class Fields extends Group
+/*final*/ class Fields extends Group
     implements
         Variable,
         ConstantVariables,
@@ -87,7 +88,7 @@ final class Fields extends Group
   const Fields._() : super._();
 
   /// {@macro fields}
-  static const Fields _fields = ._();
+  static const Fields _fields = Fields._();
 }
 
 /// {@template methods}
@@ -95,7 +96,7 @@ final class Fields extends Group
 ///
 /// {@macro sortDeclaration}
 /// {@endtemplate}
-final class Methods extends Group
+/*final*/ class Methods extends Group
     implements
         OperatorModifiable,
         NullableOperatorModifiable,
@@ -106,7 +107,7 @@ final class Methods extends Group
   const Methods._() : super._();
 
   /// {@macro methods}
-  static const Methods _methods = ._();
+  static const Methods _methods = Methods._();
 }
 
 /// {@template getters}
@@ -116,11 +117,11 @@ final class Methods extends Group
 /// {@endtemplate}
 @MemberGroup(#gettersSetters)
 @MemberGroup(#fieldsGettersSetters)
-final class Getters extends Group implements _InstanciableMembers {
+/*final*/ class Getters extends Group implements _InstanciableMembers {
   const Getters._() : super._();
 
   /// {@macro getters}
-  static const Getters _getters = ._();
+  static const Getters _getters = Getters._();
 }
 
 /// {@template setters}
@@ -130,13 +131,13 @@ final class Getters extends Group implements _InstanciableMembers {
 /// {@endtemplate}
 @MemberGroup(#gettersSetters)
 @MemberGroup(#fieldsGettersSetters)
-final class Setters extends Group implements _InstanciableMembers {
+/*final*/ class Setters extends Group implements _InstanciableMembers {
   const Setters._() : super._();
 
-  static const Setters _setters = ._();
+  static const Setters _setters = Setters._();
 }
 
-final class _InstanciableMembers extends Group
+/*final*/ class _InstanciableMembers extends Group
     implements
         NullableMembersModifiable,
         PrivateModifiable,

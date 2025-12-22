@@ -10,7 +10,7 @@ void main() {
   late ResolvedLibraryResult sortDeclarationsResult;
 
   setUpAll(() async {
-    var currentPackageDir = await currentPackage();
+    var currentPackageDir = await essentialLintsAnnotationsPackage();
     final sortDeclarationsPath = path.normalize(
       path.join(
         currentPackageDir.path,
