@@ -46,7 +46,7 @@ class _MemberVisitor extends RecursiveAstVisitor<void> {
   final SortingMembersRule rule;
   final RuleContext context;
   int current = 0;
-  bool _reported = false;
+  bool reported = false;
   int? previousDeclarationLastLine;
   String? previousMemberName;
   String? previousUnsortedMemberName;
@@ -183,7 +183,7 @@ class _MemberVisitor extends RecursiveAstVisitor<void> {
   }
 
   void _validateMember(AstNode node, Element element) {
-    if (_reported) return;
+    if (reported) return;
     if (current >= validatorFromAnnotation.validators.length) return;
 
     var validator = validatorFromAnnotation.validators[current];
@@ -192,10 +192,10 @@ class _MemberVisitor extends RecursiveAstVisitor<void> {
     if (validator.isValid(node, element)) {
       // Check spacing before alphabetical/order checks
       _checkSpacing(node, element, validatorIndex: current, isSorted: true);
-      if (_reported) return;
+      if (reported) return;
 
       _checkAlphabeticalSorted(node, element, memberName);
-      if (_reported) return;
+      if (reported) return;
 
       // Member matches current validator
       // Check ALL validators for a more specific match
@@ -252,7 +252,7 @@ class _MemberVisitor extends RecursiveAstVisitor<void> {
       if (validatorFromAnnotation.validators[i].isValid(node, element)) {
         // Found a matching validator ahead - check spacing before moving to it
         _checkSpacing(node, element, validatorIndex: i, isSorted: true);
-        if (_reported) return;
+        if (reported) return;
 
         // Move to the new validator
         current = i;
@@ -268,10 +268,10 @@ class _MemberVisitor extends RecursiveAstVisitor<void> {
     // No matching validator found - this is an unsorted member
     // Now check spacing and alphabetical constraints for unsorted members.
     _checkSpacing(node, element, validatorIndex: -1, isSorted: false);
-    if (_reported) return;
+    if (reported) return;
 
     _checkAlphabeticalUnsorted(node, element, memberName);
-    if (_reported) return;
+    if (reported) return;
     current = previousCurrent;
     // Reset previousUnsortedMemberName when transitioning to unsorted
     if (previousWasSorted ?? true) {
@@ -285,7 +285,7 @@ class _MemberVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitConstructorDeclaration(ConstructorDeclaration node) {
-    if (_reported) return;
+    if (reported) return;
     var element = node.declaredFragment?.element;
     if (element == null) return;
     _validateMember(node, element);
@@ -293,19 +293,19 @@ class _MemberVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitFieldDeclaration(FieldDeclaration node) {
-    if (_reported) return;
+    if (reported) return;
     // Check each variable in the field declaration
     for (var variable in node.fields.variables) {
       var element = variable.declaredFragment?.element;
       if (element == null) continue;
       _validateMember(node, element);
-      if (_reported) return;
+      if (reported) return;
     }
   }
 
   @override
   void visitMethodDeclaration(MethodDeclaration node) {
-    if (_reported) return;
+    if (reported) return;
     var element = node.declaredFragment?.element;
     if (element == null) return;
     _validateMember(node, element);
@@ -329,7 +329,7 @@ class _MemberVisitor extends RecursiveAstVisitor<void> {
           rule.reportAtNode(node.returnType);
         }
     }
-    _reported = true;
+    reported = true;
   }
 }
 
