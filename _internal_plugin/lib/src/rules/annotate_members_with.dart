@@ -38,7 +38,7 @@ class AnnotateMembersWithRule extends MultiAnalysisRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _AnnotateMembersWithVisitor(this, context);
+    var visitor = _AnnotateMembersWithVisitor(this, context);
     registry
       ..addMethodDeclaration(this, visitor)
       ..addFieldDeclaration(this, visitor)
@@ -64,7 +64,7 @@ class _AnnotateMembersWithVisitor extends GeneralizingAstVisitor<void> {
       (a) => a.elementAnnotation,
     );
     var finalAnnotations = <_AnnotateMembersWith>[];
-    for (final elementAnnotation in annotations) {
+    for (var elementAnnotation in annotations) {
       if (elementAnnotation?.computeConstantValue()
           case DartObject(:var type) && var annotation) {
         if (type?.element?.name == 'AnnotateMembersWith' &&
@@ -88,7 +88,7 @@ class _AnnotateMembersWithVisitor extends GeneralizingAstVisitor<void> {
         }
       }
     }
-    for (final annotation in finalAnnotations) {
+    for (var annotation in finalAnnotations) {
       var annotationObject = annotation.annotation;
       if (annotationObject == null) {
         continue;
@@ -111,7 +111,7 @@ class _AnnotateMembersWithVisitor extends GeneralizingAstVisitor<void> {
         return annotationObject == object;
       }
 
-      for (final element in elements) {
+      for (var element in elements) {
         if (annotation.onlyConcrete &&
             ((element is ExecutableElement && element.isAbstract) ||
                 (element is FieldElement && element.isAbstract))) {

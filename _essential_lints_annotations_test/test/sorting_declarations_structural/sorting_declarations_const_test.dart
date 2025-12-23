@@ -14,7 +14,7 @@ class ConstructorReferenceCollector extends RecursiveAstVisitor<void> {
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    final element = node.constructorName.element;
+    var element = node.constructorName.element;
     if (element != null) {
       constructors.add(element);
     }
@@ -23,7 +23,7 @@ class ConstructorReferenceCollector extends RecursiveAstVisitor<void> {
 
   @override
   void visitConstructorReference(ConstructorReference node) {
-    final element = node.constructorName.element;
+    var element = node.constructorName.element;
     if (element != null) {
       constructors.add(element);
     }
@@ -32,7 +32,7 @@ class ConstructorReferenceCollector extends RecursiveAstVisitor<void> {
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    final element = node.element;
+    var element = node.element;
     if (element is ConstructorElement) {
       constructors.add(element);
     }
@@ -41,7 +41,7 @@ class ConstructorReferenceCollector extends RecursiveAstVisitor<void> {
 
   @override
   void visitPrefixedIdentifier(PrefixedIdentifier node) {
-    final element = node.element;
+    var element = node.element;
     if (element is ConstructorElement) {
       constructors.add(element);
     }
@@ -50,7 +50,7 @@ class ConstructorReferenceCollector extends RecursiveAstVisitor<void> {
 
   @override
   void visitPropertyAccess(PropertyAccess node) {
-    final element = node.propertyName.element;
+    var element = node.propertyName.element;
     if (element is ConstructorElement) {
       constructors.add(element);
     }
@@ -59,7 +59,7 @@ class ConstructorReferenceCollector extends RecursiveAstVisitor<void> {
 
   @override
   void visitSuperConstructorInvocation(SuperConstructorInvocation node) {
-    final element = node.element;
+    var element = node.element;
     if (element != null) {
       constructors.add(element);
     }
@@ -70,7 +70,7 @@ class ConstructorReferenceCollector extends RecursiveAstVisitor<void> {
   void visitRedirectingConstructorInvocation(
     RedirectingConstructorInvocation node,
   ) {
-    final element = node.element;
+    var element = node.element;
     if (element != null) {
       constructors.add(element);
     }
@@ -79,7 +79,7 @@ class ConstructorReferenceCollector extends RecursiveAstVisitor<void> {
 
   @override
   void visitDotShorthandInvocation(DotShorthandInvocation node) {
-    final element = node.memberName.element;
+    var element = node.memberName.element;
     if (element is ConstructorElement) {
       constructors.add(element);
     }
@@ -90,7 +90,7 @@ class ConstructorReferenceCollector extends RecursiveAstVisitor<void> {
   void visitDotShorthandConstructorInvocation(
     DotShorthandConstructorInvocation node,
   ) {
-    final element = node.element;
+    var element = node.element;
     if (element != null) {
       constructors.add(element);
     }
@@ -105,7 +105,7 @@ void main() {
 
   setUpAll(() async {
     var currentPackageDir = await essentialLintsAnnotationsPackage();
-    final sortDeclarationsPath = path.normalize(
+    var sortDeclarationsPath = path.normalize(
       path.join(
         currentPackageDir.path,
         'lib',
@@ -115,7 +115,7 @@ void main() {
       ),
     );
 
-    final testFilePath = path.normalize(
+    var testFilePath = path.normalize(
       path.join(
         currentPackageDir.path,
         'test',
@@ -128,8 +128,8 @@ void main() {
     );
 
     // Resolve the sort_declarations.dart library
-    final context = collection.contextFor(sortDeclarationsPath);
-    final result = await context.currentSession.getResolvedLibrary(
+    var context = collection.contextFor(sortDeclarationsPath);
+    var result = await context.currentSession.getResolvedLibrary(
       sortDeclarationsPath,
     );
 
@@ -139,16 +139,16 @@ void main() {
     sortDeclarationsResult = result;
 
     // Collect constructor references from both the library and the test file
-    final collector = ConstructorReferenceCollector();
+    var collector = ConstructorReferenceCollector();
 
     // Collect from the library itself (for tearoffs like `.new`)
-    for (final unit in sortDeclarationsResult.units) {
+    for (var unit in sortDeclarationsResult.units) {
       unit.unit.visitChildren(collector);
     }
 
     // Parse the test file and collect all constructor references
-    final testContext = collection.contextFor(testFilePath);
-    final testResult = await testContext.currentSession.getResolvedUnit(
+    var testContext = collection.contextFor(testFilePath);
+    var testResult = await testContext.currentSession.getResolvedUnit(
       testFilePath,
     );
 
@@ -166,14 +166,14 @@ void main() {
 
   group('Code quality checks', () {
     test('All static fields should be const', () {
-      final classElements = sortDeclarationsResult.element.classes;
+      var classElements = sortDeclarationsResult.element.classes;
 
       expect(classElements, isNotEmpty, reason: 'No classes found in library');
 
-      final nonConstStaticFields = <String>[];
+      var nonConstStaticFields = <String>[];
 
-      for (final classElement in classElements) {
-        for (final field in classElement.fields) {
+      for (var classElement in classElements) {
+        for (var field in classElement.fields) {
           if (field.isStatic && !field.isSynthetic && !field.isConst) {
             nonConstStaticFields.add(
               '${classElement.displayName}.${field.displayName}',
@@ -192,17 +192,17 @@ void main() {
     });
 
     test('All constructors should be const', () {
-      final classElements = sortDeclarationsResult.element.classes;
+      var classElements = sortDeclarationsResult.element.classes;
 
       expect(classElements, isNotEmpty, reason: 'No classes found in library');
 
-      final nonConstConstructors = <String>[];
+      var nonConstConstructors = <String>[];
 
-      for (final classElement in classElements) {
-        for (final constructor in classElement.constructors) {
+      for (var classElement in classElements) {
+        for (var constructor in classElement.constructors) {
           if (!constructor.isSynthetic && !constructor.isConst) {
-            final name = constructor.name;
-            final constructorName = name == null || name.isEmpty
+            var name = constructor.name;
+            var constructorName = name == null || name.isEmpty
                 ? '${classElement.displayName}()'
                 : '${classElement.displayName}.$name()';
             nonConstConstructors.add(constructorName);
@@ -220,15 +220,15 @@ void main() {
     });
 
     test('All constructors should be referenced', () {
-      final classElements = sortDeclarationsResult.element.classes;
+      var classElements = sortDeclarationsResult.element.classes;
 
       expect(classElements, isNotEmpty, reason: 'No classes found in library');
 
       // Collect classes that are extended by other classes
       // If a class is extended, its constructor is implicitly used
-      final extendedClasses = <InterfaceElement>{};
-      for (final classElement in classElements) {
-        final supertype = classElement.supertype;
+      var extendedClasses = <InterfaceElement>{};
+      for (var classElement in classElements) {
+        var supertype = classElement.supertype;
         if (supertype != null) {
           extendedClasses.add(supertype.element);
         }
@@ -237,7 +237,7 @@ void main() {
       // Helper to check if a class is or extends/implements Modifiable or is SortDeclaration
       bool isModifiableOrSortDeclaration(InterfaceElement element) {
         if (element.name == 'SortDeclaration') return true;
-        for (final t in element.allSupertypes) {
+        for (var t in element.allSupertypes) {
           if (t.element.name == '_Modifiable') {
             return true;
           }
@@ -245,21 +245,21 @@ void main() {
         return false;
       }
 
-      final unreferencedConstructors = <String>[];
+      var unreferencedConstructors = <String>[];
 
-      for (final classElement in classElements) {
+      for (var classElement in classElements) {
         // If this class is extended, its constructors are considered used
         if (extendedClasses.contains(classElement)) continue;
 
         // Ignore modifiable and base classes using the type system
         if (isModifiableOrSortDeclaration(classElement)) continue;
 
-        for (final constructor in classElement.constructors) {
+        for (var constructor in classElement.constructors) {
           if (!constructor.isSynthetic && constructor.isPublic) {
-            final isReferenced = referencedConstructors.contains(constructor);
+            var isReferenced = referencedConstructors.contains(constructor);
             if (!isReferenced) {
-              final name = constructor.name;
-              final constructorName = name == null || name.isEmpty
+              var name = constructor.name;
+              var constructorName = name == null || name.isEmpty
                   ? '${classElement.displayName}()'
                   : '${classElement.displayName}.$name()';
               unreferencedConstructors.add(constructorName);

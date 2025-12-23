@@ -19,7 +19,7 @@ class MutableTearoffRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _MutableTearoffsVisitor(this, context);
+    var visitor = _MutableTearoffsVisitor(this, context);
     registry
       ..addPropertyAccess(this, visitor)
       ..addPrefixedIdentifier(this, visitor)

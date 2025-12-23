@@ -11,7 +11,7 @@ void main() {
 
   setUpAll(() async {
     var currentPackageDir = await essentialLintsAnnotationsPackage();
-    final sortDeclarationsPath = path.normalize(
+    var sortDeclarationsPath = path.normalize(
       path.join(
         currentPackageDir.path,
         'lib',
@@ -26,8 +26,8 @@ void main() {
     );
 
     // Resolve the sort_declarations.dart library
-    final context = collection.contextFor(sortDeclarationsPath);
-    final result = await context.currentSession.getResolvedLibrary(
+    var context = collection.contextFor(sortDeclarationsPath);
+    var result = await context.currentSession.getResolvedLibrary(
       sortDeclarationsPath,
     );
 
@@ -43,33 +43,33 @@ void main() {
 
   group('Code quality checks', () {
     test('All implements should have corresponding factory redirects', () {
-      final classElements = sortDeclarationsResult.element.classes;
+      var classElements = sortDeclarationsResult.element.classes;
 
       expect(classElements, isNotEmpty, reason: 'No classes found in library');
 
-      final rogueImplements = <String>[];
+      var rogueImplements = <String>[];
 
-      for (final classElement in classElements) {
+      for (var classElement in classElements) {
         // Only check classes that extend Modifier
-        final extendsModifier = classElement.allSupertypes.any(
+        var extendsModifier = classElement.allSupertypes.any(
           (type) => type.element.name == 'Modifier',
         );
 
         if (!extendsModifier) continue;
 
         // Get all interfaces this class implements
-        for (final interface in classElement.interfaces) {
-          final implementedElement = interface.element;
+        for (var interface in classElement.interfaces) {
+          var implementedElement = interface.element;
 
           // Check if the implemented interface has a factory constructor
           // that redirects to this class
           var hasFactoryRedirect = false;
 
-          for (final constructor in implementedElement.constructors) {
+          for (var constructor in implementedElement.constructors) {
             if (constructor.isFactory) {
-              final redirectedElement = constructor.redirectedConstructor;
+              var redirectedElement = constructor.redirectedConstructor;
               if (redirectedElement != null) {
-                final redirectedClass = redirectedElement.enclosingElement;
+                var redirectedClass = redirectedElement.enclosingElement;
                 // Check if it redirects to our implementing class
                 if (redirectedClass == classElement) {
                   hasFactoryRedirect = true;
@@ -98,15 +98,15 @@ void main() {
     });
 
     test('All public classes should have at least one public member', () {
-      final classElements = sortDeclarationsResult.element.classes;
+      var classElements = sortDeclarationsResult.element.classes;
 
       expect(classElements, isNotEmpty, reason: 'No classes found in library');
 
-      final classesWithoutPublicMembers = <String>[];
+      var classesWithoutPublicMembers = <String>[];
 
-      for (final classElement in classElements) {
+      for (var classElement in classElements) {
         // Skip classes that extend Group
-        final extendsGroup = classElement.allSupertypes.any(
+        var extendsGroup = classElement.allSupertypes.any(
           (type) => type.element.name == 'Group',
         );
         if (extendsGroup || classElement.name == 'Group') continue;
@@ -115,13 +115,13 @@ void main() {
         if (!classElement.isPublic) continue;
 
         // Check if the class has at least one public member
-        final hasPublicConstructor = classElement.constructors.any(
+        var hasPublicConstructor = classElement.constructors.any(
           (constructor) => constructor.isPublic,
         );
-        final hasPublicField = classElement.fields.any(
+        var hasPublicField = classElement.fields.any(
           (field) => field.isPublic,
         );
-        final hasPublicMethod = classElement.methods.any(
+        var hasPublicMethod = classElement.methods.any(
           (method) => method.isPublic,
         );
 
@@ -143,7 +143,7 @@ void main() {
       'All public classes (except Group and SortDeclaration) should be used '
       'as factory constructor parameters',
       () {
-        final classElements = sortDeclarationsResult.element.classes;
+        var classElements = sortDeclarationsResult.element.classes;
 
         expect(
           classElements,
@@ -152,17 +152,17 @@ void main() {
         );
 
         // Collect all public classes except Group and SortDeclaration
-        final publicClasses = classElements.where((c) => c.isPublic).toSet();
+        var publicClasses = classElements.where((c) => c.isPublic).toSet();
 
         // Collect all types used as factory constructor parameters
-        final typesUsedInFactories = <String>{};
+        var typesUsedInFactories = <String>{};
 
-        for (final classElement in classElements) {
-          for (final constructor in classElement.constructors) {
+        for (var classElement in classElements) {
+          for (var constructor in classElement.constructors) {
             if (constructor.isFactory) {
-              for (final parameter in constructor.formalParameters) {
-                final paramType = parameter.type;
-                final paramTypeName = paramType.element?.name;
+              for (var parameter in constructor.formalParameters) {
+                var paramType = parameter.type;
+                var paramTypeName = paramType.element?.name;
                 if (paramTypeName != null) {
                   typesUsedInFactories.add(paramTypeName);
                 }
@@ -172,17 +172,17 @@ void main() {
         }
 
         // Find classes not used in factory constructors
-        final unusedClasses = <String>[];
+        var unusedClasses = <String>[];
 
-        for (final classElement in publicClasses) {
-          final className = classElement.name;
+        for (var classElement in publicClasses) {
+          var className = classElement.name;
           if (className == null) continue;
 
           // Skip Group classes and SortDeclaration
           if (className == 'SortDeclaration') continue;
 
           // Skip classes that extend Group
-          final extendsGroup = classElement.allSupertypes.any(
+          var extendsGroup = classElement.allSupertypes.any(
             (type) => type.element.name == 'Group',
           );
           if (extendsGroup || className == 'Group') continue;

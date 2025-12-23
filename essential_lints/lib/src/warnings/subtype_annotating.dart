@@ -53,7 +53,7 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
   void visitAnnotation(Annotation node) {
     if (_isSubtypeNamingAnnotation(node.elementAnnotation)) {
       var annotation = _mapKnownArguments(node.elementAnnotation);
-      for (final parameter in [...?node.arguments?.arguments]) {
+      for (var parameter in [...?node.arguments?.arguments]) {
         if (parameter case NamedExpression(
           :var name,
         ) when name.label.token.lexeme != 'annotations') {
@@ -66,7 +66,7 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
         if (list is! ListLiteral) {
           continue;
         }
-        for (final element in list.elements) {
+        for (var element in list.elements) {
           if (element is ConstructorReference) {
             rule.reportAtNode(
               element,
@@ -152,7 +152,7 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
     }
     var annotations = <_SubtypeNamingAnnotation>[];
     var visitedElements = <InterfaceElement>{element};
-    for (final interface in element.allSupertypes) {
+    for (var interface in element.allSupertypes) {
       var current = interface.element;
       if (!visitedElements.add(current)) {
         continue;
@@ -165,7 +165,7 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
     }
 
     bool existing(DartObject annotation) {
-      for (final meta in metadata) {
+      for (var meta in metadata) {
         var value = meta.elementAnnotation?.computeConstantValue();
         if (value == null) continue;
         if (value == annotation || annotation.toTypeValue() == value.type) {
@@ -175,7 +175,7 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
       return false;
     }
 
-    for (final annotation in annotations) {
+    for (var annotation in annotations) {
       if (annotation.option?.variable?.name == 'onlyConcrete' && abstract) {
         continue;
       } else if (annotation.option?.variable?.name == 'onlyAbstract' &&

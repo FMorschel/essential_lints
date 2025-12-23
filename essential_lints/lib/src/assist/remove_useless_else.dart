@@ -29,7 +29,7 @@ class RemoveUselessElseAssistFix extends ResolvedCorrectionProducer
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
-    final node = this.node;
+    var node = this.node;
     if (node is! IfStatement) return;
     Statement elseStatement;
     if (node.elseStatement case var statement?) {

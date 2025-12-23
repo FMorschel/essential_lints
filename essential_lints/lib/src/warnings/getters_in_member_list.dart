@@ -117,7 +117,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
         .where(_isGettersInMemberListAnnotation)
         .map(_mapKnownArguments)
         .nonNulls;
-    for (final annotation in relevant) {
+    for (var annotation in relevant) {
       var memberListName = annotation.memberListName;
       if (annotation.memberListName.isEmpty) {
         continue;
@@ -152,7 +152,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
           :var variables,
         ),
       )) {
-        for (final variable in variables) {
+        for (var variable in variables) {
           if (variable.declaredFragment?.element == getterMember.variable) {
             memberElement = getterMember;
             memberName = variable.name;
@@ -209,7 +209,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
         :var variables,
       ),
     )) {
-      for (final variable in variables) {
+      for (var variable in variables) {
         if (variable.initializer != null) {
           expression = variable.initializer;
           break;
@@ -247,7 +247,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
     ListLiteral list,
   ) {
     var literalElements = <(CollectionElement, Element)>[];
-    for (final expression in list.elements) {
+    for (var expression in list.elements) {
       SimpleIdentifier? getterIdentifier;
       if (expression
           case SimpleIdentifier identifier ||
@@ -285,7 +285,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
     }
 
     var validGetters = getters.where(valid).toList();
-    for (final (expression, element) in literalElements) {
+    for (var (expression, element) in literalElements) {
       if (!validGetters.contains(element)) {
         rule.reportAtNode(
           expression,
@@ -295,7 +295,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
     }
     var missing = <String>[];
     var elements = literalElements.map((e) => e.$2).toList();
-    for (final element in validGetters) {
+    for (var element in validGetters) {
       if (!elements.contains(element)) {
         missing.add(element.displayName);
       }
@@ -353,7 +353,7 @@ extension on (MultiWarningRule, GetterElement) {
         :var variables,
       ),
     )) {
-      for (final variable in variables) {
+      for (var variable in variables) {
         if (variable.declaredFragment?.element == $2.variable) {
           return true;
         }

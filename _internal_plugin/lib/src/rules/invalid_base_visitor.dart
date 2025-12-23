@@ -117,22 +117,22 @@ abstract class InvalidBaseVisitor extends SimpleAstVisitor<void> {
     log.fine(
       '  Found ${invalidAnnotations.length} @$annotationName annotations',
     );
-    for (final annotation in invalidAnnotations) {
+    for (var annotation in invalidAnnotations) {
       var constantValue = annotation.computeConstantValue();
       if (constantValue == null) continue;
       var invalidSet = constantValue.getField(invalidFieldName)?.toSetValue();
       if (invalidSet == null) continue;
       log.fine('  Checking ${invalidSet.length} invalid items');
-      for (final member in invalidSet) {
+      for (var member in invalidSet) {
         log.fine('    Member type: ${member.type}');
         // Check if ANY child type in the chain is invalid for current node
         if (member.type case InterfaceType(
           :var typeArguments,
         ) when typeArguments.length == 1) {
           log.fine('    Type argument: ${typeArguments.first}');
-          for (final entry in _nodeToType.entries) {
-            final childNode = entry.key;
-            final childType = entry.value;
+          for (var entry in _nodeToType.entries) {
+            var childNode = entry.key;
+            var childType = entry.value;
             var isAssignable = context.typeSystem.isAssignableTo(
               childType,
               typeArguments.first,

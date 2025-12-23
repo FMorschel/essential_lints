@@ -44,7 +44,7 @@ class SamePackageDirectImportFix extends ResolvedCorrectionProducer
       builder,
     ) {
       var imports = <String>{};
-      for (final uri in uris) {
+      for (var uri in uris) {
         if (builder is DartFileEditBuilderImpl) {
           if (package || !relative) {
             imports.add(builder.importLibraryWithAbsoluteUri(uri));
@@ -59,7 +59,7 @@ class SamePackageDirectImportFix extends ResolvedCorrectionProducer
         prefix = ' as $prefix';
       }
       builder.addReplacement(range.node(node), (builder) {
-        for (final (index, import) in imports.indexed) {
+        for (var (index, import) in imports.indexed) {
           builder.write('import $quote$import$quote$prefix;');
           if (index < imports.length - 1) {
             builder.writeln();

@@ -21,7 +21,7 @@ class PreferExplicitlyNamedParameterRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _PreferExplicitlyNamedParametersVisitor(this);
+    var visitor = _PreferExplicitlyNamedParametersVisitor(this);
     registry.addGenericFunctionType(this, visitor);
   }
 }
@@ -33,7 +33,7 @@ class _PreferExplicitlyNamedParametersVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitGenericFunctionType(GenericFunctionType node) {
-    for (final parameter in node.parameters.parameters) {
+    for (var parameter in node.parameters.parameters) {
       if (parameter.isNamed) {
         continue;
       }

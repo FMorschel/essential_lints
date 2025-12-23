@@ -18,7 +18,7 @@ class DuplicateValueRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _DuplicateValueVisitor(this, context);
+    var visitor = _DuplicateValueVisitor(this, context);
     registry
       ..addBinaryExpression(this, visitor)
       ..addSwitchPatternCase(this, visitor)

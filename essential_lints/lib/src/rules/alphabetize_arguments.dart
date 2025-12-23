@@ -17,7 +17,7 @@ class AlphabetizeArgumentsRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _AlphabetizeArgumentsVisitor(this);
+    var visitor = _AlphabetizeArgumentsVisitor(this);
     registry.addArgumentList(this, visitor);
   }
 }
@@ -29,11 +29,11 @@ class _AlphabetizeArgumentsVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitArgumentList(ArgumentList node) {
-    final arguments = node.arguments;
-    final argumentNames = arguments.whereType<NamedExpression>().toList();
+    var arguments = node.arguments;
+    var argumentNames = arguments.whereType<NamedExpression>().toList();
     for (var i = 1; i < argumentNames.length; i++) {
-      final previousName = argumentNames[i - 1].name.label.name;
-      final currentName = argumentNames[i].name.label.name;
+      var previousName = argumentNames[i - 1].name.label.name;
+      var currentName = argumentNames[i].name.label.name;
       if (previousName.compareTo(currentName) > 0) {
         rule.reportAtNode(
           argumentNames[i].name.label,

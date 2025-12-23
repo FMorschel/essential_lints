@@ -18,7 +18,7 @@ class UselessElseRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _UselessElseVisitor(this, context);
+    var visitor = _UselessElseVisitor(this, context);
     registry.addIfStatement(this, visitor);
   }
 }

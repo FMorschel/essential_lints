@@ -21,7 +21,7 @@ class StandardCommentStyleRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _StandardCommentStyleVisitor(this, context);
+    var visitor = _StandardCommentStyleVisitor(this, context);
     registry.addCompilationUnit(this, visitor);
   }
 }
@@ -66,7 +66,7 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
 
   void _handleCommentList(List<CommentToken> list) {
     var textComment = <(String, CommentToken)>[];
-    for (final comment in list) {
+    for (var comment in list) {
       var commentText = comment.lexeme
           .replaceFirst(_startingComment, '')
           .trimRight();
@@ -86,7 +86,7 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
     if (commentText.trim().startsWith(_noLetter)) {
       return;
     }
-    for (final (:String paragraph, :CommentToken firstComment)
+    for (var (:String paragraph, :CommentToken firstComment)
         in textComment.paragraphs) {
       if (paragraph.isEmpty) {
         continue;
@@ -96,7 +96,7 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
         continue;
       }
       var hasPunctuation = false;
-      for (final punctuation in _punctuation) {
+      for (var punctuation in _punctuation) {
         if (paragraph.endsWith(punctuation)) {
           hasPunctuation = true;
           continue;
@@ -127,7 +127,7 @@ extension on List<(String, CommentToken)> {
       firstComment = null;
     }
 
-    for (final (text, comment) in this) {
+    for (var (text, comment) in this) {
       if (text.trim().isEmpty) {
         flushParagraph();
         continue;

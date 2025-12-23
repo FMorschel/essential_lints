@@ -19,7 +19,7 @@ class IsFutureRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _IsFutureVisitor(this, context);
+    var visitor = _IsFutureVisitor(this, context);
     registry.addIsExpression(this, visitor);
   }
 }

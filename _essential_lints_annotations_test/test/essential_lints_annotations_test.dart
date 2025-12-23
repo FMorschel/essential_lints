@@ -10,49 +10,49 @@ import 'src/current_package_path.dart';
 
 void main() {
   test('all public declarations in src are exported', () async {
-    final packageRoot = await essentialLintsAnnotationsPackage();
-    final libPath = '${packageRoot.path}${Platform.pathSeparator}lib';
-    final srcPath = '$libPath${Platform.pathSeparator}src';
-    final mainLibraryPath =
+    var packageRoot = await essentialLintsAnnotationsPackage();
+    var libPath = '${packageRoot.path}${Platform.pathSeparator}lib';
+    var srcPath = '$libPath${Platform.pathSeparator}src';
+    var mainLibraryPath =
         '$libPath${Platform.pathSeparator}essential_lints_annotations.dart';
 
-    final collection = AnalysisContextCollection(
+    var collection = AnalysisContextCollection(
       includedPaths: [libPath],
       resourceProvider: PhysicalResourceProvider.INSTANCE,
     );
 
-    final context = collection.contextFor(mainLibraryPath);
+    var context = collection.contextFor(mainLibraryPath);
 
     // Get all public declarations from src files
-    final srcDeclarations = <String>{};
-    final srcDir = Directory(srcPath);
-    for (final file in srcDir.listSync().whereType<File>()) {
+    var srcDeclarations = <String>{};
+    var srcDir = Directory(srcPath);
+    for (var file in srcDir.listSync().whereType<File>()) {
       if (!file.path.endsWith('.dart')) continue;
 
-      final result = await context.currentSession.getResolvedLibrary(file.path);
+      var result = await context.currentSession.getResolvedLibrary(file.path);
       if (result is! ResolvedLibraryResult) {
         fail('Failed to resolve ${file.path}');
       }
 
-      final library = result.element;
+      var library = result.element;
       srcDeclarations.addAll(_getPublicDeclarations(library));
     }
 
     // Get all exported declarations from the main library
-    final mainResult = await context.currentSession.getResolvedLibrary(
+    var mainResult = await context.currentSession.getResolvedLibrary(
       mainLibraryPath,
     );
     if (mainResult is! ResolvedLibraryResult) {
       fail('Failed to resolve main library');
     }
 
-    final exportedDeclarations = <String>{};
+    var exportedDeclarations = <String>{};
     mainResult.element.exportNamespace.definedNames2.keys.forEach(
       exportedDeclarations.add,
     );
 
     // Verify all src declarations are exported
-    final notExported = srcDeclarations.difference(exportedDeclarations);
+    var notExported = srcDeclarations.difference(exportedDeclarations);
 
     expect(
       notExported,
@@ -66,59 +66,59 @@ void main() {
 
 /// Returns all public declaration names from a library element.
 Set<String> _getPublicDeclarations(LibraryElement library) {
-  final declarations = <String>{};
+  var declarations = <String>{};
 
   // Top-level classes
-  for (final classElement in library.classes) {
+  for (var classElement in library.classes) {
     if (classElement.isPublic) {
       declarations.add(classElement.displayName);
     }
   }
 
   // Top-level enums
-  for (final enumElement in library.enums) {
+  for (var enumElement in library.enums) {
     if (enumElement.isPublic) {
       declarations.add(enumElement.displayName);
     }
   }
 
   // Top-level functions
-  for (final functionElement in library.topLevelFunctions) {
+  for (var functionElement in library.topLevelFunctions) {
     if (functionElement.isPublic) {
       declarations.add(functionElement.displayName);
     }
   }
 
   // Top-level type aliases
-  for (final typeAlias in library.typeAliases) {
+  for (var typeAlias in library.typeAliases) {
     if (typeAlias.isPublic) {
       declarations.add(typeAlias.displayName);
     }
   }
 
   // Top-level variables/constants
-  for (final variable in library.topLevelVariables) {
+  for (var variable in library.topLevelVariables) {
     if (variable.isPublic) {
       declarations.add(variable.displayName);
     }
   }
 
   // Extensions
-  for (final extension in library.extensions) {
+  for (var extension in library.extensions) {
     if (extension.isPublic) {
       declarations.add(extension.displayName);
     }
   }
 
   // Mixins
-  for (final mixin in library.mixins) {
+  for (var mixin in library.mixins) {
     if (mixin.isPublic) {
       declarations.add(mixin.displayName);
     }
   }
 
   // Extension types
-  for (final extensionType in library.extensionTypes) {
+  for (var extensionType in library.extensionTypes) {
     if (extensionType.isPublic) {
       declarations.add(extensionType.displayName);
     }

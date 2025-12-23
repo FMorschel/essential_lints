@@ -20,7 +20,7 @@ class CompleterErrorNoStackRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _CompleterErrorNoStackVisitor(this, context);
+    var visitor = _CompleterErrorNoStackVisitor(this, context);
     registry.addMethodInvocation(this, visitor);
   }
 }

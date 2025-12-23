@@ -18,7 +18,7 @@ class ClosureIncorrectTypeRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _ClosureIncorrectTypeVisitor(this, context);
+    var visitor = _ClosureIncorrectTypeVisitor(this, context);
     registry.addFunctionExpression(this, visitor);
   }
 }
@@ -41,7 +41,7 @@ class _ClosureIncorrectTypeVisitor extends SimpleAstVisitor<void> {
       return;
     }
     var index = 0;
-    for (final parameter in parameters.parameters) {
+    for (var parameter in parameters.parameters) {
       FormalParameter actualParameter;
       if (parameter is DefaultFormalParameter) {
         actualParameter = parameter.parameter;

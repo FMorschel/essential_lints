@@ -32,7 +32,7 @@ class InvalidMembersRule extends AnalysisRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _InvalidMembersVisitor(this, context);
+    var visitor = _InvalidMembersVisitor(this, context);
     registry
       ..addDotShorthandPropertyAccess(this, visitor)
       ..addDotShorthandConstructorInvocation(this, visitor);

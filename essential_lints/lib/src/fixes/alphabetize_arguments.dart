@@ -32,7 +32,7 @@ class AlphabetizeArgumentsFix extends ResolvedCorrectionProducer with LintFix {
     if (node is! ArgumentList) return;
     var ranges = <SourceRange>[];
     var namedArguments = node.arguments.whereType<NamedExpression>().toList();
-    for (final argument in namedArguments) {
+    for (var argument in namedArguments) {
       ranges.add(range.node(argument));
     }
     namedArguments.sort((a, b) {

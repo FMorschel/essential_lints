@@ -32,7 +32,7 @@ class InvalidModifiersRule extends AnalysisRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _InvalidModifiersVisitor(this, context);
+    var visitor = _InvalidModifiersVisitor(this, context);
     registry
       ..addDotShorthandPropertyAccess(this, visitor)
       ..addDotShorthandConstructorInvocation(this, visitor);

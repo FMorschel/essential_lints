@@ -51,7 +51,7 @@ class VariableShadowingRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _VariableShadowingVisitor(this, context);
+    var visitor = _VariableShadowingVisitor(this, context);
     registry
       ..addVariableDeclaration(this, visitor)
       ..addDeclaredVariablePattern(this, visitor);

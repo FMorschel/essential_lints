@@ -5,8 +5,10 @@ linter:
     always_use_package_imports: false
     parameter_assignments: false
     prefer_relative_imports: true
-    prefer_final_locals: false
     unnecessary_await_in_return: false
+    prefer_final_locals: false
+    prefer_final_in_for_each: false
+    unnecessary_final: true
 
 analyzer:
   language:

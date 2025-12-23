@@ -7,12 +7,12 @@ import 'package:dartdoc/src/model/package.dart';
 import 'package:test/test.dart';
 
 Future<void> main() async {
-  final packageRoot = await _findPackageRoot();
+  var packageRoot = await _findPackageRoot();
   Package? defaultPackage;
 
   setUpAll(() async {
     // Find the package root directory
-    final packageRootPath = packageRoot.path;
+    var packageRootPath = packageRoot.path;
 
     // Parse dartdoc options with the package root as input directory
     var config = parseOptions(
@@ -25,8 +25,8 @@ Future<void> main() async {
     }
 
     // Create package builder
-    final packageConfigProvider = PhysicalPackageConfigProvider();
-    final packageBuilder = PubPackageBuilder(
+    var packageConfigProvider = PhysicalPackageConfigProvider();
+    var packageBuilder = PubPackageBuilder(
       config,
       pubPackageMetaProvider,
       packageConfigProvider,
@@ -44,17 +44,17 @@ Future<void> main() async {
       fail('Package was not initialized');
     }
 
-    final libraries = defaultPackage!.libraries;
+    var libraries = defaultPackage!.libraries;
     if (libraries.isEmpty) {
       fail('No libraries found in the default package');
     }
 
-    final missingDocs = <String>[];
+    var missingDocs = <String>[];
 
-    for (final library in libraries) {
+    for (var library in libraries) {
       if (!library.isPublic) continue;
       // Check classes
-      for (final class_ in library.classes) {
+      for (var class_ in library.classes) {
         if (!class_.isPublic) continue;
 
         if (class_.documentation.trim().isEmpty) {
@@ -62,7 +62,7 @@ Future<void> main() async {
         }
 
         // Check constructors
-        for (final constructor in class_.constructors) {
+        for (var constructor in class_.constructors) {
           if (!constructor.isPublic) continue;
           if (constructor.documentation.trim().isEmpty) {
             missingDocs.add(
@@ -72,7 +72,7 @@ Future<void> main() async {
         }
 
         // Check methods
-        for (final method in class_.declaredMethods) {
+        for (var method in class_.declaredMethods) {
           if (!method.isPublic) continue;
           if (method.documentation.trim().isEmpty) {
             missingDocs.add('Method ${class_.name}.${method.name}');
@@ -80,7 +80,7 @@ Future<void> main() async {
         }
 
         // Check fields
-        for (final field in class_.declaredFields) {
+        for (var field in class_.declaredFields) {
           if (!field.isPublic) continue;
           if (field.documentation.trim().isEmpty) {
             missingDocs.add('Field ${class_.name}.${field.name}');

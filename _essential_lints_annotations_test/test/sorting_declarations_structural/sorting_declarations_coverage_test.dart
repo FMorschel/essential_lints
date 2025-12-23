@@ -35,11 +35,11 @@ List<StaticMember> getStaticMembers(InterfaceElement element) {
     return [];
   }
 
-  final members = <StaticMember>[];
-  final fieldGetters = <Element>{};
+  var members = <StaticMember>[];
+  var fieldGetters = <Element>{};
 
   // Collect static fields and track their getters/setters
-  for (final field in element.fields) {
+  for (var field in element.fields) {
     if (field.isStatic && !field.isSynthetic && field.isPublic) {
       members.add(StaticMember(field, [?field.getter, ?field.setter]));
       if (field.getter != null) {
@@ -49,7 +49,7 @@ List<StaticMember> getStaticMembers(InterfaceElement element) {
   }
 
   // Collect static getters (that are not synthetic, i.e., not from fields)
-  for (final getter in element.getters) {
+  for (var getter in element.getters) {
     if (getter.isStatic &&
         !getter.isSynthetic &&
         !fieldGetters.contains(getter) &&
@@ -59,7 +59,7 @@ List<StaticMember> getStaticMembers(InterfaceElement element) {
   }
 
   // Collect static setters (that are not synthetic, i.e., not from fields)
-  for (final setter in element.setters) {
+  for (var setter in element.setters) {
     if (setter.isStatic &&
         !setter.isSynthetic &&
         !fieldGetters.contains(setter) &&
@@ -69,13 +69,13 @@ List<StaticMember> getStaticMembers(InterfaceElement element) {
   }
 
   // Collect static methods
-  for (final method in element.methods) {
+  for (var method in element.methods) {
     if (method.isStatic && method.isPublic) {
       members.add(StaticMember(method));
     }
   }
 
-  for (final constructor in element.constructors) {
+  for (var constructor in element.constructors) {
     if (constructor.isPublic) {
       members.add(StaticMember(constructor));
     }
@@ -90,7 +90,7 @@ class ElementCollector extends RecursiveAstVisitor<void> {
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    final element = node.element;
+    var element = node.element;
     if (element != null) {
       elements.add(element);
     }
@@ -99,7 +99,7 @@ class ElementCollector extends RecursiveAstVisitor<void> {
 
   @override
   void visitPrefixedIdentifier(PrefixedIdentifier node) {
-    final element = node.element;
+    var element = node.element;
     if (element != null) {
       elements.add(element);
     }
@@ -108,7 +108,7 @@ class ElementCollector extends RecursiveAstVisitor<void> {
 
   @override
   void visitPropertyAccess(PropertyAccess node) {
-    final element = node.propertyName.element;
+    var element = node.propertyName.element;
     if (element != null) {
       elements.add(element);
     }
@@ -125,21 +125,21 @@ Set<Element> expandWithReferences(
   Set<Element> directElements,
   ResolvedLibraryResult sortDeclarationsResult,
 ) {
-  final expanded = <Element>{...directElements};
-  final toProcess = [...directElements];
-  final processed = <Element>{};
+  var expanded = <Element>{...directElements};
+  var toProcess = [...directElements];
+  var processed = <Element>{};
 
   while (toProcess.isNotEmpty) {
-    final element = toProcess.removeLast();
+    var element = toProcess.removeLast();
     if (processed.contains(element)) continue;
     processed.add(element);
 
     // Find the AST node for this element in sort_declarations.dart
-    for (final unit in sortDeclarationsResult.units) {
-      final collector = ElementCollector();
+    for (var unit in sortDeclarationsResult.units) {
+      var collector = ElementCollector();
 
       // Check if this element is defined in this compilation unit
-      final elementLibrary = element.library;
+      var elementLibrary = element.library;
       if (elementLibrary == null || elementLibrary != unit.libraryElement) {
         continue;
       }
@@ -147,7 +147,7 @@ Set<Element> expandWithReferences(
       // Visit the unit to collect all referenced elements
       unit.unit.accept(collector);
 
-      for (final referenced in collector.elements) {
+      for (var referenced in collector.elements) {
         if (!expanded.contains(referenced)) {
           expanded.add(referenced);
           toProcess.add(referenced);
@@ -167,7 +167,7 @@ void main() {
 
   setUpAll(() async {
     var packageDirectory = await essentialLintsAnnotationsPackage();
-    final sortDeclarationsPath = path.normalize(
+    var sortDeclarationsPath = path.normalize(
       path.join(
         packageDirectory.path,
         'lib',
@@ -178,7 +178,7 @@ void main() {
     );
 
     // Find all test files in the sorting_declarations folder
-    final testDirPath = path.normalize(
+    var testDirPath = path.normalize(
       path.join(
         (await packageDir(
           'package:_essential_lints_annotations_test/placehoder.dart',
@@ -189,8 +189,8 @@ void main() {
     );
 
     // List all .dart files in the testDirPath
-    final testDir = Directory(testDirPath);
-    final testFiles = [
+    var testDir = Directory(testDirPath);
+    var testFiles = [
       ...await testDir
           .list()
           .where(
@@ -205,8 +205,8 @@ void main() {
     );
 
     // Resolve the sort_declarations.dart library
-    final context = collection.contextFor(sortDeclarationsPath);
-    final result = await context.currentSession.getResolvedLibrary(
+    var context = collection.contextFor(sortDeclarationsPath);
+    var result = await context.currentSession.getResolvedLibrary(
       sortDeclarationsPath,
     );
 
@@ -217,8 +217,8 @@ void main() {
 
     // Parse all test files and collect all elements used
     directlyTestedElements = {};
-    for (final testFilePath in testFiles) {
-      final testResult = await context.currentSession.getResolvedLibrary(
+    for (var testFilePath in testFiles) {
+      var testResult = await context.currentSession.getResolvedLibrary(
         testFilePath,
       );
 
@@ -226,8 +226,8 @@ void main() {
         throw StateError('Failed to resolve test file: $testResult');
       }
 
-      final collector = ElementCollector();
-      for (final unit in testResult.units) {
+      var collector = ElementCollector();
+      for (var unit in testResult.units) {
         unit.unit.accept(collector);
       }
       directlyTestedElements.addAll(collector.elements);
@@ -247,20 +247,20 @@ void main() {
 
   group('All static members are tested', () {
     test('All classes have their static members tested', () {
-      final classElements = sortDeclarationsResult.element.classes;
+      var classElements = sortDeclarationsResult.element.classes;
 
       expect(classElements, isNotEmpty, reason: 'No classes found in library');
 
-      final missingMembers = <String>[];
+      var missingMembers = <String>[];
 
-      for (final classElement in classElements) {
+      for (var classElement in classElements) {
         // Ignore static members under the Group class
         if (classElement.displayName == 'Group') {
           continue;
         }
-        final staticMembers = getStaticMembers(classElement);
+        var staticMembers = getStaticMembers(classElement);
 
-        for (final member in staticMembers) {
+        for (var member in staticMembers) {
           var isCovered = [
             member.element,
             ...member.relatedElements,

@@ -18,7 +18,7 @@ class OptionalPositionalParametersRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _OptionalPositionalParametersVisitor(this, context);
+    var visitor = _OptionalPositionalParametersVisitor(this, context);
     registry.addFormalParameterList(this, visitor);
   }
 }

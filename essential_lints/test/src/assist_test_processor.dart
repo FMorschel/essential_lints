@@ -68,7 +68,7 @@ abstract class AssistTestProcessor extends BaseEditTestProcessor {
       expect(change.edits, hasLength(additionallyChangedFiles.length + 1));
       var fileEdit = change.getFileEdit(testFile.path)!;
       matchesExpected(expected, fileEdit: fileEdit);
-      for (final (:path, :original, :result) in additionallyChangedFiles) {
+      for (var (:path, :original, :result) in additionallyChangedFiles) {
         var fileEdit = change.getFileEdit(path)!;
         matchesExpected(
           result,
@@ -84,7 +84,7 @@ abstract class AssistTestProcessor extends BaseEditTestProcessor {
   Future<void> assertNoAssist([int index = 0]) async {
     setPositionOrRange(index);
     var assists = await _computeAssists();
-    for (final assist in assists) {
+    for (var assist in assists) {
       if (assist.kind == assistKind) {
         fail('Unexpected assist $assistKind in\n${assists.join('\n')}');
       }

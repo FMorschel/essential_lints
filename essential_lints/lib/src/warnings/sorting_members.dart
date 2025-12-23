@@ -28,7 +28,7 @@ class SortingMembersRule extends WarningRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _SortingMembersVisitor(this, context);
+    var visitor = _SortingMembersVisitor(this, context);
     registry
       ..addClassDeclaration(this, visitor)
       ..addMixinDeclaration(this, visitor)
@@ -87,7 +87,7 @@ class _MemberVisitor extends RecursiveAstVisitor<void> {
     }
 
     // Try to find a new validator that matches this member
-    final previousCurrent = current;
+    var previousCurrent = current;
     for (
       var i = current + 1;
       i < validatorFromAnnotation.validators.length;
@@ -107,7 +107,7 @@ class _MemberVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitConstructorDeclaration(ConstructorDeclaration node) {
     if (_reported) return;
-    final element = node.declaredFragment?.element;
+    var element = node.declaredFragment?.element;
     if (element == null) return;
     _validateMember(node, element);
   }
@@ -116,8 +116,8 @@ class _MemberVisitor extends RecursiveAstVisitor<void> {
   void visitFieldDeclaration(FieldDeclaration node) {
     if (_reported) return;
     // Check each variable in the field declaration
-    for (final variable in node.fields.variables) {
-      final element = variable.declaredFragment?.element;
+    for (var variable in node.fields.variables) {
+      var element = variable.declaredFragment?.element;
       if (element == null) continue;
       _validateMember(node, element);
       if (_reported) return;
@@ -127,7 +127,7 @@ class _MemberVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitMethodDeclaration(MethodDeclaration node) {
     if (_reported) return;
-    final element = node.declaredFragment?.element;
+    var element = node.declaredFragment?.element;
     if (element == null) return;
     _validateMember(node, element);
   }
@@ -137,7 +137,7 @@ class _MemberVisitor extends RecursiveAstVisitor<void> {
       case MethodDeclaration(:var name):
         rule.reportAtToken(name);
       case FieldDeclaration(:var fields):
-        for (final variable in fields.variables) {
+        for (var variable in fields.variables) {
           if (variable.declaredFragment?.element == element) {
             rule.reportAtToken(variable.name);
             break;
@@ -170,16 +170,16 @@ class _SortingMembersVisitor extends SimpleAstVisitor<void> {
   }
 
   void _handleAnnotatedNode(AnnotatedNode node) {
-    for (final annotation in node.metadata) {
+    for (var annotation in node.metadata) {
       var element = annotation.elementAnnotation;
       if (element == null) {
         continue;
       }
       if (_isSortingMembers(element)) {
-        final validatorFromAnnotation = _ValidatorFromAnnotation.fromAnnotation(
+        var validatorFromAnnotation = _ValidatorFromAnnotation.fromAnnotation(
           element,
         );
-        final visitor = _MemberVisitor(rule, context, validatorFromAnnotation);
+        var visitor = _MemberVisitor(rule, context, validatorFromAnnotation);
         node.visitChildren(visitor);
       }
     }
@@ -228,7 +228,7 @@ class _ValidatorFromAnnotation {
     }
     var declarations = constantValue.getField('declarations')?.toSetValue();
     var validators = <_ListMemberTypeValidator>[];
-    for (final declaration in {...?declarations}) {
+    for (var declaration in {...?declarations}) {
       var list = <_MemberTypeValidator>[];
       DartObject? current = declaration;
       String? typeName;
@@ -425,7 +425,7 @@ class _ListMemberTypeValidator extends _MemberTypeValidator {
 
   @override
   bool isValid(AstNode member, Element element) {
-    for (final validator in validators) {
+    for (var validator in validators) {
       if (!validator.isValid(member, element)) {
         return false;
       }
@@ -441,7 +441,7 @@ class _ListMemberTypeValidator extends _MemberTypeValidator {
     if (validators.length <= other.validators.length) return false;
 
     // Check if all validators from other exist in this list
-    for (final otherValidator in other.validators.reversed) {
+    for (var otherValidator in other.validators.reversed) {
       if (validators.none((v) => v == otherValidator)) return false;
     }
 
@@ -600,7 +600,7 @@ class _InitializedMemberTypeValidator extends _MemberTypeValidator {
     if (fieldDeclaration == null) {
       return false;
     }
-    for (final variable in fieldDeclaration.fields.variables) {
+    for (var variable in fieldDeclaration.fields.variables) {
       if (variable.declaredFragment?.element == element &&
           variable.initializer != null) {
         return true;
@@ -660,7 +660,7 @@ class _NewMemberTypeValidator extends _MemberTypeValidator {
   bool isValid(AstNode member, Element element) {
     var enclosingElement = element.enclosingElement;
     if (enclosingElement is InterfaceElement) {
-      for (final name in enclosingElement.inheritedMembers.keys) {
+      for (var name in enclosingElement.inheritedMembers.keys) {
         if (name.name == element.lookupName) {
           return false;
         }
@@ -710,7 +710,7 @@ class _OverriddenMemberTypeValidator extends _MemberTypeValidator {
   bool isValid(AstNode member, Element element) {
     var enclosingElement = element.enclosingElement;
     if (enclosingElement is InterfaceElement) {
-      for (final name in enclosingElement.inheritedMembers.keys) {
+      for (var name in enclosingElement.inheritedMembers.keys) {
         if (name.name == element.lookupName) {
           return true;
         }

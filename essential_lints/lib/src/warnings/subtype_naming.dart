@@ -152,7 +152,7 @@ class _SubtypeNamingVisitor extends SimpleAstVisitor<void> {
     }
     var annotations = <_SubtypeNamingAnnotation>[];
     var visitedElements = <InterfaceElement>{element};
-    for (final interface in element.allSupertypes) {
+    for (var interface in element.allSupertypes) {
       var current = interface.element;
       if (!visitedElements.add(current)) {
         continue;
@@ -163,7 +163,7 @@ class _SubtypeNamingVisitor extends SimpleAstVisitor<void> {
             .map(_mapKnownArguments),
       );
     }
-    for (final annotation in annotations) {
+    for (var annotation in annotations) {
       if (annotation.option?.variable?.name == 'onlyConcrete' && abstract) {
         continue;
       } else if (annotation.option?.variable?.name == 'onlyAbstract' &&

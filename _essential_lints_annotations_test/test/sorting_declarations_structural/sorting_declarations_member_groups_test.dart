@@ -12,7 +12,7 @@ void main() {
 
   setUpAll(() async {
     var currentPackageDir = await essentialLintsAnnotationsPackage();
-    final sortDeclarationsPath = path.normalize(
+    var sortDeclarationsPath = path.normalize(
       path.join(
         currentPackageDir.path,
         'lib',
@@ -27,8 +27,8 @@ void main() {
     );
 
     // Resolve the sort_declarations.dart library
-    final context = collection.contextFor(sortDeclarationsPath);
-    final result = await context.currentSession.getResolvedLibrary(
+    var context = collection.contextFor(sortDeclarationsPath);
+    var result = await context.currentSession.getResolvedLibrary(
       sortDeclarationsPath,
     );
 
@@ -44,35 +44,35 @@ void main() {
 
   group('MemberGroup constraints', () {
     test('All member groups have at least two participants', () {
-      final classElements = sortDeclarationsResult.element.classes;
+      var classElements = sortDeclarationsResult.element.classes;
 
       expect(classElements, isNotEmpty, reason: 'No classes found in library');
 
       // Build a map of member groups and their participants
-      final memberGroups = <String, Set<String>>{};
-      final nonParticipants = <String, Set<String>>{};
+      var memberGroups = <String, Set<String>>{};
+      var nonParticipants = <String, Set<String>>{};
 
-      for (final classElement in classElements) {
-        for (final metadata in classElement.metadata.annotations) {
-          final element = metadata.element;
+      for (var classElement in classElements) {
+        for (var metadata in classElement.metadata.annotations) {
+          var element = metadata.element;
           if (element is! ConstructorElement) continue;
 
-          final enclosingElement = element.enclosingElement;
+          var enclosingElement = element.enclosingElement;
           if (enclosingElement.name != 'MemberGroup') continue;
 
-          final constantValue = metadata.computeConstantValue();
+          var constantValue = metadata.computeConstantValue();
           if (constantValue == null) continue;
 
-          final nameField = constantValue.getField('name');
+          var nameField = constantValue.getField('name');
           if (nameField == null) continue;
 
-          final symbolValue = nameField.toSymbolValue();
+          var symbolValue = nameField.toSymbolValue();
           if (symbolValue == null) continue;
 
-          final participantField = constantValue.getField('participant');
-          final isParticipant = participantField?.toBoolValue() ?? true;
+          var participantField = constantValue.getField('participant');
+          var isParticipant = participantField?.toBoolValue() ?? true;
 
-          final className = classElement.name;
+          var className = classElement.name;
           if (className != null) {
             if (isParticipant) {
               memberGroups.putIfAbsent(symbolValue, () => {}).add(className);
@@ -84,11 +84,11 @@ void main() {
       }
 
       // Find groups with less than two participants
-      final insufficientGroups = <String>[];
+      var insufficientGroups = <String>[];
 
-      for (final entry in memberGroups.entries) {
-        final groupId = entry.key;
-        final participants = entry.value;
+      for (var entry in memberGroups.entries) {
+        var groupId = entry.key;
+        var participants = entry.value;
 
         if (participants.length < 2) {
           insufficientGroups.add(
@@ -108,35 +108,35 @@ void main() {
     });
 
     test('No member group collection is missing its non-participant', () {
-      final classElements = sortDeclarationsResult.element.classes;
+      var classElements = sortDeclarationsResult.element.classes;
 
       expect(classElements, isNotEmpty, reason: 'No classes found in library');
 
       // Build a map of member groups and their participants
-      final memberGroups = <String, Set<String>>{};
-      final nonParticipants = <String, String>{};
+      var memberGroups = <String, Set<String>>{};
+      var nonParticipants = <String, String>{};
 
-      for (final classElement in classElements) {
-        for (final metadata in classElement.metadata.annotations) {
-          final element = metadata.element;
+      for (var classElement in classElements) {
+        for (var metadata in classElement.metadata.annotations) {
+          var element = metadata.element;
           if (element is! ConstructorElement) continue;
 
-          final enclosingElement = element.enclosingElement;
+          var enclosingElement = element.enclosingElement;
           if (enclosingElement.name != 'MemberGroup') continue;
 
-          final constantValue = metadata.computeConstantValue();
+          var constantValue = metadata.computeConstantValue();
           if (constantValue == null) continue;
 
-          final nameField = constantValue.getField('name');
+          var nameField = constantValue.getField('name');
           if (nameField == null) continue;
 
-          final symbolValue = nameField.toSymbolValue();
+          var symbolValue = nameField.toSymbolValue();
           if (symbolValue == null) continue;
 
-          final participantField = constantValue.getField('participant');
-          final isParticipant = participantField?.toBoolValue() ?? true;
+          var participantField = constantValue.getField('participant');
+          var isParticipant = participantField?.toBoolValue() ?? true;
 
-          final className = classElement.name;
+          var className = classElement.name;
           if (className != null) {
             if (isParticipant) {
               memberGroups.putIfAbsent(symbolValue, () => {}).add(className);
@@ -148,11 +148,11 @@ void main() {
       }
 
       // Find groups that have participants but no non-participant
-      final missingNonParticipants = <String>[];
+      var missingNonParticipants = <String>[];
 
-      for (final entry in memberGroups.entries) {
-        final groupId = entry.key;
-        final participants = entry.value;
+      for (var entry in memberGroups.entries) {
+        var groupId = entry.key;
+        var participants = entry.value;
 
         if (!nonParticipants.containsKey(groupId)) {
           missingNonParticipants.add(
@@ -175,7 +175,7 @@ void main() {
       'When a class references a member group member as static field, '
       'all group members must be present',
       () {
-        final classElements = sortDeclarationsResult.element.classes;
+        var classElements = sortDeclarationsResult.element.classes;
 
         expect(
           classElements,
@@ -184,35 +184,35 @@ void main() {
         );
 
         // Build a map of member groups and their members
-        final memberGroups = <String, Set<String>>{};
-        final nonParticipants = <String, String>{};
-        final classNameToElement = <String, InterfaceElement>{};
+        var memberGroups = <String, Set<String>>{};
+        var nonParticipants = <String, String>{};
+        var classNameToElement = <String, InterfaceElement>{};
 
         // First pass: collect all member group relationships
-        for (final classElement in classElements) {
-          final className = classElement.name;
+        for (var classElement in classElements) {
+          var className = classElement.name;
           if (className == null) continue;
 
           classNameToElement[className] = classElement;
 
-          for (final metadata in classElement.metadata.annotations) {
-            final element = metadata.element;
+          for (var metadata in classElement.metadata.annotations) {
+            var element = metadata.element;
             if (element is! ConstructorElement) continue;
 
-            final enclosingElement = element.enclosingElement;
+            var enclosingElement = element.enclosingElement;
             if (enclosingElement.name != 'MemberGroup') continue;
 
-            final constantValue = metadata.computeConstantValue();
+            var constantValue = metadata.computeConstantValue();
             if (constantValue == null) continue;
 
-            final nameField = constantValue.getField('name');
+            var nameField = constantValue.getField('name');
             if (nameField == null) continue;
 
-            final symbolValue = nameField.toSymbolValue();
+            var symbolValue = nameField.toSymbolValue();
             if (symbolValue == null) continue;
 
-            final participantField = constantValue.getField('participant');
-            final isParticipant = participantField?.toBoolValue() ?? true;
+            var participantField = constantValue.getField('participant');
+            var isParticipant = participantField?.toBoolValue() ?? true;
 
             if (isParticipant) {
               memberGroups.putIfAbsent(symbolValue, () => {}).add(className);
@@ -223,46 +223,46 @@ void main() {
         }
 
         // Create reverse lookup: class name -> groups it belongs to
-        final classToGroups = <String, Set<String>>{};
-        for (final entry in memberGroups.entries) {
-          for (final className in entry.value) {
+        var classToGroups = <String, Set<String>>{};
+        for (var entry in memberGroups.entries) {
+          for (var className in entry.value) {
             classToGroups.putIfAbsent(className, () => {}).add(entry.key);
           }
         }
-        for (final entry in nonParticipants.entries) {
+        for (var entry in nonParticipants.entries) {
           classToGroups.putIfAbsent(entry.value, () => {}).add(entry.key);
         }
 
         // Second pass: For each StaticalContext class, check static fields
-        final violations = <String>[];
+        var violations = <String>[];
 
-        for (final classElement in classElements) {
-          final className = classElement.name;
+        for (var classElement in classElements) {
+          var className = classElement.name;
           if (className == null) continue;
 
           // Check if this class directly extends StaticalContext
-          final extendsStaticalContext =
+          var extendsStaticalContext =
               classElement.supertype != null &&
               classElement.supertype!.element.name == 'StaticalContext';
 
           if (!extendsStaticalContext) continue;
 
           // Collect all static const fields that reference member group members
-          final referencedGroupMembers = <String, Set<String>>{};
+          var referencedGroupMembers = <String, Set<String>>{};
 
-          for (final field in classElement.fields) {
+          for (var field in classElement.fields) {
             if (!field.isStatic || !field.isConst) continue;
 
-            final fieldType = field.type.element;
+            var fieldType = field.type.element;
             if (fieldType is! InterfaceElement) continue;
 
-            final fieldTypeName = fieldType.name;
+            var fieldTypeName = fieldType.name;
             if (fieldTypeName == null) continue;
 
             // Check if this field references a member group member
-            final groups = classToGroups[fieldTypeName];
+            var groups = classToGroups[fieldTypeName];
             if (groups != null) {
-              for (final groupId in groups) {
+              for (var groupId in groups) {
                 referencedGroupMembers
                     .putIfAbsent(groupId, () => {})
                     .add(fieldTypeName);
@@ -272,24 +272,24 @@ void main() {
 
           // For each group that has at least one referenced member,
           // verify all members are referenced
-          for (final entry in referencedGroupMembers.entries) {
-            final groupId = entry.key;
-            final referencedMembers = entry.value;
+          for (var entry in referencedGroupMembers.entries) {
+            var groupId = entry.key;
+            var referencedMembers = entry.value;
 
             // Get participants and non-participant for this group
-            final participants = memberGroups[groupId] ?? {};
-            final nonParticipant = nonParticipants[groupId];
+            var participants = memberGroups[groupId] ?? {};
+            var nonParticipant = nonParticipants[groupId];
 
             // Check which participants are referenced
-            final referencedParticipants = participants.intersection(
+            var referencedParticipants = participants.intersection(
               referencedMembers,
             );
-            final missingParticipants = participants.difference(
+            var missingParticipants = participants.difference(
               referencedMembers,
             );
 
             // Check if non-participant is referenced
-            final hasNonParticipant =
+            var hasNonParticipant =
                 nonParticipant != null &&
                 referencedMembers.contains(nonParticipant);
 

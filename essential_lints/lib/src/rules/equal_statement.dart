@@ -18,7 +18,7 @@ class EqualStatementRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _EqualStatementVisitor(this, context);
+    var visitor = _EqualStatementVisitor(this, context);
     registry
       ..addSwitchStatement(this, visitor)
       ..addSwitchExpression(this, visitor);
@@ -42,7 +42,7 @@ class _EqualStatementVisitor extends SimpleAstVisitor<void> {
       if (equals.containsKey(comparingExpression.toSource())) {
         continue;
       }
-      for (final switchCase in node.cases) {
+      for (var switchCase in node.cases) {
         if (switchCase.expression.toSource() ==
             comparingExpression.toSource()) {
           equals
@@ -51,7 +51,7 @@ class _EqualStatementVisitor extends SimpleAstVisitor<void> {
         }
       }
     }
-    for (final entry in equals.entries) {
+    for (var entry in equals.entries) {
       if (entry.value.length < 2) {
         continue;
       }
@@ -78,7 +78,7 @@ class _EqualStatementVisitor extends SimpleAstVisitor<void> {
       if (equals.containsKey(statementsSource)) {
         continue;
       }
-      for (final switchCase in node.members) {
+      for (var switchCase in node.members) {
         var switchCaseStatementsSource = switchCase.statements
             .map((e) => e.toSource())
             .join();
@@ -87,7 +87,7 @@ class _EqualStatementVisitor extends SimpleAstVisitor<void> {
         }
       }
     }
-    for (final entry in equals.entries) {
+    for (var entry in equals.entries) {
       if (entry.value.length < 2) {
         continue;
       }

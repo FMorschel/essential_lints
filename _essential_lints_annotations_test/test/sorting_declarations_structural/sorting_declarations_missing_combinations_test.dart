@@ -24,7 +24,7 @@ final class _Nested implements Comparable<_Nested> {
 
   @override
   String toString() {
-    final buffer = StringBuffer()..write('.${element.name!}');
+    var buffer = StringBuffer()..write('.${element.name!}');
     if (element is ConstructorElement) {
       buffer.write('(');
     }
@@ -76,10 +76,10 @@ Set<_Nested> _buildAllCombinations(
   InterfaceElement? currentElement,
   Set<InterfaceElement> visited = const {},
 }) {
-  final results = <_Nested>{};
+  var results = <_Nested>{};
 
   // Find the starting class or continue from current element
-  final elementToExplore = currentElement ?? classElements['SortDeclaration'];
+  var elementToExplore = currentElement ?? classElements['SortDeclaration'];
   if (elementToExplore == null) return results;
 
   // Check if we've already visited this element in the current path
@@ -87,7 +87,7 @@ Set<_Nested> _buildAllCombinations(
   if (currentElement != null && visited.contains(elementToExplore)) {
     return results;
   }
-  final newVisited = currentElement != null
+  var newVisited = currentElement != null
       ? {...visited, elementToExplore}
       : visited;
 
@@ -95,31 +95,31 @@ Set<_Nested> _buildAllCombinations(
   // All static fields in modifier classes are terminal nodes
   // Skip static fields for Symbol class
   if (currentElement != null && elementToExplore.name != 'Symbol') {
-    for (final field in elementToExplore.fields) {
+    for (var field in elementToExplore.fields) {
       if (field.isStatic && field.isPublic) {
-        final fieldName = field.name;
+        var fieldName = field.name;
         if (fieldName == null) continue;
 
         // This is a terminal node - just the field without wrapping
-        final newNested = _Nested(field);
+        var newNested = _Nested(field);
         results.add(newNested);
       }
     }
   }
 
   // Explore factory constructors (intermediate nodes)
-  for (final constructor in elementToExplore.constructors) {
+  for (var constructor in elementToExplore.constructors) {
     if (!constructor.isFactory) continue;
 
     // Get the first parameter's type
     if (constructor.formalParameters.isEmpty) continue;
-    final param = constructor.formalParameters.first;
-    final paramType = param.type.element;
+    var param = constructor.formalParameters.first;
+    var paramType = param.type.element;
 
     if (paramType is! InterfaceElement) continue;
 
     // Recursively explore this parameter type
-    final subResults = _buildAllCombinations(
+    var subResults = _buildAllCombinations(
       classElements,
       currentElement: paramType,
       visited: newVisited,
@@ -127,7 +127,7 @@ Set<_Nested> _buildAllCombinations(
 
     // Wrap each sub-result with the current constructor
     // This creates .constructor(.subResult) instead of .subResult.constructor()
-    for (final subResult in subResults) {
+    for (var subResult in subResults) {
       results.add(_Nested(constructor.baseElement, subResult));
     }
   }
@@ -143,11 +143,11 @@ class _TestCombinationVisitor extends RecursiveAstVisitor<void> {
   void visitMethodInvocation(MethodInvocation node) {
     // Look for calls to expectSortDeclaration
     if (node.methodName.name == 'expectSortDeclaration') {
-      final args = node.argumentList.arguments;
+      var args = node.argumentList.arguments;
       if (args.isNotEmpty) {
-        final firstArg = args.first;
+        var firstArg = args.first;
         // Process the first argument (should be a const expression)
-        final visitor = _NestedExpressionVisitor();
+        var visitor = _NestedExpressionVisitor();
         firstArg.accept(visitor);
         if (visitor.result != null) {
           combinations.add(visitor.result!);
@@ -179,14 +179,14 @@ class _NestedExpressionVisitor extends SimpleAstVisitor<_Nested?> {
   _Nested? visitDotShorthandConstructorInvocation(
     DotShorthandConstructorInvocation node,
   ) {
-    final element = node.constructorName.element;
+    var element = node.constructorName.element;
     if (element == null) return null;
 
     // Visit the first argument to get the child (if any)
     _Nested? child;
-    final args = node.argumentList.arguments;
+    var args = node.argumentList.arguments;
     if (args.isNotEmpty) {
-      final childVisitor = _NestedExpressionVisitor();
+      var childVisitor = _NestedExpressionVisitor();
       args.first.accept(childVisitor);
       child = childVisitor.result;
     }
@@ -201,11 +201,11 @@ class _NestedExpressionVisitor extends SimpleAstVisitor<_Nested?> {
 Set<_Nested> _extractTestedCombinations(
   List<ResolvedLibraryResult> testResults,
 ) {
-  final allCombinations = <_Nested>{};
+  var allCombinations = <_Nested>{};
 
-  for (final result in testResults) {
-    for (final unit in result.units) {
-      final visitor = _TestCombinationVisitor();
+  for (var result in testResults) {
+    for (var unit in result.units) {
+      var visitor = _TestCombinationVisitor();
       unit.unit.visitChildren(visitor);
       allCombinations.addAll(visitor.combinations);
     }
@@ -216,8 +216,8 @@ Set<_Nested> _extractTestedCombinations(
 
 Future<void> main() async {
   // Load all the data upfront
-  final currentPackageDir = await essentialLintsAnnotationsPackage();
-  final sortDeclarationsPath = path.normalize(
+  var currentPackageDir = await essentialLintsAnnotationsPackage();
+  var sortDeclarationsPath = path.normalize(
     path.join(
       currentPackageDir.path,
       'lib',
@@ -226,7 +226,7 @@ Future<void> main() async {
       'sort_declarations.dart',
     ),
   );
-  final testDirPath = path.normalize(
+  var testDirPath = path.normalize(
     path.join(
       currentPackageDir.path,
       'test',
@@ -235,38 +235,38 @@ Future<void> main() async {
   );
 
   // Analyze sort_declarations.dart
-  final collection = AnalysisContextCollection(
+  var collection = AnalysisContextCollection(
     includedPaths: [sortDeclarationsPath, testDirPath],
   );
 
-  final context = collection.contextFor(sortDeclarationsPath);
-  final result = await context.currentSession.getResolvedLibrary(
+  var context = collection.contextFor(sortDeclarationsPath);
+  var result = await context.currentSession.getResolvedLibrary(
     sortDeclarationsPath,
   );
 
   if (result is! ResolvedLibraryResult) {
     throw StateError('Failed to resolve sort_declarations library: $result');
   }
-  final sortDeclarationsResult = result;
+  var sortDeclarationsResult = result;
 
   // Build class elements map
-  final classElements = <String, InterfaceElement>{};
-  for (final classElement in sortDeclarationsResult.element.classes) {
-    final name = classElement.name;
+  var classElements = <String, InterfaceElement>{};
+  for (var classElement in sortDeclarationsResult.element.classes) {
+    var name = classElement.name;
     if (name != null) {
       classElements[name] = classElement;
     }
   }
 
   // Generate all possible combinations
-  final allCombinations = _buildAllCombinations(classElements);
+  var allCombinations = _buildAllCombinations(classElements);
 
   // Analyze all test files
-  final testResults = <ResolvedLibraryResult>[];
+  var testResults = <ResolvedLibraryResult>[];
 
   // List all .dart files in the testDirPath
-  final testDir = Directory(testDirPath);
-  final testFiles = [
+  var testDir = Directory(testDirPath);
+  var testFiles = [
     ...await testDir
         .list()
         .where(
@@ -276,9 +276,9 @@ Future<void> main() async {
         .toList(),
   ];
 
-  for (final testFile in testFiles) {
-    final testPath = path.join(testDirPath, testFile);
-    final testResult = await context.currentSession.getResolvedLibrary(
+  for (var testFile in testFiles) {
+    var testPath = path.join(testDirPath, testFile);
+    var testResult = await context.currentSession.getResolvedLibrary(
       testPath,
     );
     if (testResult is ResolvedLibraryResult) {
@@ -287,21 +287,21 @@ Future<void> main() async {
   }
 
   // Extract tested combinations
-  final testedCombinations = _extractTestedCombinations(testResults);
+  var testedCombinations = _extractTestedCombinations(testResults);
 
   // Group untested combinations by top-level element
-  final untested = allCombinations.difference(testedCombinations);
-  final topLevelGroups = <String>{};
-  final untestedGroupedByTopLevel = <String, List<_Nested>>{};
+  var untested = allCombinations.difference(testedCombinations);
+  var topLevelGroups = <String>{};
+  var untestedGroupedByTopLevel = <String, List<_Nested>>{};
 
-  for (final nested in allCombinations) {
-    final topLevelName = nested.name;
+  for (var nested in allCombinations) {
+    var topLevelName = nested.name;
     topLevelGroups.add(topLevelName);
   }
   var topLevelNames = topLevelGroups.toList()..sort();
 
-  for (final nested in untested) {
-    final topLevelName = nested.name;
+  for (var nested in untested) {
+    var topLevelName = nested.name;
     untestedGroupedByTopLevel.putIfAbsent(topLevelName, () => []).add(nested);
   }
 
@@ -322,9 +322,9 @@ Future<void> main() async {
   });
 
   // Create a separate test for each top-level element that has untested combos
-  for (final topLevelName in topLevelNames) {
+  for (var topLevelName in topLevelNames) {
     test('.$topLevelName combinations should be tested', () {
-      final combinations =
+      var combinations =
           (untestedGroupedByTopLevel[topLevelName]?..sort()) ?? const [];
 
       if (combinations.isNotEmpty) {
@@ -332,7 +332,7 @@ Future<void> main() async {
           '\nUntested .$topLevelName combinations '
           '(${combinations.length}):',
         );
-        for (final combo in combinations) {
+        for (var combo in combinations) {
           print('  $combo');
         }
         print('');

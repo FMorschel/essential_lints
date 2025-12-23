@@ -12,7 +12,7 @@ void main() {
 
   setUpAll(() async {
     var currentPackageDir = await essentialLintsAnnotationsPackage();
-    final sortDeclarationsPath = path.normalize(
+    var sortDeclarationsPath = path.normalize(
       path.join(
         currentPackageDir.path,
         'lib',
@@ -27,8 +27,8 @@ void main() {
     );
 
     // Resolve the sort_declarations.dart library
-    final context = collection.contextFor(sortDeclarationsPath);
-    final result = await context.currentSession.getResolvedLibrary(
+    var context = collection.contextFor(sortDeclarationsPath);
+    var result = await context.currentSession.getResolvedLibrary(
       sortDeclarationsPath,
     );
 
@@ -46,7 +46,7 @@ void main() {
     test(
       'Where the constructors are redirected all from the same group exist',
       () {
-        final classElements = sortDeclarationsResult.element.classes;
+        var classElements = sortDeclarationsResult.element.classes;
 
         expect(
           classElements,
@@ -55,24 +55,24 @@ void main() {
         );
 
         // Build a map of mutually exclusive groups
-        final mutuallyExclusiveGroups = <String, Set<InterfaceElement>>{};
-        final optionalMembers = <String, Set<InterfaceElement>>{};
+        var mutuallyExclusiveGroups = <String, Set<InterfaceElement>>{};
+        var optionalMembers = <String, Set<InterfaceElement>>{};
 
-        for (final classElement in classElements) {
-          for (final metadata in classElement.metadata.annotations) {
-            final element = metadata.element;
+        for (var classElement in classElements) {
+          for (var metadata in classElement.metadata.annotations) {
+            var element = metadata.element;
             if (element is! ConstructorElement) continue;
 
-            final enclosingElement = element.enclosingElement;
+            var enclosingElement = element.enclosingElement;
             if (enclosingElement.name != 'MutuallyExclusive') continue;
 
-            final constantValue = metadata.computeConstantValue();
+            var constantValue = metadata.computeConstantValue();
             if (constantValue == null) continue;
 
-            final idField = constantValue.getField('id');
+            var idField = constantValue.getField('id');
             if (idField == null) continue;
 
-            final symbolValue = idField.toSymbolValue();
+            var symbolValue = idField.toSymbolValue();
             if (symbolValue == null) continue;
 
             mutuallyExclusiveGroups
@@ -80,8 +80,8 @@ void main() {
                 .add(classElement);
 
             // Check if this member is optional
-            final optionalField = constantValue.getField('optional');
-            final isOptional = optionalField?.toBoolValue() ?? false;
+            var optionalField = constantValue.getField('optional');
+            var isOptional = optionalField?.toBoolValue() ?? false;
             if (isOptional) {
               optionalMembers
                   .putIfAbsent(symbolValue, () => {})
@@ -93,22 +93,22 @@ void main() {
         }
 
         // For each class, collect all classes it redirects to via constructors
-        final violations = <String>[];
+        var violations = <String>[];
 
-        for (final classElement in classElements) {
+        for (var classElement in classElements) {
           // Map of redirect targets by their mutually exclusive group
-          final redirectsByGroup = <String, Set<InterfaceElement>>{};
+          var redirectsByGroup = <String, Set<InterfaceElement>>{};
 
-          for (final constructor in classElement.constructors) {
-            final redirectedConstructor = constructor.redirectedConstructor;
+          for (var constructor in classElement.constructors) {
+            var redirectedConstructor = constructor.redirectedConstructor;
             if (redirectedConstructor == null) continue;
 
-            final redirectedClass = redirectedConstructor.enclosingElement;
+            var redirectedClass = redirectedConstructor.enclosingElement;
 
             // Check if redirected class is part of a mutually exclusive group
-            for (final entry in mutuallyExclusiveGroups.entries) {
-              final groupId = entry.key;
-              final groupMembers = entry.value;
+            for (var entry in mutuallyExclusiveGroups.entries) {
+              var groupId = entry.key;
+              var groupMembers = entry.value;
 
               if (groupMembers.contains(redirectedClass)) {
                 redirectsByGroup
@@ -121,40 +121,40 @@ void main() {
 
           // For each group that has redirects, verify all members are
           // redirected to
-          for (final entry in redirectsByGroup.entries) {
-            final groupId = entry.key;
-            final redirectedMembers = entry.value;
-            final allGroupMembers = mutuallyExclusiveGroups[groupId]!;
-            final optionalInGroup = optionalMembers[groupId] ?? {};
+          for (var entry in redirectsByGroup.entries) {
+            var groupId = entry.key;
+            var redirectedMembers = entry.value;
+            var allGroupMembers = mutuallyExclusiveGroups[groupId]!;
+            var optionalInGroup = optionalMembers[groupId] ?? {};
 
             if (redirectedMembers.length < allGroupMembers.length) {
-              final redirectedNames = redirectedMembers
+              var redirectedNames = redirectedMembers
                   .map((e) => e.name)
                   .toSet();
 
               // Get required members (all non-optional members)
-              final requiredMembers = allGroupMembers.difference(
+              var requiredMembers = allGroupMembers.difference(
                 optionalInGroup,
               );
-              final requiredNames = requiredMembers.map((e) => e.name).toSet();
+              var requiredNames = requiredMembers.map((e) => e.name).toSet();
 
               // Check if any optional member is present
-              final hasOptional = redirectedMembers.any(
+              var hasOptional = redirectedMembers.any(
                 optionalInGroup.contains,
               );
 
               if (hasOptional) {
                 // If optional member(s) are present, all required members
                 // must also be present
-                final missingRequired = requiredNames.difference(
+                var missingRequired = requiredNames.difference(
                   redirectedNames,
                 );
 
                 if (missingRequired.isNotEmpty) {
-                  final optionalNames = optionalInGroup
+                  var optionalNames = optionalInGroup
                       .map((e) => e.name)
                       .toSet();
-                  final presentOptional = redirectedNames.intersection(
+                  var presentOptional = redirectedNames.intersection(
                     optionalNames,
                   );
 
@@ -169,7 +169,7 @@ void main() {
               } else {
                 // No optional members present
                 // Check if all present members are required
-                final missingRequired = requiredNames.difference(
+                var missingRequired = requiredNames.difference(
                   redirectedNames,
                 );
 
@@ -198,20 +198,20 @@ void main() {
     );
 
     test('All mutually exclusive group members are Modifiers', () {
-      final classElements = sortDeclarationsResult.element.classes;
+      var classElements = sortDeclarationsResult.element.classes;
 
       expect(classElements, isNotEmpty, reason: 'No classes found in library');
 
-      final nonModifierClasses = <String>[];
+      var nonModifierClasses = <String>[];
 
-      for (final classElement in classElements) {
+      for (var classElement in classElements) {
         // Check if this class has @MutuallyExclusive annotation
         var hasMutuallyExclusive = false;
-        for (final metadata in classElement.metadata.annotations) {
-          final element = metadata.element;
+        for (var metadata in classElement.metadata.annotations) {
+          var element = metadata.element;
           if (element is! ConstructorElement) continue;
 
-          final enclosingElement = element.enclosingElement;
+          var enclosingElement = element.enclosingElement;
           if (enclosingElement.name == 'MutuallyExclusive') {
             hasMutuallyExclusive = true;
             break;
@@ -221,12 +221,12 @@ void main() {
         if (!hasMutuallyExclusive) continue;
 
         // Check if this class extends Modifier
-        final extendsModifier = classElement.allSupertypes.any(
+        var extendsModifier = classElement.allSupertypes.any(
           (type) => type.element.name == 'Modifier',
         );
 
         if (!extendsModifier) {
-          final className = classElement.name;
+          var className = classElement.name;
           if (className != null) {
             nonModifierClasses.add(className);
           }
@@ -243,31 +243,31 @@ void main() {
     });
 
     test('No mutually exclusive group should contain a single member', () {
-      final classElements = sortDeclarationsResult.element.classes;
+      var classElements = sortDeclarationsResult.element.classes;
 
       expect(classElements, isNotEmpty, reason: 'No classes found in library');
 
       // Build a map of mutually exclusive groups
-      final mutuallyExclusiveGroups = <String, Set<String>>{};
+      var mutuallyExclusiveGroups = <String, Set<String>>{};
 
-      for (final classElement in classElements) {
-        for (final metadata in classElement.metadata.annotations) {
-          final element = metadata.element;
+      for (var classElement in classElements) {
+        for (var metadata in classElement.metadata.annotations) {
+          var element = metadata.element;
           if (element is! ConstructorElement) continue;
 
-          final enclosingElement = element.enclosingElement;
+          var enclosingElement = element.enclosingElement;
           if (enclosingElement.name != 'MutuallyExclusive') continue;
 
-          final constantValue = metadata.computeConstantValue();
+          var constantValue = metadata.computeConstantValue();
           if (constantValue == null) continue;
 
-          final idField = constantValue.getField('id');
+          var idField = constantValue.getField('id');
           if (idField == null) continue;
 
-          final symbolValue = idField.toSymbolValue();
+          var symbolValue = idField.toSymbolValue();
           if (symbolValue == null) continue;
 
-          final className = classElement.name;
+          var className = classElement.name;
           if (className != null) {
             mutuallyExclusiveGroups
                 .putIfAbsent(symbolValue, () => {})
@@ -279,11 +279,11 @@ void main() {
       }
 
       // Find groups with only one member
-      final singleMemberGroups = <String>[];
+      var singleMemberGroups = <String>[];
 
-      for (final entry in mutuallyExclusiveGroups.entries) {
-        final groupId = entry.key;
-        final members = entry.value;
+      for (var entry in mutuallyExclusiveGroups.entries) {
+        var groupId = entry.key;
+        var members = entry.value;
 
         if (members.length == 1) {
           singleMemberGroups.add(

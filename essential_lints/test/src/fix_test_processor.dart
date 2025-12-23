@@ -93,7 +93,7 @@ mixin EditTestProcessorMixin on BaseEditTestProcessor {
             'found none.',
       );
     }
-    for (final fix in fixes) {
+    for (var fix in fixes) {
       if (!allowFixAllFixes &&
           fix.kind.priority == DartFixKindPriority.inFile) {
         fail(
