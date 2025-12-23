@@ -1,4 +1,5 @@
 import 'package:_internal_testing/dependencies.dart';
+import 'package:analyzer/src/error/codes.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:essential_lints/src/warnings/sorting_members.dart';
 import 'package:essential_lints/src/warnings/warning.dart';
@@ -184,13 +185,13 @@ class A {
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
 @SortingMembers({
-  .public(.unnamed(.constructors)),
-  .unnamed(.constructors),
+  .named(.private(.constructors)),
+  .named(.constructors),
   .constructors,
 })
 class A {
+  A._private();
   A();
-  A.named();
 }
 ''');
   }
@@ -211,7 +212,7 @@ class A {
   void method() {}
 }
 ''',
-      [lint(162, 5)],
+      [lint(164, 5)],
     );
   }
 
@@ -233,7 +234,7 @@ abstract class A {
   void abstractMethod();
 }
 ''',
-      [error(rule.diagnosticCode, 183, 14)],
+      [error(rule.diagnosticCode, 189, 14)],
     );
   }
 
@@ -251,7 +252,7 @@ class A {
   static int staticField = 0;
 }
 ''',
-      [error(rule.diagnosticCode, 175, 11)],
+      [error(rule.diagnosticCode, 180, 11)],
     );
   }
 
@@ -266,10 +267,10 @@ import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 })
 class A {
   int regularField = 0;
-  static const int CONSTANT = 1;
+  static const int constant = 1;
 }
 ''',
-      [error(rule.diagnosticCode, 179, 8)],
+      [error(rule.diagnosticCode, 185, 8)],
     );
   }
 
@@ -287,7 +288,7 @@ class A {
   const A.constant();
 }
 ''',
-      [error(rule.diagnosticCode, 179, 8)],
+      [error(rule.diagnosticCode, 171, 8)],
     );
   }
 
@@ -323,7 +324,7 @@ class A {
   late int lateField;
 }
 ''',
-      [error(rule.diagnosticCode, 176, 9)],
+      [error(rule.diagnosticCode, 175, 9)],
     );
   }
 
@@ -341,7 +342,7 @@ class A {
   var varField = 0;
 }
 ''',
-      [error(rule.diagnosticCode, 174, 8)],
+      [error(rule.diagnosticCode, 168, 8)],
     );
   }
 
@@ -359,7 +360,7 @@ class A {
   int initializedField = 0;
 }
 ''',
-      [error(rule.diagnosticCode, 202, 18)],
+      [error(rule.diagnosticCode, 180, 16)],
     );
   }
 
@@ -377,7 +378,7 @@ class A {
   int? nullableField;
 }
 ''',
-      [error(rule.diagnosticCode, 181, 13)],
+      [error(rule.diagnosticCode, 179, 13)],
     );
   }
 
@@ -395,7 +396,7 @@ class A {
   int? nullableMethod() => null;
 }
 ''',
-      [error(rule.diagnosticCode, 181, 13)],
+      [error(rule.diagnosticCode, 185, 14)],
     );
   }
 
@@ -413,7 +414,7 @@ class A {
   int _privateField = 0;
 }
 ''',
-      [error(rule.diagnosticCode, 177, 13)],
+      [error(rule.diagnosticCode, 172, 13)],
     );
   }
 
@@ -431,7 +432,7 @@ class A {
   int _privateMethod() => 0;
 }
 ''',
-      [error(rule.diagnosticCode, 177, 13)],
+      [error(rule.diagnosticCode, 178, 14)],
     );
   }
 
@@ -449,7 +450,7 @@ class A {
   A._private();
 }
 ''',
-      [error(rule.diagnosticCode, 177, 13)],
+      [error(rule.diagnosticCode, 166, 8)],
     );
   }
 
@@ -467,7 +468,7 @@ class A {
   int publicField = 0;
 }
 ''',
-      [error(rule.diagnosticCode, 178, 11)],
+      [error(rule.diagnosticCode, 173, 11)],
     );
   }
 
@@ -485,7 +486,7 @@ class A {
   int publicMethod() => 0;
 }
 ''',
-      [error(rule.diagnosticCode, 178, 11)],
+      [error(rule.diagnosticCode, 179, 12)],
     );
   }
 
@@ -503,7 +504,7 @@ class A {
   A();
 }
 ''',
-      [error(rule.diagnosticCode, 178, 11)],
+      [error(rule.diagnosticCode, 172, 1)],
     );
   }
 
@@ -521,7 +522,7 @@ class A {
   external void externalMethod();
 }
 ''',
-      [error(rule.diagnosticCode, 183, 14)],
+      [error(rule.diagnosticCode, 188, 14)],
     );
   }
 
@@ -539,7 +540,7 @@ class A {
   external int externalField;
 }
 ''',
-      [error(rule.diagnosticCode, 183, 14)],
+      [error(rule.diagnosticCode, 183, 13)],
     );
   }
 
@@ -557,7 +558,7 @@ class A {
   external A.external();
 }
 ''',
-      [error(rule.diagnosticCode, 183, 14)],
+      [error(rule.diagnosticCode, 176, 8)],
     );
   }
 
@@ -575,7 +576,7 @@ class A {
   factory A.create() => A();
 }
 ''',
-      [error(rule.diagnosticCode, 189, 6)],
+      [error(rule.diagnosticCode, 175, 6)],
     );
   }
 
@@ -593,7 +594,7 @@ class A {
   A.named();
 }
 ''',
-      [error(rule.diagnosticCode, 166, 5)],
+      [error(rule.diagnosticCode, 164, 5)],
     );
   }
 
@@ -611,7 +612,7 @@ class A {
   A();
 }
 ''',
-      [error(rule.diagnosticCode, 166, 5)],
+      [error(rule.diagnosticCode, 170, 1)],
     );
   }
 
@@ -629,7 +630,7 @@ class A {
   factory A.redirect() = A;
 }
 ''',
-      [error(rule.diagnosticCode, 171, 5)],
+      [error(rule.diagnosticCode, 178, 8)],
     );
   }
 
@@ -647,7 +648,7 @@ class A {
   bool operator ==(Object other) => identical(this, other);
 }
 ''',
-      [error(rule.diagnosticCode, 183, 8)],
+      [error(rule.diagnosticCode, 188, 2)],
     );
   }
 
@@ -670,7 +671,7 @@ class A extends Base {
   void method() {}
 }
 ''',
-      [error(rule.diagnosticCode, 246, 6)],
+      [error(rule.diagnosticCode, 248, 6)],
     );
   }
 
@@ -693,7 +694,14 @@ class A extends Base {
   int field = 1;
 }
 ''',
-      [error(rule.diagnosticCode, 246, 6)],
+      [
+        error(
+          CompileTimeErrorCode.notInitializedNonNullableInstanceField,
+          108,
+          5,
+        ),
+        error(rule.diagnosticCode, 239, 5),
+      ],
     );
   }
 }

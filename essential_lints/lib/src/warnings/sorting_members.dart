@@ -1,15 +1,19 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
+import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 
 import 'warning.dart';
+
+final _logger = Logger('sorting_members_rule');
 
 /// {@template sorting_members_rule}
 /// The rule for sorting_members warning.
@@ -135,7 +139,7 @@ class _MemberVisitor extends RecursiveAstVisitor<void> {
         for (final variable in fields.variables) {
           if (variable.declaredFragment?.element == element) {
             rule.reportAtToken(variable.name);
-            return;
+            break;
           }
         }
       case ConstructorDeclaration(:var name):
@@ -231,7 +235,7 @@ class _ValidatorFromAnnotation {
       do {
         typeName = current?.type?.element?.lookupName;
         switch (typeName) {
-          case 'Field':
+          case '_Field':
             list.add(const _FieldMemberTypeValidator());
             list.add(
               _ExpectedNamedMemberTypeValidator(
@@ -245,7 +249,7 @@ class _ValidatorFromAnnotation {
               ),
             );
             break While;
-          case 'Constructor':
+          case '_Constructor':
             list.add(const _ConstructorMemberTypeValidator());
             list.add(
               _ExpectedNamedMemberTypeValidator(
@@ -259,7 +263,7 @@ class _ValidatorFromAnnotation {
               ),
             );
             break While;
-          case 'Method':
+          case '_Method':
             list.add(const _MethodMemberTypeValidator());
             list.add(
               _ExpectedNamedMemberTypeValidator(
@@ -273,7 +277,7 @@ class _ValidatorFromAnnotation {
               ),
             );
             break While;
-          case 'Getter':
+          case '_Getter':
             list.add(const _GetterMemberTypeValidator());
             list.add(
               _ExpectedNamedMemberTypeValidator(
@@ -287,7 +291,7 @@ class _ValidatorFromAnnotation {
               ),
             );
             break While;
-          case 'Setter':
+          case '_Setter':
             list.add(const _SetterMemberTypeValidator());
             list.add(
               _ExpectedNamedMemberTypeValidator(
@@ -311,41 +315,42 @@ class _ValidatorFromAnnotation {
             list.add(const _GetterMemberTypeValidator());
           case 'Setters':
             list.add(const _SetterMemberTypeValidator());
-          case 'Named':
+          case '_Named':
             list.add(const _NamedMemberTypeValidator());
-          case 'Abstract':
+          case '_Abstract':
             list.add(const _AbstractMemberTypeValidator());
-          case 'Const':
+          case '_Const':
             list.add(const _ConstMemberTypeValidator());
-          case 'External':
+          case '_External':
             list.add(const _ExternalMemberTypeValidator());
-          case 'Factory':
+          case '_Factory':
             list.add(const _FactoryMemberTypeValidator());
-          case 'Final':
+          case '_Final':
             list.add(const _FinalMemberTypeValidator());
-          case 'Initialized':
+          case '_Initialized':
             list.add(const _InitializedMemberTypeValidator());
-          case 'Late':
+          case '_Late':
             list.add(const _LateMemberTypeValidator());
-          case 'Nullable':
+          case '_Nullable':
             list.add(const _NullableMemberTypeValidator());
-          case 'Operator':
+          case '_Operator':
             list.add(const _OperatorMemberTypeValidator());
-          case 'Overriden':
-            list.add(const _OverridenMemberTypeValidator());
-          case 'Private':
+          case '_Overridden':
+            list.add(const _OverriddenMemberTypeValidator());
+          case '_Private':
             list.add(const _PrivateMemberTypeValidator());
-          case 'Public':
+          case '_Public':
             list.add(const _PublicMemberTypeValidator());
-          case 'Redirecting':
+          case '_Redirecting':
             list.add(const _RedirectingMemberTypeValidator());
-          case 'Static':
+          case '_Static':
             list.add(const _StaticMemberTypeValidator());
-          case 'Unnamed':
+          case '_Unnamed':
             list.add(const _UnnamedMemberTypeValidator());
-          case 'Var':
+          case '_Var':
             list.add(const _VarMemberTypeValidator());
           default:
+            _logger.severe('Unknown member type: $typeName');
             assert(false, 'Unknown member type: $typeName');
         }
         current =
@@ -604,16 +609,18 @@ class _OperatorMemberTypeValidator extends _MemberTypeValidator {
   }
 }
 
-class _OverridenMemberTypeValidator extends _MemberTypeValidator {
-  const _OverridenMemberTypeValidator();
+class _OverriddenMemberTypeValidator extends _MemberTypeValidator {
+  const _OverriddenMemberTypeValidator();
 
   @override
   bool isValid(AstNode member, Element element) {
-    if (element is MethodElement) {
-      return element.baseElement != element;
-    }
-    if (element is PropertyAccessorElement) {
-      return element.baseElement != element;
+    var enclosingElement = element.enclosingElement;
+    if (enclosingElement is InterfaceElement) {
+      for (final name in enclosingElement.inheritedMembers.keys) {
+        if (name.name == element.lookupName) {
+          return true;
+        }
+      }
     }
     return false;
   }
@@ -678,7 +685,11 @@ class _VarMemberTypeValidator extends _MemberTypeValidator {
   @override
   bool isValid(AstNode member, Element element) {
     if (element is FieldElement) {
-      return !element.isFinal && !element.isConst;
+      var keyword = member
+          .thisOrAncestorOfType<FieldDeclaration>()
+          ?.fields
+          .keyword;
+      return keyword?.keyword == Keyword.VAR;
     }
     return false;
   }
