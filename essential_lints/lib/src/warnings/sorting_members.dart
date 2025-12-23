@@ -7,6 +7,7 @@ import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:analyzer/source/line_info.dart';
 import 'package:collection/collection.dart';
 import 'package:essential_lints_annotations/src/sorting_members/sort_declarations.dart'; // ignore: implementation_imports used only for exhaustiveness
 import 'package:logging/logging.dart';
@@ -46,14 +47,156 @@ class _MemberVisitor extends RecursiveAstVisitor<void> {
   final RuleContext context;
   int current = 0;
   bool _reported = false;
+  int? previousDeclarationLastLine;
+  String? previousMemberName;
+  String? previousUnsortedMemberName;
+  int? previousValidatorIndex;
+  bool? previousWasSorted;
+
+  LineInfo get lineInfo => context.definingUnit.unit.lineInfo;
+
+  int _getDeclarationLastLine(AstNode node) {
+    return lineInfo.getLocation(node.endToken.offset).lineNumber;
+  }
+
+  String _getMemberName(AstNode node, Element element) {
+    // Treat unnamed constructors as "new" for alphabetical sorting
+    if (node is ConstructorDeclaration && node.name == null) {
+      return 'new';
+    }
+    return element.name ?? '';
+  }
+
+  int _getBlankLinesBetween(int lastLine, int currentLine) {
+    // Number of blank lines = (current line - last line - 1)
+    // e.g., line 5 to line 7 has 1 blank line (line 6)
+    return currentLine - lastLine - 1;
+  }
+
+  void _checkSpacing(
+    AstNode node,
+    Element element, {
+    required int validatorIndex,
+    required bool isSorted,
+  }) {
+    if (previousDeclarationLastLine == null) return;
+
+    var currentLine = lineInfo.getLocation(node.beginToken.offset).lineNumber;
+    var blankLines = _getBlankLinesBetween(
+      previousDeclarationLastLine!,
+      currentLine,
+    );
+
+    // Check linesBetweenSameSortMembers - when staying within same validator
+    if (validatorFromAnnotation.linesBetweenSameSortMembers != null &&
+        previousValidatorIndex == validatorIndex &&
+        previousValidatorIndex != null &&
+        previousValidatorIndex != -1 &&
+        validatorIndex != -1) {
+      var required = validatorFromAnnotation.linesBetweenSameSortMembers!;
+      if (blankLines != required) {
+        _reportAt(node, element);
+        return;
+      }
+    }
+
+    // Check linesAroundSortedMembers - when transitioning between different
+    // validators (both sorted)
+    if (validatorFromAnnotation.linesAroundSortedMembers != null &&
+        previousValidatorIndex != validatorIndex &&
+        previousValidatorIndex != null &&
+        previousValidatorIndex != -1 &&
+        validatorIndex != -1) {
+      var required = validatorFromAnnotation.linesAroundSortedMembers!;
+      if (blankLines != required) {
+        _reportAt(node, element);
+        return;
+      }
+    }
+
+    // Check linesAroundUnsortedMembers - when transitioning between sorted and
+    // unsorted
+    if (validatorFromAnnotation.linesAroundUnsortedMembers != null &&
+        previousWasSorted != isSorted) {
+      var required = validatorFromAnnotation.linesAroundUnsortedMembers!;
+      if (blankLines != required) {
+        _reportAt(node, element);
+        return;
+      }
+    }
+  }
+
+  void _checkAlphabeticalSorted(
+    AstNode node,
+    Element element,
+    String memberName,
+  ) {
+    if (previousMemberName != null &&
+        validatorFromAnnotation.alphabetizeSortedMembers) {
+      // Special case: "new" (unnamed constructor) always comes first
+      if (previousMemberName == 'new' && memberName != 'new') {
+        // Previous was unnamed constructor, current is not - correct order
+      } else if (memberName == 'new' && previousMemberName != 'new') {
+        // Current is unnamed constructor, previous was not - wrong order
+        _reportAt(node, element);
+        return;
+      } else {
+        // Both are "new" or neither is "new" - use regular alphabetical
+        // comparison
+        if (memberName.toLowerCase().compareTo(
+              previousMemberName!.toLowerCase(),
+            ) <
+            0) {
+          _reportAt(node, element);
+          return;
+        }
+      }
+    }
+  }
+
+  void _checkAlphabeticalUnsorted(
+    AstNode node,
+    Element element,
+    String memberName,
+  ) {
+    if (previousUnsortedMemberName != null &&
+        validatorFromAnnotation.alphabetizeUnsortedMembers) {
+      // Special case: "new" (unnamed constructor) always comes first
+      if (previousUnsortedMemberName == 'new' && memberName != 'new') {
+        // Previous was unnamed constructor, current is not - correct order
+      } else if (memberName == 'new' && previousUnsortedMemberName != 'new') {
+        // Current is unnamed constructor, previous was not - wrong order
+        _reportAt(node, element);
+        return;
+      } else {
+        // Both are "new" or neither is "new" - use regular alphabetical
+        // comparison
+        if (memberName.toLowerCase().compareTo(
+              previousUnsortedMemberName!.toLowerCase(),
+            ) <
+            0) {
+          _reportAt(node, element);
+          return;
+        }
+      }
+    }
+  }
 
   void _validateMember(AstNode node, Element element) {
     if (_reported) return;
     if (current >= validatorFromAnnotation.validators.length) return;
 
     var validator = validatorFromAnnotation.validators[current];
+    var memberName = _getMemberName(node, element);
 
     if (validator.isValid(node, element)) {
+      // Check spacing before alphabetical/order checks
+      _checkSpacing(node, element, validatorIndex: current, isSorted: true);
+      if (_reported) return;
+
+      _checkAlphabeticalSorted(node, element, memberName);
+      if (_reported) return;
+
       // Member matches current validator
       // Check ALL validators for a more specific match
       for (var i = 0; i < validatorFromAnnotation.validators.length; i++) {
@@ -65,6 +208,10 @@ class _MemberVisitor extends RecursiveAstVisitor<void> {
           if (i > current) {
             // More specific validator is ahead - jump to it
             current = i;
+            previousMemberName = null;
+            previousDeclarationLastLine = _getDeclarationLastLine(node);
+            previousValidatorIndex = i;
+            previousWasSorted = true;
             return;
           } else {
             // More specific validator is behind - member is out of order
@@ -74,9 +221,18 @@ class _MemberVisitor extends RecursiveAstVisitor<void> {
         }
       }
       // No more specific validator found - this is the right match
+      // Reset previousMemberName if validator changed
+      if (previousValidatorIndex != current) {
+        previousMemberName = null;
+      }
+      previousMemberName = memberName;
+      previousDeclarationLastLine = _getDeclarationLastLine(node);
+      previousValidatorIndex = current;
+      previousWasSorted = true;
       return;
     }
 
+    // Member doesn't match current validator.
     // Check if member matches any previous validators (wrong order)
     for (var i = 0; i < current; i++) {
       if (validatorFromAnnotation.validators[i].isValid(node, element)) {
@@ -94,14 +250,37 @@ class _MemberVisitor extends RecursiveAstVisitor<void> {
       i++
     ) {
       if (validatorFromAnnotation.validators[i].isValid(node, element)) {
-        // Found a matching validator ahead - move to it
+        // Found a matching validator ahead - check spacing before moving to it
+        _checkSpacing(node, element, validatorIndex: i, isSorted: true);
+        if (_reported) return;
+
+        // Move to the new validator
         current = i;
+        // Reset previousMemberName when changing validators
+        previousMemberName = memberName;
+        previousDeclarationLastLine = _getDeclarationLastLine(node);
+        previousValidatorIndex = i;
+        previousWasSorted = true;
         return;
       }
     }
 
-    // No matching validator found - revert to previous current
+    // No matching validator found - this is an unsorted member
+    // Now check spacing and alphabetical constraints for unsorted members.
+    _checkSpacing(node, element, validatorIndex: -1, isSorted: false);
+    if (_reported) return;
+
+    _checkAlphabeticalUnsorted(node, element, memberName);
+    if (_reported) return;
     current = previousCurrent;
+    // Reset previousUnsortedMemberName when transitioning to unsorted
+    if (previousWasSorted ?? true) {
+      previousUnsortedMemberName = null;
+    }
+    previousUnsortedMemberName = memberName;
+    previousDeclarationLastLine = _getDeclarationLastLine(node);
+    previousValidatorIndex = -1;
+    previousWasSorted = false;
   }
 
   @override
@@ -215,6 +394,11 @@ class _ValidatorFromAnnotation {
   _ValidatorFromAnnotation._({
     required this.annotation,
     required this.validators,
+    required this.linesBetweenSameSortMembers,
+    required this.linesAroundSortedMembers,
+    required this.linesAroundUnsortedMembers,
+    required this.alphabetizeSortedMembers,
+    required this.alphabetizeUnsortedMembers,
   });
 
   factory _ValidatorFromAnnotation.fromAnnotation(
@@ -370,11 +554,31 @@ class _ValidatorFromAnnotation {
     return _ValidatorFromAnnotation._(
       annotation: annotation,
       validators: validators,
+      linesBetweenSameSortMembers: constantValue
+          .getField('linesBetweenSameSortMembers')
+          ?.toIntValue(),
+      linesAroundSortedMembers: constantValue
+          .getField('linesAroundSortedMembers')
+          ?.toIntValue(),
+      linesAroundUnsortedMembers: constantValue
+          .getField('linesAroundUnsortedMembers')
+          ?.toIntValue(),
+      alphabetizeSortedMembers:
+          constantValue.getField('alphabetizeSortedMembers')?.toBoolValue() ??
+          false,
+      alphabetizeUnsortedMembers:
+          constantValue.getField('alphabetizeUnsortedMembers')?.toBoolValue() ??
+          false,
     );
   }
 
   final ElementAnnotation annotation;
   final List<_ListMemberTypeValidator> validators;
+  final int? linesBetweenSameSortMembers;
+  final int? linesAroundSortedMembers;
+  final int? linesAroundUnsortedMembers;
+  final bool alphabetizeSortedMembers;
+  final bool alphabetizeUnsortedMembers;
 }
 
 @immutable

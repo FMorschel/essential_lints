@@ -216,6 +216,246 @@ class A {
     );
   }
 
+  Future<void> test_unsortedMiddleSorted() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers({
+  .fields,
+  .methods,
+})
+class A {
+  int field = 0;
+  A();
+  void method() {}
+  A.other();
+  void method2() {}
+}
+''');
+  }
+
+  // ========================================================================
+  // Alphabetizing configuration tests
+  // ========================================================================
+
+  Future<void> test_alphabetize_members() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers(
+  {.fields},
+  alphabetizeSortedMembers: true,
+)
+class A {
+  int zebra = 0;
+  int apple = 0;
+  int monkey = 0;
+}
+''',
+      [lint(179, 5)],
+    );
+  }
+
+  Future<void> test_alphabetize_unsorted_midstSorted() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers(
+  {.fields},
+  alphabetizeUnsortedMembers: true,
+)
+abstract class A {
+  int get last;
+  int middle = 0;
+  int get getter;
+}
+''',
+      [lint(211, 6)],
+    );
+  }
+
+  Future<void> test_alphabetize_members_fields() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers(
+  {.fields},
+  alphabetizeSortedMembers: true,
+)
+class A {
+  int zebra = 0, apple = 0, monkey = 0;
+}
+''',
+      [lint(173, 5)],
+    );
+  }
+
+  Future<void> test_alphabetize_unsorted() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers(
+  {.fields},
+  alphabetizeUnsortedMembers: true,
+)
+class A {
+  void zebra() {}
+  void apple() {}
+  void monkey() {}
+}
+''',
+      [lint(183, 5)],
+    );
+  }
+
+  Future<void> test_alphabetize_unnamedConstructorAsNew() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers(
+  {.constructors},
+  alphabetizeSortedMembers: true,
+)
+class A {
+  A();
+  A.other();
+  A.zebra();
+}
+''');
+  }
+
+  Future<void> test_alphabetize_unnamedConstructorAsNew_outOfOrder() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers(
+  {.constructors},
+  alphabetizeSortedMembers: true,
+)
+class A {
+  A.apple();
+  A();
+}
+''',
+      [lint(177, 1)],
+    );
+  }
+
+  Future<void> test_alphabetize_allOptions_pass() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers(
+  {.fields, .constructors},
+  alphabetizeSortedMembers: true,
+  alphabetizeUnsortedMembers: true,
+)
+class A {
+  int apple = 0;
+  int banana = 0;
+  int zebra = 0;
+
+  A();
+  A.create();
+  A.named();
+
+  void aMethod() {}
+  void bMethod() {}
+  void zMethod() {}
+}
+''');
+  }
+
+  // ========================================================================
+  // Spacing configuration tests
+  // ========================================================================
+
+  Future<void> test_spacing_linesBetweenSame() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers(
+  {.fields},
+  linesBetweenSameSortMembers: 2,
+)
+class A {
+  int field1 = 0;
+  int field2 = 0;
+}
+''',
+      [lint(180, 6)],
+    );
+  }
+
+  Future<void> test_spacing_linesAroundSorted() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers(
+  {.fields, .constructors},
+  linesAroundSortedMembers: 3,
+)
+class A {
+  int field = 0;
+  A();
+}
+''',
+      [lint(187, 1)],
+    );
+  }
+
+  Future<void> test_spacing_linesAroundUnsorted() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers(
+  {.fields},
+  linesAroundUnsortedMembers: 2,
+)
+class A {
+  int field = 0;
+  void method() {}
+}
+''',
+      [lint(179, 6)],
+    );
+  }
+
+  Future<void> test_spacing_allOptions_pass() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers(
+  {.fields, .constructors},
+  linesBetweenSameSortMembers: 1,
+  linesAroundSortedMembers: 2,
+  linesAroundUnsortedMembers: 3,
+)
+class A {
+  int field1 = 0;
+
+  int field2 = 0;
+
+
+  A();
+
+  A.named();
+
+
+
+  void method() {}
+}
+''');
+  }
+
   // ========================================================================
   // Modifier-specific tests
   // ========================================================================
