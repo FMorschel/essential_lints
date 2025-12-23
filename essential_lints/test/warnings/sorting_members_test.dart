@@ -704,4 +704,165 @@ class A extends Base {
       ],
     );
   }
+
+  Future<void> test_modifier_new() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+abstract class Base {
+  void method();
+}
+
+@SortingMembers({
+  .new_(.methods),
+  .methods,
+})
+class A extends Base {
+  @override
+  void method() {}
+  void newMethod() {}
+}
+''',
+      [error(rule.diagnosticCode, 235, 9)],
+    );
+  }
+
+  Future<void> test_modifier_new_fields() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+abstract class Base {
+  int field;
+}
+
+@SortingMembers({
+  .new_(.fields),
+  .fields,
+})
+class A extends Base {
+  @override
+  int field = 1;
+  int newField = 0;
+}
+''',
+      [
+        error(
+          CompileTimeErrorCode.notInitializedNonNullableInstanceField,
+          108,
+          5,
+        ),
+        error(rule.diagnosticCode, 226, 8),
+      ],
+    );
+  }
+
+  Future<void> test_modifier_instance() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers({
+  .instance(.fields),
+  .fields,
+})
+class A {
+  static int staticField = 0;
+  int instanceField = 0;
+}
+''',
+      [lint(180, 13)],
+    );
+  }
+
+  Future<void> test_modifier_instance_method() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers({
+  .instance(.methods),
+  .methods,
+})
+class A {
+  static void staticMethod() {}
+  void instanceMethod() {}
+}
+''',
+      [lint(185, 14)],
+    );
+  }
+
+  Future<void> test_modifier_dynamic() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers({
+  .dynamic(.fields),
+  .fields,
+})
+class A {
+  int typedField = 0;
+  var dynamicField = 0;
+}
+''',
+      [lint(171, 12)],
+    );
+  }
+
+  Future<void> test_modifier_dynamic_method() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers({
+  .dynamic(.methods),
+  .methods,
+})
+class A {
+  void typedMethod() {}
+  dynamicMethod() {}
+}
+''',
+      [lint(171, 13)],
+    );
+  }
+
+  Future<void> test_modifier_typed() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers({
+  .typed(.fields),
+  .fields,
+})
+class A {
+  var dynamicField = 0;
+  int typedField = 0;
+}
+''',
+      [lint(171, 10)],
+    );
+  }
+
+  Future<void> test_modifier_typed_method() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers({
+  .typed(.methods),
+  .methods,
+})
+class A {
+  dynamicMethod() {}
+  void typedMethod() {}
+}
+''',
+      [lint(171, 11)],
+    );
+  }
 }

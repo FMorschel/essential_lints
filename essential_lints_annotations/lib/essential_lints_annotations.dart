@@ -1,7 +1,7 @@
 export 'src/getters_in_member_list.dart';
 export 'src/sorting_members.dart';
 export 'src/sorting_members/sort_declarations.dart'
-    hide Group, Modifier, Testable, Tests;
+    hide Group, HelperEnum, Modifier, Testable, Tests;
 export 'src/subtype_annotating.dart';
 export 'src/subtype_naming.dart';
 export 'src/utils/subtype_option.dart';

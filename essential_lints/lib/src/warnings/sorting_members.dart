@@ -8,6 +8,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
+import 'package:essential_lints_annotations/src/sorting_members/sort_declarations.dart'; // ignore: implementation_imports used only for exhaustiveness
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 
@@ -349,6 +350,14 @@ class _ValidatorFromAnnotation {
             list.add(const _UnnamedMemberTypeValidator());
           case '_Var':
             list.add(const _VarMemberTypeValidator());
+          case '_Typed':
+            list.add(const _TypedMemberTypeValidator());
+          case '_Instance':
+            list.add(const _InstanceMemberTypeValidator());
+          case '_Dynamic':
+            list.add(const _DynamicMemberTypeValidator());
+          case '_New':
+            list.add(const _NewMemberTypeValidator());
           default:
             _logger.severe('Unknown member type: $typeName');
             assert(false, 'Unknown member type: $typeName');
@@ -371,6 +380,38 @@ class _ValidatorFromAnnotation {
 @immutable
 sealed class _MemberTypeValidator {
   const _MemberTypeValidator();
+
+  // ignore: unused_element exhaustiveness
+  factory _MemberTypeValidator._(HelperEnum constant) {
+    return switch (constant) {
+      .abstract => const _AbstractMemberTypeValidator(),
+      .const_ => const _ConstMemberTypeValidator(),
+      .constructor => const _ConstructorMemberTypeValidator(),
+      .dynamic => const _DynamicMemberTypeValidator(),
+      .external => const _ExternalMemberTypeValidator(),
+      .factory_ => const _FactoryMemberTypeValidator(),
+      .field => const _FieldMemberTypeValidator(),
+      .final_ => const _FinalMemberTypeValidator(),
+      .getter => const _GetterMemberTypeValidator(),
+      .initialized => const _InitializedMemberTypeValidator(),
+      .instance => const _InstanceMemberTypeValidator(),
+      .late => const _LateMemberTypeValidator(),
+      .method => const _MethodMemberTypeValidator(),
+      .named => const _NamedMemberTypeValidator(),
+      .new_ => const _NewMemberTypeValidator(),
+      .nullable => const _NullableMemberTypeValidator(),
+      .operator => const _OperatorMemberTypeValidator(),
+      .overridden => const _OverriddenMemberTypeValidator(),
+      .private => const _PrivateMemberTypeValidator(),
+      .public => const _PublicMemberTypeValidator(),
+      .redirecting => const _RedirectingMemberTypeValidator(),
+      .setter => const _SetterMemberTypeValidator(),
+      .static => const _StaticMemberTypeValidator(),
+      .typed => const _TypedMemberTypeValidator(),
+      .unnamed => const _UnnamedMemberTypeValidator(),
+      .var_ => const _VarMemberTypeValidator(),
+    };
+  }
 
   bool isValid(AstNode member, Element element);
 }
@@ -421,6 +462,23 @@ class _ConstructorMemberTypeValidator extends _MemberTypeValidator {
   @override
   bool isValid(AstNode member, Element element) =>
       element is ConstructorElement;
+}
+
+class _DynamicMemberTypeValidator extends _MemberTypeValidator {
+  const _DynamicMemberTypeValidator();
+
+  @override
+  bool isValid(AstNode member, Element element) {
+    if (element is FieldElement) {
+      return member.thisOrAncestorOfType<FieldDeclaration>()?.fields.type ==
+          null;
+    }
+    if (element is MethodElement) {
+      return member.thisOrAncestorOfType<MethodDeclaration>()?.returnType ==
+          null;
+    }
+    return false;
+  }
 }
 
 class _MethodMemberTypeValidator extends _MemberTypeValidator {
@@ -552,6 +610,21 @@ class _InitializedMemberTypeValidator extends _MemberTypeValidator {
   }
 }
 
+class _InstanceMemberTypeValidator extends _MemberTypeValidator {
+  const _InstanceMemberTypeValidator();
+
+  @override
+  bool isValid(AstNode member, Element element) {
+    if (element is FieldElement) {
+      return !element.isStatic;
+    }
+    if (element is MethodElement) {
+      return !element.isStatic;
+    }
+    return false;
+  }
+}
+
 class _LateMemberTypeValidator extends _MemberTypeValidator {
   const _LateMemberTypeValidator();
 
@@ -577,6 +650,27 @@ class _NamedMemberTypeValidator extends _MemberTypeValidator {
       return false;
     }
     return member.name != null;
+  }
+}
+
+class _NewMemberTypeValidator extends _MemberTypeValidator {
+  const _NewMemberTypeValidator();
+
+  @override
+  bool isValid(AstNode member, Element element) {
+    var enclosingElement = element.enclosingElement;
+    if (enclosingElement is InterfaceElement) {
+      for (final name in enclosingElement.inheritedMembers.keys) {
+        if (name.name == element.lookupName) {
+          return false;
+        }
+      }
+      return true;
+    }
+    if (enclosingElement is ExtensionElement) {
+      return true;
+    }
+    return false;
   }
 }
 
@@ -662,6 +756,23 @@ class _StaticMemberTypeValidator extends _MemberTypeValidator {
     }
     if (element is MethodElement) {
       return element.isStatic;
+    }
+    return false;
+  }
+}
+
+class _TypedMemberTypeValidator extends _MemberTypeValidator {
+  const _TypedMemberTypeValidator();
+
+  @override
+  bool isValid(AstNode member, Element element) {
+    if (element is FieldElement) {
+      return member.thisOrAncestorOfType<FieldDeclaration>()?.fields.type !=
+          null;
+    }
+    if (element is MethodElement) {
+      return member.thisOrAncestorOfType<MethodDeclaration>()?.returnType !=
+          null;
     }
     return false;
   }

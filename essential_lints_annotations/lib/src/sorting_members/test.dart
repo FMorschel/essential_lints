@@ -1,3 +1,5 @@
+// ignore_for_file: public_member_api_docs only used for testing
+
 part of 'sort_declarations.dart';
 
 /// {@template wrapper}
@@ -58,4 +60,39 @@ part of 'sort_declarations.dart';
 /*final*/ class _Test extends Modifier<Testable> implements Testable {
   @Deprecated('Only used for testing')
   const _Test._(super.modifiable) : super._();
+}
+
+/// Helper enum for sort declarations.
+// ignore: library_private_types_in_public_api internal use
+enum HelperEnum<T extends _StaticalContext> {
+  abstract(SortDeclaration.abstract),
+  const_(SortDeclaration.const_),
+  constructor._named(SortDeclaration.constructor),
+  dynamic(SortDeclaration.dynamic),
+  external(SortDeclaration.external),
+  factory_(SortDeclaration.factory_),
+  field._named(SortDeclaration.field),
+  final_(SortDeclaration.final_),
+  getter(SortDeclaration.getter),
+  initialized(SortDeclaration.initialized),
+  instance(SortDeclaration.instance),
+  late(SortDeclaration.late),
+  method._named(SortDeclaration.method),
+  named(SortDeclaration.named),
+  new_(SortDeclaration.new_),
+  nullable(SortDeclaration.nullable),
+  operator(SortDeclaration.operator),
+  overridden(SortDeclaration.overridden),
+  private(SortDeclaration.private),
+  public(SortDeclaration.public),
+  redirecting(SortDeclaration.redirecting),
+  setter._named(SortDeclaration.setter),
+  static(SortDeclaration.static),
+  typed(SortDeclaration.typed),
+  unnamed(SortDeclaration.unnamed),
+  var_(SortDeclaration.var_),
+  ;
+
+  const HelperEnum(SortDeclaration Function(T _) _);
+  const HelperEnum._named(SortDeclaration Function(Symbol _) _);
 }
