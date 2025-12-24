@@ -57,7 +57,7 @@ abstract class WarningRule extends AnalysisRule {
   final EssentialLintWarnings rule;
 
   @override
-  DiagnosticCode get diagnosticCode => rule.code;
+  DiagnosticCode get diagnosticCode => rule;
 
   @override
   @mustBeOverridden

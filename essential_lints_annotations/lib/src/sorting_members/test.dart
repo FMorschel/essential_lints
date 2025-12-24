@@ -91,8 +91,16 @@ enum HelperEnum<T extends _StaticalContext> {
   typed(SortDeclaration.typed),
   unnamed(SortDeclaration.unnamed),
   var_(SortDeclaration.var_),
+  constructors._group(SortDeclaration.constructors),
+  fields._group(SortDeclaration.fields),
+  fieldsGettersSetters._group(SortDeclaration.fieldsGettersSetters),
+  getters._group(SortDeclaration.getters),
+  gettersSetters._group(SortDeclaration.gettersSetters),
+  methods._group(SortDeclaration.methods),
+  setters._group(SortDeclaration.setters),
   ;
 
   const HelperEnum(SortDeclaration Function(T _) _);
   const HelperEnum._named(SortDeclaration Function(Symbol _) _);
+  const HelperEnum._group(Group _);
 }

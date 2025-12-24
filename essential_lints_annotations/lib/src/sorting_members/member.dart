@@ -12,28 +12,48 @@ part of 'sort_declarations.dart';
 /*sealed*/ abstract class _NonConstructorMember extends _Member {
   const _NonConstructorMember._(this.name) : super._(name);
 
-  /// The name of the member.
   @override
   // ignore: overridden_fields type promotion trick
   final Symbol name;
 }
 
 /*final*/ class _Constructor extends _Member {
-  const _Constructor._([super.name]) : super._();
+  // ignore: use_super_parameters, annotation trick
+  const _Constructor._([this.name]) : super._(name);
+
+  @override
+  // ignore: overridden_fields annotation trick
+  final Symbol? name;
 }
 
 /*final*/ class _Field extends _NonConstructorMember {
-  const _Field._(super.name) : super._();
+  const _Field._(this.name) : super._(name);
+
+  @override
+  // ignore: overridden_fields annotation trick
+  final Symbol name;
 }
 
 /*final*/ class _Getter extends _NonConstructorMember {
-  const _Getter._(super.name) : super._();
+  const _Getter._(this.name) : super._(name);
+
+  @override
+  // ignore: overridden_fields annotation trick
+  final Symbol name;
 }
 
 /*final*/ class _Method extends _NonConstructorMember {
-  const _Method._(super.name) : super._();
+  const _Method._(this.name) : super._(name);
+
+  @override
+  // ignore: overridden_fields annotation trick
+  final Symbol name;
 }
 
 /*final*/ class _Setter extends _NonConstructorMember {
-  const _Setter._(super.name) : super._();
+  const _Setter._(this.name) : super._(name);
+
+  @override
+  // ignore: overridden_fields annotation trick
+  final Symbol name;
 }

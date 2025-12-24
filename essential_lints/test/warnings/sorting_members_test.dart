@@ -43,6 +43,24 @@ class A {
     );
   }
 
+  Future<void> test_unnamedConstructorFirst2() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers({
+  .constructor(),
+  .constructors,
+})
+class A {
+  A.named();
+  A();
+}
+''',
+      [error(rule.diagnosticCode, 161, 1)],
+    );
+  }
+
   Future<void> test_unnamedConstructorLast() async {
     await assertDiagnostics(
       '''
@@ -79,6 +97,120 @@ abstract class A {
 ''',
       [error(rule.diagnosticCode, 213, 5)],
     );
+  }
+
+  Future<void> test_fieldsGettersSetters() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers({
+  .fieldsGettersSetters,
+  .methods,
+})
+class A {
+  void method() {}
+  int get value => 0;
+  set value(int v) {}
+  int field = 0;
+}
+''',
+      [lint(177, 5)],
+    );
+  }
+
+  Future<void> test_gettersSetters() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers({
+  .gettersSetters,
+  .methods,
+})
+class A {
+  void method() {}
+  set value(int v) {}
+  int get value => 0;
+}
+''',
+      [lint(167, 5)],
+    );
+  }
+
+  Future<void> test_unsortedLines() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers({}, linesAroundUnsortedMembers: 1)
+class A {
+  void method() {}
+  set value(int v) {}
+  int get value => 0;
+}
+''',
+      [lint(166, 5)],
+    );
+  }
+
+  Future<void> test_unsortedAlphabetize() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers({}, alphabetizeUnsortedMembers: true)
+class A {
+  int value = 0;
+  void method() {}
+}
+''',
+      [lint(168, 6)],
+    );
+  }
+
+  Future<void> test_sortedAlphabetize() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers({.fields}, alphabetizeSortedMembers: true)
+class A {
+  int zebra = 0;
+  int apple = 0;
+}
+''',
+      [lint(172, 5)],
+    );
+  }
+
+  Future<void> test_comprehensive() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers(
+  {.fields, .methods},
+  linesBetweenSameSortMembers: 1,
+  linesAroundSortedMembers: 2,
+  linesAroundUnsortedMembers: 1,
+  alphabetizeSortedMembers: true,
+  alphabetizeUnsortedMembers: true,
+)
+class MyClass {
+  int fieldA = 0;
+
+  int fieldB = 0;
+
+
+  void apple() {}
+
+  void zebra() {}
+
+  String get unsorted => '';
+
+  String get unsorted2 => '';
+}
+''');
   }
 
   Future<void> test_specificallyNamed_field() async {
