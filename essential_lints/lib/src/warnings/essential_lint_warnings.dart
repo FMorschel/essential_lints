@@ -3,7 +3,13 @@ import 'package:analyzer/error/error.dart';
 /// {@template enum_diagnostic}
 /// A mixin for enums that provide a diagnostic code.
 /// {@endtemplate}
-mixin EnumDiagnostic implements DiagnosticCode {
+mixin EnumDiagnostic
+    implements
+        DiagnosticCode,
+        // Needed for the current version of `analyzer`
+        // TODO(FMorschel): remove when analyzer supports registering non-lint
+        //  codes
+        LintCode {
   /// The diagnostic code associated with the enum value.
   DiagnosticCode get code;
 
@@ -285,7 +291,12 @@ mixin SubWarnings on EnumDiagnostic {
 /// {@template rule_code}
 /// A diagnostic code for warnings.
 /// {@endtemplate}
-class WarningCode extends DiagnosticCode {
+class WarningCode extends DiagnosticCode
+        // Needed for the current version of `analyzer`
+        // TODO(FMorschel): remove when analyzer supports registering non-lint
+        //  codes
+        implements
+        LintCode {
   /// {@macro rule_code}
   const WarningCode({
     required super.name,
