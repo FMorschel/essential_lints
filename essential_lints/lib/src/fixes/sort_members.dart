@@ -1,6 +1,7 @@
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
@@ -96,6 +97,28 @@ class SortMembersFix extends ResolvedCorrectionProducer with WarningFix {
     var sortedMembers = trackingVisitor.sortedMembers;
     var originalMembers = trackingVisitor.members;
 
+    // Deduplicate members with the same node (happens with multi-variable field
+    // declarations)
+    var uniqueOriginal = <MemberResult>[];
+    var seenNodes = <AstNode>{};
+    for (var member in originalMembers) {
+      if (!seenNodes.contains(member.node)) {
+        uniqueOriginal.add(member);
+        seenNodes.add(member.node);
+      }
+    }
+    originalMembers = uniqueOriginal;
+
+    var uniqueSorted = <MemberResult>[];
+    seenNodes.clear();
+    for (var member in sortedMembers) {
+      if (!seenNodes.contains(member.node)) {
+        uniqueSorted.add(member);
+        seenNodes.add(member.node);
+      }
+    }
+    sortedMembers = uniqueSorted;
+
     // Check if already sorted
     var needsSorting = false;
     for (var i = 0; i < originalMembers.length; i++) {
@@ -105,12 +128,25 @@ class SortMembersFix extends ResolvedCorrectionProducer with WarningFix {
       }
     }
 
-    if (!needsSorting) {
+    // Also check if any multi-variable field declarations need reordering
+    var needsFieldReordering = _checkMultiVariableFields(
+      enclosingInstanceDeclaration,
+      validatorFromAnnotation,
+    );
+
+    if (!needsSorting && !needsFieldReordering) {
       return;
     }
 
     // Collect all edits first
     var edits = <({int start, int end, String replacement})>[];
+
+    // Handle multi-variable field declarations that need reordering
+    await _handleMultiVariableFields(
+      enclosingInstanceDeclaration,
+      validatorFromAnnotation,
+      edits,
+    );
 
     // Find which members need to be moved
     var membersToMove = _findMembersToMove(
@@ -355,11 +391,18 @@ class SortMembersFix extends ResolvedCorrectionProducer with WarningFix {
         // Replace with single newline from end of last member to right bracket
         // line
         if (lineBeforeRightBracketEnd > lastMemberEnd) {
-          edits.add((
-            start: lastMemberEnd,
-            end: lineBeforeRightBracketEnd,
-            replacement: builder.defaultEol,
-          ));
+          // Only add edit if the current content is different from a single EOL
+          var currentContent = utils.getText(
+            lastMemberEnd,
+            lineBeforeRightBracketEnd - lastMemberEnd,
+          );
+          if (currentContent != builder.defaultEol) {
+            edits.add((
+              start: lastMemberEnd,
+              end: lineBeforeRightBracketEnd,
+              replacement: builder.defaultEol,
+            ));
+          }
         }
       }
     }
@@ -572,6 +615,106 @@ class SortMembersFix extends ResolvedCorrectionProducer with WarningFix {
     }
 
     return result.reversed.toList();
+  }
+
+  /// Checks if we should reorder variables in a multi-variable declaration.
+  /// We skip reordering only if the variables are already in alphabetical
+  /// order.
+  bool _shouldReorderMultiVariableDeclaration(
+    NodeList<VariableDeclaration> variables,
+  ) {
+    // Check if variables are already in alphabetical order
+    for (var i = 1; i < variables.length; i++) {
+      var prevName = variables[i - 1].declaredFragment?.element.name ?? '';
+      var currName = variables[i].declaredFragment?.element.name ?? '';
+      if (prevName.toLowerCase().compareTo(currName.toLowerCase()) > 0) {
+        // Found a pair that's out of order
+        return true;
+      }
+    }
+    // Already in order
+    return false;
+  }
+
+  /// Checks if any multi-variable field declarations need variable reordering.
+  bool _checkMultiVariableFields(
+    CompilationUnitMember enclosingDeclaration,
+    ValidatorFromAnnotation validatorFromAnnotation,
+  ) {
+    var needsReordering = false;
+    enclosingDeclaration.visitChildren(
+      _FieldDeclarationVisitor((node) {
+        var variables = node.fields.variables;
+        if (variables.length <= 1) return;
+
+        // Check if alphabetization is enabled
+        if (!validatorFromAnnotation.alphabetizeSortedMembers) return;
+
+        // Check if reordering is needed
+        if (_shouldReorderMultiVariableDeclaration(variables)) {
+          needsReordering = true;
+        }
+      }),
+    );
+    return needsReordering;
+  }
+
+  /// Handles reordering variables within multi-variable field declarations.
+  Future<void> _handleMultiVariableFields(
+    CompilationUnitMember enclosingDeclaration,
+    ValidatorFromAnnotation validatorFromAnnotation,
+    List<({int start, int end, String replacement})> edits,
+  ) async {
+    enclosingDeclaration.visitChildren(
+      _FieldDeclarationVisitor((node) {
+        var variables = node.fields.variables;
+        if (variables.length <= 1) return;
+
+        // Check if alphabetization is enabled
+        if (!validatorFromAnnotation.alphabetizeSortedMembers) return;
+
+        // Check if reordering is needed
+        if (!_shouldReorderMultiVariableDeclaration(variables)) {
+          return;
+        }
+
+        // Sort the variables by name
+        var sortedVariables = variables.toList()
+          ..sort((a, b) {
+            var nameA = a.declaredFragment?.element.name ?? '';
+            var nameB = b.declaredFragment?.element.name ?? '';
+            return nameA.toLowerCase().compareTo(nameB.toLowerCase());
+          });
+
+        // Build the replacement text
+        var buffer = StringBuffer();
+        for (var i = 0; i < sortedVariables.length; i++) {
+          if (i > 0) buffer.write(', ');
+          buffer.write(utils.getNodeText(sortedVariables[i]));
+        }
+
+        // Replace the variables list
+        var firstVar = variables.first;
+        var lastVar = variables.last;
+        edits.add((
+          start: firstVar.offset,
+          end: lastVar.end,
+          replacement: buffer.toString(),
+        ));
+      }),
+    );
+  }
+}
+
+/// Simple visitor for field declarations.
+class _FieldDeclarationVisitor extends SimpleAstVisitor<void> {
+  _FieldDeclarationVisitor(this.onFieldDeclaration);
+
+  final void Function(FieldDeclaration) onFieldDeclaration;
+
+  @override
+  void visitFieldDeclaration(FieldDeclaration node) {
+    onFieldDeclaration(node);
   }
 }
 

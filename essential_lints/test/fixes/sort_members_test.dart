@@ -612,6 +612,110 @@ class MyClass {
 ''');
   }
 
+  Future<void> test_multipleFields() async {
+    await resolveTestCode('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers({.fields}, alphabetizeSortedMembers: true)
+class MyClass {
+  int field2 = 0, field1 = 0;
+}
+''');
+    await assertHasFix('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers({.fields}, alphabetizeSortedMembers: true)
+class MyClass {
+  int field1 = 0, field2 = 0;
+}
+''');
+  }
+
+  Future<void> test_multipleFields2() async {
+    await resolveTestCode('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers({.fields}, alphabetizeSortedMembers: true)
+class MyClass {
+  int field3 = 0, field1 = 0;
+  int field2 = 0;
+}
+''');
+    await assertHasFix('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers({.fields}, alphabetizeSortedMembers: true)
+class MyClass {
+  int field1 = 0, field3 = 0;
+  int field2 = 0;
+}
+''');
+  }
+
+  Future<void> test_noFixMultipleField() async {
+    await resolveTestCode('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers({.fields}, alphabetizeSortedMembers: true)
+class MyClass {
+  int field1 = 0, field3 = 0;
+  int field2 = 0;
+}
+''');
+    await assertNoFix();
+  }
+
+  Future<void> test_annotatedCommentedMembers() async {
+    await resolveTestCode('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+const visibleForTesting = null;
+
+@SortingMembers({.fields, .methods})
+class MyClass {
+  @Deprecated('Use newField instead')
+  // This is an old field
+  int oldField = 0;
+
+  // test
+  @Deprecated('Use newMethod instead')
+  // This is an old method
+  void oldMethod() {}
+
+  @visibleForTesting
+  // Test
+  /// This is a new field
+  int newField = 0;
+
+  /// This is a new method
+  void newMethod() {}
+}
+''');
+    await assertHasFix('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+const visibleForTesting = null;
+
+@SortingMembers({.fields, .methods})
+class MyClass {
+  @Deprecated('Use newField instead')
+  // This is an old field
+  int oldField = 0;
+  @visibleForTesting
+  // Test
+  /// This is a new field
+  int newField = 0;
+
+  // test
+  @Deprecated('Use newMethod instead')
+  // This is an old method
+  void oldMethod() {}
+  /// This is a new method
+  void newMethod() {}
+}
+''');
+  }
+
   Future<void> test_sortCombinedModifiers() async {
     await resolveTestCode('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
