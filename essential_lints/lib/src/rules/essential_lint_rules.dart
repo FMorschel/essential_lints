@@ -447,7 +447,7 @@ enum PendingListener with EnumDiagnostic, SubLints {
 /// {@template sub_warnings}
 /// A grouping of sub-warnings under a base warning.
 /// {@endtemplate}
-mixin SubLints on EnumDiagnostic {
+mixin SubLints on EnumDiagnostic implements LintCode {
   /// The base warning.
   EssentialMultiLints get base;
 
