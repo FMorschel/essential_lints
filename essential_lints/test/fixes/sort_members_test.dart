@@ -567,10 +567,12 @@ import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 )
 class MyClass {
   int field1 = 0;
-  int field2 = 0;
 
 
   void unsortedMethod() {}
+
+
+  int field2 = 0;
 }
 ''');
   }
@@ -763,12 +765,11 @@ class MyClass {
 
   int field2 = 0;
 
+  String get unsorted => '';
 
   void method1() {}
 
   void method2() {}
-
-  String get unsorted => '';
 }
 ''');
   }
@@ -787,11 +788,11 @@ import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 )
 class MyClass {
   void zebra() {}
+  String get unsorted2 => '';
+  String get unsorted => '';
   int fieldB = 0;
   void apple() {}
   int fieldA = 0;
-  String get unsorted2 => '';
-  String get unsorted => '';
 }
 ''');
     await assertHasFix('''
@@ -818,6 +819,41 @@ class MyClass {
   String get unsorted => '';
 
   String get unsorted2 => '';
+}
+''');
+  }
+
+  Future<void> test_unsortedBetweenSorted() async {
+    await resolveTestCode('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers(
+  {.methods},
+  linesAroundSortedMembers: 1,
+  linesAroundUnsortedMembers: 2,
+)
+class MyClass {
+  void method1() {}
+  int field1 = 0;
+  void method2() {}
+}
+''');
+    await assertHasFix('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SortingMembers(
+  {.methods},
+  linesAroundSortedMembers: 1,
+  linesAroundUnsortedMembers: 2,
+)
+class MyClass {
+  void method1() {}
+
+
+  int field1 = 0;
+
+
+  void method2() {}
 }
 ''');
   }

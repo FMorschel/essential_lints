@@ -442,34 +442,103 @@ class TrackingMemberVisitor extends _BaseMemberVisitor {
   /// Returns the members sorted according to the validator indices and, if
   /// needed, alphabetically, with spacing information.
   List<MemberResult> get sortedMembers {
-    var sorted = List<MemberResult>.from(members)
-      ..sort((a, b) {
-        // 1. Validator Index
-        if (a.validatorIndex != null && b.validatorIndex != null) {
-          if (a.validatorIndex != b.validatorIndex) {
-            return a.validatorIndex!.compareTo(b.validatorIndex!);
+    var sorted = <MemberResult>[];
+
+    // Separate sorted and unsorted members
+    var sortedMembers = <MemberResult>[];
+    var unsortedMembers = <MemberResult>[];
+
+    for (var member in members) {
+      if (member.validatorIndex != null) {
+        sortedMembers.add(member);
+      } else {
+        unsortedMembers.add(member);
+      }
+    }
+
+    // If alphabetizeUnsortedMembers is true, group all unsorted members
+    // together
+    if (validatorFromAnnotation.alphabetizeUnsortedMembers ||
+        validatorFromAnnotation.validators.isEmpty) {
+      // Group sorted members by validator index
+      var membersByValidator = <int, List<MemberResult>>{};
+      for (var member in sortedMembers) {
+        membersByValidator
+            .putIfAbsent(member.validatorIndex!, () => [])
+            .add(member);
+      }
+
+      // Sort members within each validator group if needed
+      for (var validatorIndex in membersByValidator.keys) {
+        if (validatorFromAnnotation.alphabetizeSortedMembers) {
+          membersByValidator[validatorIndex]!.sort(_compareAlphabetical);
+        }
+      }
+
+      // Process validators in order
+      var sortedValidatorIndices = membersByValidator.keys.toList()..sort();
+
+      for (var validatorIndex in sortedValidatorIndices) {
+        sorted.addAll(membersByValidator[validatorIndex]!);
+      }
+
+      // Add all unsorted members at the end
+      if (validatorFromAnnotation.alphabetizeUnsortedMembers) {
+        unsortedMembers.sort(_compareAlphabetical);
+      }
+      sorted.addAll(unsortedMembers);
+    } else {
+      // Keep unsorted members attached to the specific sorted member before
+      // them
+      var unsortedAttachments = <MemberResult?, List<MemberResult>>{};
+      MemberResult? lastSortedMember;
+
+      for (var member in members) {
+        if (member.validatorIndex != null) {
+          lastSortedMember = member;
+        } else {
+          unsortedAttachments
+              .putIfAbsent(lastSortedMember, () => [])
+              .add(member);
+        }
+      }
+
+      // First, add any unsorted members that came before any sorted members
+      if (unsortedAttachments.containsKey(null)) {
+        sorted.addAll(unsortedAttachments[null]!);
+      }
+
+      // Group sorted members by validator index while preserving original order
+      var membersByValidator = <int, List<MemberResult>>{};
+      for (var member in sortedMembers) {
+        membersByValidator
+            .putIfAbsent(member.validatorIndex!, () => [])
+            .add(member);
+      }
+
+      // Sort members within each validator group if needed
+      for (var validatorIndex in membersByValidator.keys) {
+        if (validatorFromAnnotation.alphabetizeSortedMembers) {
+          membersByValidator[validatorIndex]!.sort(_compareAlphabetical);
+        }
+      }
+
+      // Process validators in order
+      var sortedValidatorIndices = membersByValidator.keys.toList()..sort();
+
+      for (var validatorIndex in sortedValidatorIndices) {
+        var membersWithValidator = membersByValidator[validatorIndex]!;
+
+        for (var member in membersWithValidator) {
+          sorted.add(member);
+
+          // Add any unsorted members that follow this specific sorted member
+          if (unsortedAttachments.containsKey(member)) {
+            sorted.addAll(unsortedAttachments[member]!);
           }
-          // Same validator - check alphabetical
-          if (validatorFromAnnotation.alphabetizeSortedMembers) {
-            return _compareAlphabetical(a, b);
-          }
-          return 0; // Keep original order
         }
-
-        if (a.validatorIndex != null && b.validatorIndex == null) {
-          return -1; // Sorted comes before unsorted
-        }
-
-        if (a.validatorIndex == null && b.validatorIndex != null) {
-          return 1;
-        }
-
-        // Both unsorted
-        if (validatorFromAnnotation.alphabetizeUnsortedMembers) {
-          return _compareAlphabetical(a, b);
-        }
-        return 0;
-      });
+      }
+    }
 
     // Calculate required spacing for each member
     var sortedWithSpacing = <MemberResult>[];
