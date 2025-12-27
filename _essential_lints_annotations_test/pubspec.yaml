@@ -21,8 +21,7 @@ dev_dependencies:
     git:
       url: https://github.com/dart-lang/dartdoc/
       ref: 3f1f09cddec561faaa61ba3dc767b813f6d6c699
-  essential_lints_annotations:
-    path: ../essential_lints_annotations
+  essential_lints_annotations: any
   meta: any
   path: any
   test: any

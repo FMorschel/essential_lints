@@ -18,8 +18,7 @@ dependencies:
   analyzer: any
   essential_lints:
     path: ../essential_lints
-  essential_lints_annotations:
-    path: ../essential_lints_annotations
+  essential_lints_annotations: any
   logging: any
   meta: any
 
