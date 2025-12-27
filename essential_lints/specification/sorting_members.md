@@ -16,14 +16,25 @@ The `SortingMembers` rule enforces a consistent order of class members through a
 ### Basic Syntax
 
 ```dart
-@SortingMembers({
-  <declaration1>,
-  <declaration2>,
-  ...
-})
+@SortingMembers(
+  {
+    <declaration1>,
+    <declaration2>,
+    ...
+  },
+  // Optional configuration parameters
+  alphabetizeSortedMembers: false,
+  alphabetizeUnsortedMembers: false,
+  linesAroundSortedMembers: 0,
+  linesBetweenSameSortMembers: 0,
+  linesAroundUnsortedMembers: 0,
+)
 ```
 
-The annotation accepts a `Set<SortDeclaration>` where declarations are evaluated in the order they appear. Each declaration specifies a pattern that members should match.
+The annotation accepts:
+
+- A `Set<SortDeclaration>` where declarations are evaluated in the order they appear
+- Optional configuration parameters for spacing and alphabetization
 
 ### Declaration Types
 
@@ -86,6 +97,131 @@ Modifiers can be applied to groups or combined to create more specific patterns:
 **Method Modifiers:**
 
 - `.operator(...)` - Operator methods
+
+**Inheritance Modifiers:**
+
+- `.overridden(...)` - Overridden members (with `@override` annotation)
+- `.new_(...)` - New members (not overridden from parent)
+
+**Scope Modifiers:**
+
+- `.instance(...)` - Instance members (opposite of static)
+
+**Type Modifiers:**
+
+- `.dynamic(...)` - Dynamically typed fields/methods (no explicit type)
+- `.typed(...)` - Explicitly typed fields/methods
+- `.nullable(...)` - Nullable fields/methods (type ends with `?`)
+
+## Configuration Parameters
+
+The `@SortingMembers` annotation supports several optional parameters to control spacing and alphabetization:
+
+### Alphabetization Options
+
+#### `alphabetizeSortedMembers` (bool, default: `false`)
+
+When `true`, members within each sorted group are alphabetized by name.
+
+```dart
+@SortingMembers({.fields}, alphabetizeSortedMembers: true)
+class MyClass {
+  int apple = 0;   // Alphabetically first
+  int banana = 1;  // Alphabetically second
+  int zebra = 2;   // Alphabetically third
+}
+```
+
+**Special case for constructors:** The unnamed constructor is treated as "new" for alphabetization purposes, appearing before constructors starting with letters after 'n'.
+
+#### `alphabetizeUnsortedMembers` (bool, default: `false`)
+
+When `true`, members that don't match any sort declaration are alphabetized by name.
+
+```dart
+@SortingMembers({.fields}, alphabetizeUnsortedMembers: true)
+class MyClass {
+  int field1 = 0;
+  int field2 = 0;
+
+  void apple() {}  // Unsorted, alphabetized
+  void zebra() {}  // Unsorted, alphabetized
+}
+```
+
+### Spacing Options
+
+#### `linesAroundSortedMembers` (int, default: `0`)
+
+Number of blank lines to enforce between different sorted groups.
+
+```dart
+@SortingMembers({.fields, .methods}, linesAroundSortedMembers: 2)
+class MyClass {
+  int field = 0;
+  // ← 2 blank lines enforced here
+
+  void method() {}
+}
+```
+
+#### `linesBetweenSameSortMembers` (int, default: `0`)
+
+Number of blank lines to enforce between members in the same sorted group.
+
+```dart
+@SortingMembers({.fields}, linesBetweenSameSortMembers: 1)
+class MyClass {
+  int field1 = 0;
+  // ← 1 blank line enforced here
+  int field2 = 0;
+}
+```
+
+#### `linesAroundUnsortedMembers` (int, default: `0`)
+
+Number of blank lines to enforce around members that don't match any sort declaration.
+
+```dart
+@SortingMembers({.fields}, linesAroundUnsortedMembers: 2)
+class MyClass {
+  int field1 = 0;
+  int field2 = 0;
+  // ← 2 blank lines enforced here
+
+  void unsortedMethod() {}
+  // ← 2 blank lines enforced here
+
+  int field3 = 0;
+}
+```
+
+### Combined Configuration Example
+
+```dart
+@SortingMembers(
+  {.fields, .methods},
+  linesBetweenSameSortMembers: 1,
+  linesAroundSortedMembers: 2,
+  linesAroundUnsortedMembers: 1,
+  alphabetizeSortedMembers: true,
+  alphabetizeUnsortedMembers: true,
+)
+class MyClass {
+  int fieldA = 0;
+
+  int fieldB = 0;
+
+
+  void apple() {}
+
+  void zebra() {}
+
+  String get unsorted => '';
+
+  String get unsorted2 => '';
+}
+```
 
 ## Member Matching Algorithm
 
@@ -255,6 +391,88 @@ class Entity {
 }
 ```
 
+### Example 8: Annotations and Comments
+
+```dart
+@SortingMembers({.fields, .methods})
+class MyClass {
+  @Deprecated('Use newField instead')
+  // This is an old field
+  int oldField = 0;
+
+  @visibleForTesting
+  /// This is a new field
+  int newField = 0;
+
+  // test
+  @Deprecated('Use newMethod instead')
+  // This is an old method
+  void oldMethod() {}
+
+  /// This is a new method
+  void newMethod() {}
+}
+```
+
+**Note:** Annotations and comments are preserved and moved with their associated members.
+
+### Example 9: Multiple Fields in Single Declaration
+
+```dart
+@SortingMembers({.fields}, alphabetizeSortedMembers: true)
+class MyClass {
+  int zebra = 0, apple = 1, monkey = 2;
+}
+```
+
+**Fixed to:**
+
+```dart
+@SortingMembers({.fields}, alphabetizeSortedMembers: true)
+class MyClass {
+  int apple = 1, monkey = 2, zebra = 0;
+}
+```
+
+**Note:** Variables within a single declaration can be alphabetized when `alphabetizeSortedMembers` is enabled.
+
+### Example 10: Comprehensive Spacing and Alphabetization
+
+```dart
+@SortingMembers(
+  {.fields, .methods},
+  linesBetweenSameSortMembers: 1,
+  linesAroundSortedMembers: 2,
+  linesAroundUnsortedMembers: 1,
+  alphabetizeSortedMembers: true,
+  alphabetizeUnsortedMembers: true,
+)
+class MyClass {
+  int fieldA = 0;
+
+  int fieldB = 0;
+
+
+  void apple() {}
+
+  void zebra() {}
+
+  String get unsorted => '';
+
+  String get unsorted2 => '';
+}
+```
+
+This example demonstrates:
+
+- Fields are alphabetized (`fieldA` before `fieldB`)
+- 1 blank line between fields in the same group
+- 2 blank lines between field and method groups
+- Methods are alphabetized (`apple` before `zebra`)
+- 1 blank line between methods in the same group
+- Unsorted getters are alphabetized
+- 1 blank line around unsorted members
+
 ## Supported Targets
 
 The `@SortingMembers` annotation can be applied to:
@@ -275,11 +493,29 @@ The `@SortingMembers` annotation can be applied to:
 
 ## Implementation Notes
 
+### Features
+
+1. **Automatic Fix Available** - The rule provides an automatic fix (`EssentialLintWarningFixes.sortMembers`) that:
+   - Reorders members according to the specified sort declarations
+   - Preserves member annotations and comments
+   - Handles multiple field declarations (e.g., `int a = 0, b = 1;`)
+   - Applies spacing rules according to configuration parameters
+   - Alphabetizes members when configured
+
+2. **Multiple Field Declaration Handling** - When a single declaration contains multiple variables (e.g., `int field1 = 0, field2 = 0;`):
+   - Each variable is treated as a separate member for sorting purposes
+   - Variables within the same declaration can be reordered alphabetically
+   - The entire declaration is moved as a unit when all variables belong to the same sort group
+
+3. **Annotation and Comment Preservation** - When members are reordered:
+   - Member annotations (e.g., `@override`, `@Deprecated`) are preserved
+   - Comments (both `//` and `///` style) are preserved
+   - Doc comments and inline comments stay with their members
+
 ### Current Limitations
 
-1. **Single Error per Class** - The rule stops after reporting the first ordering violation (`_reported` flag)
-2. **No Automatic Fixing** - The rule identifies violations but does not provide automatic code fixes
-3. **Declaration Order Matters** - The sequence in the Set is significant
+1. **Single Error per Class** - The rule reports only the first ordering violation per class/mixin/extension/etc
+2. **Declaration Order Matters** - The sequence in the Set is significant and determines the expected order
 
 ### Validator Types
 
