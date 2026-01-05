@@ -4,7 +4,7 @@
 
 Released on: 2026-01-05
 
-- Fixes PANA problems in essential_lints_annotations package.
+- Fixes PANA problems in essential_lints package.
 
 ## 0.1.0
 
