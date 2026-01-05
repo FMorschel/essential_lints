@@ -1,3 +1,11 @@
+/// Example of variable shadowing.
+///
+/// To clone this example, run:
+///
+/// ```sh
+/// dart pub global run essential_lints:get_example
+/// ```
+
 void foo(int number) {
   var number = 4;
   print(number);
