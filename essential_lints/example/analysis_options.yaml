@@ -1,0 +1,35 @@
+include: package:lints/recommended.yaml
+
+plugins:
+  essential_lints:
+    path: ../
+    diagnostics:
+      - alphabetize_arguments
+      - alphabetize_enum_constants
+      - boolean_assignment
+      - border_all
+      - border_radius_all
+      - closure_incorrect_type
+      - completer_error_no_stack
+      - duplicate_value
+      - empty_container
+      - equal_statement
+      - first_getter
+      - getters_in_member_list
+      - is_future
+      - last_getter
+      - mutable_tearoff
+      - new_instance_cascade
+      - numeric_constant_style
+      - optional_positional_parameters
+      - padding_over_container
+      - pending_listener
+      - prefer_explicitly_named_parameter
+      - returning_widgets
+      - same_package_direct_import
+      - standard_comment_style
+      - subtype_annotating
+      - subtype_naming
+      - unnecessary_setstate
+      - useless_else
+      - variable_shadowing
