@@ -65,7 +65,7 @@ Add `essential_lints` in your `analysis_options.yaml` plugins:
 ```yaml
 plugins:
   essential_lints:
-    version: ^0.1.0
+    version: ^0.1.1
     diagnostics:
       - alphabetize_arguments
       - alphabetize_enum_constants
@@ -104,7 +104,7 @@ If you plan to use the configurable warning rules (`getters_in_member_list`, `su
 
 ```yaml
 dependencies:
-  essential_lints_annotations: ^0.1.0
+  essential_lints_annotations: ^0.1.1
 ```
 
 ## Usage
