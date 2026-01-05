@@ -1,0 +1,3 @@
+plugins:
+  essential_lints:
+    path: ../../essential_lints
