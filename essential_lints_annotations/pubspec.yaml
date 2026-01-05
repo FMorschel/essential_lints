@@ -1,6 +1,6 @@
 name: essential_lints_annotations
 description: Annotations for essential_lints package, that help maintaining code quality.
-version: 0.1.1
+version: 0.1.1+1
 
 executables:
   essential_lints_get_example: get_example

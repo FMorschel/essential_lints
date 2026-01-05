@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1+1
+
+Released on: 2026-01-05
+
+- Fixes an error on the example comment regarding how to clone it.
+
 ## 0.1.1
 
 Released on: 2026-01-05

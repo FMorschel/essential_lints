@@ -8,5 +8,5 @@ environment:
   sdk: ^3.10.0
 
 dependencies:
-  essential_lints_annotations: 0.1.0
+  essential_lints_annotations: 0.1.1
 

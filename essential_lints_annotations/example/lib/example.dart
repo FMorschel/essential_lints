@@ -6,7 +6,7 @@ import 'package:essential_lints_annotations/essential_lints_annotations.dart' as
 ///
 /// ```sh
 /// dart pub global activate essential_lints_annotations
-/// dart pub global run essential_lints_annotations:essential_lints_get_example
+/// dart pub global run essential_lints_annotations:get_example
 /// ```
 @ela.SubtypeNaming(prefix: 'Foo')
 mixin class Foo {}
