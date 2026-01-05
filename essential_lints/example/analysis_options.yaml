@@ -1,6 +1,6 @@
 plugins:
   essential_lints:
-    version: ^0.1.0
+    version: ^0.1.2
     diagnostics:
       - alphabetize_arguments
       - alphabetize_enum_constants

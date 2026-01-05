@@ -3,7 +3,7 @@ description: New lint rules for Dart/Flutter projects and related fixes.
 version: 0.1.1
 
 executables:
-  get_example:
+  essential_lints_get_example: get_example
 
 repository: https://github.com/FMorschel/essential_lints
 issue_tracker: https://github.com/FMorschel/essential_lints/issues
@@ -27,7 +27,7 @@ dependencies:
   analyzer_plugin: ^0.13.10
   args: ^2.0.0
   collection: ^1.16.0
-  essential_lints_annotations: ^0.1.0
+  essential_lints_annotations: ^0.1.1
   logging: ^1.0.0
   meta: ^1.9.0
 

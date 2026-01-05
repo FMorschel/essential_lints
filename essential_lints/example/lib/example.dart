@@ -3,9 +3,9 @@
 /// To clone this example, run:
 ///
 /// ```sh
+/// dart pub global activate essential_lints
 /// dart pub global run essential_lints:get_example
 /// ```
-
 void foo(int number) {
   var number = 4;
   print(number);
