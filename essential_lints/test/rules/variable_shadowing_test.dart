@@ -86,4 +86,44 @@ void f(int a) {
       [lint(33, 1)],
     );
   }
+
+  Future<void> test_variableDeclaration_shadowingParameter() async {
+    await assertDiagnostics(
+      '''
+void f(int a) {
+  var a = 2;
+  print(a);
+}
+''',
+      [lint(22, 1)],
+    );
+  }
+
+  Future<void> test_variableDeclaration_shadowingParameter_method() async {
+    await assertDiagnostics(
+      '''
+class C {
+  void m(int a) {
+    var a = 2;
+    print(a);
+  }
+}
+''',
+      [lint(36, 1)],
+    );
+  }
+
+  Future<void> test_variableDeclaration_shadowingParameter_constructor() async {
+    await assertDiagnostics(
+      '''
+class C {
+  C(int a) {
+    var a = 2;
+    print(a);
+  }
+}
+''',
+      [lint(31, 1)],
+    );
+  }
 }

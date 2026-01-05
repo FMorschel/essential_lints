@@ -17,6 +17,23 @@ bool _resolveNameInPreviousScope(String id, AstNode node) {
       // Reached the top-level scope.
       break;
     }
+    if (context case BlockFunctionBody(:var parent)) {
+      FormalParameterList? declaredParameters;
+      if (parent case FunctionExpression(:var parameters)) {
+        declaredParameters = parameters;
+      } else if (parent case MethodDeclaration(:var parameters)) {
+        declaredParameters = parameters;
+      } else if (parent case ConstructorDeclaration(:var parameters)) {
+        declaredParameters = parameters;
+      }
+      if (declaredParameters != null) {
+        for (var parameter in declaredParameters.parameters) {
+          if (parameter.declaredFragment?.element.displayName == id) {
+            return true;
+          }
+        }
+      }
+    }
     var nodeScope = ScopeResolverVisitor.getNodeNameScope(context);
     if (nodeScope != null) {
       if (skipNext) {
