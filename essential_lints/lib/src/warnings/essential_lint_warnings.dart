@@ -3,7 +3,13 @@ import 'package:analyzer/error/error.dart';
 /// {@template enum_diagnostic}
 /// A mixin for enums that provide a diagnostic code.
 /// {@endtemplate}
-mixin EnumDiagnostic implements DiagnosticCode {
+mixin EnumDiagnostic
+    implements
+        DiagnosticCode,
+        // Needed for the current version of `analyzer`
+        // TODO(FMorschel): remove when analyzer supports registering non-lint
+        //  codes
+        LintCode {
   /// The diagnostic code associated with the enum value.
   DiagnosticCode get code;
 
@@ -43,6 +49,30 @@ mixin EnumDiagnostic implements DiagnosticCode {
 
   @override
   String? get url => code.url;
+}
+
+/// The list of all essential lint warnings.
+enum EssentialLintWarnings with EnumDiagnostic {
+  /// Members of a class should be sorted in a specific order.
+  sortingMembers(
+    WarningCode(
+      name: 'sorting_members',
+      problemMessage:
+          'The members of this class are not sorted according to the '
+          'required order.',
+      correctionMessage:
+          'Sort the members of the class to follow the required order.',
+      description:
+          'A rule that ensures the members of a class are sorted in a '
+          'specific order.',
+    ),
+  ),
+  ;
+
+  const EssentialLintWarnings(this.code);
+
+  @override
+  final WarningCode code;
 }
 
 /// The list of all essential lint rules.
@@ -103,11 +133,11 @@ enum GettersInMemberList with EnumDiagnostic, SubWarnings {
     WarningCode(
       name: 'getters_in_member_list',
       problemMessage:
-          "The class needs an instance member called '{0}' to list the "
+          "The class needs a{1} member called '{0}' to list the "
           'members.',
       correctionMessage:
-          "Include the missing member '{0}' or turn the static member into an "
-          'instance member.',
+          "Include the missing member '{0}' or turn the static member into "
+          'a{1} member.',
       description:
           'A lint rule that ensures getters/fields list instance member is '
           'declared.',
@@ -261,7 +291,12 @@ mixin SubWarnings on EnumDiagnostic {
 /// {@template rule_code}
 /// A diagnostic code for warnings.
 /// {@endtemplate}
-class WarningCode extends DiagnosticCode {
+class WarningCode extends DiagnosticCode
+        // Needed for the current version of `analyzer`
+        // TODO(FMorschel): remove when analyzer supports registering non-lint
+        //  codes
+        implements
+        LintCode {
   /// {@macro rule_code}
   const WarningCode({
     required super.name,

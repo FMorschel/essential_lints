@@ -1,0 +1,9 @@
+name: example
+description: An example package demonstrating essential_lints.
+version: 1.0.0
+
+publish_to: none
+
+environment:
+  sdk: ^3.10.0
+

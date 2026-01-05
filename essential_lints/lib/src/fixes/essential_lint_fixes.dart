@@ -147,7 +147,17 @@ enum EssentialLintWarningFixes implements EnumFix {
       DartFixKindPriority.standard,
       'Create getter',
     ),
-  )
+  ),
+
+  /// Fix to sort members within a class, mixin, enum, extension or extension
+  /// type.
+  sortMembers(
+    FixKind(
+      'dart.fix.sort.members',
+      DartFixKindPriority.standard,
+      'Sort members',
+    ),
+  ),
   ;
 
   const EssentialLintWarningFixes(this.fixKind);

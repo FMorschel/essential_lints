@@ -1,10 +1,10 @@
+import 'package:_internal_testing/dependencies.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:essential_lints/src/warnings/essential_lint_warnings.dart';
 import 'package:essential_lints/src/warnings/getters_in_member_list.dart';
 import 'package:essential_lints/src/warnings/warning.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import '../src/dependencies.dart';
 import '../src/warning_test_processor.dart';
 
 void main() {
@@ -21,23 +21,24 @@ class GettersInMemberListTest extends MultiWarningTestProcessor
 
   @override
   Future<void> setUp() async {
-    super.setUp();
     await addAnnotationsDependency();
+    super.setUp();
   }
 
+  @FailingTest(issue: 'https://github.com/dart-lang/sdk/issues/61597')
   Future<void> test_findsAnnotation_emptyName() async {
     await assertDiagnostics(
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: '')
+@GettersInMemberList(memberListName: Symbol.empty)
 class A {}
 ''',
       [
         error(
           GettersInMemberList.invalidMemberListName,
           117,
-          2,
+          1,
         ),
       ],
     );
@@ -48,7 +49,7 @@ class A {}
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A(this.value);
   final int value;
@@ -56,7 +57,7 @@ class A {
   List<Object?> get members => [];
 }
 ''',
-      [lint(195, 7, correctionContains: RegExp(r"^(?!.*'members').+$"))],
+      [lint(194, 7, correctionContains: RegExp(r"^(?!.*'members').+$"))],
     );
   }
 
@@ -65,7 +66,7 @@ class A {
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A(this.value);
   final int value;
@@ -73,7 +74,7 @@ class A {
   List<Object?> get members => [];
 }
 ''',
-      [lint(195, 7, correctionContains: 'value')],
+      [lint(194, 7, correctionContains: 'value')],
     );
   }
 
@@ -82,7 +83,7 @@ class A {
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 abstract class A {
   int? value, otherValue;
 
@@ -91,7 +92,7 @@ abstract class A {
 ''',
       [
         lint(
-          194,
+          193,
           7,
           correctionContains: RegExp(
             r"^(?=.*'value')(?=.*'otherValue').+$",
@@ -106,14 +107,14 @@ abstract class A {
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 abstract class A {
   int get value;
 
   List<Object?> get members => [];
 }
 ''',
-      [lint(185, 7, correctionContains: 'value')],
+      [lint(184, 7, correctionContains: 'value')],
     );
   }
 
@@ -122,7 +123,7 @@ abstract class A {
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members', getters: false)
+@GettersInMemberList(memberListName: #members, getters: false)
 abstract class A {
   int? value;
   int get otherValue;
@@ -132,7 +133,7 @@ abstract class A {
 ''',
       [
         lint(
-          220,
+          219,
           7,
           correctionContains: RegExp(
             r"^(?=.*'value')(?!.*'otherValue').+$",
@@ -147,7 +148,7 @@ abstract class A {
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members', fields: false)
+@GettersInMemberList(memberListName: #members, fields: false)
 abstract class A {
   int? value;
   int get otherValue;
@@ -157,7 +158,7 @@ abstract class A {
 ''',
       [
         lint(
-          219,
+          218,
           7,
           correctionContains: RegExp(
             r"^(?!.*'value')(?=.*'otherValue').+$",
@@ -172,7 +173,7 @@ abstract class A {
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members', superTypes: [th<int>()])
+@GettersInMemberList(memberListName: #members, superTypes: [th<int>()])
 abstract class A {
   int? value;
   int get otherValue;
@@ -182,7 +183,7 @@ abstract class A {
 ''',
       [
         lint(
-          229,
+          228,
           7,
           correctionContains: RegExp(
             r"^(?!.*'value')(?=.*'otherValue').+$",
@@ -197,7 +198,7 @@ abstract class A {
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members', superTypes: [th<int?>()])
+@GettersInMemberList(memberListName: #members, superTypes: [th<int?>()])
 abstract class A {
   int? value;
   int get otherValue;
@@ -207,7 +208,7 @@ abstract class A {
 ''',
       [
         lint(
-          230,
+          229,
           7,
           correctionContains: RegExp(
             r"^(?=.*'value')(?=.*'otherValue').+$",
@@ -222,7 +223,7 @@ abstract class A {
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members', types: [th<int>()])
+@GettersInMemberList(memberListName: #members, types: [th<int>()])
 abstract class A {
   int? value;
   int get otherValue;
@@ -232,7 +233,7 @@ abstract class A {
 ''',
       [
         lint(
-          224,
+          223,
           7,
           correctionContains: RegExp(
             r"^(?!.*'value')(?=.*'otherValue').+$",
@@ -247,7 +248,7 @@ abstract class A {
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members', types: [th<int?>()])
+@GettersInMemberList(memberListName: #members, types: [th<int?>()])
 abstract class A {
   int? value;
   int get otherValue;
@@ -257,29 +258,11 @@ abstract class A {
 ''',
       [
         lint(
-          225,
+          224,
           7,
           correctionContains: RegExp(
             r"^(?=.*'value')(?!.*'otherValue').+$",
           ),
-        ),
-      ],
-    );
-  }
-
-  Future<void> test_findsAnnotation_invalidName() async {
-    await assertDiagnostics(
-      '''
-import 'package:essential_lints_annotations/essential_lints_annotations.dart';
-
-@GettersInMemberList(memberListName: '0 test')
-class A {}
-''',
-      [
-        error(
-          GettersInMemberList.invalidMemberListName,
-          117,
-          8,
         ),
       ],
     );
@@ -290,7 +273,7 @@ class A {}
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   int? value;
 }
@@ -298,8 +281,9 @@ class A {
       [
         error(
           GettersInMemberList.missingList,
-          134,
+          133,
           1,
+          correctionContains: 'an instance',
         ),
       ],
     );
@@ -310,7 +294,7 @@ class A {
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A(this.value);
   final int value;
@@ -321,7 +305,7 @@ class A {
       [
         error(
           GettersInMemberList.nonMemberIn,
-          214,
+          213,
           1,
         ),
       ],
@@ -335,7 +319,7 @@ import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
 int? get nullableInt => null;
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A(this.value, this.value2);
   final int value;
@@ -347,7 +331,7 @@ class A {
       [
         error(
           GettersInMemberList.nonMemberIn,
-          278,
+          277,
           12,
         ),
       ],
@@ -359,7 +343,7 @@ class A {
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A(this.value);
   final int value;
@@ -372,7 +356,7 @@ class A {
       [
         error(
           GettersInMemberList.nonMemberIn,
-          251,
+          250,
           11,
         ),
       ],
@@ -384,7 +368,7 @@ class A {
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   static List<Object?> get members => [];
 }
@@ -392,8 +376,9 @@ class A {
       [
         error(
           GettersInMemberList.missingList,
-          134,
+          133,
           1,
+          correctionContains: 'an instance',
         ),
       ],
     );
@@ -404,12 +389,12 @@ class A {
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'list')
+@GettersInMemberList(memberListName: #list)
 class A {
   late List<Object?> list = [], other = [];
 }
 ''',
-      [lint(156, 4)],
+      [lint(155, 4)],
     );
   }
 
@@ -418,7 +403,7 @@ class A {
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A(this.value);
   final int value;
@@ -426,7 +411,7 @@ class A {
   late List<Object?> members = [];
 }
 ''',
-      [lint(196, 7)],
+      [lint(195, 7)],
     );
   }
 
@@ -435,12 +420,12 @@ class A {
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   late List<Object?> members = [], other = [];
 }
 ''',
-      [lint(159, 7)],
+      [lint(158, 7)],
     );
   }
 
@@ -449,7 +434,7 @@ class A {
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A(this.value);
   final int value;
@@ -457,7 +442,125 @@ class A {
   List<Object?> get members => [];
 }
 ''',
-      [lint(195, 7)],
+      [lint(194, 7)],
     );
+  }
+
+  Future<void> test_staticOnly() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: #members, membersOption: .static)
+class A {
+  A(this.value);
+  final int value;
+
+  static const int staticValue = 0;
+
+  List<Object?> get members => [staticValue];
+}
+''');
+  }
+
+  Future<void> test_staticOnly_diagnostic() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: #members, membersOption: .static)
+class A {
+  static const int staticValue = 0;
+
+  List<Object?> get members => [];
+}
+''',
+      [lint(218, 7, correctionContains: 'staticValue')],
+    );
+  }
+
+  Future<void> test_staticAndInstance() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: #members, membersOption: .all)
+class A {
+  int? value;
+
+  static const int staticValue = 0;
+
+  List<Object?> get members => [];
+}
+''',
+      [
+        lint(
+          230,
+          7,
+          correctionContains: RegExp(
+            r"^(?=.*'staticValue')(?=.*'value').+$",
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> test_staticList() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: #members, membersOption: .static)
+class A {
+  static const int staticValue = 0;
+
+  static List<Object?> get members => [staticValue];
+}
+''');
+  }
+
+  Future<void> test_staticList_missing() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: #members, membersOption: .static)
+class A {
+  static const int staticValue = 0;
+}
+''',
+      [
+        error(
+          GettersInMemberList.missingList,
+          157,
+          1,
+          correctionContains: RegExp(r'^(?!.*an instance).+$'),
+        ),
+      ],
+    );
+  }
+
+  Future<void> test_variable() async {
+    await assertNoDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+const a = GettersInMemberList(memberListName: #members);
+
+@a
+class A {
+  List<Object?> get members => [];
+}
+''');
+  }
+
+  Future<void> test_variable_missingList() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+const a = GettersInMemberList(memberListName: #_members);
+
+@a
+class A {}
+''', [lint(148, 1)]);
   }
 }

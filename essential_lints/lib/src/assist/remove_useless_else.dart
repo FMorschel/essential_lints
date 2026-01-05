@@ -13,10 +13,10 @@ import 'essential_lint_assists.dart';
 /// {@template swap_cases}
 /// Assist to remove useless else statements.
 /// {@endtemplate}
-class RemoveUselessElseAssist extends ResolvedCorrectionProducer
+class RemoveUselessElseAssistFix extends ResolvedCorrectionProducer
     with Assist, LintFix {
   /// {@macro swap_cases}
-  RemoveUselessElseAssist({required super.context});
+  RemoveUselessElseAssistFix({required super.context});
 
   @override
   CorrectionApplicability get applicability => .acrossSingleFile;
@@ -29,7 +29,7 @@ class RemoveUselessElseAssist extends ResolvedCorrectionProducer
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
-    final node = this.node;
+    var node = this.node;
     if (node is! IfStatement) return;
     Statement elseStatement;
     if (node.elseStatement case var statement?) {

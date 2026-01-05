@@ -21,7 +21,7 @@ class BorderRadiusAllRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _BorderRadiusAllVisitor(this, context);
+    var visitor = _BorderRadiusAllVisitor(this, context);
     registry.addInstanceCreationExpression(this, visitor);
   }
 }

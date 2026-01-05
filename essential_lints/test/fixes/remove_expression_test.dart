@@ -1,14 +1,12 @@
-import 'package:analyzer/utilities/package_config_file_builder.dart';
-import 'package:analyzer_testing/utilities/utilities.dart';
+import 'package:_internal_testing/dependencies.dart';
+import 'package:_internal_testing/flutter_dependency_mixin.dart';
 import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
 import 'package:essential_lints/src/rules/empty_container.dart';
 import 'package:essential_lints/src/warnings/getters_in_member_list.dart';
 import 'package:essential_lints/src/warnings/warning.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import '../src/dependencies.dart';
 import '../src/fix_test_processor.dart';
-import '../src/flutter_dependency_mixin.dart';
 
 void main() {
   defineReflectiveSuite(() {
@@ -27,19 +25,9 @@ class RemoveEmptyContainerExpressionTest extends WarningFixTestProcessor
   EmptyContainerRule get rule => EmptyContainerRule();
 
   @override
-  Future<void> setUp() async {
-    await super.setUp();
+  void setUp() {
     createFlutterMock();
-    newPackageConfigJsonFileFromBuilder(
-      testPackageRootPath,
-      PackageConfigFileBuilder()..add(
-        name: 'flutter',
-        rootPath: flutterFolder.path,
-      ),
-    );
-    pubspecYamlContent(
-      dependencies: ['flutter'],
-    );
+    super.setUp();
   }
 
   Future<void> test_removeExpression_assignment() async {
@@ -163,15 +151,15 @@ class RemoveExpressionTest extends MultiWarningFixTestProcessor
 
   @override
   Future<void> setUp() async {
-    await super.setUp();
     await addAnnotationsDependency();
+    super.setUp();
   }
 
   Future<void> test_removeExpression_first() async {
     await resolveTestCode('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A(this.value);
   final int value;
@@ -182,7 +170,7 @@ class A {
     await assertHasFix('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A(this.value);
   final int value;
@@ -196,7 +184,7 @@ class A {
     await resolveTestCode('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A(this.value);
   final int value;
@@ -207,7 +195,7 @@ class A {
     await assertHasFix('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A(this.value);
   final int value;
@@ -223,7 +211,7 @@ import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
 int? get nullableInt => null;
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A(this.value, this.value2);
   final int value;
@@ -237,7 +225,7 @@ import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
 int? get nullableInt => null;
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A(this.value, this.value2);
   final int value;
@@ -252,7 +240,7 @@ class A {
     await resolveTestCode('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A(this.value, this.value2);
   final int value;
@@ -264,7 +252,7 @@ class A {
     await assertHasFix('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A(this.value, this.value2);
   final int value;

@@ -31,7 +31,7 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _PendingListenerVisitor(this, context);
+    var visitor = _PendingListenerVisitor(this, context);
     registry
       ..addMethodInvocation(this, visitor)
       ..afterLibrary(this, () {
@@ -51,13 +51,13 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
     Map<Element, List<Expression>> compareMap,
     DiagnosticCode code,
   ) {
-    for (final entry in controllMap.keys) {
+    for (var entry in controllMap.keys) {
       var controlListeners = controllMap[entry]!;
       var compareListeners = [...?compareMap[entry]];
       var comparedIdentifiers = compareListeners.whereType<Identifier>().map(
         (i) => i.element,
       );
-      for (final control in controlListeners.whereType<Identifier>()) {
+      for (var control in controlListeners.whereType<Identifier>()) {
         if (!comparedIdentifiers.contains(control.element)) {
           reportAtNode(control, diagnosticCode: code);
         }
@@ -70,7 +70,7 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
               property: i.propertyName.element,
             ),
           );
-      for (final control in controlListeners.whereType<PropertyAccess>()) {
+      for (var control in controlListeners.whereType<PropertyAccess>()) {
         if (!comparedPropertyAccesses.contains((
           target: control.target?.toSource(),
           property: control.propertyName.element,
@@ -86,7 +86,7 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
               identifier: i.identifier.element,
             ),
           );
-      for (final control in controlListeners.whereType<PrefixedIdentifier>()) {
+      for (var control in controlListeners.whereType<PrefixedIdentifier>()) {
         if (!comparedPrefixedIdentifiers.contains((
           prefix: control.prefix.element,
           identifier: control.identifier.element,

@@ -1,10 +1,10 @@
+import 'package:_internal_testing/dependencies.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:essential_lints/src/warnings/essential_lint_warnings.dart';
 import 'package:essential_lints/src/warnings/subtype_annotating.dart';
 import 'package:essential_lints/src/warnings/warning.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import '../src/dependencies.dart';
 import '../src/warning_test_processor.dart';
 
 void main() {
@@ -21,8 +21,8 @@ class SubtypeAnnotatingTest extends MultiWarningTestProcessor
 
   @override
   Future<void> setUp() async {
-    super.setUp();
     await addAnnotationsDependency();
+    super.setUp();
   }
 
   Future<void> test_allMissing() async {
@@ -197,10 +197,11 @@ abstract class MyOtherClass extends MyClass {}
     await assertNoDiagnostics('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@SubtypeAnnotating(annotations: [SubtypeAnnotating], onlyConcrete: true)
+@SubtypeAnnotating(annotations: [SubtypeAnnotating], option: .onlyConcrete)
 class MyClass {}
 
 abstract class MyOtherClass extends MyClass {}
+sealed class OtherClass extends MyClass {}
 ''');
   }
 
@@ -209,12 +210,54 @@ abstract class MyOtherClass extends MyClass {}
       '''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@SubtypeAnnotating(annotations: [SubtypeAnnotating], onlyConcrete: true)
+@SubtypeAnnotating(annotations: [SubtypeAnnotating], option: .onlyConcrete)
 class MyClass {}
 
 class OtherClass extends MyClass {}
 ''',
-      [error(rule.rule, 177, 10)],
+      [error(rule.rule, 180, 10)],
+    );
+  }
+
+  Future<void> test_onlyAbstract_abstract() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeAnnotating(annotations: [SubtypeAnnotating], option: .onlyAbstract)
+class MyClass {}
+
+abstract class MyOtherClass extends MyClass {}
+sealed class OtherClass extends MyClass {}
+''',
+      [lint(189, 12), lint(234, 10)],
+    );
+  }
+
+  Future<void> test_onlyAbstract_concrete() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeAnnotating(annotations: [SubtypeAnnotating], option: .onlyAbstract)
+class MyClass {}
+
+class OtherClass extends MyClass {}
+''');
+  }
+
+  Future<void> test_all() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeAnnotating(annotations: [SubtypeAnnotating], option: .all)
+class MyClass {}
+
+abstract class MyOtherClass extends MyClass {}
+
+class OtherClass extends MyClass {}
+''',
+      [lint(180, 12), lint(219, 10)],
     );
   }
 }

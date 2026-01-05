@@ -20,7 +20,7 @@ class SamePackageDirectImportRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = SamePackageDirectImportVisitor._(
+    var visitor = SamePackageDirectImportVisitor._(
       rule: this,
       context: context,
     );
@@ -80,10 +80,10 @@ class SamePackageDirectImportVisitor extends SimpleAstVisitor<void> {
           return;
         }
     }
-    final namespace = libraryImport.namespace;
+    var namespace = libraryImport.namespace;
     var usedElements = <Element>{};
     node.root.accept(_NamespaceElementCollector(namespace, usedElements));
-    for (final element in usedElements) {
+    for (var element in usedElements) {
       if (element.library?.uri case var uri?
           when uri != libraryImport.importedLibrary?.uri) {
         _rule?.reportAtNode(node.uri);
@@ -98,7 +98,7 @@ class SamePackageDirectImportVisitor extends SimpleAstVisitor<void> {
   /// Collects all URIs of direct imports within the same package found for the
   /// given [importDirective].
   static Set<Uri> uris(ImportDirective importDirective) {
-    final visitor = SamePackageDirectImportVisitor._();
+    var visitor = SamePackageDirectImportVisitor._();
     importDirective.accept(visitor);
     return visitor._uris;
   }
@@ -112,7 +112,7 @@ class _NamespaceElementCollector extends RecursiveAstVisitor<void> {
 
   @override
   void visitNamedType(NamedType node) {
-    final element = node.element;
+    var element = node.element;
     if (element != null &&
         namespace.definedNames2[node.name.lexeme] == element) {
       usedElements.add(element);
@@ -122,7 +122,7 @@ class _NamespaceElementCollector extends RecursiveAstVisitor<void> {
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    final element = node.element;
+    var element = node.element;
     if (element != null && namespace.definedNames2[node.name] == element) {
       usedElements.add(element);
     }

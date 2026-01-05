@@ -22,7 +22,7 @@ class NumericConstantStyleRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _NumericConstantStyleVisitor(this);
+    var visitor = _NumericConstantStyleVisitor(this);
     registry.addDoubleLiteral(this, visitor);
   }
 }

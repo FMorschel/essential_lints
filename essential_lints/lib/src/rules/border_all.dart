@@ -20,7 +20,7 @@ class BorderAllRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _BorderAllVisitor(this, context);
+    var visitor = _BorderAllVisitor(this, context);
     registry.addInstanceCreationExpression(this, visitor);
   }
 }

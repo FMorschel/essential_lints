@@ -21,6 +21,7 @@ import 'fixes/replace_with_from_border_side.dart';
 import 'fixes/replace_with_squared_box.dart';
 import 'fixes/same_package_direct_import.dart';
 import 'fixes/sort_enum_constants.dart';
+import 'fixes/sort_members.dart';
 import 'fixes/use_defined_type.dart';
 import 'fixes/use_padding_property.dart';
 import 'plugin.dart';
@@ -54,6 +55,7 @@ import 'rules/variable_shadowing.dart';
 import 'utils/extensions/logger.dart';
 import 'warnings/essential_lint_warnings.dart';
 import 'warnings/getters_in_member_list.dart';
+import 'warnings/sorting_members.dart';
 import 'warnings/subtype_annotating.dart';
 import 'warnings/subtype_naming.dart';
 import 'warnings/warning.dart';
@@ -74,12 +76,12 @@ mixin AssistsPluginIntegration {
   /// Returns the list of registered assists.
   Set<fix_generators.ProducerGenerator> get assists {
     logger.info('Mapping assists');
-    final assists = <fix_generators.ProducerGenerator>{};
+    var assists = <fix_generators.ProducerGenerator>{};
 
-    for (final assist in EssentialLintAssists.values) {
+    for (var assist in EssentialLintAssists.values) {
       switch (assist) {
         case EssentialLintAssists.removeUselessElse:
-          assists.add(RemoveUselessElseAssist.new);
+          assists.add(RemoveUselessElseAssistFix.new);
       }
     }
     logger.info('Mapped assists');
@@ -89,7 +91,7 @@ mixin AssistsPluginIntegration {
   /// Registers all assists with the given registry.
   void registerAssists(PluginRegistry registry) {
     logger.info('Registering assists');
-    for (final generator in assists) {
+    for (var generator in assists) {
       try {
         registry.registerAssist(generator);
         // ignore: avoid_catches_without_on_clauses, handles integration
@@ -116,17 +118,17 @@ mixin FixesPluginIntegration {
   /// Returns the list of registered lint fixes.
   Map<LintCode, List<FixGenerator>> get lintFixes {
     logger.info('Mapping lint fixes');
-    final fixes = <LintCode, List<FixGenerator>>{};
+    var fixes = <LintCode, List<FixGenerator>>{};
 
     void addFixTo(FixGenerator generator, List<EssentialLintRules> rules) {
-      for (final rule in rules) {
+      for (var rule in rules) {
         fixes.putIfAbsent(rule, () => []).add(generator);
       }
     }
 
     addFixTo(RemoveExpressionFix.new, [.emptyContainer]);
 
-    for (final fix in EssentialLintFixes.values) {
+    for (var fix in EssentialLintFixes.values) {
       var _ = switch (fix) {
         .alphabetizeArguments => addFixTo(AlphabetizeArgumentsFix.new, [
           .alphabetizeArguments,
@@ -164,7 +166,7 @@ mixin FixesPluginIntegration {
           [.completerErrorNoStack],
         ),
         .removeUselessElse => addFixTo(
-          RemoveUselessElseAssist.new,
+          RemoveUselessElseAssistFix.new,
           [.uselessElse],
         ),
       };
@@ -174,17 +176,18 @@ mixin FixesPluginIntegration {
   }
 
   /// Returns the list of registered lint fixes.
-  Map<DiagnosticCode, List<FixGenerator>> get warningFixes {
+  // TODO(FMorschel): Replace with DiagngnosticCode when analyzer supports it.
+  Map<LintCode, List<FixGenerator>> get warningFixes {
     logger.info('Mapping warning fixes');
-    final fixes = <DiagnosticCode, List<FixGenerator>>{};
+    var fixes = <LintCode, List<FixGenerator>>{};
 
     void addFixTo(FixGenerator generator, List<EnumDiagnostic> rules) {
-      for (final rule in rules) {
+      for (var rule in rules) {
         fixes.putIfAbsent(rule, () => []).add(generator);
       }
     }
 
-    for (final fix in EssentialLintWarningFixes.values) {
+    for (var fix in EssentialLintWarningFixes.values) {
       var _ = switch (fix) {
         .addMissingMembers => addFixTo(AddMissingMembersFix.new, [
           EssentialMultiWarnings.gettersInMemberList,
@@ -194,6 +197,9 @@ mixin FixesPluginIntegration {
         ]),
         .createGetter => addFixTo(CreateGetterFix.new, [
           GettersInMemberList.missingList,
+        ]),
+        .sortMembers => addFixTo(SortMembersFix.new, [
+          EssentialLintWarnings.sortingMembers,
         ]),
       };
     }
@@ -205,7 +211,7 @@ mixin FixesPluginIntegration {
   void registerFixes(PluginRegistry registry) {
     logger.info('Registering lint fixes');
     lintFixes.forEach((diagnosticCode, generators) {
-      for (final generator in generators) {
+      for (var generator in generators) {
         try {
           registry.registerFixForRule(diagnosticCode, generator);
           // ignore: avoid_catches_without_on_clauses, handles integration
@@ -223,7 +229,7 @@ mixin FixesPluginIntegration {
       ..info('Registered lint fixes')
       ..info('Registering warning fixes');
     warningFixes.forEach((diagnosticCode, generators) {
-      for (final generator in generators) {
+      for (var generator in generators) {
         try {
           registry.registerFixForRule(diagnosticCode, generator);
           // ignore: avoid_catches_without_on_clauses, handles integration
@@ -251,8 +257,8 @@ mixin RulesPluginIntegration {
   /// Returns the list of registered rules.
   Set<AbstractAnalysisRule> get rules {
     logger.info('Mapping lint rules');
-    final rules = <AbstractAnalysisRule>{};
-    for (final rule in EssentialLintRules.values) {
+    var rules = <AbstractAnalysisRule>{};
+    for (var rule in EssentialLintRules.values) {
       rules.add(switch (rule) {
         .alphabetizeEnumConstants => AlphabetizeEnumConstantsRule(),
         .alphabetizeArguments => AlphabetizeArgumentsRule(),
@@ -284,7 +290,7 @@ mixin RulesPluginIntegration {
     logger
       ..info('Mapped lint rules')
       ..info('Mapping multi lint rules');
-    for (final rule in EssentialMultiLints.values) {
+    for (var rule in EssentialMultiLints.values) {
       rules.add(switch (rule) {
         .pendingListener => PendingListenerRule(),
       });
@@ -296,7 +302,7 @@ mixin RulesPluginIntegration {
   /// Registers all lint rules with the given registry.
   void registerRules(PluginRegistry registry) {
     logger.info('Registering lint rules');
-    for (final rule in rules) {
+    for (var rule in rules) {
       try {
         registry.registerLintRule(rule);
         // ignore: avoid_catches_without_on_clauses, handles integration
@@ -321,15 +327,29 @@ mixin WarningsPluginIntegration {
   );
 
   /// Returns the list of registered warnings.
-  Set<MultiWarningRule> get warnings {
-    logger.info('Mapping warning rules');
-    final rules = <MultiWarningRule>{};
+  Set<MultiWarningRule> get multiWarnings {
+    logger.info('Mapping multi warning rules');
+    var rules = <MultiWarningRule>{};
     // Single instance to satisfy exhaustive switch requirement.
-    for (final rule in EssentialMultiWarnings.values) {
+    for (var rule in EssentialMultiWarnings.values) {
       rules.add(switch (rule) {
         .gettersInMemberList => GettersInMemberListRule(),
         .subtypeNaming => SubtypeNamingRule(),
         .subtypeAnnotating => SubtypeAnnotatingRule(),
+      });
+    }
+    logger.info('Mapped multi warning rules');
+    return rules;
+  }
+
+  /// Returns the list of registered warnings.
+  Set<WarningRule> get warnings {
+    logger.info('Mapping warning rules');
+    var rules = <WarningRule>{};
+    // Single instance to satisfy exhaustive switch requirement.
+    for (var rule in EssentialLintWarnings.values) {
+      rules.add(switch (rule) {
+        .sortingMembers => SortingMembersRule(),
       });
     }
     logger.info('Mapped warning rules');
@@ -339,7 +359,7 @@ mixin WarningsPluginIntegration {
   /// Registers all lint rules with the given registry.
   void registerWarnings(PluginRegistry registry) {
     logger.info('Registering warning rules');
-    for (final rule in warnings) {
+    for (var rule in [...multiWarnings, ...warnings]) {
       try {
         registry.registerWarningRule(rule);
         // ignore: avoid_catches_without_on_clauses, handles integration

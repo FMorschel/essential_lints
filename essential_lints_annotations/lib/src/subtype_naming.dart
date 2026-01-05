@@ -1,5 +1,7 @@
 import 'package:meta/meta_meta.dart';
 
+import 'utils/subtype_option.dart';
+
 /// {@template subtype_naming}
 /// Annotations for the `subtype_naming` rule.
 /// {@endtemplate}
@@ -15,7 +17,7 @@ class SubtypeNaming {
     this.prefix,
     this.suffix,
     this.containing,
-    this.onlyConcrete = false,
+    this.option = SubtypeOption.all,
   });
 
   /// The required prefix for the subtype name.
@@ -27,6 +29,6 @@ class SubtypeNaming {
   /// The required part of the name of the subtype.
   final String? containing;
 
-  /// Whether the annotation should only be applied to concrete subtypes.
-  final bool onlyConcrete;
+  /// {@macro subtype_option}
+  final SubtypeOption option;
 }

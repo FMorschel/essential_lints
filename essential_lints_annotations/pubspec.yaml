@@ -7,9 +7,7 @@ issue_tracker: https://github.com/FMorschel/essential_lints/issues
 license: MIT
 
 environment:
-  sdk: ^3.10.0
-
-resolution: workspace
+  sdk: ">=2.19.0 <4.0.0"
 
 # Recommended keywords help users find the package on pub.dev.
 keywords:
@@ -18,7 +16,8 @@ keywords:
   - annotations
   - meta
 
-dev_dependencies:
-  test: any
 dependencies:
-  meta: ^1.17.0
+  meta: ^1.11.0
+
+dev_dependencies:
+  very_good_analysis: ^10.0.0

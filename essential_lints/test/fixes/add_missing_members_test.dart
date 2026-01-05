@@ -1,9 +1,9 @@
+import 'package:_internal_testing/dependencies.dart';
 import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
 import 'package:essential_lints/src/warnings/getters_in_member_list.dart';
 import 'package:essential_lints/src/warnings/warning.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import '../src/dependencies.dart';
 import '../src/fix_test_processor.dart';
 
 void main() {
@@ -23,15 +23,15 @@ class AddMissingMembersTest extends MultiWarningFixTestProcessor
 
   @override
   Future<void> setUp() async {
-    await super.setUp();
     await addAnnotationsDependency();
+    super.setUp();
   }
 
   Future<void> test_addsMissingGetters_field() async {
     await resolveTestCode('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A(this.value);
   final int value;
@@ -42,7 +42,7 @@ class A {
     await assertHasFix('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A(this.value);
   final int value;
@@ -56,7 +56,7 @@ class A {
     await resolveTestCode('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A(this.value);
   final int value;
@@ -67,7 +67,7 @@ class A {
     await assertHasFix('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A(this.value);
   final int value;
@@ -81,7 +81,7 @@ class A {
     await resolveTestCode('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A(this.value, this.value2);
   final int value;
@@ -93,7 +93,7 @@ class A {
     await assertHasFix('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
-@GettersInMemberList(memberListName: 'members')
+@GettersInMemberList(memberListName: #members)
 class A {
   A(this.value, this.value2);
   final int value;

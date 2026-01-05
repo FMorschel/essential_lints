@@ -92,9 +92,10 @@ abstract class BaseEditTestProcessor extends AnalysisRuleTest
   }
 
   @override
-  Future<void> setUp() async {
+  void setUp() {
     rules.forEach(registry.Registry.ruleRegistry.registerLintRule);
     builtInRules.forEach(registry.Registry.ruleRegistry.registerLintRule);
+    multiWarnings.forEach(registry.Registry.ruleRegistry.registerWarningRule);
     warnings.forEach(registry.Registry.ruleRegistry.registerWarningRule);
     fix_generators.registeredFixGenerators.lintProducers.addAll(lintFixes);
     fix_generators.registeredFixGenerators.nonLintProducers.addAll(

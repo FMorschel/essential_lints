@@ -35,7 +35,7 @@ class SortEnumConstantsFix extends ResolvedCorrectionProducer with LintFix {
         (builder) {
           var writeIndent = false;
           for (var i = 0; i < sortedConstants.length; i++) {
-            final constant = sortedConstants[i];
+            var constant = sortedConstants[i];
             if (writeIndent) {
               builder.writeIndent();
             }

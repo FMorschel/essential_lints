@@ -1,10 +1,8 @@
-import 'package:analyzer/utilities/package_config_file_builder.dart';
-import 'package:analyzer_testing/utilities/utilities.dart';
+import 'package:_internal_testing/flutter_dependency_mixin.dart';
 import 'package:essential_lints/src/rules/empty_container.dart';
 import 'package:essential_lints/src/rules/rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import '../src/flutter_dependency_mixin.dart';
 import '../src/rule_test_processor.dart';
 
 void main() {
@@ -20,18 +18,8 @@ class EmptyContainerTest extends LintTestProcessor with FlutterDependencyMixin {
 
   @override
   void setUp() {
-    super.setUp();
     createFlutterMock();
-    newPackageConfigJsonFileFromBuilder(
-      testPackageRootPath,
-      PackageConfigFileBuilder()..add(
-        name: 'flutter',
-        rootPath: flutterFolder.path,
-      ),
-    );
-    pubspecYamlContent(
-      dependencies: ['flutter'],
-    );
+    super.setUp();
   }
 
   Future<void> test_emptyContainer() async {
@@ -46,8 +34,7 @@ var container = Container();
   }
 
   Future<void> test_container_withParameters() async {
-    await assertNoDiagnostics(
-      '''
+    await assertNoDiagnostics('''
 import 'package:flutter/widgets.dart';
 
 var container = Container(

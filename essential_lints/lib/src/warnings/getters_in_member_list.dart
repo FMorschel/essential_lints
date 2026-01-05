@@ -3,6 +3,7 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
@@ -41,6 +42,7 @@ class _GettersInMemberListAnnotation {
     required this.fields,
     required this.types,
     required this.superTypes,
+    required this.membersOption,
   });
 
   static const _GettersInMemberListAnnotation empty = .new(
@@ -49,6 +51,7 @@ class _GettersInMemberListAnnotation {
     fields: false,
     types: [],
     superTypes: [],
+    membersOption: null,
   );
 
   final String memberListName;
@@ -56,12 +59,19 @@ class _GettersInMemberListAnnotation {
   final List<DartType> superTypes;
   final bool getters;
   final bool fields;
+  final DartObject? membersOption;
 
   String get gettersAndFieldsDescription => getters && !fields
       ? 'getters'
       : !getters && fields
       ? 'fields'
       : 'getters/fields';
+
+  bool get static => membersOption?.variable?.name != 'instance';
+  bool get instance => membersOption?.variable?.name != 'static';
+
+  bool get instanceOnly => instance && !static;
+  bool get staticOnly => static && !instance;
 }
 
 class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
@@ -72,7 +82,6 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
   static final Uri _annotationUri = .parse(
     'package:essential_lints_annotations/src/getters_in_member_list.dart',
   );
-  static final _validNamePattern = RegExp(r'^[a-zA-Z_$][a-zA-Z_$0-9]*$');
 
   final GettersInMemberListRule rule;
   final RuleContext context;
@@ -85,7 +94,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
         assert(false, 'The annotation should not be null here.');
         return;
       }
-      if (!_validNamePattern.hasMatch(annotation.memberListName)) {
+      if (annotation.memberListName.isEmpty) {
         rule.reportAtNode(
           node.arguments?.arguments
                   .firstWhereOrNull(_isMemberListName)
@@ -108,16 +117,21 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
         .where(_isGettersInMemberListAnnotation)
         .map(_mapKnownArguments)
         .nonNulls;
-    for (final annotation in relevant) {
-      if (!_validNamePattern.hasMatch(annotation.memberListName)) {
+    for (var annotation in relevant) {
+      var memberListName = annotation.memberListName;
+      if (annotation.memberListName.isEmpty) {
         continue;
       }
-      var getterMember = element.getGetter(annotation.memberListName);
-      if (getterMember == null || getterMember.isStatic) {
+      var getterMember = element.getGetter(memberListName);
+      if (getterMember == null ||
+          getterMember.isStatic && annotation.instanceOnly) {
         rule.reportAtToken(
           node.name,
           diagnosticCode: GettersInMemberList.missingList,
-          arguments: [annotation.memberListName],
+          arguments: [
+            memberListName,
+            if (annotation.instance) 'an instance' else '',
+          ],
         );
         continue;
       }
@@ -138,7 +152,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
           :var variables,
         ),
       )) {
-        for (final variable in variables) {
+        for (var variable in variables) {
           if (variable.declaredFragment?.element == getterMember.variable) {
             memberElement = getterMember;
             memberName = variable.name;
@@ -195,7 +209,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
         :var variables,
       ),
     )) {
-      for (final variable in variables) {
+      for (var variable in variables) {
         if (variable.initializer != null) {
           expression = variable.initializer;
           break;
@@ -233,7 +247,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
     ListLiteral list,
   ) {
     var literalElements = <(CollectionElement, Element)>[];
-    for (final expression in list.elements) {
+    for (var expression in list.elements) {
       SimpleIdentifier? getterIdentifier;
       if (expression
           case SimpleIdentifier identifier ||
@@ -252,7 +266,8 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
     }
 
     bool valid(GetterElement element) {
-      if (element.isStatic ||
+      if ((!annotation.static && element.isStatic) ||
+          (!annotation.instance && !element.isStatic) ||
           !annotation.getters && element.variable.isSynthetic ||
           !annotation.fields && !element.variable.isSynthetic ||
           annotation.types.isNotEmpty &&
@@ -270,7 +285,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
     }
 
     var validGetters = getters.where(valid).toList();
-    for (final (expression, element) in literalElements) {
+    for (var (expression, element) in literalElements) {
       if (!validGetters.contains(element)) {
         rule.reportAtNode(
           expression,
@@ -280,7 +295,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
     }
     var missing = <String>[];
     var elements = literalElements.map((e) => e.$2).toList();
-    for (final element in validGetters) {
+    for (var element in validGetters) {
       if (!elements.contains(element)) {
         missing.add(element.displayName);
       }
@@ -289,9 +304,6 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
   }
 
   bool _isGettersInMemberListAnnotation(ElementAnnotation? annotation) {
-    if (annotation?.element is! ConstructorElement) {
-      return false;
-    }
     var element = annotation?.computeConstantValue()?.type?.element;
     return element?.library?.uri == _annotationUri &&
         element?.name == _annotationName;
@@ -307,25 +319,24 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
   _GettersInMemberListAnnotation? _mapKnownArguments(
     ElementAnnotation? annotation,
   ) {
-    var element = annotation?.element;
-    if (element is! ConstructorElement) return .empty;
-
     var type = annotation?.computeConstantValue();
     if (type == null) return .empty;
-    var memberListName = type.getField('memberListName')?.toStringValue();
+    var memberListNameString = type.getField('memberListName')?.toSymbolValue();
     var getters = type.getField('getters')?.toBoolValue();
     var fields = type.getField('fields')?.toBoolValue();
     var types = type.getField('types')?.toListValue();
     var superTypes = type.getField('superTypes')?.toListValue();
+    var membersOption = type.getField('membersOption');
 
     return _GettersInMemberListAnnotation(
-      memberListName: memberListName ?? '',
+      memberListName: memberListNameString ?? '',
       getters: getters ?? true,
       fields: fields ?? false,
       types: [...?types?.map((e) => e.type.singleTypeArgument).nonNulls],
       superTypes: [
         ...?superTypes?.map((e) => e.type.singleTypeArgument).nonNulls,
       ],
+      membersOption: membersOption,
     );
   }
 }
@@ -342,7 +353,7 @@ extension on (MultiWarningRule, GetterElement) {
         :var variables,
       ),
     )) {
-      for (final variable in variables) {
+      for (var variable in variables) {
         if (variable.declaredFragment?.element == $2.variable) {
           return true;
         }

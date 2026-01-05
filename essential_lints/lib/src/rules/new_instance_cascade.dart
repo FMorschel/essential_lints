@@ -19,7 +19,7 @@ class NewInstanceCascadeRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _NewInstanceCascadeVisitor(
+    var visitor = _NewInstanceCascadeVisitor(
       this,
       context,
     );
@@ -35,9 +35,9 @@ class _NewInstanceCascadeVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitCascadeExpression(CascadeExpression node) {
-    final targetType = node.target.staticType;
+    var targetType = node.target.staticType;
     if (targetType == null) return;
-    for (final section in node.cascadeSections) {
+    for (var section in node.cascadeSections) {
       if (section is MethodInvocation) {
         var element = section.methodName.element;
         if (element is ExecutableElement) {

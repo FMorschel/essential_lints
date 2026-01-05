@@ -1,0 +1,31 @@
+name: _internal_plugin
+description: An internal plugin package for essential_lints.
+version: 1.0.0
+
+repository: https://github.com/FMorschel/essential_lints
+issue_tracker: https://github.com/FMorschel/essential_lints/issues
+license: MIT
+
+publish_to: none
+
+resolution: workspace
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  analysis_server_plugin: any
+  analyzer: any
+  essential_lints:
+    path: ../essential_lints
+  essential_lints_annotations: any
+  logging: any
+  meta: any
+
+dev_dependencies:
+  _internal_testing:
+    path: ../_internal_testing
+  analyzer_testing: any
+  lints: any
+  test: any
+  test_reflective_loader: any

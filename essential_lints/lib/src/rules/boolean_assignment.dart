@@ -17,7 +17,7 @@ class BooleanAssignmentRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _BooleanAssignmentVisitor(this, context);
+    var visitor = _BooleanAssignmentVisitor(this, context);
     registry
       ..addIfStatement(this, visitor)
       ..addVariableDeclaration(this, visitor)
@@ -119,7 +119,7 @@ class _BooleanAssignmentVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitArgumentList(ArgumentList node) {
-    for (final argument in node.arguments) {
+    for (var argument in node.arguments) {
       var expression = argument;
       if (expression is NamedExpression) {
         expression = expression.expression;

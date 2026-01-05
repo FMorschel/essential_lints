@@ -7,7 +7,7 @@ import 'object.dart';
 extension AstExtension on AstNode {
   /// Gets the enclosing executable element of the AST node.
   ExecutableElement? get enclosingExecutableElement {
-    for (final ancestor in withAncestors) {
+    for (var ancestor in withAncestors) {
       switch (ancestor) {
         case MethodDeclaration(
               declaredFragment: ExecutableFragment(:var element),
@@ -32,7 +32,7 @@ extension AstExtension on AstNode {
   /// Gets the enclosing executable element of the AST node if it is
   /// synchronous.
   ExecutableElement? get enclosingExecutableElementIfSync {
-    for (final ancestor in withAncestors) {
+    for (var ancestor in withAncestors) {
       switch (ancestor) {
         case MethodDeclaration(
                   declaredFragment: ExecutableFragment(:var element),
@@ -61,7 +61,7 @@ extension AstExtension on AstNode {
 
   /// Gets the enclosing type element of the AST node.
   InterfaceElement? get enclosingTypeElement {
-    for (final ancestor in withAncestors) {
+    for (var ancestor in withAncestors) {
       switch (ancestor) {
         case ExtensionDeclaration(
           declaredFragment: ExtensionFragment(:var element),

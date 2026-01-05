@@ -2,6 +2,7 @@ import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/error/error.dart';
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 import 'package:meta/meta.dart';
 
 import 'essential_lint_rules.dart';
@@ -9,6 +10,7 @@ import 'essential_lint_rules.dart';
 /// {@template rule}
 /// The base class for all essential lint rules.
 /// {@endtemplate}
+@SubtypeNaming(suffix: 'Rule')
 abstract class LintRule extends AnalysisRule {
   /// {@macro rule}
   LintRule(this.rule)
@@ -34,6 +36,7 @@ abstract class LintRule extends AnalysisRule {
 /// {@template rule}
 /// The base class for all essential multi-lints rules.
 /// {@endtemplate}
+@SubtypeNaming(suffix: 'Rule')
 abstract class MultiLintRule<T extends SubLints> extends MultiAnalysisRule {
   /// {@macro rule}
   MultiLintRule(this.rule)

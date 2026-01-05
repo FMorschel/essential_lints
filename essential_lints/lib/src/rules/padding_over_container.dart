@@ -38,7 +38,7 @@ class _PaddingOverContainerVisitor extends SimpleAstVisitor<void> {
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
     if (node.constructorName.type.element.isPadding) {
       var argumentList = node.argumentList;
-      for (final argument in argumentList.arguments) {
+      for (var argument in argumentList.arguments) {
         if (argument is NamedExpression &&
             argument.name.label.name == _child) {
           var expression = argument.expression;

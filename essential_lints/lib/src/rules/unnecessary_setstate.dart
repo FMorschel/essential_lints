@@ -24,7 +24,7 @@ class UnnecessarySetstateRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _UnnecessarySetstateVisitor(this, context);
+    var visitor = _UnnecessarySetstateVisitor(this, context);
     registry.addMethodInvocation(this, visitor);
   }
 }
@@ -157,7 +157,7 @@ class _SyncCallVisitor extends RecursiveAstVisitor<void> {
     if (visitedElements != null && visitedElements.contains(element)) {
       return [];
     }
-    final visitor = _SyncCallVisitor._(
+    var visitor = _SyncCallVisitor._(
       classDeclaration,
       element,
       invoked,
@@ -208,7 +208,7 @@ class _UnnecessarySetstateVisitor extends SimpleAstVisitor<void> {
       null,
       classDeclaration,
     );
-    for (final node in nodes) {
+    for (var node in nodes) {
       rule.reportAtNode(
         node,
         contextMessages: [

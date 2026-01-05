@@ -1,12 +1,10 @@
-import 'package:analyzer/utilities/package_config_file_builder.dart';
+import 'package:_internal_testing/flutter_dependency_mixin.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
-import 'package:analyzer_testing/utilities/utilities.dart';
 import 'package:essential_lints/src/rules/essential_lint_rules.dart';
 import 'package:essential_lints/src/rules/pending_listener.dart';
 import 'package:essential_lints/src/rules/rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import '../src/flutter_dependency_mixin.dart';
 import '../src/rule_test_processor.dart';
 
 void main() {
@@ -23,18 +21,8 @@ class PendingListenerTest extends MultiLintTestProcessor<PendingListener>
 
   @override
   void setUp() {
-    super.setUp();
     createFlutterMock();
-    newPackageConfigJsonFileFromBuilder(
-      testPackageRootPath,
-      PackageConfigFileBuilder()..add(
-        name: 'flutter',
-        rootPath: flutterFolder.path,
-      ),
-    );
-    pubspecYamlContent(
-      dependencies: ['flutter'],
-    );
+    super.setUp();
   }
 
   Future<void> test_added_cascade() async {
@@ -74,8 +62,7 @@ class C {
   }
 
   Future<void> test_disposed() async {
-    await assertNoDiagnostics(
-      '''
+    await assertNoDiagnostics('''
 import 'package:flutter/foundation.dart';
 
 class C {
@@ -148,8 +135,7 @@ class C {
   }
 
   Future<void> test_different_targets_OK() async {
-    await assertNoDiagnostics(
-      '''
+    await assertNoDiagnostics('''
 import 'package:flutter/foundation.dart';
 
 class C {

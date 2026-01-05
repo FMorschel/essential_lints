@@ -8,10 +8,14 @@ import 'package:analyzer/src/test_utilities/test_code_format.dart'
     as test_code_format;
 import 'package:essential_lints/src/assist/essential_lint_assists.dart';
 import 'package:essential_lints/src/rules/essential_lint_rules.dart';
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 import 'package:test/test.dart';
+import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import 'base_edit_test_processor.dart';
 
+@SubtypeNaming(suffix: 'Test')
+@SubtypeAnnotating(annotations: [reflectiveTest], option: .onlyConcrete)
 abstract class AssistTestProcessor extends BaseEditTestProcessor {
   EssentialLintAssists get assistKind;
 
@@ -64,7 +68,7 @@ abstract class AssistTestProcessor extends BaseEditTestProcessor {
       expect(change.edits, hasLength(additionallyChangedFiles.length + 1));
       var fileEdit = change.getFileEdit(testFile.path)!;
       matchesExpected(expected, fileEdit: fileEdit);
-      for (final (:path, :original, :result) in additionallyChangedFiles) {
+      for (var (:path, :original, :result) in additionallyChangedFiles) {
         var fileEdit = change.getFileEdit(path)!;
         matchesExpected(
           result,
@@ -80,7 +84,7 @@ abstract class AssistTestProcessor extends BaseEditTestProcessor {
   Future<void> assertNoAssist([int index = 0]) async {
     setPositionOrRange(index);
     var assists = await _computeAssists();
-    for (final assist in assists) {
+    for (var assist in assists) {
       if (assist.kind == assistKind) {
         fail('Unexpected assist $assistKind in\n${assists.join('\n')}');
       }

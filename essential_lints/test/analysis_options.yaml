@@ -5,12 +5,12 @@ analyzer:
     strict-casts: true
     strict-inference: true
     strict-raw-types: true
-  errors:
-    parameter_assignments: false
-    non_constant_identifier_names: false
-    avoid_catches_without_on_clauses: false
 
 linter:
   rules:
     unreachable_from_main: true
     specify_nonobvious_property_types: false
+    avoid_print: false
+    avoid_catches_without_on_clauses: false
+    non_constant_identifier_names: false
+    parameter_assignments: false

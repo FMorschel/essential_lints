@@ -1,5 +1,7 @@
 import 'package:meta/meta_meta.dart';
 
+import 'utils/subtype_option.dart';
+
 /// {@template subtype_annotating}
 /// Annotations for the `subtype_annotating` rule.
 /// {@endtemplate}
@@ -13,12 +15,12 @@ class SubtypeAnnotating {
   /// {@macro subtype_naming}
   const SubtypeAnnotating({
     required this.annotations,
-    this.onlyConcrete = false,
+    this.option = SubtypeOption.all,
   });
 
   /// The required annotations for the subtype.
   final List<Object> annotations;
 
-  /// Whether the annotation should only be applied to concrete subtypes.
-  final bool onlyConcrete;
+  /// {@macro subtype_option}
+  final SubtypeOption option;
 }

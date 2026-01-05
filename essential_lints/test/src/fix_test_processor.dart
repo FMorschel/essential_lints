@@ -10,8 +10,10 @@ import 'package:analyzer/diagnostic/diagnostic.dart';
 import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
 import 'package:essential_lints/src/rules/rule.dart';
 import 'package:essential_lints/src/warnings/warning.dart';
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 import 'package:meta/meta.dart';
 import 'package:test/test.dart';
+import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import 'base_edit_test_processor.dart';
 
@@ -91,7 +93,7 @@ mixin EditTestProcessorMixin on BaseEditTestProcessor {
             'found none.',
       );
     }
-    for (final fix in fixes) {
+    for (var fix in fixes) {
       if (!allowFixAllFixes &&
           fix.kind.priority == DartFixKindPriority.inFile) {
         fail(
@@ -131,6 +133,8 @@ abstract class FixTestProcessor extends BaseEditTestProcessor
   AnalysisRule get rule;
 }
 
+@SubtypeNaming(suffix: 'Test')
+@SubtypeAnnotating(annotations: [reflectiveTest], option: .onlyConcrete)
 abstract class LintFixTestProcessor extends FixTestProcessor {
   @override
   EssentialLintFixes get fix;
@@ -140,6 +144,8 @@ abstract class LintFixTestProcessor extends FixTestProcessor {
   LintRule get rule;
 }
 
+@SubtypeNaming(suffix: 'Test')
+@SubtypeAnnotating(annotations: [reflectiveTest], option: .onlyConcrete)
 abstract class MultiWarningFixTestProcessor extends BaseEditTestProcessor
     with EditTestProcessorMixin {
   @override
@@ -153,6 +159,8 @@ abstract class MultiWarningFixTestProcessor extends BaseEditTestProcessor
   MultiWarningRule get rule;
 }
 
+@SubtypeNaming(suffix: 'Test')
+@SubtypeAnnotating(annotations: [reflectiveTest], option: .onlyConcrete)
 abstract class WarningFixTestProcessor extends FixTestProcessor {
   @override
   EssentialLintWarningFixes get fix;
