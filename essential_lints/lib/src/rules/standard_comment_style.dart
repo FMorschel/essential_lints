@@ -29,7 +29,7 @@ class StandardCommentStyleRule extends LintRule {
 class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
   _StandardCommentStyleVisitor(this.rule, this.context);
 
-  static const _punctuation = {'.', '!', '?'};
+  static const _punctuation = {'.', '!', '?', ':', ';'};
   static final _startingComment = RegExp(r'^((///?)|/\*)');
   static final _endOfComment = RegExp(r'(\*/)$');
   static final _nonWhitespace = RegExp(r'^\S');

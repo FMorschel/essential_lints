@@ -185,4 +185,16 @@ that does not follow the rules */
       [lint(0, 38)],
     );
   }
+
+  Future<void> test_endsInColon() async {
+    await assertNoDiagnostics('''
+// This comment ends in colon:
+''');
+  }
+
+  Future<void> test_endsInSemicolon() async {
+    await assertNoDiagnostics('''
+// This comment ends in semicolon;
+''');
+  }
 }
