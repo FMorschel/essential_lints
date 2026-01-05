@@ -1,5 +1,3 @@
-include: package:lints/recommended.yaml
-
 plugins:
   essential_lints:
     path: ../
