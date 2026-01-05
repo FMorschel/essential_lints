@@ -1585,9 +1585,11 @@ void main() {
                 test('fields', () {
                   expectSortDeclaration(
                     const .overridden(
-                      .late(.final_(
-                        .typed(.nullable(.initialized(.public(.fields)))),
-                      )),
+                      .late(
+                        .final_(
+                          .typed(.nullable(.initialized(.public(.fields)))),
+                        ),
+                      ),
                     ),
                   );
                 });
@@ -1596,9 +1598,11 @@ void main() {
                 test('fields', () {
                   expectSortDeclaration(
                     const .overridden(
-                      .late(.final_(
-                        .typed(.nullable(.initialized(.private(.fields)))),
-                      )),
+                      .late(
+                        .final_(
+                          .typed(.nullable(.initialized(.private(.fields)))),
+                        ),
+                      ),
                     ),
                   );
                 });

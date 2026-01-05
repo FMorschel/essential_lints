@@ -1,4 +1,5 @@
-import 'package:essential_lints_annotations/essential_lints_annotations.dart' as ela;
+import 'package:essential_lints_annotations/essential_lints_annotations.dart'
+    as ela;
 
 /// Example of subtype naming convention.
 ///
@@ -18,4 +19,3 @@ class Baz extends Foo {}
 class Qux implements Foo {}
 
 class Other with Foo {}
-

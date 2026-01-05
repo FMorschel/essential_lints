@@ -71,8 +71,7 @@ void f(bool a) {
   }
 
   Future<void> test_duplicate_carret_int() async {
-    await assertNoDiagnostics(
-      '''
+    await assertNoDiagnostics('''
 void f(int a) {
   if (a ^ a == 0) {}
 }

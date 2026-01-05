@@ -16,13 +16,16 @@ class IsFutureTest extends LintTestProcessor {
   LintRule get rule => IsFutureRule();
 
   Future<void> test_isDynamic() async {
-    await assertDiagnostics('''
+    await assertDiagnostics(
+      '''
 import 'dart:async';
 
 void f<T>(FutureOr<T> value) {
   if (value is Future) {}
 }
-''', [lint(68, 6)]);
+''',
+      [lint(68, 6)],
+    );
   }
 
   Future<void> test_isNotFuture() async {
@@ -36,12 +39,15 @@ void f<T extends int>(FutureOr<T> value) {
   }
 
   Future<void> test_isDynamic_doubleBound() async {
-    await assertDiagnostics('''
+    await assertDiagnostics(
+      '''
 import 'dart:async';
 
 void f<T, O extends T>(FutureOr<O> value) {
   if (value is Future) {}
 }
-''', [lint(81, 6)]);
+''',
+      [lint(81, 6)],
+    );
   }
 }

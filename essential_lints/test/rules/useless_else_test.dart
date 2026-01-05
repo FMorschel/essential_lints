@@ -35,8 +35,7 @@ void f(bool a) {
   }
 
   Future<void> test_notExiting() async {
-    await assertNoDiagnostics(
-      '''
+    await assertNoDiagnostics('''
 void f(bool a) {
   if (a) {
   } else {

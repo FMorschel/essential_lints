@@ -539,8 +539,7 @@ class A {
   }
 
   Future<void> test_variable() async {
-    await assertNoDiagnostics(
-      '''
+    await assertNoDiagnostics('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
 const a = GettersInMemberList(memberListName: #members);
@@ -561,6 +560,8 @@ const a = GettersInMemberList(memberListName: #_members);
 
 @a
 class A {}
-''', [lint(148, 1)]);
+''',
+      [lint(148, 1)],
+    );
   }
 }

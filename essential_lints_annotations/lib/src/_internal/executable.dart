@@ -15,6 +15,7 @@ class GetExample {
 
   /// The default output directory for the get_example executable.
   final String defaultOutputDir;
+
   /// The default source path in the repository to extract.
   final String defaultSourcePath;
 

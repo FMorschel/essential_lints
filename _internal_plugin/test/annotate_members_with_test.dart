@@ -48,8 +48,7 @@ class C {
   }
 
   Future<void> test_noMissingAnnotationType() async {
-    await assertNoDiagnostics(
-      '''
+    await assertNoDiagnostics('''
 import 'package:essential_lints_annotations/src/_internal/annotate_members_with.dart';
 
 @AnnotateMembersWith(Deprecated)

@@ -12,8 +12,9 @@ const _gettersInMemberList = GettersInMemberList(
 
 /// Class representing statical context for [Modifier]s.
 @SubtypeAnnotating(
-    annotations: [_gettersInMemberList], option: SubtypeOption.onlyAbstract,
-    )
+  annotations: [_gettersInMemberList],
+  option: SubtypeOption.onlyAbstract,
+)
 /*sealed*/ abstract class _StaticalContext extends _Modifiable {
   const _StaticalContext._() : super._();
 }

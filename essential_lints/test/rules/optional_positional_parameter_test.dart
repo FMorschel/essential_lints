@@ -40,8 +40,11 @@ void f(int a, {int? b}) {}
   }
 
   Future<void> test_multiple() async {
-    await assertDiagnostics('''
+    await assertDiagnostics(
+      '''
 void f(int a, [int? b, int? c]) {}
-''', [lint(20, 1)]);
+''',
+      [lint(20, 1)],
+    );
   }
 }
