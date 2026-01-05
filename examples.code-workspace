@@ -1,0 +1,23 @@
+{
+  "folders": [
+    {
+      "name": "essential_lints",
+      "path": "essential_lints/example"
+    },
+    {
+      "name": "essential_lints_annotations",
+      "path": "essential_lints_annotations/example"
+    },
+  ],
+  "editor.codeActionsOnSave": {
+    "source.sortMembers": "never"
+  },
+  "notebook.codeActionsOnSave": {
+    "source.sortMembers": "never",
+  },
+  "markdownlint.config": {
+    "MD024": {
+      "siblings_only": true
+    }
+  }
+}
