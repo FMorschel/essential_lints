@@ -176,9 +176,10 @@ mixin FixesPluginIntegration {
   }
 
   /// Returns the list of registered lint fixes.
-  Map<DiagnosticCode, List<FixGenerator>> get warningFixes {
+  // TODO(FMorschel): Replace with DiagngnosticCode when analyzer supports it.
+  Map<LintCode, List<FixGenerator>> get warningFixes {
     logger.info('Mapping warning fixes');
-    var fixes = <DiagnosticCode, List<FixGenerator>>{};
+    var fixes = <LintCode, List<FixGenerator>>{};
 
     void addFixTo(FixGenerator generator, List<EnumDiagnostic> rules) {
       for (var rule in rules) {
