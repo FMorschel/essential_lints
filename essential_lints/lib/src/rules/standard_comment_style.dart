@@ -35,7 +35,10 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
   static final _nonWhitespace = RegExp(r'^\S');
   static final _noLetter = RegExp('^[^A-Za-z]');
   static final _noUppercaseLetter = RegExp('^[^A-Z]');
+  static final _mdCompatible = RegExp(r'(#|>|-|\*|>\s)');
   static final _codeBlockDelimitor = RegExp('^```');
+  static final _ignoreForFile = RegExp('^ignore_for_file:');
+  static final _ignore = RegExp('^ignore:');
 
   final StandardCommentStyleRule rule;
 
@@ -70,6 +73,10 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
       var commentText = comment.lexeme
           .replaceFirst(_startingComment, '')
           .trimRight();
+      if (_ignore.hasMatch(commentText.trim()) ||
+          _ignoreForFile.hasMatch(commentText.trim())) {
+        continue;
+      }
       if (comment.type == .MULTI_LINE_COMMENT) {
         commentText = commentText.replaceFirst(_endOfComment, '').trimRight();
       }
@@ -89,6 +96,9 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
     for (var (:String paragraph, :CommentToken firstComment)
         in textComment.paragraphs) {
       if (paragraph.isEmpty) {
+        continue;
+      }
+      if (paragraph.startsWith(_mdCompatible)) {
         continue;
       }
       if (paragraph.startsWith(_noUppercaseLetter)) {

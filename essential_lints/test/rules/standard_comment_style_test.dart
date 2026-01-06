@@ -197,4 +197,34 @@ that does not follow the rules */
 // This comment ends in semicolon;
 ''');
   }
+
+  Future<void> test_docComment_md() async {
+    await assertNoDiagnostics('''
+/// Doc for [C].
+///
+/// ### WARNING:
+/// Something about [foo].
+///
+/// - Something
+///
+/// * Another thing
+///
+/// > A quote
+class C {
+  void foo() {}
+}
+''');
+  }
+
+  Future<void> test_ignoreForFile() async {
+    await assertNoDiagnostics('''
+// ignore_for_file: prefer_foreach, avoid_print, this is a simple example
+''');
+  }
+
+  Future<void> test_ignore() async {
+    await assertNoDiagnostics('''
+// ignore: prefer_foreach, avoid_print, this is a simple example
+''');
+  }
 }
