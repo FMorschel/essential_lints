@@ -80,7 +80,7 @@ void f() {
 ''');
   }
 
-  Future<void> test_variableDeclaration_shadowingClass() async {
+  Future<void> test_variableDeclaration_shadowingClassField() async {
     await assertNoDiagnostics('''
 class C {
   var a = 0;
@@ -153,5 +153,23 @@ class C {
 ''',
       [lint(31, 1)],
     );
+  }
+
+  Future<void> test_innerBlock_shadowingClassFieldGetterSetter() async {
+    await assertNoDiagnostics('''
+class C {
+  int a = 0;
+  int get g => 0;
+  set s(int value) {}
+  void m() {
+    for (var i in const []) {
+      var a = i;
+      var g = i;
+      var s = i;
+      print(a);
+    }
+  }
+}
+''');
   }
 }

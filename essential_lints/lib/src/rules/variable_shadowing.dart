@@ -91,22 +91,29 @@ class _VariableShadowingVisitor extends SimpleAstVisitor<void> {
       node,
     );
     if (element != null) {
-      reportForToken(node.name, element);
+      reportForTokenIfValid(node.name, element);
     }
   }
 
   @override
   void visitVariableDeclaration(VariableDeclaration node) {
-    var result = _resolveNameInPreviousScope(
+    if (node.thisOrAncestorOfType<FieldDeclaration>() != null) {
+      return;
+    }
+    var element = _resolveNameInPreviousScope(
       node.declaredFragment!.element.displayName,
       node,
     );
-    if (result != null) {
-      reportForToken(node.name, result);
+    if (element != null) {
+      reportForTokenIfValid(node.name, element);
     }
   }
 
-  void reportForToken(Token token, Element element) {
+  void reportForTokenIfValid(Token token, Element element) {
+    if (element is PropertyAccessorElement &&
+        element.enclosingElement is InstanceElement) {
+      return;
+    }
     rule.reportAtToken(
       token,
       contextMessages: [
