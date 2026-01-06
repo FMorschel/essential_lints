@@ -49,10 +49,8 @@ Element? _resolveNameInPreviousScope(String id, AstNode node) {
   }
 
   if (scope != null) {
-    var ScopeLookupResult(:getter) = scope.lookup(id);
-    if (getter != null) {
-      return getter;
-    }
+    var ScopeLookupResult(:getter, :setter) = scope.lookup(id);
+    return getter ?? setter;
   }
 
   return null;
@@ -111,7 +109,8 @@ class _VariableShadowingVisitor extends SimpleAstVisitor<void> {
 
   void reportForTokenIfValid(Token token, Element element) {
     if (element is PropertyAccessorElement &&
-        element.enclosingElement is InstanceElement) {
+            element.enclosingElement is InstanceElement ||
+        element.enclosingElement is LibraryElement) {
       return;
     }
     rule.reportAtToken(

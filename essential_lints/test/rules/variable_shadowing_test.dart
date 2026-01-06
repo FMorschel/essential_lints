@@ -172,4 +172,21 @@ class C {
 }
 ''');
   }
+
+  Future<void> test_innerBlock_shadowingTopLevelFieldGetterSetter() async {
+    await assertNoDiagnostics('''
+int a = 0;
+int get g => 0;
+set s(int value) {}
+
+void f() {
+  for (var i in const []) {
+    var a = i;
+    var g = i;
+    var s = i;
+    print(a);
+  }
+}
+''');
+  }
 }
