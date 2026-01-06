@@ -65,7 +65,7 @@ Add `essential_lints` in your `analysis_options.yaml` plugins:
 ```yaml
 plugins:
   essential_lints:
-    version: ^0.1.2
+    version: ^0.1.3
     diagnostics:
       - alphabetize_arguments
       - alphabetize_enum_constants
@@ -78,7 +78,6 @@ plugins:
       - empty_container
       - equal_statement
       - first_getter
-      - getters_in_member_list
       - is_future
       - last_getter
       - mutable_tearoff
@@ -91,8 +90,6 @@ plugins:
       - returning_widgets
       - same_package_direct_import
       - standard_comment_style
-      - subtype_annotating
-      - subtype_naming
       - unnecessary_setstate
       - useless_else
       - variable_shadowing

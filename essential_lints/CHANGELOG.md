@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.3
+
+Released on: 2026-01-06
+
+- Fixes `standard_comment_style` rule to allow markdown compatible comments (like headings, lists, blockquotes) to pass without linting errors.
+- Fixes `variable_shadowing` rule to avoid false positives in certain scenarios.
+- Fixes `mutable_tearoff` rule to avoid false positives with property accessors.
+
 ## 0.1.2
 
 Released on: 2026-01-05
