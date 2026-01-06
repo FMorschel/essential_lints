@@ -3,6 +3,7 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 
 import '../utils/extensions/ast.dart';
 import 'rule.dart';
@@ -91,6 +92,16 @@ class _MutableTearoffsVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (node.thisOrAncestorOfType<CommentReference>() != null) {
+      return;
+    }
+    if (node.parent is! PrefixedIdentifier && node.parent is! PropertyAccess) {
+      var element = node.element;
+      if (element is! PropertyAccessorElement ||
+          !element.variable.type.isFunction) {
+        return;
+      }
+    }
     if (node.parent case PrefixedIdentifier(
       :var prefix,
     ) when prefix.unParenthesized != node) {
@@ -119,6 +130,7 @@ class _MutableTearoffsVisitor extends SimpleAstVisitor<void> {
     var element = node.element;
     if (element is PropertyAccessorElement && element.variable.isSynthetic) {
       rule.reportAtNode(node);
+      return;
     }
     if (element is! PropertyAccessorElement && element is! MethodElement) {
       return;
@@ -138,5 +150,13 @@ class _MutableTearoffsVisitor extends SimpleAstVisitor<void> {
         element.isPublic) {
       rule.reportAtNode(node);
     }
+  }
+}
+
+extension on DartType? {
+  bool get isFunction {
+    var self = this;
+    if (self == null) return false;
+    return self.isDartCoreFunction || self is FunctionType;
   }
 }

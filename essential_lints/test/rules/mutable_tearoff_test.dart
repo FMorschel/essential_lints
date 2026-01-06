@@ -25,6 +25,26 @@ class A {
 ''');
   }
 
+  Future<void> test_fieldGetter() async {
+    await assertNoDiagnostics('''
+class A {
+  final int field = 0;
+  void foo(int _) {
+    foo(field);
+  }
+}
+''');
+  }
+
+  Future<void> test_commentReference() async {
+    await assertNoDiagnostics('''
+class A {
+  /// This is a comment about [foo] which is [A.foo].
+  void foo() {}
+}
+''');
+  }
+
   Future<void> test_deepCall() async {
     await assertDiagnostics(
       '''
