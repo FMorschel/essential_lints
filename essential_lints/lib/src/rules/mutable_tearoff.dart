@@ -95,27 +95,33 @@ class _MutableTearoffsVisitor extends SimpleAstVisitor<void> {
     if (node.thisOrAncestorOfType<CommentReference>() != null) {
       return;
     }
-    if (node.parent is! PrefixedIdentifier && node.parent is! PropertyAccess) {
+    var parent = node.parent;
+    if (parent case ParenthesizedExpression(:var lastParenthesizedParent)) {
+      parent = lastParenthesizedParent.parent;
+    }
+    if (parent is! PrefixedIdentifier && parent is! PropertyAccess) {
       var element = node.element;
       if (element is! PropertyAccessorElement ||
           !element.variable.type.isFunction) {
         return;
       }
     }
-    if (node.parent case PrefixedIdentifier(
+    if (parent case PrefixedIdentifier(
       :var prefix,
-    ) when prefix.unParenthesized != node) {
+      expressionType: var lastMemberType,
+    ) when prefix.unParenthesized != node || !lastMemberType.isFunction) {
       return;
     }
-    if (node.parent case PropertyAccess(
+    if (parent case PropertyAccess(
       :var target,
-    ) when target?.unParenthesized != node) {
+      expressionType: var lastMemberType,
+    ) when target?.unParenthesized != node || !lastMemberType.isFunction) {
       return;
     }
-    if (node.parent is MethodInvocation) {
+    if (parent is MethodInvocation) {
       return;
     }
-    if (node.element is MethodElement && node.parent is ArgumentList) {
+    if (node.element is MethodElement && parent is ArgumentList) {
       return;
     }
     _reportIfMayBeMutable(node);
@@ -158,5 +164,31 @@ extension on DartType? {
     var self = this;
     if (self == null) return false;
     return self.isDartCoreFunction || self is FunctionType;
+  }
+}
+
+extension on Expression {
+  DartType? get expressionType {
+    var self = this;
+    if (self is! PropertyAccess &&
+        self is! PrefixedIdentifier &&
+        self is! FunctionReference &&
+        self is! ParenthesizedExpression) {
+      return null; // We don't care.
+    }
+    if (parent case Expression(:var expressionType)) {
+      return expressionType;
+    }
+    return staticType;
+  }
+}
+
+extension on ParenthesizedExpression {
+  ParenthesizedExpression get lastParenthesizedParent {
+    var parent = this.parent;
+    if (parent is ParenthesizedExpression) {
+      return parent.lastParenthesizedParent;
+    }
+    return this;
   }
 }

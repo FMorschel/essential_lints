@@ -229,6 +229,24 @@ class A {
 ''');
   }
 
+  Future<void> test_fieldField() async {
+    await assertNoDiagnostics('''
+class A {
+  final int field = 0;
+  bool m(int other) => other.isEven == field.isEven;
+}
+''');
+  }
+
+  Future<void> test_field_propertyAccess() async {
+    await assertNoDiagnostics('''
+class A {
+  final int field = 0;
+  bool m(int other) => other.isEven == (field).isEven;
+}
+''');
+  }
+
   Future<void> test_staticConstField() async {
     await assertNoDiagnostics('''
 class A {
