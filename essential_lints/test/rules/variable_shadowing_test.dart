@@ -1,3 +1,4 @@
+import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:essential_lints/src/rules/rule.dart';
 import 'package:essential_lints/src/rules/variable_shadowing.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
@@ -27,7 +28,7 @@ void f() {
 ''');
   }
 
-  Future<void> test_variableDeclaration_shadowing() async {
+  Future<void> test_variableDeclaration_shadowingBlock() async {
     await assertDiagnostics(
       '''
 void f() {
@@ -39,6 +40,33 @@ void f() {
 }
 ''',
       [lint(36, 1)],
+    );
+  }
+
+  Future<void> test_variableDeclaration_shadowingContext() async {
+    await assertDiagnostics(
+      '''
+void f() {
+  var a = 1;
+  {
+    var a = 2;
+    print(a);
+  }
+}
+''',
+      [
+        lint(
+          36,
+          1,
+          contextMessages: [
+            contextMessage(
+              testFile,
+              17,
+              1,
+            ),
+          ],
+        ),
+      ],
     );
   }
 

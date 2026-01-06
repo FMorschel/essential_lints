@@ -1,14 +1,17 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/scope.dart';
 import 'package:analyzer/src/generated/resolver.dart' // ignore: implementation_imports, not exposed api
     show ScopeResolverVisitor;
 
+import '../utils/diagnostic_message.dart';
 import 'rule.dart';
 
-bool _resolveNameInPreviousScope(String id, AstNode node) {
+Element? _resolveNameInPreviousScope(String id, AstNode node) {
   Scope? scope;
   var skipNext = true;
   for (AstNode? context = node; context != null; context = context.parent) {
@@ -29,7 +32,7 @@ bool _resolveNameInPreviousScope(String id, AstNode node) {
       if (declaredParameters != null) {
         for (var parameter in declaredParameters.parameters) {
           if (parameter.declaredFragment?.element.displayName == id) {
-            return true;
+            return parameter.declaredFragment?.element;
           }
         }
       }
@@ -48,11 +51,11 @@ bool _resolveNameInPreviousScope(String id, AstNode node) {
   if (scope != null) {
     var ScopeLookupResult(:getter) = scope.lookup(id);
     if (getter != null) {
-      return true;
+      return getter;
     }
   }
 
-  return false;
+  return null;
 }
 
 /// {@template variable_shadowing}
@@ -83,12 +86,12 @@ class _VariableShadowingVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitDeclaredVariablePattern(DeclaredVariablePattern node) {
-    var result = _resolveNameInPreviousScope(
+    var element = _resolveNameInPreviousScope(
       node.declaredFragment!.element.displayName,
       node,
     );
-    if (result) {
-      rule.reportAtToken(node.name);
+    if (element != null) {
+      reportForToken(node.name, element);
     }
   }
 
@@ -98,8 +101,24 @@ class _VariableShadowingVisitor extends SimpleAstVisitor<void> {
       node.declaredFragment!.element.displayName,
       node,
     );
-    if (result) {
-      rule.reportAtToken(node.name);
+    if (result != null) {
+      reportForToken(node.name, result);
     }
+  }
+
+  void reportForToken(Token token, Element element) {
+    rule.reportAtToken(
+      token,
+      contextMessages: [
+        DiagnosticMessageImpl(
+          filePath: element.firstFragment.libraryFragment!.source.fullName,
+          offset:
+              element.firstFragment.nameOffset ?? element.firstFragment.offset,
+          length: element.firstFragment.name?.length ?? 1,
+          message: 'Previous declaration is here.',
+          url: null,
+        ),
+      ],
+    );
   }
 }
