@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.5
+
+Released on: 2026-01-07
+
+- Fixes `standard_comment_style` for some token sequences that made it stop looking.
+
 ## 0.1.4
 
 Released on: 2026-01-07
