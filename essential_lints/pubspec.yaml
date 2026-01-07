@@ -1,6 +1,6 @@
 name: essential_lints
 description: New lint rules for Dart/Flutter projects and related fixes.
-version: 0.1.5
+version: 0.1.6
 
 executables:
   essential_lints_get_example: get_example

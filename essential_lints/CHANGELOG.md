@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.6
+
+Released on: 2026-01-07
+
+- Fixes `standard_comment_style` to be compatible with `dartdoc`.
+
 ## 0.1.5
 
 Released on: 2026-01-07
