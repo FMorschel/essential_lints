@@ -36,6 +36,7 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
   static final _noLetter = RegExp('^[^A-Za-z]');
   static final _noUppercaseLetter = RegExp('^[^A-Z]');
   static final _mdCompatible = RegExp(r'(#|>|-|\*|>\s)');
+  static final _dartdocCompatible = RegExp(r'\{@.*\}');
   static final _codeBlockDelimitor = RegExp('^```');
   static final _ignoreForFile = RegExp('^ignore_for_file:');
   static final _ignore = RegExp('^ignore:');
@@ -98,6 +99,11 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
     }
     for (var (:String paragraph, :CommentToken firstComment)
         in textComment.paragraphs) {
+      if (paragraph.startsWith(_dartdocCompatible)) {
+        paragraph = paragraph.substring(
+          _dartdocCompatible.firstMatch(paragraph)!.end,
+        ).trim();
+      }
       if (paragraph.isEmpty) {
         continue;
       }

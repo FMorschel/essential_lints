@@ -242,4 +242,18 @@ class C {}
       [lint(19, 10), lint(37, 7), lint(52, 7)],
     );
   }
+
+  Future<void> test_dartDoc() async {
+    await assertNoDiagnostics('''
+/// {@template c}
+/// An example of dartdoc comment
+/// {@endtemplate}
+class C {
+  /// This is a doc for the constructor.
+  ///
+  /// {@macro c}
+  C();
+}
+''');
+  }
 }
