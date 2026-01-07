@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.4
+
+Released on: 2026-01-07
+
+- Fixes warnings to be ignorable.
+- Adds some fixes for warnings and for `first_getter` and `last_getter` rules.
+
 ## 0.1.3
 
 Released on: 2026-01-06
