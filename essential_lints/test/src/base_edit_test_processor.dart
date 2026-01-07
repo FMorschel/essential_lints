@@ -23,10 +23,13 @@ import 'package:analyzer_plugin/protocol/protocol.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:essential_lints/src/plugin_integration.dart';
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 import 'package:test/test.dart';
+import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import 'built_in_rules.dart';
 
+@SubtypeAnnotating(annotations: [reflectiveTest], option: .onlyConcrete)
 abstract class BaseEditTestProcessor extends AnalysisRuleTest
     with
         _PrivateMixin,
@@ -67,11 +70,20 @@ abstract class BaseEditTestProcessor extends AnalysisRuleTest
       (change != null) ^ (fileEdit != null),
       'Provide either change or fileEdit, not both.',
     );
-    expect(change?.edits ?? const <Object>[1], hasLength(1));
+    expect(
+      change?.edits ?? const <Object>[1],
+      hasLength(1),
+      reason:
+          'Expected a single file edit, found ${change?.edits.length ?? 0}.',
+    );
     fileEdit = change?.edits.single ?? fileEdit!;
     String code;
     if (target != null) {
-      expect(fileEdit.file, target);
+      expect(
+        fileEdit.file,
+        target,
+        reason: 'Expected file $target, found ${fileEdit.file}',
+      );
       code = original ?? getFile(target).readAsStringSync();
     } else {
       code = original ?? this.code;

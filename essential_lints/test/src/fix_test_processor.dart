@@ -19,6 +19,7 @@ import 'base_edit_test_processor.dart';
 
 typedef DiagnosticFilter = bool Function(Diagnostic diagnostic);
 
+// ignore: _internal_plugin/subtype_annotating not necessary
 mixin EditTestProcessorMixin on BaseEditTestProcessor {
   EnumFix get fix;
 
@@ -38,7 +39,11 @@ mixin EditTestProcessorMixin on BaseEditTestProcessor {
       matchFixMessage: matchFixMessage,
       allowFixAllFixes: allowFixAllFixes,
     );
-    expect(fix, hasLength(1));
+    expect(
+      fix,
+      hasLength(1),
+      reason: 'Expected a single fix, found ${fix.length}.',
+    );
     matchesExpected(expected, change: fix.single.change, target: target);
   }
 
@@ -46,7 +51,7 @@ mixin EditTestProcessorMixin on BaseEditTestProcessor {
     var diagnostic = _singleDiagnostic(filter: filter);
     var fixes = await _computeFixes(diagnostic);
     var fix = _parseFix(fixes);
-    expect(fix, isEmpty);
+    expect(fix, isEmpty, reason: 'Expected no fixes, found ${fix.length}.');
   }
 
   /// Computes fixes for the given [diagnostic] in [testUnit].
@@ -111,7 +116,7 @@ mixin EditTestProcessorMixin on BaseEditTestProcessor {
       diagnostics = diagnostics.where(filter).toList();
     }
     if (diagnostics.isEmpty) {
-      expect(diagnostics, hasLength(1));
+      expect(diagnostics, hasLength(1), reason: 'No diagnostics found.');
     }
     if (diagnostics.length > 1) {
       fail(

@@ -111,6 +111,24 @@ enum EssentialLintFixes implements EnumFix {
       'Remove useless else',
     ),
   ),
+
+  /// Fix to replace `[0]` with `.first`.
+  replaceWithFirst(
+    FixKind(
+      'dart.fix.replaceWithFirst',
+      DartFixKindPriority.standard,
+      "Replace with '.first'",
+    ),
+  ),
+
+  /// Fix to replace `[length - 1]` with `.last`.
+  replaceWithLast(
+    FixKind(
+      'dart.fix.replaceWithLast',
+      DartFixKindPriority.standard,
+      "Replace with '.last'",
+    ),
+  ),
   ;
 
   const EssentialLintFixes(this.fixKind);

@@ -6,9 +6,7 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/dart/element/type.dart';
 
-import '../utils/extensions/ast.dart';
 import 'rule.dart';
 
 /// {@template first_getter}
@@ -41,20 +39,9 @@ class _PreferFirstVisitor extends SimpleAstVisitor<void> {
   @override
   void visitIndexExpression(IndexExpression node) {
     var target = node.target;
-    DartType? type;
-    Element? targetElement;
-
-    if (target
-        case SimpleIdentifier(:var staticType, :var element) ||
-            ThisExpression(
-              :var staticType,
-              enclosingTypeElement: Element? element,
-            )) {
-      targetElement = element;
-      type = staticType;
-    }
+    var type = target?.staticType;
     var element = type?.element;
-    if (element == null || targetElement == null) {
+    if (element == null) {
       super.visitIndexExpression(node);
       return;
     }

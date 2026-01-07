@@ -17,7 +17,9 @@ import 'fixes/essential_lint_fixes.dart';
 import 'fixes/numeric_constant_style.dart';
 import 'fixes/remove_expression.dart';
 import 'fixes/replace_with_border_radius_all.dart';
+import 'fixes/replace_with_first.dart';
 import 'fixes/replace_with_from_border_side.dart';
+import 'fixes/replace_with_last.dart';
 import 'fixes/replace_with_squared_box.dart';
 import 'fixes/same_package_direct_import.dart';
 import 'fixes/sort_enum_constants.dart';
@@ -168,6 +170,14 @@ mixin FixesPluginIntegration {
         .removeUselessElse => addFixTo(
           RemoveUselessElseAssistFix.new,
           [.uselessElse],
+        ),
+        .replaceWithFirst => addFixTo(
+          ReplaceWithFirstFix.new,
+          [.firstGetter],
+        ),
+        .replaceWithLast => addFixTo(
+          ReplaceWithLastFix.new,
+          [.lastGetter],
         ),
       };
     }

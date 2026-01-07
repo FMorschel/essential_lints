@@ -26,8 +26,8 @@ abstract class MultiWarningRule<T extends SubWarnings>
 
   @override
   List<DiagnosticCode> get diagnosticCodes => [
-    rule.code,
-    ...subWarnings.map((e) => e.code),
+    rule,
+    ...subWarnings,
   ];
 
   /// The list of sub-warnings associated with this analysis rule.

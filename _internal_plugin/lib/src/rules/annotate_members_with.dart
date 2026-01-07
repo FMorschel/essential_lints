@@ -11,7 +11,7 @@ import 'package:essential_lints/src/utils/dart_object_to_string.dart';
 
 import 'diagnostic.dart';
 
-class AnnotateMembersWithRule extends MultiAnalysisRule {
+class AnnotateMembersWithRule extends AnalysisRule {
   AnnotateMembersWithRule()
     : super(
         name: _diagnostic.name,
@@ -26,12 +26,8 @@ class AnnotateMembersWithRule extends MultiAnalysisRule {
     severity: .ERROR,
   );
 
-  final DiagnosticCode diagnosticCode = _diagnostic;
-
   @override
-  List<DiagnosticCode> get diagnosticCodes => [
-    diagnosticCode,
-  ];
+  final DiagnosticCode diagnosticCode = _diagnostic;
 
   @override
   void registerNodeProcessors(
@@ -131,19 +127,16 @@ class _AnnotateMembersWithVisitor extends GeneralizingAstVisitor<void> {
             rule.reportAtToken(
               name,
               arguments: [requiredAnnotationString],
-              diagnosticCode: rule.diagnosticCode,
             );
           } else if (node case ConstructorDeclaration(:var returnType)) {
             rule.reportAtNode(
               returnType,
               arguments: [requiredAnnotationString],
-              diagnosticCode: rule.diagnosticCode,
             );
           } else {
             rule.reportAtNode(
               node,
               arguments: [requiredAnnotationString],
-              diagnosticCode: rule.diagnosticCode,
             );
           }
         }
