@@ -53,13 +53,16 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
   void _gatherComments(Token? token) {
     var list = <CommentToken>[];
     while (token != null && (!token.isEof || token.precedingComments != null)) {
+      var current = token;
       Token? commentToken = token.precedingComments;
       while (commentToken is CommentToken) {
         list.add(commentToken);
-        token = commentToken = commentToken.next;
+        token = commentToken = commentToken.next ?? current;
       }
-      _handleCommentList(list);
-      list.clear();
+      if (list.isNotEmpty) {
+        _handleCommentList(list);
+        list.clear();
+      }
       if (token?.next == token) {
         break;
       }

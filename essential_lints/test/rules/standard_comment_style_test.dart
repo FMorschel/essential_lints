@@ -227,4 +227,19 @@ class C {
 // ignore: prefer_foreach, avoid_print, this is a simple example
 ''');
   }
+
+  Future<void> test_eolArgument_many() async {
+    await assertDiagnostics(
+      '''
+final _ = [
+  C(), // Comment
+  C(), // here
+  C(), // test
+];
+
+class C {}
+''',
+      [lint(19, 10), lint(37, 7), lint(52, 7)],
+    );
+  }
 }
