@@ -100,9 +100,11 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
     for (var (:String paragraph, :CommentToken firstComment)
         in textComment.paragraphs) {
       if (paragraph.startsWith(_dartdocCompatible)) {
-        paragraph = paragraph.substring(
-          _dartdocCompatible.firstMatch(paragraph)!.end,
-        ).trim();
+        paragraph = paragraph
+            .substring(
+              _dartdocCompatible.firstMatch(paragraph)!.end,
+            )
+            .trim();
       }
       if (paragraph.isEmpty) {
         continue;

@@ -52,10 +52,13 @@ void f(List<int> numbers) {
   }
 
   Future<void> test_literal() async {
-    await assertDiagnostics('''
+    await assertDiagnostics(
+      '''
 void f() {
   var firstNumber = [1, 2, 3][0];
 }
-''', [lint(40, 3)]);
+''',
+      [lint(40, 3)],
+    );
   }
 }
