@@ -94,4 +94,20 @@ import 'a.dart';
 void f(A a) {}
 ''');
   }
+
+  Future<void> test_testFolder() async {
+    newFile(join(testPackageLibPath, 'a.dart'), 'class A {}');
+    newFile(join(testPackageLibPath, 'export.dart'), "export 'a.dart';");
+    testFile = newFile(join(testPackageRootPath, 'test', 'test.dart'), '');
+    await resolveTestCode('''
+import 'package:test/export.dart';
+
+void f(A a) {}
+''');
+    await assertHasFix('''
+import 'package:test/a.dart';
+
+void f(A a) {}
+''');
+  }
 }

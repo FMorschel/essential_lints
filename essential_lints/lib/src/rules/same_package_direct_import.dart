@@ -37,11 +37,14 @@ class SamePackageDirectImportVisitor extends SimpleAstVisitor<void> {
   SamePackageDirectImportVisitor._({
     SamePackageDirectImportRule? rule,
     RuleContext? context,
-  }) : _context = context,
-       _rule = rule;
+    PubPackage? pubPackage,
+  }) : _pubPackage = pubPackage,
+       _rule = rule,
+       _context = context;
 
   final SamePackageDirectImportRule? _rule;
   final RuleContext? _context;
+  final PubPackage? _pubPackage;
 
   /// A callback of all detected URIs.
   final Set<Uri> _uris = {};
@@ -70,12 +73,9 @@ class SamePackageDirectImportVisitor extends SimpleAstVisitor<void> {
           return;
         }
         var packageName = uri.pathSegments.first;
-        var package = _context?.package;
-        if (package is! PubPackage) {
-          super.visitImportDirective(node);
-          return;
-        }
-        if (packageName != package.pubspec?.name?.value.text) {
+        var package = _pubPackage ?? _context?.package;
+        if (package is! PubPackage ||
+            packageName != package.pubspec?.name?.value.text) {
           super.visitImportDirective(node);
           return;
         }
@@ -97,8 +97,11 @@ class SamePackageDirectImportVisitor extends SimpleAstVisitor<void> {
 
   /// Collects all URIs of direct imports within the same package found for the
   /// given [importDirective].
-  static Set<Uri> uris(ImportDirective importDirective) {
-    var visitor = SamePackageDirectImportVisitor._();
+  static Set<Uri> uris(
+    ImportDirective importDirective,
+    PubPackage? pubPackage,
+  ) {
+    var visitor = SamePackageDirectImportVisitor._(pubPackage: pubPackage);
     importDirective.accept(visitor);
     return visitor._uris;
   }

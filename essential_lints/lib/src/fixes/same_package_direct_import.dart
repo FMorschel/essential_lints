@@ -1,5 +1,7 @@
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/src/workspace/pub.dart'; // ignore: implementation_imports, not exported
+import 'package:analyzer/src/workspace/workspace.dart';
 import 'package:analyzer_plugin/src/utilities/change_builder/change_builder_dart.dart'; // ignore: implementation_imports, needed for imports
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
@@ -23,6 +25,9 @@ class SamePackageDirectImportFix extends ResolvedCorrectionProducer
   @override
   EssentialLintFixes get fix => .samePackageDirectImportFix;
 
+  Workspace get _workspace =>
+      sessionHelper.session.analysisContext.contextRoot.workspace;
+
   @override
   Future<void> compute(ChangeBuilder builder) async {
     if (diagnostic == null) {
@@ -32,8 +37,16 @@ class SamePackageDirectImportFix extends ResolvedCorrectionProducer
     if (node is! ImportDirective) {
       return;
     }
-
-    var uris = SamePackageDirectImportVisitor.uris(node);
+    PubPackage pubPackage;
+    var libraryPackage = _workspace.findPackageFor(
+      unitResult.libraryElement.firstFragment.source.fullName,
+    );
+    if (libraryPackage is PubPackage) {
+      pubPackage = libraryPackage;
+    } else {
+      return;
+    }
+    var uris = SamePackageDirectImportVisitor.uris(node, pubPackage);
     if (uris.isEmpty) {
       return;
     }
