@@ -1,1 +1,1 @@
-include: ../analysis_options.yaml
+include: package:essential_lints_annotations/src/_internal/analysis_options.yaml

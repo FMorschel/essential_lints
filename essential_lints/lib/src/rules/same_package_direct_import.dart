@@ -4,7 +4,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/src/dart/resolver/scope.dart'; // ignore: implementation_imports, not exported
-import 'package:analyzer/src/workspace/pub.dart'; // ignore: implementation_imports, not exported
+import 'package:analyzer/workspace/workspace.dart';
 
 import 'rule.dart';
 
@@ -37,14 +37,14 @@ class SamePackageDirectImportVisitor extends SimpleAstVisitor<void> {
   SamePackageDirectImportVisitor._({
     SamePackageDirectImportRule? rule,
     RuleContext? context,
-    PubPackage? pubPackage,
-  }) : _pubPackage = pubPackage,
+    WorkspacePackage? package,
+  }) : _package = package,
        _rule = rule,
        _context = context;
 
   final SamePackageDirectImportRule? _rule;
   final RuleContext? _context;
-  final PubPackage? _pubPackage;
+  final WorkspacePackage? _package;
 
   /// A callback of all detected URIs.
   final Set<Uri> _uris = {};
@@ -72,10 +72,13 @@ class SamePackageDirectImportVisitor extends SimpleAstVisitor<void> {
           super.visitImportDirective(node);
           return;
         }
-        var packageName = uri.pathSegments.first;
-        var package = _pubPackage ?? _context?.package;
-        if (package is! PubPackage ||
-            packageName != package.pubspec?.name?.value.text) {
+        var source = libraryImport.importedLibrary?.firstFragment.source;
+        if (source == null) {
+          super.visitImportDirective(node);
+          return;
+        }
+        var package = _package ?? _context?.package;
+        if (!(package?.contains(source) ?? false)) {
           super.visitImportDirective(node);
           return;
         }
@@ -99,9 +102,9 @@ class SamePackageDirectImportVisitor extends SimpleAstVisitor<void> {
   /// given [importDirective].
   static Set<Uri> uris(
     ImportDirective importDirective,
-    PubPackage? pubPackage,
+    WorkspacePackage? package,
   ) {
-    var visitor = SamePackageDirectImportVisitor._(pubPackage: pubPackage);
+    var visitor = SamePackageDirectImportVisitor._(package: package);
     importDirective.accept(visitor);
     return visitor._uris;
   }

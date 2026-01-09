@@ -1,20 +1,4 @@
-include: package:very_good_analysis/analysis_options.yaml
-
-linter:
-  rules:
-    always_use_package_imports: false
-    parameter_assignments: false
-    prefer_relative_imports: true
-    unnecessary_await_in_return: false
-    prefer_final_locals: false
-    prefer_final_in_for_each: false
-    unnecessary_final: true
-
-analyzer:
-  language:
-    strict-casts: true
-    strict-inference: true
-    strict-raw-types: true
+include: essential_lints_annotations\lib\src\_internal\analysis_options.yaml
 
 plugins:
   _internal_plugin:

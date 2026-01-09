@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.7
+
+Released on: 2026-01-09
+
+- Fixes `Use direct import` fix for non-lib files.
+
 ## 0.1.6
 
 Released on: 2026-01-07

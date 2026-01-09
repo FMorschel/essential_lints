@@ -1,3 +1,4 @@
+import 'package:analyzer/utilities/package_config_file_builder.dart';
 import 'package:analyzer_testing/utilities/utilities.dart';
 import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
 import 'package:essential_lints/src/rules/rule.dart';
@@ -98,7 +99,87 @@ void f(A a) {}
   Future<void> test_testFolder() async {
     newFile(join(testPackageLibPath, 'a.dart'), 'class A {}');
     newFile(join(testPackageLibPath, 'export.dart'), "export 'a.dart';");
+    // Change it so the test file is in the `test` folder.
     testFile = newFile(join(testPackageRootPath, 'test', 'test.dart'), '');
+    await resolveTestCode('''
+import 'package:test/export.dart';
+
+void f(A a) {}
+''');
+    await assertHasFix('''
+import 'package:test/a.dart';
+
+void f(A a) {}
+''');
+  }
+
+  Future<void> test_innerPubPackage() async {
+    newFile(testPackagePubspecPath, '''
+${pubspecYamlContent(name: 'test')}
+
+workspace:
+  - another
+''');
+    var anotherPackageRootPath = join(testPackageRootPath, 'another');
+    var anotherPackageLibPath = join(anotherPackageRootPath, 'lib');
+    newFile(
+      join(anotherPackageRootPath, 'pubspec.yaml'),
+      '''
+${pubspecYamlContent(name: 'another')}
+
+resolution: workspace
+''',
+    );
+    newPackageConfigJsonFileFromBuilder(
+      testPackageRootPath,
+      PackageConfigFileBuilder()
+        ..add(name: 'test', rootPath: testPackageRootPath)
+        ..add(name: 'another', rootPath: anotherPackageRootPath),
+    );
+    newFile(join(anotherPackageLibPath, 'a.dart'), 'class A {}');
+    newFile(join(anotherPackageLibPath, 'export.dart'), "export 'a.dart';");
+    // Change it so the test file is in the `another` package.
+    testFile = newFile(
+      join(anotherPackageLibPath, 'test.dart'),
+      '',
+    );
+    await resolveTestCode('''
+import 'package:another/export.dart';
+
+void f(A a) {}
+''');
+    await assertHasFix('''
+import 'package:another/a.dart';
+
+void f(A a) {}
+''');
+  }
+
+  Future<void> test_outerPubPackage() async {
+    newFile(testPackagePubspecPath, '''
+${pubspecYamlContent(name: 'test')}
+
+workspace:
+  - another
+''');
+    var anotherPackageRootPath = join(testPackageRootPath, 'another');
+    newFile(
+      join(anotherPackageRootPath, 'pubspec.yaml'),
+      '''
+${pubspecYamlContent(name: 'another')}
+
+resolution: workspace
+''',
+    );
+    newPackageConfigJsonFileFromBuilder(
+      testPackageRootPath,
+      PackageConfigFileBuilder()
+        ..add(name: 'test', rootPath: testPackageRootPath)
+        ..add(name: 'another', rootPath: anotherPackageRootPath),
+    );
+    newFile(join(testPackageLibPath, 'a.dart'), 'class A {}');
+    newFile(join(testPackageLibPath, 'export.dart'), "export 'a.dart';");
+    // Change it so the test file is in the `another` package.
     await resolveTestCode('''
 import 'package:test/export.dart';
 

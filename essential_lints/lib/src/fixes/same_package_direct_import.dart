@@ -1,7 +1,6 @@
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/src/workspace/pub.dart'; // ignore: implementation_imports, not exported
-import 'package:analyzer/src/workspace/workspace.dart';
+import 'package:analyzer/src/workspace/workspace.dart'; // ignore: implementation_imports, not exported
 import 'package:analyzer_plugin/src/utilities/change_builder/change_builder_dart.dart'; // ignore: implementation_imports, needed for imports
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
@@ -37,16 +36,13 @@ class SamePackageDirectImportFix extends ResolvedCorrectionProducer
     if (node is! ImportDirective) {
       return;
     }
-    PubPackage pubPackage;
     var libraryPackage = _workspace.findPackageFor(
       unitResult.libraryElement.firstFragment.source.fullName,
     );
-    if (libraryPackage is PubPackage) {
-      pubPackage = libraryPackage;
-    } else {
+    if (libraryPackage == null) {
       return;
     }
-    var uris = SamePackageDirectImportVisitor.uris(node, pubPackage);
+    var uris = SamePackageDirectImportVisitor.uris(node, libraryPackage);
     if (uris.isEmpty) {
       return;
     }

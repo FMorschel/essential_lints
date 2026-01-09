@@ -63,9 +63,6 @@ void f() {
         rootPath: join(workspaceRootPath, 'other'),
       ),
     );
-    pubspecYamlContent(
-      dependencies: ['other'],
-    );
     await assertNoDiagnostics('''
 import 'package:other/export.dart';
 
@@ -101,5 +98,131 @@ void f(A a) {}
 ''',
       [lint(7, 13)],
     );
+  }
+
+  @FailingTest(issue: 'https://github.com/dart-lang/sdk/issues/62383')
+  Future<void> test_testFolder() async {
+    newFile(join(testPackageLibPath, 'a.dart'), 'class A {}');
+    newFile(join(testPackageLibPath, 'export.dart'), "export 'a.dart';");
+    // Change it so the test file is in the `test` folder.
+    testFile = newFile(join(testPackageRootPath, 'test', 'test.dart'), '');
+    await assertDiagnostics(
+      '''
+import 'package:test/export.dart';
+
+void f(A a) {}
+''',
+      [lint(7, 26)],
+    );
+  }
+
+  @FailingTest(issue: 'https://github.com/dart-lang/sdk/issues/62383')
+  Future<void> test_innerPubPackage() async {
+    newFile(testPackagePubspecPath, '''
+${pubspecYamlContent(name: 'test')}
+
+workspace:
+  - another
+''');
+    var anotherPackageRootPath = join(testPackageRootPath, 'another');
+    var anotherPackageLibPath = join(anotherPackageRootPath, 'lib');
+    newFile(
+      join(anotherPackageRootPath, 'pubspec.yaml'),
+      '''
+${pubspecYamlContent(name: 'another')}
+
+resolution: workspace
+''',
+    );
+    newPackageConfigJsonFileFromBuilder(
+      testPackageRootPath,
+      PackageConfigFileBuilder()
+        ..add(name: 'test', rootPath: testPackageRootPath)
+        ..add(name: 'another', rootPath: anotherPackageRootPath),
+    );
+    newFile(join(anotherPackageLibPath, 'a.dart'), 'class A {}');
+    newFile(join(anotherPackageLibPath, 'export.dart'), "export 'a.dart';");
+    // Change it so the test file is in the `another` package.
+    testFile = newFile(
+      join(anotherPackageLibPath, 'test.dart'),
+      '',
+    );
+    await assertDiagnostics(
+      '''
+import 'package:another/export.dart';
+
+void f(A a) {}
+''',
+      [lint(7, 29)],
+    );
+  }
+
+  Future<void> test_innerPubPackage_fromOther() async {
+    newFile(join(testPackageLibPath, 'a.dart'), 'class A {}');
+    newFile(join(testPackageLibPath, 'export.dart'), "export 'a.dart';");
+    newFile(testPackagePubspecPath, '''
+${pubspecYamlContent(name: 'test')}
+
+workspace:
+  - another
+''');
+    var anotherPackageRootPath = join(testPackageRootPath, 'another');
+    var anotherPackageLibPath = join(anotherPackageRootPath, 'lib');
+    newFile(
+      join(anotherPackageRootPath, 'pubspec.yaml'),
+      '''
+${pubspecYamlContent(name: 'another')}
+
+resolution: workspace
+''',
+    );
+    newPackageConfigJsonFileFromBuilder(
+      testPackageRootPath,
+      PackageConfigFileBuilder()
+        ..add(name: 'test', rootPath: testPackageRootPath)
+        ..add(name: 'another', rootPath: anotherPackageRootPath),
+    );
+    // Change it so the test file is in the `another` package.
+    testFile = newFile(
+      join(anotherPackageLibPath, 'test.dart'),
+      '',
+    );
+    await assertNoDiagnostics('''
+import 'package:test/export.dart';
+
+void f(A a) {}
+''');
+  }
+
+  Future<void> test_innerPubPackage_fromOther2() async {
+    newFile(testPackagePubspecPath, '''
+${pubspecYamlContent(name: 'test')}
+
+workspace:
+  - another
+''');
+    var anotherPackageRootPath = join(testPackageRootPath, 'another');
+    var anotherPackageLibPath = join(anotherPackageRootPath, 'lib');
+    newFile(
+      join(anotherPackageRootPath, 'pubspec.yaml'),
+      '''
+${pubspecYamlContent(name: 'another')}
+
+resolution: workspace
+''',
+    );
+    newFile(join(anotherPackageLibPath, 'a.dart'), 'class A {}');
+    newFile(join(anotherPackageLibPath, 'export.dart'), "export 'a.dart';");
+    newPackageConfigJsonFileFromBuilder(
+      testPackageRootPath,
+      PackageConfigFileBuilder()
+        ..add(name: 'test', rootPath: testPackageRootPath)
+        ..add(name: 'another', rootPath: anotherPackageRootPath),
+    );
+    await assertNoDiagnostics('''
+import 'package:another/export.dart';
+
+void f(A a) {}
+''');
   }
 }
