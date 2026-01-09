@@ -1,1 +1,1 @@
-include: ../analysis_options.yaml
+include: lib/src/_internal/analysis_options.yaml
