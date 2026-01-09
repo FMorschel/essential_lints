@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1+2
+
+Released on: 2026-01-09
+
+- Adds an internal `analysis_options.yaml` file to the package to ensure compatibility with `essential_lints` package.
+
 ## 0.1.1+1
 
 Released on: 2026-01-05
