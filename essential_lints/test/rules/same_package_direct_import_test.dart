@@ -100,23 +100,19 @@ void f(A a) {}
     );
   }
 
-  @FailingTest(issue: 'https://github.com/dart-lang/sdk/issues/62383')
   Future<void> test_testFolder() async {
     newFile(join(testPackageLibPath, 'a.dart'), 'class A {}');
     newFile(join(testPackageLibPath, 'export.dart'), "export 'a.dart';");
     // Change it so the test file is in the `test` folder.
-    testFile = newFile(join(testPackageRootPath, 'test', 'test.dart'), '');
-    await assertDiagnostics(
-      '''
+    var path = join(testPackageRootPath, 'test', 'test.dart');
+    newFile(path, '''
 import 'package:test/export.dart';
 
 void f(A a) {}
-''',
-      [lint(7, 26)],
-    );
+''');
+    await assertDiagnosticsInFile(path, [lint(7, 26)]);
   }
 
-  @FailingTest(issue: 'https://github.com/dart-lang/sdk/issues/62383')
   Future<void> test_innerPubPackage() async {
     newFile(testPackagePubspecPath, '''
 ${pubspecYamlContent(name: 'test')}
@@ -143,18 +139,13 @@ resolution: workspace
     newFile(join(anotherPackageLibPath, 'a.dart'), 'class A {}');
     newFile(join(anotherPackageLibPath, 'export.dart'), "export 'a.dart';");
     // Change it so the test file is in the `another` package.
-    testFile = newFile(
-      join(anotherPackageLibPath, 'test.dart'),
-      '',
-    );
-    await assertDiagnostics(
-      '''
+    var path = join(anotherPackageLibPath, 'test.dart');
+    newFile(path, '''
 import 'package:another/export.dart';
 
 void f(A a) {}
-''',
-      [lint(7, 29)],
-    );
+''');
+    await assertDiagnosticsInFile(path, [lint(7, 29)]);
   }
 
   Future<void> test_innerPubPackage_fromOther() async {
