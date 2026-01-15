@@ -81,4 +81,43 @@ int f(int value) {
       [lint(98, 4)],
     );
   }
+
+  Future<void> test_statement_consequent() async {
+    await assertNoDiagnostics('''
+int f(int value) {
+  switch (value) {
+    case 2:
+    case 4:
+      return 3;
+    case 1:
+    case 3:
+      return 1;
+    default:
+      return 2;
+  }
+}
+''');
+  }
+
+  Future<void> test_statement_separate() async {
+    await assertDiagnostics(
+      '''
+int f(int value) {
+  switch (value) {
+    case 2:
+    case 4:
+      return 3;
+    case 1:
+    case 3:
+      return 1;
+    case 5:
+      return 3;
+    default:
+      return 2;
+  }
+}
+''',
+      [lint(122, 4)],
+    );
+  }
 }

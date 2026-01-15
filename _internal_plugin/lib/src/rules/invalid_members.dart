@@ -13,7 +13,7 @@ final _log = Logger('InvalidMembersRule');
 class InvalidMembersRule extends AnalysisRule {
   InvalidMembersRule()
     : super(
-        name: _diagnostic.name,
+        name: _diagnostic.lowerCaseUniqueName,
         description: 'Members that are invalid for a given modifier.',
       );
 

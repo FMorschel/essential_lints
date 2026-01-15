@@ -47,9 +47,9 @@ class CreateGetterFix extends ResolvedCorrectionProducer with WarningFix {
       }
     }
     await builder.addDartFileEdit(file, (builder) {
-      var offset = node.members.lastOrNull?.end ?? node.rightBracket.offset;
+      var offset = node.members.lastOrNull?.end ?? node.body.endToken.offset;
       var needsNewLine =
-          offset == node.leftBracket.end || node.members.isNotEmpty;
+          offset == node.body.beginToken.end || node.members.isNotEmpty;
       builder.addInsertion(offset, (builder) {
         if (needsNewLine) {
           builder.writeln();
@@ -61,7 +61,7 @@ class CreateGetterFix extends ResolvedCorrectionProducer with WarningFix {
             returnType: typeProvider.listType(typeProvider.objectQuestionType),
             bodyWriter: () => builder.write('=> [];'),
           );
-        if (offset == node.rightBracket.offset) {
+        if (offset == node.body.endToken.offset) {
           builder.writeln();
         }
       });

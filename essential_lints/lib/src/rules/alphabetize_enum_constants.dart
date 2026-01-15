@@ -30,12 +30,12 @@ class _AlphabetizeEnumConstantsVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitEnumDeclaration(EnumDeclaration node) {
-    if (node.constants.length < 2) {
+    if (node.body.constants.length < 2) {
       return;
     }
-    for (var i = 1; i < node.constants.length; i++) {
-      var previous = node.constants[i - 1];
-      var current = node.constants[i];
+    for (var i = 1; i < node.body.constants.length; i++) {
+      var previous = node.body.constants[i - 1];
+      var current = node.body.constants[i];
       if (previous.name.lexeme.compareTo(current.name.lexeme) > 0) {
         rule.reportAtToken(current.name);
         return;

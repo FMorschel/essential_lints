@@ -13,7 +13,7 @@ final _log = Logger('InvalidModifiersRule');
 class InvalidModifiersRule extends AnalysisRule {
   InvalidModifiersRule()
     : super(
-        name: _diagnostic.name,
+        name: _diagnostic.lowerCaseUniqueName,
         description: 'Modifiers that are invalid for a given modifier.',
       );
 

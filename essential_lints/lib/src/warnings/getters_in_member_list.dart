@@ -126,7 +126,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
       if (getterMember == null ||
           getterMember.isStatic && annotation.instanceOnly) {
         rule.reportAtToken(
-          node.name,
+          node.namePart.typeName,
           diagnosticCode: GettersInMemberList.missingList,
           arguments: [
             memberListName,
@@ -268,8 +268,8 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
     bool valid(GetterElement element) {
       if ((!annotation.static && element.isStatic) ||
           (!annotation.instance && !element.isStatic) ||
-          !annotation.getters && element.variable.isSynthetic ||
-          !annotation.fields && !element.variable.isSynthetic ||
+          !annotation.getters && !element.variable.isOriginDeclaration ||
+          !annotation.fields && element.variable.isOriginDeclaration ||
           annotation.types.isNotEmpty &&
               !annotation.types.contains(element.returnType) ||
           annotation.superTypes.isNotEmpty &&

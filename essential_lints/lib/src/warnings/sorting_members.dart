@@ -398,7 +398,7 @@ class _LintingMemberVisitor extends _BaseMemberVisitor {
         if (name != null) {
           rule.reportAtToken(name);
         } else {
-          rule.reportAtNode(node.returnType);
+          rule.reportAtNode(node.typeName);
         }
       default:
         _logger.severe('Unexpected node type for member: $node');

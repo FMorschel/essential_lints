@@ -33,6 +33,11 @@ class _OptionalPositionalParametersVisitor extends SimpleAstVisitor<void> {
   void visitFormalParameterList(FormalParameterList node) {
     if (node.parameters.firstWhereOrNull((p) => p.isOptionalPositional)
         case var parameter?) {
+      if (parameter case DefaultFormalParameter(
+        parameter: SuperFormalParameter(),
+      )) {
+        return;
+      }
       if (parameter.name case var name?) {
         rule.reportAtToken(name);
       } else {

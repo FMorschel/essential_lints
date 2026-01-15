@@ -134,7 +134,8 @@ class _MutableTearoffsVisitor extends SimpleAstVisitor<void> {
     // If it is a const variable, then it's ok.
     // If it is a getter then report a lint.
     var element = node.element;
-    if (element is PropertyAccessorElement && element.variable.isSynthetic) {
+    if (element is PropertyAccessorElement &&
+        !element.variable.isOriginDeclaration) {
       rule.reportAtNode(node);
       return;
     }
@@ -142,11 +143,13 @@ class _MutableTearoffsVisitor extends SimpleAstVisitor<void> {
       return;
     }
     if (element is PropertyAccessorElement &&
-        !element.variable.isSynthetic &&
+        element.variable.isOriginDeclaration &&
         (!element.variable.isFinal || !element.variable.isConst) &&
         !element.isStatic &&
         element.enclosingElement == node.enclosingTypeElement &&
         element.enclosingElement.isPublic &&
+        !element.enclosingElement.isImmutable &&
+        !element.enclosingElement.isFinal &&
         element.isPublic) {
       rule.reportAtNode(node);
     } else if (element is MethodElement &&
@@ -156,6 +159,32 @@ class _MutableTearoffsVisitor extends SimpleAstVisitor<void> {
         element.isPublic) {
       rule.reportAtNode(node);
     }
+  }
+}
+
+extension on Element {
+  bool get isFinal {
+    var self = this;
+    if (self is ClassElement) {
+      return self.isFinal;
+    }
+    return false;
+  }
+
+  bool get isImmutable {
+    var self = this;
+    return self.metadata.annotations.any(_isImmutable) ||
+        self is InterfaceElement &&
+            self.allSupertypes.any((type) => type.element.isImmutable);
+  }
+
+  bool _isImmutable(ElementAnnotation annotation) {
+    var object = annotation.computeConstantValue();
+    if (object?.type case var type?) {
+      return type.element?.name == 'Immutable' &&
+          type.element?.library?.uri == .parse('package:meta/meta.dart');
+    }
+    return false;
   }
 }
 

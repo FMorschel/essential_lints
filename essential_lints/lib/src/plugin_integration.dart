@@ -228,7 +228,7 @@ mixin FixesPluginIntegration {
         } catch (e, st) {
           logger.severe(
             'Failed to register fix for rule '
-            "'${diagnosticCode.name}'",
+            "'${diagnosticCode.lowerCaseUniqueName}'",
             e,
             st,
           );
@@ -246,7 +246,7 @@ mixin FixesPluginIntegration {
         } catch (e, st) {
           logger.severe(
             'Failed to register fix for rule '
-            "'${diagnosticCode.name}'",
+            "'${diagnosticCode.lowerCaseUniqueName}'",
             e,
             st,
           );

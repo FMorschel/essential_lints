@@ -51,8 +51,10 @@ class _ClosureIncorrectTypeVisitor extends SimpleAstVisitor<void> {
       if (actualParameter is! NormalFormalParameter) {
         continue;
       }
-      var actualParameterType =
-          actualParameter.type ?? context.typeProvider.objectQuestionType;
+      var actualParameterType = actualParameter.type;
+      if (actualParameterType == null) {
+        continue;
+      }
       DartType expectedType;
       if (!parameter.isNamed) {
         expectedType = correspondingParameterType.formalParameters[index].type;
@@ -61,6 +63,12 @@ class _ClosureIncorrectTypeVisitor extends SimpleAstVisitor<void> {
         expectedType = correspondingParameterType.formalParameters
             .firstWhere((e) => e.name == parameter.name?.lexeme && e.isNamed)
             .type;
+      }
+      if (expectedType.isDartCoreNull && actualParameterType.isDartCoreObject) {
+        // Special case: `Null` can be represented as `Object?` in the closure.
+        // See
+        // https://github.com/dart-lang/language/blob/master/resources/type-system/inference.md#function-literal-return-type-inference.
+        continue;
       }
       if (actualParameterType != expectedType) {
         rule.reportAtNode(actualParameter);

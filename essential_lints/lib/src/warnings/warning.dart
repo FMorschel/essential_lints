@@ -17,7 +17,7 @@ abstract class MultiWarningRule<T extends SubWarnings>
   /// {@macro rule}
   MultiWarningRule(this.rule)
     : super(
-        name: rule.code.name,
+        name: rule.code.lowerCaseUniqueName,
         description: rule.code.description,
       );
 
@@ -49,7 +49,7 @@ abstract class WarningRule extends AnalysisRule {
   /// {@macro rule}
   WarningRule(this.rule)
     : super(
-        name: rule.code.name,
+        name: rule.code.lowerCaseUniqueName,
         description: rule.code.description,
       );
 

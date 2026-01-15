@@ -15,7 +15,7 @@ abstract class LintRule extends AnalysisRule {
   /// {@macro rule}
   LintRule(this.rule)
     : super(
-        name: rule.code.name,
+        name: rule.code.lowerCaseUniqueName,
         description: rule.code.description,
       );
 
@@ -41,7 +41,7 @@ abstract class MultiLintRule<T extends SubLints> extends MultiAnalysisRule {
   /// {@macro rule}
   MultiLintRule(this.rule)
     : super(
-        name: rule.code.name,
+        name: rule.code.lowerCaseUniqueName,
         description: rule.code.description,
       );
 

@@ -30,7 +30,11 @@ mixin EnumDiagnostic
   bool get isUnresolvedIdentifier => code.isUnresolvedIdentifier;
 
   @override
+  @Deprecated('Use lowercaseName instead')
   String get name => code.name;
+
+  @override
+  String get lowerCaseName => code.lowerCaseName;
 
   @override
   int get numParameters => code.numParameters;
@@ -45,7 +49,11 @@ mixin EnumDiagnostic
   DiagnosticType get type => code.type;
 
   @override
+  @Deprecated('Use lowercaseUniqueName instead')
   String get uniqueName => code.uniqueName;
+
+  @override
+  String get lowerCaseUniqueName => code.lowerCaseUniqueName;
 
   @override
   String? get url => code.url;

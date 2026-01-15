@@ -131,7 +131,7 @@ mixin EditTestProcessorMixin on BaseEditTestProcessor {
 abstract class FixTestProcessor extends BaseEditTestProcessor
     with EditTestProcessorMixin {
   @override
-  String get analysisRule => rule.diagnosticCode.name;
+  String get analysisRule => rule.diagnosticCode.lowerCaseUniqueName;
 
   @override
   @mustBeOverridden
@@ -154,7 +154,7 @@ abstract class LintFixTestProcessor extends FixTestProcessor {
 abstract class MultiWarningFixTestProcessor extends BaseEditTestProcessor
     with EditTestProcessorMixin {
   @override
-  String get analysisRule => rule.rule.code.name;
+  String get analysisRule => rule.rule.code.lowerCaseUniqueName;
 
   @override
   EssentialLintWarningFixes get fix;

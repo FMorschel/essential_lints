@@ -25,12 +25,12 @@ class SortEnumConstantsFix extends ResolvedCorrectionProducer with LintFix {
     var enumDeclaration = node.thisOrAncestorOfType<EnumDeclaration>();
     if (enumDeclaration == null) return;
     await builder.addDartFileEdit(file, (builder) {
-      var sortedConstants = enumDeclaration.constants.toList()
+      var sortedConstants = enumDeclaration.body.constants.toList()
         ..sort((a, b) => a.name.lexeme.compareTo(b.name.lexeme));
       builder.addReplacement(
         range.startEnd(
-          enumDeclaration.constants.first,
-          enumDeclaration.constants.last,
+          enumDeclaration.body.constants.first,
+          enumDeclaration.body.constants.last,
         ),
         (builder) {
           var writeIndent = false;

@@ -10,7 +10,7 @@ import 'package:test_reflective_loader/test_reflective_loader.dart';
 @SubtypeAnnotating(annotations: [reflectiveTest], option: .onlyConcrete)
 abstract class MultiWarningTestProcessor extends AnalysisRuleTest {
   @override
-  String get analysisRule => rule.rule.code.name;
+  String get analysisRule => rule.rule.code.lowerCaseUniqueName;
 
   @override
   @mustBeOverridden
@@ -33,7 +33,7 @@ optional-checks:
 @SubtypeAnnotating(annotations: [reflectiveTest], option: .onlyConcrete)
 abstract class WarningTestProcessor extends AnalysisRuleTest {
   @override
-  String get analysisRule => rule.rule.code.name;
+  String get analysisRule => rule.rule.code.lowerCaseUniqueName;
 
   @override
   @mustBeOverridden

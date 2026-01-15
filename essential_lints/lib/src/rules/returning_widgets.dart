@@ -6,6 +6,7 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:collection/collection.dart';
 
 import '../utils/extensions/ast.dart';
 import '../utils/extensions/element.dart';
@@ -33,8 +34,6 @@ class ReturningWidgetsRule extends LintRule {
 class _ReturningWidgetsVisitor extends SimpleAstVisitor<void> {
   _ReturningWidgetsVisitor(this.rule, this.context);
 
-  static const _buildName = 'build';
-
   ReturningWidgetsRule rule;
   RuleContext context;
 
@@ -54,14 +53,14 @@ class _ReturningWidgetsVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitMethodDeclaration(MethodDeclaration node) {
-    if (isWidgetType(node.returnType) && node.notInStateOrStateless ||
-        node.name.lexeme != _buildName) {
+    var element = node.enclosingTypeElement;
+    if (isWidgetType(node.returnType) &&
+        (element?.inheritedMembers.entries.none(
+              (entry) =>
+                  entry.key.name == node.declaredFragment?.element.lookupName,
+            ) ??
+            true)) {
       rule.reportAtToken(node.name);
     }
   }
-}
-
-extension on MethodDeclaration {
-  bool get notInStateOrStateless =>
-      !enclosingTypeElement.isState && !enclosingTypeElement.isStatelessWidget;
 }

@@ -88,7 +88,7 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
   @override
   void visitClassDeclaration(ClassDeclaration node) {
     _verifySuperTypes(
-      node.name,
+      node.namePart.typeName,
       node.declaredFragment?.element,
       node.metadata,
       abstract: node.abstractKeyword != null || node.sealedKeyword != null,
@@ -98,13 +98,21 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitEnumDeclaration(EnumDeclaration node) {
-    _verifySuperTypes(node.name, node.declaredFragment?.element, node.metadata);
+    _verifySuperTypes(
+      node.namePart.typeName,
+      node.declaredFragment?.element,
+      node.metadata,
+    );
     super.visitEnumDeclaration(node);
   }
 
   @override
   void visitExtensionTypeDeclaration(ExtensionTypeDeclaration node) {
-    _verifySuperTypes(node.name, node.declaredFragment?.element, node.metadata);
+    _verifySuperTypes(
+      node.primaryConstructor.typeName,
+      node.declaredFragment?.element,
+      node.metadata,
+    );
     super.visitExtensionTypeDeclaration(node);
   }
 

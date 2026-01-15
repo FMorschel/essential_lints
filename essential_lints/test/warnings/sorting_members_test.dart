@@ -1,5 +1,5 @@
 import 'package:_internal_testing/dependencies.dart';
-import 'package:analyzer/src/error/codes.dart';
+import 'package:analyzer/src/diagnostic/diagnostic.dart' as diag;
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:essential_lints/src/warnings/sorting_members.dart';
 import 'package:essential_lints/src/warnings/warning.dart';
@@ -1215,7 +1215,7 @@ class A extends Base {
 ''',
       [
         error(
-          CompileTimeErrorCode.notInitializedNonNullableInstanceField,
+          diag.notInitializedNonNullableInstanceField,
           108,
           5,
         ),
@@ -1268,7 +1268,7 @@ class A extends Base {
 ''',
       [
         error(
-          CompileTimeErrorCode.notInitializedNonNullableInstanceField,
+          diag.notInitializedNonNullableInstanceField,
           108,
           5,
         ),

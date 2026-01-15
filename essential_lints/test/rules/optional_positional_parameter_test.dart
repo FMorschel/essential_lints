@@ -47,4 +47,19 @@ void f(int a, [int? b, int? c]) {}
       [lint(20, 1)],
     );
   }
+
+  Future<void> test_super() async {
+    await assertDiagnostics(
+      '''
+class A {
+  A([int? a]);
+}
+
+class B extends A {
+  B([super.a]);
+}
+''',
+      [lint(20, 1)],
+    );
+  }
 }

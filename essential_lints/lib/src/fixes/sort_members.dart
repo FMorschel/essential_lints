@@ -722,15 +722,15 @@ extension on CompilationUnitMember {
   Token? get leftBracket {
     var self = this;
     if (self is ClassDeclaration) {
-      return self.leftBracket;
+      return self.body.beginToken;
     } else if (self is MixinDeclaration) {
-      return self.leftBracket;
+      return self.body.beginToken;
     } else if (self is EnumDeclaration) {
-      return self.leftBracket;
+      return self.body.beginToken;
     } else if (self is ExtensionDeclaration) {
-      return self.leftBracket;
+      return self.body.beginToken;
     } else if (self is ExtensionTypeDeclaration) {
-      return self.leftBracket;
+      return self.body.beginToken;
     }
     return null;
   }
@@ -738,15 +738,15 @@ extension on CompilationUnitMember {
   Token? get rightBracket {
     var self = this;
     if (self is ClassDeclaration) {
-      return self.rightBracket;
+      return self.body.endToken;
     } else if (self is MixinDeclaration) {
-      return self.rightBracket;
+      return self.body.endToken;
     } else if (self is EnumDeclaration) {
-      return self.rightBracket;
+      return self.body.endToken;
     } else if (self is ExtensionDeclaration) {
-      return self.rightBracket;
+      return self.body.endToken;
     } else if (self is ExtensionTypeDeclaration) {
-      return self.rightBracket;
+      return self.body.endToken;
     }
     return null;
   }

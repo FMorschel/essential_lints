@@ -74,6 +74,9 @@ class _EqualStatementVisitor extends SimpleAstVisitor<void> {
     var equals = <String, List<SwitchMember>>{};
     for (var i = 0; i < node.members.length; i++) {
       var member = node.members[i];
+      if (member.statements.isEmpty) {
+        continue;
+      }
       var statementsSource = member.statements.map((e) => e.toSource()).join();
       if (equals.containsKey(statementsSource)) {
         continue;

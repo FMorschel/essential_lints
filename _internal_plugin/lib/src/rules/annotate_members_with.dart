@@ -14,7 +14,7 @@ import 'diagnostic.dart';
 class AnnotateMembersWithRule extends AnalysisRule {
   AnnotateMembersWithRule()
     : super(
-        name: _diagnostic.name,
+        name: _diagnostic.lowerCaseUniqueName,
         description:
             'Members that should be annotated with specific annotations.',
       );
@@ -128,9 +128,9 @@ class _AnnotateMembersWithVisitor extends GeneralizingAstVisitor<void> {
               name,
               arguments: [requiredAnnotationString],
             );
-          } else if (node case ConstructorDeclaration(:var returnType)) {
+          } else if (node case ConstructorDeclaration(:var typeName)) {
             rule.reportAtNode(
-              returnType,
+              typeName,
               arguments: [requiredAnnotationString],
             );
           } else {
@@ -172,6 +172,7 @@ extension on ClassMember {
       MethodDeclaration(:var name) => name,
       FieldDeclaration(:var fields) => fields.variables.first.name,
       ConstructorDeclaration(:var name) => name,
+      PrimaryConstructorBody(:var name) => name,
     };
   }
 }
