@@ -135,8 +135,8 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
         );
         continue;
       }
-      var member = node.members
-          .where((rule, getterMember).whereMatches)
+      var member = node.body.membersOrNull
+          ?.where((rule, getterMember).whereMatches)
           .singleOrNull;
       Token? memberName;
       Element? memberElement;
@@ -370,4 +370,12 @@ extension on DartType? {
     }
     return null;
   }
+}
+
+extension on ClassBody {
+  List<ClassMember>? get membersOrNull => switch (this) {
+    BlockClassBody(:var members) => members,
+    EmptyClassBody() => null,
+    _ => null,
+  };
 }

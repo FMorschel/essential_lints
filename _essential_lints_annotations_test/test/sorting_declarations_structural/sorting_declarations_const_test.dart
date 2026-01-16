@@ -174,7 +174,7 @@ void main() {
 
       for (var classElement in classElements) {
         for (var field in classElement.fields) {
-          if (field.isStatic && !field.isSynthetic && !field.isConst) {
+          if (field.isStatic && field.isOriginDeclaration && !field.isConst) {
             nonConstStaticFields.add(
               '${classElement.displayName}.${field.displayName}',
             );
@@ -200,7 +200,7 @@ void main() {
 
       for (var classElement in classElements) {
         for (var constructor in classElement.constructors) {
-          if (!constructor.isSynthetic && !constructor.isConst) {
+          if (constructor.isOriginDeclaration && !constructor.isConst) {
             var name = constructor.name;
             var constructorName = name == null || name.isEmpty
                 ? '${classElement.displayName}()'
@@ -255,7 +255,7 @@ void main() {
         if (isModifiableOrSortDeclaration(classElement)) continue;
 
         for (var constructor in classElement.constructors) {
-          if (!constructor.isSynthetic && constructor.isPublic) {
+          if (constructor.isOriginDeclaration && constructor.isPublic) {
             var isReferenced = referencedConstructors.contains(constructor);
             if (!isReferenced) {
               var name = constructor.name;

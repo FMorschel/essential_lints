@@ -637,8 +637,8 @@ import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
 @SortingMembers({.fields}, alphabetizeSortedMembers: true)
 class MyClass {
-  int field3 = 0, field1 = 0;
   int field2 = 0;
+  int field3 = 0, field1 = 0;
 }
 ''');
     await assertHasFix('''

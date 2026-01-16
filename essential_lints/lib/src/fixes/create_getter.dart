@@ -1,7 +1,9 @@
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
+import 'package:analyzer_plugin/utilities/range_factory.dart';
 
 import 'essential_lint_fixes.dart';
 import 'fix.dart';
@@ -37,8 +39,8 @@ class CreateGetterFix extends ResolvedCorrectionProducer with WarningFix {
     if (name == null) {
       return;
     }
-    var node = this.node;
-    if (node is! ClassDeclaration) {
+    var node = this.node.thisOrAncestorOfType<ClassDeclaration>();
+    if (node == null) {
       return;
     }
     if (node.declaredFragment!.element case ClassElement(:var getters)) {
@@ -47,9 +49,21 @@ class CreateGetterFix extends ResolvedCorrectionProducer with WarningFix {
       }
     }
     await builder.addDartFileEdit(file, (builder) {
-      var offset = node.members.lastOrNull?.end ?? node.body.endToken.offset;
+      var offset = node.lastMemberOrNull?.end ?? node.closeBraceToken?.offset;
       var needsNewLine =
-          offset == node.body.beginToken.end || node.members.isNotEmpty;
+          offset == node.openBraceToken?.end || node.lastMemberOrNull != null;
+      var needsClosingBrace = offset == null;
+      if (offset == null) {
+        if (node.body case EmptyClassBody body) {
+          offset = body.semicolon.end;
+          builder.addReplacement(range.token(body.semicolon), (builder) {
+            builder.write(' {');
+          });
+        } else {
+          assert(false, 'Cannot determine where to insert the getter.');
+          return;
+        }
+      }
       builder.addInsertion(offset, (builder) {
         if (needsNewLine) {
           builder.writeln();
@@ -61,10 +75,58 @@ class CreateGetterFix extends ResolvedCorrectionProducer with WarningFix {
             returnType: typeProvider.listType(typeProvider.objectQuestionType),
             bodyWriter: () => builder.write('=> [];'),
           );
-        if (offset == node.body.endToken.offset) {
+        if (offset == node.closeBraceToken?.offset) {
           builder.writeln();
+        }
+        if (needsClosingBrace) {
+          builder
+            ..writeln()
+            ..write('}');
         }
       });
     });
+  }
+}
+
+extension on AstNode {
+  /// Returns the last member of the class, or `null` if there are no members.
+  ClassMember? get lastMemberOrNull => switch (body) {
+    BlockClassBody(:var members) => members.lastOrNull,
+    EmptyClassBody() => null,
+    _ => null,
+  };
+
+  ClassBody? get body {
+    var self = this;
+    if (self is ClassDeclaration) {
+      return self.body;
+    }
+    return null;
+  }
+
+  Token? get openBraceToken {
+    var self = this;
+    if (self is ClassDeclaration) {
+      var body = self.body;
+      return switch (body) {
+        BlockClassBody(:var leftBracket) => leftBracket,
+        EmptyClassBody() => null,
+        _ => null,
+      };
+    }
+    return null;
+  }
+
+  Token? get closeBraceToken {
+    var self = this;
+    if (self is ClassDeclaration) {
+      var body = self.body;
+      return switch (body) {
+        BlockClassBody(:var rightBracket) => rightBracket,
+        EmptyClassBody() => null,
+        _ => null,
+      };
+    }
+    return null;
   }
 }

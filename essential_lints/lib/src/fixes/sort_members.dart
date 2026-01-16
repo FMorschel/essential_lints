@@ -64,9 +64,8 @@ class SortMembersFix extends ResolvedCorrectionProducer with WarningFix {
     }
 
     // Find the @SortingMembers annotation
-    var annotatedNode = enclosingInstanceDeclaration as AnnotatedNode;
     ElementAnnotation? sortingMembersAnnotation;
-    for (var annotation in annotatedNode.metadata) {
+    for (var annotation in enclosingInstanceDeclaration.metadata) {
       var element = annotation.elementAnnotation;
       if (element == null) continue;
       var object = element.computeConstantValue();
@@ -128,25 +127,12 @@ class SortMembersFix extends ResolvedCorrectionProducer with WarningFix {
       }
     }
 
-    // Also check if any multi-variable field declarations need reordering
-    var needsFieldReordering = _checkMultiVariableFields(
-      enclosingInstanceDeclaration,
-      validatorFromAnnotation,
-    );
-
-    if (!needsSorting && !needsFieldReordering) {
+    if (!needsSorting) {
       return;
     }
 
     // Collect all edits first
     var edits = <({int start, int end, String replacement})>[];
-
-    // Handle multi-variable field declarations that need reordering
-    await _handleMultiVariableFields(
-      enclosingInstanceDeclaration,
-      validatorFromAnnotation,
-      edits,
-    );
 
     // Find which members need to be moved
     var membersToMove = _findMembersToMove(
@@ -225,7 +211,6 @@ class SortMembersFix extends ResolvedCorrectionProducer with WarningFix {
     }
 
     // Add insertions for members that were moved
-    // Group members by their insert offset to handle spacing correctly
     var membersByOffset = <int, List<_MemberToMove>>{};
     for (var moveInfo in membersToMove) {
       membersByOffset
@@ -233,6 +218,15 @@ class SortMembersFix extends ResolvedCorrectionProducer with WarningFix {
           .add(moveInfo);
     }
 
+    // Handle multi-variable field declarations that need reordering
+    await _handleMultiVariableFields(
+      enclosingInstanceDeclaration,
+      validatorFromAnnotation,
+      edits,
+      nodesBeingMoved,
+    );
+
+    // Group members by their insert offset to handle spacing correctly
     for (var entry in membersByOffset.entries) {
       var offset = entry.key;
       var members = entry.value;
@@ -250,9 +244,21 @@ class SortMembersFix extends ResolvedCorrectionProducer with WarningFix {
         }
 
         // Add the member itself with proper indentation
-        buffer
-          ..write(utils.oneIndent)
-          ..write(utils.getNodeText(moveInfo.member.node));
+        buffer.write(utils.oneIndent);
+        
+        // For multi-variable field declarations, alphabetize if needed
+        var memberText = utils.getNodeText(moveInfo.member.node);
+        if (validatorFromAnnotation.alphabetizeSortedMembers &&
+            moveInfo.member.node is FieldDeclaration) {
+          var fieldDecl = moveInfo.member.node as FieldDeclaration;
+          var variables = fieldDecl.fields.variables;
+          if (variables.length > 1 &&
+              _shouldReorderMultiVariableDeclaration(variables)) {
+            // Rebuild the field declaration with sorted variables
+            memberText = _buildReorderedFieldDeclaration(fieldDecl);
+          }
+        }
+        buffer.write(memberText);
       }
 
       // Add spacing after the last member in this insertion if needed
@@ -617,6 +623,35 @@ class SortMembersFix extends ResolvedCorrectionProducer with WarningFix {
     return result.reversed.toList();
   }
 
+  /// Builds the text for a field declaration with variables reordered
+  /// alphabetically.
+  String _buildReorderedFieldDeclaration(FieldDeclaration fieldDecl) {
+    var variables = fieldDecl.fields.variables;
+    var sortedVariables = variables.toList()
+      ..sort((a, b) {
+        var nameA = a.declaredFragment?.element.name ?? '';
+        var nameB = b.declaredFragment?.element.name ?? '';
+        return nameA.toLowerCase().compareTo(nameB.toLowerCase());
+      });
+
+    // Get the text before the first variable (type, modifiers, etc.)
+    var firstVar = variables.first;
+    var prefix = utils.getText(
+      fieldDecl.offset,
+      firstVar.offset - fieldDecl.offset,
+    );
+
+    // Build the sorted variables list
+    var buffer = StringBuffer(prefix);
+    for (var i = 0; i < sortedVariables.length; i++) {
+      if (i > 0) buffer.write(', ');
+      buffer.write(utils.getNodeText(sortedVariables[i]));
+    }
+    buffer.write(';');
+
+    return buffer.toString();
+  }
+
   /// Checks if we should reorder variables in a multi-variable declaration.
   /// We skip reordering only if the variables are already in alphabetical
   /// order.
@@ -636,37 +671,18 @@ class SortMembersFix extends ResolvedCorrectionProducer with WarningFix {
     return false;
   }
 
-  /// Checks if any multi-variable field declarations need variable reordering.
-  bool _checkMultiVariableFields(
-    CompilationUnitMember enclosingDeclaration,
-    ValidatorFromAnnotation validatorFromAnnotation,
-  ) {
-    var needsReordering = false;
-    enclosingDeclaration.visitChildren(
-      _FieldDeclarationVisitor((node) {
-        var variables = node.fields.variables;
-        if (variables.length <= 1) return;
-
-        // Check if alphabetization is enabled
-        if (!validatorFromAnnotation.alphabetizeSortedMembers) return;
-
-        // Check if reordering is needed
-        if (_shouldReorderMultiVariableDeclaration(variables)) {
-          needsReordering = true;
-        }
-      }),
-    );
-    return needsReordering;
-  }
-
   /// Handles reordering variables within multi-variable field declarations.
   Future<void> _handleMultiVariableFields(
     CompilationUnitMember enclosingDeclaration,
     ValidatorFromAnnotation validatorFromAnnotation,
     List<({int start, int end, String replacement})> edits,
+    Set<AstNode> nodesBeingMoved,
   ) async {
     enclosingDeclaration.visitChildren(
       _FieldDeclarationVisitor((node) {
+        // Skip if this field declaration is being moved
+        if (nodesBeingMoved.contains(node)) return;
+        
         var variables = node.fields.variables;
         if (variables.length <= 1) return;
 
@@ -707,7 +723,7 @@ class SortMembersFix extends ResolvedCorrectionProducer with WarningFix {
 }
 
 /// Simple visitor for field declarations.
-class _FieldDeclarationVisitor extends SimpleAstVisitor<void> {
+class _FieldDeclarationVisitor extends RecursiveAstVisitor<void> {
   _FieldDeclarationVisitor(this.onFieldDeclaration);
 
   final void Function(FieldDeclaration) onFieldDeclaration;
@@ -719,37 +735,37 @@ class _FieldDeclarationVisitor extends SimpleAstVisitor<void> {
 }
 
 extension on CompilationUnitMember {
-  Token? get leftBracket {
-    var self = this;
-    if (self is ClassDeclaration) {
-      return self.body.beginToken;
-    } else if (self is MixinDeclaration) {
-      return self.body.beginToken;
-    } else if (self is EnumDeclaration) {
-      return self.body.beginToken;
-    } else if (self is ExtensionDeclaration) {
-      return self.body.beginToken;
-    } else if (self is ExtensionTypeDeclaration) {
-      return self.body.beginToken;
-    }
-    return null;
-  }
+  Token? get leftBracket => switch (this) {
+    ClassDeclaration(:var body) => body.leftBracket,
+    MixinDeclaration(:var body) => body.leftBracket,
+    EnumDeclaration(:var body) => body.leftBracket,
+    ExtensionDeclaration(:var body) => body.leftBracket,
+    ExtensionTypeDeclaration(:var body) => body.leftBracket,
+    _ => null,
+  };
 
-  Token? get rightBracket {
-    var self = this;
-    if (self is ClassDeclaration) {
-      return self.body.endToken;
-    } else if (self is MixinDeclaration) {
-      return self.body.endToken;
-    } else if (self is EnumDeclaration) {
-      return self.body.endToken;
-    } else if (self is ExtensionDeclaration) {
-      return self.body.endToken;
-    } else if (self is ExtensionTypeDeclaration) {
-      return self.body.endToken;
-    }
-    return null;
-  }
+  Token? get rightBracket => switch (this) {
+    ClassDeclaration(:var body) => body.rightBracket,
+    MixinDeclaration(:var body) => body.rightBracket,
+    EnumDeclaration(:var body) => body.rightBracket,
+    ExtensionDeclaration(:var body) => body.rightBracket,
+    ExtensionTypeDeclaration(:var body) => body.rightBracket,
+    _ => null,
+  };
+}
+
+extension on ClassBody {
+  Token? get leftBracket => switch (this) {
+    BlockClassBody(:var leftBracket) => leftBracket,
+    EmptyClassBody() => null,
+    _ => null,
+  };
+
+  Token? get rightBracket => switch (this) {
+    BlockClassBody(:var rightBracket) => rightBracket,
+    EmptyClassBody() => null,
+    _ => null,
+  };
 }
 
 extension on AstNode {

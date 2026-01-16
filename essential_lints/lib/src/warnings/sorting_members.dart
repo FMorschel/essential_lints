@@ -621,13 +621,35 @@ class TrackingMemberVisitor extends _BaseMemberVisitor {
   }
 
   int _compareAlphabetical(MemberResult a, MemberResult b) {
+    var declarationA = a.node.thisOrAncestorOfType<FieldDeclaration>();
+    var declarationB = b.node.thisOrAncestorOfType<FieldDeclaration>();
+    if (declarationA != null &&
+        declarationB != null &&
+        // If both are fields
+        declarationA != declarationB &&
+        // The fields are not from the same multi-declaration
+        (declarationA.fields.variables.length != 1 ||
+            declarationB.fields.variables.length != 1)
+    // If either is from a multi-declaration
+    ) {
+      // Compare based on first alphabetical variable name in each declaration
+      var firstAlphabeticalFieldA =
+          declarationA.fields.variables.map((v) => v.name.lexeme).toList()
+            ..sort();
+      var firstAlphabeticalFieldB =
+          declarationB.fields.variables.map((v) => v.name.lexeme).toList()
+            ..sort();
+      return firstAlphabeticalFieldA.first.compareTo(
+        firstAlphabeticalFieldB.first,
+      );
+    }
     var nameA = _getMemberName(a.node, a.element);
     var nameB = _getMemberName(b.node, b.element);
 
     if (nameA == 'new' && nameB != 'new') return -1;
     if (nameA != 'new' && nameB == 'new') return 1;
 
-    return nameA.toLowerCase().compareTo(nameB.toLowerCase());
+    return nameA.compareTo(nameB);
   }
 }
 

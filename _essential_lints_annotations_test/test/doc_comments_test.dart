@@ -25,11 +25,9 @@ Future<void> main() async {
     }
 
     // Create package builder
-    var packageConfigProvider = PhysicalPackageConfigProvider();
     var packageBuilder = PubPackageBuilder(
       config,
       pubPackageMetaProvider,
-      packageConfigProvider,
     );
 
     // Build package graph without generating documentation

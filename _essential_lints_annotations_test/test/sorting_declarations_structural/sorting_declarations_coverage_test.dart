@@ -40,7 +40,7 @@ List<StaticMember> getStaticMembers(InterfaceElement element) {
 
   // Collect static fields and track their getters/setters
   for (var field in element.fields) {
-    if (field.isStatic && !field.isSynthetic && field.isPublic) {
+    if (field.isStatic && field.isOriginDeclaration && field.isPublic) {
       members.add(StaticMember(field, [?field.getter, ?field.setter]));
       if (field.getter != null) {
         fieldGetters.add(field.getter!);
@@ -51,7 +51,7 @@ List<StaticMember> getStaticMembers(InterfaceElement element) {
   // Collect static getters (that are not synthetic, i.e., not from fields)
   for (var getter in element.getters) {
     if (getter.isStatic &&
-        !getter.isSynthetic &&
+        getter.isOriginDeclaration &&
         !fieldGetters.contains(getter) &&
         getter.isPublic) {
       members.add(StaticMember(getter));
@@ -61,7 +61,7 @@ List<StaticMember> getStaticMembers(InterfaceElement element) {
   // Collect static setters (that are not synthetic, i.e., not from fields)
   for (var setter in element.setters) {
     if (setter.isStatic &&
-        !setter.isSynthetic &&
+        setter.isOriginDeclaration &&
         !fieldGetters.contains(setter) &&
         setter.isPublic) {
       members.add(StaticMember(setter));
