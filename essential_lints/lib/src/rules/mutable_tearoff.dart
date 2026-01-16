@@ -139,6 +139,7 @@ class _MutableTearoffsVisitor extends SimpleAstVisitor<void> {
       rule.reportAtNode(node);
       return;
     }
+    ClassBody b;
     if (element is! PropertyAccessorElement && element is! MethodElement) {
       return;
     }

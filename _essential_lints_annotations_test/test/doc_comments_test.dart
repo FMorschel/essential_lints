@@ -1,5 +1,6 @@
 import 'dart:isolate';
 
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:dartdoc/dartdoc.dart';
@@ -11,6 +12,7 @@ Future<void> main() async {
   Package? defaultPackage;
 
   setUpAll(() async {
+    ClassBody n;
     // Find the package root directory
     var packageRootPath = packageRoot.path;
 

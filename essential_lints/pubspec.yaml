@@ -22,8 +22,8 @@ keywords:
   - linters
 
 dependencies:
-  analysis_server_plugin: ">=0.3.4 <=0.3.5"
-  analyzer: ">=8.4.0 <=10.0.0"
+  analysis_server_plugin: ">=0.3.4 <=0.3.6"
+  analyzer: ^10.0.0
   analyzer_plugin: ">=0.13.10 <=0.14.0"
   args: ^2.0.0
   collection: ^1.16.0
