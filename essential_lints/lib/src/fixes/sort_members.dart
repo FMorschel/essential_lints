@@ -245,7 +245,7 @@ class SortMembersFix extends ResolvedCorrectionProducer with WarningFix {
 
         // Add the member itself with proper indentation
         buffer.write(utils.oneIndent);
-        
+
         // For multi-variable field declarations, alphabetize if needed
         var memberText = utils.getNodeText(moveInfo.member.node);
         if (validatorFromAnnotation.alphabetizeSortedMembers &&
@@ -682,7 +682,7 @@ class SortMembersFix extends ResolvedCorrectionProducer with WarningFix {
       _FieldDeclarationVisitor((node) {
         // Skip if this field declaration is being moved
         if (nodesBeingMoved.contains(node)) return;
-        
+
         var variables = node.fields.variables;
         if (variables.length <= 1) return;
 
