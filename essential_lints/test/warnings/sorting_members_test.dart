@@ -1209,11 +1209,11 @@ abstract class Base {
 class A extends Base {
   int regularField = 0;
   @override
-  int field = 1;
+  int? field = 1;
 }
 ''',
       [
-        error(rule.diagnosticCode, 239, 5),
+        error(rule.diagnosticCode, 241, 5),
       ],
     );
   }
@@ -1256,12 +1256,12 @@ abstract class Base {
 })
 class A extends Base {
   @override
-  int field = 1;
+  int? field = 1;
   int newField = 0;
 }
 ''',
       [
-        error(rule.diagnosticCode, 226, 8),
+        error(rule.diagnosticCode, 228, 8),
       ],
     );
   }
