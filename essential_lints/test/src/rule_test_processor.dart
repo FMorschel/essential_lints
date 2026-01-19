@@ -11,7 +11,7 @@ import 'package:test_reflective_loader/test_reflective_loader.dart';
 @SubtypeAnnotating(annotations: [reflectiveTest], option: .onlyConcrete)
 abstract class LintTestProcessor extends AnalysisRuleTest {
   @override
-  String get analysisRule => rule.rule.code.lowerCaseUniqueName;
+  String get analysisRule => rule.rule.lowerCaseUniqueName;
 
   @override
   @mustBeOverridden
@@ -35,7 +35,7 @@ optional-checks:
 abstract class MultiLintTestProcessor<T extends SubLints>
     extends AnalysisRuleTest {
   @override
-  String get analysisRule => rule.rule.code.lowerCaseUniqueName;
+  String get analysisRule => rule.rule.lowerCaseUniqueName;
 
   @override
   MultiLintRule<T> get rule;

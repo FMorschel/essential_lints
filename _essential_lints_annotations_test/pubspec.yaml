@@ -18,7 +18,8 @@ dev_dependencies:
   dartdoc: ^9.0.2
   essential_lints_annotations:
     path: ../essential_lints_annotations
+  frontend_server_client: ^4.0.0 # Test bug https://github.com/dart-lang/test/issues/2516
   meta: ^1.11.0
   path: ^1.9.1
-  test: ^1.26.3
+  test: ^1.29.0
   very_good_analysis: ^10.0.0

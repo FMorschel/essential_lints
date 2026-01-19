@@ -1,6 +1,5 @@
-import 'package:analyzer/analysis_rule/analysis_rule.dart';
-
 import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
+import 'package:essential_lints/src/rules/analysis_rule.dart';
 import 'package:essential_lints/src/rules/first_getter.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
@@ -18,7 +17,7 @@ class ReplaceWithFirstTest extends FixTestProcessor {
   EssentialLintFixes get fix => .replaceWithFirst;
 
   @override
-  AnalysisRule get rule => FirstGetterRule();
+  EssentialAnalysisRule get rule => FirstGetterRule();
 
   Future<void> test_replaceWithFirst() async {
     await resolveTestCode('''

@@ -1,6 +1,7 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/syntactic_entity.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/constant/value.dart';
@@ -150,7 +151,7 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
   }
 
   void _verifySuperTypes(
-    Token name,
+    SyntacticEntity name,
     InterfaceElement? element,
     NodeList<Annotation> metadata, {
     bool abstract = false,
@@ -192,13 +193,28 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
       }
       var missingAnnotations = annotation.annotations.whereNot(existing);
       if (missingAnnotations.isNotEmpty) {
-        rule.reportAtToken(
-          name,
-          diagnosticCode: rule.rule,
-          arguments: [
-            missingAnnotations.map(dartObjectToString).commaSeparatedWithAnd,
-          ],
-        );
+        switch (name) {
+          case Token():
+            rule.reportAtToken(
+              name,
+              diagnosticCode: rule.rule,
+              arguments: [
+                missingAnnotations
+                    .map(dartObjectToString)
+                    .commaSeparatedWithAnd,
+              ],
+            );
+          case AstNode():
+            rule.reportAtNode(
+              name,
+              diagnosticCode: rule.rule,
+              arguments: [
+                missingAnnotations
+                    .map(dartObjectToString)
+                    .commaSeparatedWithAnd,
+              ],
+            );
+        }
       }
     }
   }

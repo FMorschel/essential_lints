@@ -1,6 +1,7 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/syntactic_entity.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/constant/value.dart';
@@ -146,7 +147,7 @@ class _SubtypeNamingVisitor extends SimpleAstVisitor<void> {
   }
 
   void _verifySuperTypes(
-    Token name,
+    SyntacticEntity name,
     InterfaceElement? element, {
     bool abstract = false,
   }) {
@@ -173,25 +174,29 @@ class _SubtypeNamingVisitor extends SimpleAstVisitor<void> {
           !abstract) {
         continue;
       }
-      var typeName = name.lexeme;
-      if (annotation.prefix != null &&
-          !typeName.startsWith(annotation.prefix!)) {
-        rule.reportAtToken(
-          name,
-          diagnosticCode: rule.rule,
-        );
-      } else if (annotation.suffix != null &&
-          !typeName.endsWith(annotation.suffix!)) {
-        rule.reportAtToken(
-          name,
-          diagnosticCode: rule.rule,
-        );
-      } else if (annotation.containing != null &&
-          !typeName.contains(annotation.containing!)) {
-        rule.reportAtToken(
-          name,
-          diagnosticCode: rule.rule,
-        );
+      var typeName = switch (name) {
+        Token() => name.lexeme,
+        Identifier() => name.name,
+        _ => '',
+      };
+      if ((annotation.prefix != null &&
+              !typeName.startsWith(annotation.prefix!)) ||
+          (annotation.suffix != null &&
+              !typeName.endsWith(annotation.suffix!)) ||
+          (annotation.containing != null &&
+              !typeName.contains(annotation.containing!))) {
+        switch (name) {
+          case Token():
+            rule.reportAtToken(
+              name,
+              diagnosticCode: rule.rule,
+            );
+          case AstNode():
+            rule.reportAtNode(
+              name,
+              diagnosticCode: rule.rule,
+            );
+        }
       }
     }
   }

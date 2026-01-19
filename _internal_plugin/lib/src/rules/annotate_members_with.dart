@@ -6,7 +6,6 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/error/error.dart';
 import 'package:essential_lints/src/utils/dart_object_to_string.dart';
 
 import 'diagnostic.dart';
@@ -27,7 +26,7 @@ class AnnotateMembersWithRule extends AnalysisRule {
   );
 
   @override
-  final DiagnosticCode diagnosticCode = _diagnostic;
+  final InternalDiagnosticCode diagnosticCode = _diagnostic;
 
   @override
   void registerNodeProcessors(
@@ -172,7 +171,7 @@ extension on ClassMember {
       MethodDeclaration(:var name) => name,
       FieldDeclaration(:var fields) => fields.variables.first.name,
       ConstructorDeclaration(:var name) => name,
-      PrimaryConstructorBody(:var name) => name,
+      _ => null,
     };
   }
 }

@@ -1,21 +1,21 @@
-import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
-import 'package:analyzer/error/error.dart';
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 import 'package:meta/meta.dart';
 
+import '../warnings/essential_lint_warnings.dart' hide SubtypeNaming;
+import 'analysis_rule.dart';
 import 'essential_lint_rules.dart';
 
 /// {@template rule}
 /// The base class for all essential lint rules.
 /// {@endtemplate}
 @SubtypeNaming(suffix: 'Rule')
-abstract class LintRule extends AnalysisRule {
+abstract class LintRule extends EssentialAnalysisRule {
   /// {@macro rule}
   LintRule(this.rule)
     : super(
-        name: rule.code.lowerCaseUniqueName,
+        name: rule.lowerCaseUniqueName,
         description: rule.code.description,
       );
 
@@ -23,7 +23,7 @@ abstract class LintRule extends AnalysisRule {
   final EssentialLintRules rule;
 
   @override
-  DiagnosticCode get diagnosticCode => rule;
+  EnumDiagnostic get diagnosticCode => rule;
 
   @override
   @mustBeOverridden
@@ -37,11 +37,12 @@ abstract class LintRule extends AnalysisRule {
 /// The base class for all essential multi-lints rules.
 /// {@endtemplate}
 @SubtypeNaming(suffix: 'Rule')
-abstract class MultiLintRule<T extends SubLints> extends MultiAnalysisRule {
+abstract class MultiLintRule<T extends SubLints>
+    extends EssentialMultiAnalysisRule {
   /// {@macro rule}
   MultiLintRule(this.rule)
     : super(
-        name: rule.code.lowerCaseUniqueName,
+        name: rule.lowerCaseUniqueName,
         description: rule.code.description,
       );
 
@@ -49,9 +50,9 @@ abstract class MultiLintRule<T extends SubLints> extends MultiAnalysisRule {
   final EssentialMultiLints<T> rule;
 
   @override
-  List<DiagnosticCode> get diagnosticCodes => [
-    rule.code,
-    ...subLints.map((e) => e.code),
+  List<EnumDiagnostic> get diagnosticCodes => [
+    rule,
+    ...subLints.map((e) => e),
   ];
 
   /// The list of sub-lints associated with this analysis rule.

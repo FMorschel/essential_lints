@@ -1,5 +1,4 @@
 import 'package:_internal_testing/dependencies.dart';
-import 'package:analyzer/src/diagnostic/diagnostic.dart' as diag;
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:essential_lints/src/warnings/sorting_members.dart';
 import 'package:essential_lints/src/warnings/warning.dart';
@@ -1200,7 +1199,7 @@ class A extends Base {
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
 abstract class Base {
-  int field;
+  int? field;
 }
 
 @SortingMembers({
@@ -1214,11 +1213,6 @@ class A extends Base {
 }
 ''',
       [
-        error(
-          diag.notInitializedNonNullableInstanceField,
-          108,
-          5,
-        ),
         error(rule.diagnosticCode, 239, 5),
       ],
     );
@@ -1253,7 +1247,7 @@ class A extends Base {
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
 abstract class Base {
-  int field;
+  int? field;
 }
 
 @SortingMembers({
@@ -1267,11 +1261,6 @@ class A extends Base {
 }
 ''',
       [
-        error(
-          diag.notInitializedNonNullableInstanceField,
-          108,
-          5,
-        ),
         error(rule.diagnosticCode, 226, 8),
       ],
     );

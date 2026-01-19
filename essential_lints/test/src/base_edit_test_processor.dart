@@ -55,10 +55,13 @@ abstract class BaseEditTestProcessor extends AnalysisRuleTest
 
   // ignore: library_private_types_in_public_api, only used internally.
   _TestInstrumentationService get instrumentationService => .new();
+
   Folder get sdkRoot => getFolder('/sdk');
+
   dart_change_workspace.DartChangeWorkspace get workspace => .new([
     sessionFor(testUnit.path),
   ]);
+
   void matchesExpected(
     String expected, {
     SourceChange? change,
@@ -107,14 +110,10 @@ abstract class BaseEditTestProcessor extends AnalysisRuleTest
   void setUp() {
     rules.forEach(registry.Registry.ruleRegistry.registerLintRule);
     builtInRules.forEach(registry.Registry.ruleRegistry.registerLintRule);
-    multiWarnings.forEach(registry.Registry.ruleRegistry.registerWarningRule);
-    warnings.forEach(registry.Registry.ruleRegistry.registerWarningRule);
+    multiWarnings.forEach(registry.Registry.ruleRegistry.registerLintRule);
+    warnings.forEach(registry.Registry.ruleRegistry.registerLintRule);
     fix_generators.registeredFixGenerators.lintProducers.addAll(lintFixes);
-    // TODO(FMorschel): Remove this when analyzer supports accepting non-lints.
     fix_generators.registeredFixGenerators.lintProducers.addAll(warningFixes);
-    fix_generators.registeredFixGenerators.nonLintProducers.addAll(
-      warningFixes,
-    );
     assist_generators.registeredAssistGenerators.producerGenerators.addAll(
       assists,
     );

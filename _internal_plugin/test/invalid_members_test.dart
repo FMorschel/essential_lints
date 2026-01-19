@@ -1,6 +1,6 @@
 import 'package:_internal_plugin/src/rules/invalid_members.dart';
 import 'package:_internal_testing/dependencies.dart';
-import 'package:analyzer/src/diagnostic/diagnostic.dart' as diag;
+import 'package:analyzer/src/lint/registry.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:logging/logging.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
@@ -24,6 +24,7 @@ class InvalidMembersTest extends AnalysisRuleTest
   Future<void> setUp() async {
     rule = InvalidMembersRule();
     await addAnnotationsDependency();
+    Registry.ruleRegistry.registerLintRule(rule);
     super.setUp();
   }
 
@@ -32,15 +33,12 @@ class InvalidMembersTest extends AnalysisRuleTest
       '''
 import 'package:essential_lints_annotations/src/sorting_members/sort_declarations.dart';
 
+@deprecated
 void foo(SortDeclaration _) {
   foo(.test(.tests));
 }
 ''',
-      [
-        error(diag.deprecatedMemberUseWithMessage, 127, 4),
-        error(diag.deprecatedMemberUseWithMessage, 133, 5),
-        lint(133, 5),
-      ],
+      [lint(145, 5)],
     );
   }
 
@@ -49,16 +47,12 @@ void foo(SortDeclaration _) {
       '''
 import 'package:essential_lints_annotations/src/sorting_members/sort_declarations.dart';
 
+@deprecated
 void foo(SortDeclaration _) {
   foo(.test(.wrapper(.tests)));
 }
 ''',
-      [
-        error(diag.deprecatedMemberUseWithMessage, 127, 4),
-        error(diag.deprecatedMemberUseWithMessage, 133, 7),
-        error(diag.deprecatedMemberUseWithMessage, 142, 5),
-        lint(142, 5),
-      ],
+      [lint(154, 5)],
     );
   }
 }

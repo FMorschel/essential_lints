@@ -20,8 +20,7 @@ abstract class AssistTestProcessor extends BaseEditTestProcessor {
   EssentialLintAssists get assistKind;
 
   @override
-  late final analysisRule =
-      EssentialLintRules.values.first.code.lowerCaseUniqueName;
+  late final analysisRule = EssentialLintRules.values.first.lowerCaseUniqueName;
 
   /// Asserts that there is an assist of the given [assistKind] at [offset]
   /// which produces the [expected] code when applied to [testCode]. The map of

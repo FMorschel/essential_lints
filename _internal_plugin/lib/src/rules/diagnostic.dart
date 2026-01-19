@@ -1,10 +1,6 @@
 import 'package:analyzer/error/error.dart';
 
-class InternalDiagnosticCode extends DiagnosticCode
-    implements
-        // TODO(FMorschel): remove when analyzer supports registering non-lint
-        //  codes
-        LintCode {
+class InternalDiagnosticCode extends DiagnosticCode {
   const InternalDiagnosticCode({
     required super.name,
     required super.problemMessage,

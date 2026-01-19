@@ -5,9 +5,9 @@ import 'package:analysis_server_plugin/edit/fix/dart_fix_context.dart';
 import 'package:analysis_server_plugin/edit/fix/fix.dart';
 import 'package:analysis_server_plugin/src/correction/fix_processor.dart'
     as fix_processor;
-import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/diagnostic/diagnostic.dart';
 import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
+import 'package:essential_lints/src/rules/analysis_rule.dart';
 import 'package:essential_lints/src/rules/rule.dart';
 import 'package:essential_lints/src/warnings/warning.dart';
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
@@ -135,7 +135,7 @@ abstract class FixTestProcessor extends BaseEditTestProcessor
 
   @override
   @mustBeOverridden
-  AnalysisRule get rule;
+  EssentialAnalysisRule get rule;
 }
 
 @SubtypeNaming(suffix: 'Test')
@@ -154,7 +154,7 @@ abstract class LintFixTestProcessor extends FixTestProcessor {
 abstract class MultiWarningFixTestProcessor extends BaseEditTestProcessor
     with EditTestProcessorMixin {
   @override
-  String get analysisRule => rule.rule.code.lowerCaseUniqueName;
+  String get analysisRule => rule.rule.lowerCaseUniqueName;
 
   @override
   EssentialLintWarningFixes get fix;
@@ -172,5 +172,5 @@ abstract class WarningFixTestProcessor extends FixTestProcessor {
 
   @override
   @mustBeOverridden
-  AnalysisRule get rule;
+  EssentialAnalysisRule get rule;
 }
