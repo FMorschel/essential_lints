@@ -16,9 +16,11 @@ environment:
 dependencies:
   analysis_server_plugin: any
   analyzer: any
+  collection: ^1.19.1
   essential_lints:
     path: ../essential_lints
-  essential_lints_annotations: any
+  essential_lints_annotations:
+    path: ../essential_lints_annotations
   logging: any
   meta: any
 

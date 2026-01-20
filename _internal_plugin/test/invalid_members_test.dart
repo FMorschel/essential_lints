@@ -1,6 +1,5 @@
 import 'package:_internal_plugin/src/rules/invalid_members.dart';
 import 'package:_internal_testing/dependencies.dart';
-import 'package:analyzer/src/lint/registry.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:logging/logging.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
@@ -24,7 +23,6 @@ class InvalidMembersTest extends AnalysisRuleTest
   Future<void> setUp() async {
     rule = InvalidMembersRule();
     await addAnnotationsDependency();
-    Registry.ruleRegistry.registerLintRule(rule);
     super.setUp();
   }
 

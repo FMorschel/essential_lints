@@ -27,7 +27,9 @@ dependencies:
   analyzer_plugin: ^0.14.0
   args: ^2.0.0
   collection: ^1.16.0
-  essential_lints_annotations: ^0.1.1+2
+  # essential_lints_annotations: ^0.1.1+2
+  essential_lints_annotations:
+    path: ../essential_lints_annotations
   logging: ^1.0.0
   meta: ^1.9.0
 

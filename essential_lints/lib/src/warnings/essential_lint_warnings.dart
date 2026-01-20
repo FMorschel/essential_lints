@@ -5,7 +5,7 @@ import 'package:analyzer/error/error.dart';
 /// {@endtemplate}
 mixin EnumDiagnostic implements DiagnosticCode {
   /// The diagnostic code associated with the enum value.
-  DiagnosticCode get code;
+  WarningCode get code;
 
   @override
   String? get correctionMessage => code.correctionMessage;
@@ -41,6 +41,9 @@ mixin EnumDiagnostic implements DiagnosticCode {
 
   @override
   DiagnosticType get type => code.type;
+
+  /// A detailed description of the lint rule.
+  String get description => code.description;
 
   @override
   @Deprecated('Use lowercaseUniqueName instead')

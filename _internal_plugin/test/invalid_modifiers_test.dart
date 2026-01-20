@@ -1,6 +1,5 @@
 import 'package:_internal_plugin/src/rules/invalid_modifiers.dart';
 import 'package:_internal_testing/dependencies.dart';
-import 'package:analyzer/src/lint/registry.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:logging/logging.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
@@ -23,7 +22,6 @@ class InvalidModifiersTest extends AnalysisRuleTest
   @override
   Future<void> setUp() async {
     rule = InvalidModifiersRule();
-    Registry.ruleRegistry.registerLintRule(rule);
     await addAnnotationsDependency();
     super.setUp();
   }

@@ -18,14 +18,7 @@ import 'essential_lint_warnings.dart'
 abstract class MultiWarningRule<T extends SubWarnings>
     extends EssentialMultiAnalysisRule {
   /// {@macro rule}
-  MultiWarningRule(this.rule)
-    : super(
-        name: rule.lowerCaseUniqueName,
-        description: rule.code.description,
-      );
-
-  /// The essential warning rule associated with this analysis rule.
-  final EssentialMultiWarnings<T> rule;
+  MultiWarningRule(EssentialMultiWarnings<T> super.rule);
 
   @override
   List<EnumDiagnostic> get diagnosticCodes => [
@@ -50,14 +43,7 @@ abstract class MultiWarningRule<T extends SubWarnings>
 @SubtypeNaming(suffix: 'Rule')
 abstract class WarningRule extends EssentialAnalysisRule {
   /// {@macro rule}
-  WarningRule(this.rule)
-    : super(
-        name: rule.lowerCaseUniqueName,
-        description: rule.code.description,
-      );
-
-  /// The essential warning rule associated with this analysis rule.
-  final EssentialLintWarnings rule;
+  WarningRule(EssentialLintWarnings super.rule);
 
   @override
   EnumDiagnostic get diagnosticCode => rule;

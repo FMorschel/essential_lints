@@ -1,13 +1,24 @@
 import 'package:analyzer/analysis_rule/analysis_rule.dart';
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+// ignore: implementation_imports internal
+import 'package:essential_lints_annotations/src/_internal/static_enforcement.dart';
 
-import '../warnings/essential_lint_warnings.dart';
+import '../warnings/essential_lint_warnings.dart' hide SubtypeAnnotating;
 
 /// {@template essentialAnalysisRule}
 /// The base class for all essential analysis rules.
 /// {@endtemplate}
+@SubtypeAnnotating(annotations: [StaticEnforcement(#_logger)])
 abstract class EssentialAnalysisRule extends AnalysisRule {
   /// {@macro essentialAnalysisRule}
-  EssentialAnalysisRule({required super.name, required super.description});
+  EssentialAnalysisRule(this.rule)
+    : super(
+        name: rule.lowerCaseUniqueName,
+        description: rule.code.description,
+      );
+
+  /// The essential lint rule associated with this analysis rule.
+  final EnumDiagnostic rule;
 
   @override
   EnumDiagnostic get diagnosticCode;
@@ -18,7 +29,14 @@ abstract class EssentialAnalysisRule extends AnalysisRule {
 /// {@endtemplate}
 abstract class EssentialMultiAnalysisRule extends MultiAnalysisRule {
   /// {@macro essentialMultiAnalysisRule}
-  EssentialMultiAnalysisRule({required super.name, required super.description});
+  EssentialMultiAnalysisRule(this.rule)
+    : super(
+        name: rule.lowerCaseUniqueName,
+        description: rule.code.description,
+      );
+
+  /// The essential lint rule associated with this analysis rule.
+  final EnumDiagnostic rule;
 
   @override
   List<EnumDiagnostic> get diagnosticCodes;

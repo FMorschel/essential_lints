@@ -13,14 +13,7 @@ import 'essential_lint_rules.dart';
 @SubtypeNaming(suffix: 'Rule')
 abstract class LintRule extends EssentialAnalysisRule {
   /// {@macro rule}
-  LintRule(this.rule)
-    : super(
-        name: rule.lowerCaseUniqueName,
-        description: rule.code.description,
-      );
-
-  /// The essential lint rule associated with this analysis rule.
-  final EssentialLintRules rule;
+  LintRule(EssentialLintRules super.rule);
 
   @override
   EnumDiagnostic get diagnosticCode => rule;
@@ -40,14 +33,7 @@ abstract class LintRule extends EssentialAnalysisRule {
 abstract class MultiLintRule<T extends SubLints>
     extends EssentialMultiAnalysisRule {
   /// {@macro rule}
-  MultiLintRule(this.rule)
-    : super(
-        name: rule.lowerCaseUniqueName,
-        description: rule.code.description,
-      );
-
-  /// The essential lint rule associated with this analysis rule.
-  final EssentialMultiLints<T> rule;
+  MultiLintRule(EssentialMultiLints<T> super.rule);
 
   @override
   List<EnumDiagnostic> get diagnosticCodes => [

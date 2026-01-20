@@ -1,6 +1,5 @@
 import 'package:_internal_plugin/src/rules/annotate_members_with.dart';
 import 'package:_internal_testing/dependencies.dart';
-import 'package:analyzer/src/lint/registry.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
@@ -17,7 +16,6 @@ class AnnotateMembersWithTest extends AnalysisRuleTest
   Future<void> setUp() async {
     rule = AnnotateMembersWithRule();
     await addAnnotationsDependency();
-    Registry.ruleRegistry.registerLintRule(rule);
     super.setUp();
   }
 
