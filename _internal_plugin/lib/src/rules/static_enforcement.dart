@@ -122,7 +122,7 @@ class _StaticEnforcementVisitor extends SimpleAstVisitor<void> {
         continue;
       }
       var type = annotation.computeConstantValue()?.getField('type')?.type;
-      if (type is InterfaceType) {
+      if (type is InterfaceType && !type.isDartCoreNull) {
         var argument = type.typeArguments.first;
         if (memberWithName
             case FieldElement(:var type) ||
