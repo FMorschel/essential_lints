@@ -14,4 +14,10 @@ enum SubtypeOption {
 
   /// Only concrete subtypes should be annotated.
   onlyConcrete,
+
+  /// Only instantiable subtypes should be annotated.
+  ///
+  /// Meaning subtypes that can have generative constructors (i.e., not `mixin`s
+  /// or `abstract class`es).
+  onlyInstantiable,
 }

@@ -13,16 +13,22 @@ import 'package:essential_lints_annotations/src/sorting_members/sort_declaration
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 
+import '../plugin.dart';
+import '../rules/analysis_rule.dart';
+import '../utils/extensions/logger.dart';
 import 'warning.dart';
-
-final _logger = Logger('sorting_members_rule');
 
 /// {@template sorting_members_rule}
 /// The rule for sorting_members warning.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class SortingMembersRule extends WarningRule {
   /// {@macro sorting_members_rule}
-  SortingMembersRule() : super(.sortingMembers);
+  SortingMembersRule() : super(.sortingMembers, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'SortingMembersRule',
+  );
 
   @override
   void registerNodeProcessors(
@@ -401,7 +407,9 @@ class _LintingMemberVisitor extends _BaseMemberVisitor {
           rule.reportAtNode(node.typeName);
         }
       default:
-        _logger.severe('Unexpected node type for member: $node');
+        rule.logger.severe(
+          'Unexpected node type for member: $node',
+        );
         assert(false, 'Unexpected node type for member: $node');
         rule.reportAtNode(node);
     }
@@ -845,7 +853,7 @@ class ValidatorFromAnnotation {
           case '_New':
             list.add(const _NewMemberTypeValidator());
           default:
-            _logger.severe('Unknown member type: $typeName');
+            SortingMembersRule._logger.severe('Unknown member type: $typeName');
             assert(false, 'Unknown member type: $typeName');
         }
         current =

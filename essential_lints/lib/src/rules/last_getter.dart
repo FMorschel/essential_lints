@@ -8,17 +8,26 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
 import '../utils/extensions/ast.dart';
+import '../utils/extensions/logger.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template last_getter}
 /// A rule that suggests using `last` property instead of accessing
 /// the last element of a list-like object using length - 1 index.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class LastGetterRule extends LintRule {
   /// {@macro last_getter}
-  LastGetterRule() : super(.lastGetter);
+  LastGetterRule() : super(.lastGetter, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'LastGetterRule',
+  );
 
   @override
   void registerNodeProcessors(

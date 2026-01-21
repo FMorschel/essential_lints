@@ -4,8 +4,12 @@ import 'package:analyzer/source/source_range.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
 import 'package:collection/collection.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../rules/analysis_rule.dart';
 import '../utils/extensions/element.dart';
+import '../utils/extensions/logger.dart';
 import 'essential_lint_fixes.dart';
 import 'fix.dart';
 
@@ -13,9 +17,14 @@ import 'fix.dart';
 /// A fix that converts a Container with wrapping Padding to use the
 /// padding property.
 /// {@endtemplate}
-class UsePaddingPropertyFix extends ResolvedCorrectionProducer with LintFix {
+@staticLoggerEnforcement
+class UsePaddingPropertyFix extends CorrectionProducerLogger with LintFix {
   /// {@macro use_padding_property_fix}
-  UsePaddingPropertyFix({required super.context});
+  UsePaddingPropertyFix({required super.context}) : super(_logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'UsePaddingPropertyFix',
+  );
 
   @override
   CorrectionApplicability get applicability => .acrossSingleFile;

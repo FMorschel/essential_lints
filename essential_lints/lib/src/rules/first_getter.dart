@@ -6,16 +6,25 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../utils/extensions/logger.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template first_getter}
 /// A rule that suggests using the `first` property instead of accessing
 /// the first element of a list-like object using index 0.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class FirstGetterRule extends LintRule {
   /// {@macro first_getter}
-  FirstGetterRule() : super(.firstGetter);
+  FirstGetterRule() : super(.firstGetter, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'FirstGetterRule',
+  );
 
   @override
   void registerNodeProcessors(

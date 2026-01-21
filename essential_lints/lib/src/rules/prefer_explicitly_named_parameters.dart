@@ -5,16 +5,26 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../utils/extensions/logger.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template prefer_explicitly_named_parameters}
 /// A lint rule that encourages the use of explicitly named parameters
 /// in function type declarations for improved code clarity and completion.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class PreferExplicitlyNamedParameterRule extends LintRule {
   /// {@macro prefer_explicitly_named_parameters}
-  PreferExplicitlyNamedParameterRule() : super(.preferExplicitlyNamedParameter);
+  PreferExplicitlyNamedParameterRule()
+    : super(.preferExplicitlyNamedParameter, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'PreferExplicitlyNamedParameterRule',
+  );
 
   @override
   void registerNodeProcessors(

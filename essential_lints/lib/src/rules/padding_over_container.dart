@@ -5,16 +5,25 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
 import '../utils/extensions/element.dart';
+import '../utils/extensions/logger.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template padding_over_container_rule}
 /// A rule that prevents using Padding widget over Container widget.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class PaddingOverContainerRule extends LintRule {
   /// {@macro padding_over_container_rule}
-  PaddingOverContainerRule() : super(.paddingOverContainer);
+  PaddingOverContainerRule() : super(.paddingOverContainer, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'PaddingOverContainerRule',
+  );
 
   @override
   void registerNodeProcessors(

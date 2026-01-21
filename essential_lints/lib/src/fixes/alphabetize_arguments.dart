@@ -3,16 +3,25 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/source/source_range.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../rules/analysis_rule.dart';
+import '../utils/extensions/logger.dart';
 import 'essential_lint_fixes.dart';
 import 'fix.dart';
 
 /// {@template alphabetize_arguments}
 /// A fix that alphabetizes arguments in function, method, or constructor calls.
 /// {@endtemplate}
-class AlphabetizeArgumentsFix extends ResolvedCorrectionProducer with LintFix {
+@staticLoggerEnforcement
+class AlphabetizeArgumentsFix extends CorrectionProducerLogger with LintFix {
   /// {@macro alphabetize_arguments}
-  AlphabetizeArgumentsFix({required super.context});
+  AlphabetizeArgumentsFix({required super.context}) : super(_logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'AlphabetizeArgumentsFix',
+  );
 
   @override
   CorrectionApplicability get applicability => .singleLocation;

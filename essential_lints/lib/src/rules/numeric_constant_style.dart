@@ -5,17 +5,26 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
 import '../utils/double_literal_parser.dart';
+import '../utils/extensions/logger.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template numeric_constant_style}
 /// A lint rule that enforces a consistent format for double literals
 /// in the codebase.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class NumericConstantStyleRule extends LintRule {
   /// {@macro numeric_constant_style}
-  NumericConstantStyleRule() : super(.numericConstantStyle);
+  NumericConstantStyleRule() : super(.numericConstantStyle, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'NumericConstantStyleRule',
+  );
 
   @override
   void registerNodeProcessors(

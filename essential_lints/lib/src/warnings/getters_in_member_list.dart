@@ -7,8 +7,12 @@ import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../rules/analysis_rule.dart';
 import '../utils/extensions/list.dart';
+import '../utils/extensions/logger.dart';
 import '../utils/extensions/object.dart';
 import 'essential_lint_warnings.dart';
 import 'warning.dart';
@@ -16,12 +20,17 @@ import 'warning.dart';
 /// {@template getters_in_member_list_rule}
 /// A lint rule that ensures getters/fields are included in member lists.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class GettersInMemberListRule extends MultiWarningRule<GettersInMemberList> {
   /// {@macro getters_in_member_list_rule}
-  GettersInMemberListRule() : super(.gettersInMemberList);
+  GettersInMemberListRule() : super(.gettersInMemberList, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'GettersInMemberListRule',
+  );
 
   @override
-  List<GettersInMemberList> get subWarnings => GettersInMemberList.values;
+  List<GettersInMemberList> get subDiagnostics => GettersInMemberList.values;
 
   @override
   void registerNodeProcessors(

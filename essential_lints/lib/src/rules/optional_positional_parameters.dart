@@ -3,15 +3,25 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:collection/collection.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../utils/extensions/logger.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template optional_positional_parameters}
 /// Checks for functions or methods that declare optional positional parameters.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class OptionalPositionalParametersRule extends LintRule {
   /// {@macro optional_positional_parameters}
-  OptionalPositionalParametersRule() : super(.optionalPositionalParameters);
+  OptionalPositionalParametersRule()
+    : super(.optionalPositionalParameters, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'OptionalPositionalParametersRule',
+  );
 
   @override
   void registerNodeProcessors(

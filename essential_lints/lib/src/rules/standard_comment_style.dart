@@ -6,15 +6,24 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../utils/extensions/logger.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template standard_comment_style}
 /// A rule that checks for proper formatting of comments.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class StandardCommentStyleRule extends LintRule {
   /// {@macro standard_comment_style}
-  StandardCommentStyleRule() : super(.standardCommentStyle);
+  StandardCommentStyleRule() : super(.standardCommentStyle, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'StandardCommentStyleRule',
+  );
 
   @override
   void registerNodeProcessors(

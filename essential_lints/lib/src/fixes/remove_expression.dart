@@ -4,17 +4,26 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/source/source_range.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../rules/analysis_rule.dart';
 import '../rules/essential_lint_rules.dart';
+import '../utils/extensions/logger.dart';
 import 'essential_lint_fixes.dart';
 import 'fix.dart';
 
 /// {@template remove_expression_fix}
 /// A fix that removes an expression from the code.
 /// {@endtemplate}
-class RemoveExpressionFix extends ResolvedCorrectionProducer with WarningFix {
+@staticLoggerEnforcement
+class RemoveExpressionFix extends CorrectionProducerLogger with WarningFix {
   /// {@macro remove_expression_fix}
-  RemoveExpressionFix({required super.context});
+  RemoveExpressionFix({required super.context}) : super(_logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'RemoveExpressionFix',
+  );
 
   @override
   CorrectionApplicability get applicability => .acrossSingleFile;

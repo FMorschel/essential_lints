@@ -6,19 +6,28 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../rules/analysis_rule.dart';
+import '../utils/extensions/logger.dart';
 import 'essential_lint_warnings.dart';
 import 'warning.dart';
 
 /// {@template subtype_naming_rule}
 /// The rule for the subtype_naming warning.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class SubtypeNamingRule extends MultiWarningRule<SubtypeNaming> {
   /// {@macro subtype_naming_rule}
-  SubtypeNamingRule() : super(.subtypeNaming);
+  SubtypeNamingRule() : super(.subtypeNaming, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'SubtypeNamingRule',
+  );
 
   @override
-  List<SubtypeNaming> get subWarnings => SubtypeNaming.values;
+  List<SubtypeNaming> get subDiagnostics => SubtypeNaming.values;
 
   @override
   void registerNodeProcessors(
@@ -172,6 +181,9 @@ class _SubtypeNamingVisitor extends SimpleAstVisitor<void> {
         continue;
       } else if (annotation.option?.variable?.name == 'onlyAbstract' &&
           !abstract) {
+        continue;
+      } else if (annotation.option?.variable?.name == 'onlyInstantiable' &&
+          (abstract || element is MixinElement)) {
         continue;
       }
       var typeName = switch (name) {

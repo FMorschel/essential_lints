@@ -3,15 +3,24 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../utils/extensions/logger.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template duplicate_value}
 /// A lint rule that detects duplicate values in comparisons like `&&` and `||`.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class DuplicateValueRule extends LintRule {
   /// {@macro duplicate_value}
-  DuplicateValueRule() : super(.duplicateValue);
+  DuplicateValueRule() : super(.duplicateValue, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'DuplicateValueRule',
+  );
 
   @override
   void registerNodeProcessors(

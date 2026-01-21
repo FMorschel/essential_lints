@@ -6,18 +6,27 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
 import '../utils/diagnostic_message.dart';
 import '../utils/extensions/ast.dart';
 import '../utils/extensions/element.dart';
+import '../utils/extensions/logger.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template unnecessary_setstate_rule}
 /// A rule that detects unnecessary calls to setState in Flutter widgets.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class UnnecessarySetstateRule extends LintRule {
   /// {@macro unnecessary_setstate_rule}
-  UnnecessarySetstateRule() : super(.unnecessarySetstate);
+  UnnecessarySetstateRule() : super(.unnecessarySetstate, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'UnnecessarySetstateRule',
+  );
 
   @override
   void registerNodeProcessors(

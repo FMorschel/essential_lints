@@ -7,17 +7,26 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
 import '../utils/extensions/ast.dart';
 import '../utils/extensions/element.dart';
+import '../utils/extensions/logger.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template returning_widgets_rule}
 /// A rule that prevents returning widgets from functions/methods.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class ReturningWidgetsRule extends LintRule {
   /// {@macro returning_widgets_rule}
-  ReturningWidgetsRule() : super(.returningWidgets);
+  ReturningWidgetsRule() : super(.returningWidgets, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'ReturningWidgetsRule',
+  );
 
   @override
   void registerNodeProcessors(

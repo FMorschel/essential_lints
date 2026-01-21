@@ -7,21 +7,30 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../rules/analysis_rule.dart';
 import '../utils/dart_object_to_string.dart';
 import '../utils/extensions/list.dart';
+import '../utils/extensions/logger.dart';
 import 'essential_lint_warnings.dart';
 import 'warning.dart';
 
 /// {@template subtype_annotating_rule}
 /// The rule for subtype_annotating warning.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class SubtypeAnnotatingRule extends MultiWarningRule<SubtypeAnnotating> {
   /// {@macro subtype_annotating_rule}
-  SubtypeAnnotatingRule() : super(.subtypeAnnotating);
+  SubtypeAnnotatingRule() : super(.subtypeAnnotating, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'SubtypeAnnotatingRule',
+  );
 
   @override
-  List<SubtypeAnnotating> get subWarnings => SubtypeAnnotating.values;
+  List<SubtypeAnnotating> get subDiagnostics => SubtypeAnnotating.values;
 
   @override
   void registerNodeProcessors(
@@ -189,6 +198,9 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
         continue;
       } else if (annotation.option?.variable?.name == 'onlyAbstract' &&
           !abstract) {
+        continue;
+      } else if (annotation.option?.variable?.name == 'onlyInstantiable' &&
+          (abstract || element is MixinElement)) {
         continue;
       }
       var missingAnnotations = annotation.annotations.whereNot(existing);

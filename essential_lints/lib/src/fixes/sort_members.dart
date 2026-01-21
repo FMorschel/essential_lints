@@ -7,11 +7,12 @@ import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dar
 import 'package:analyzer_plugin/utilities/range_factory.dart';
 import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../rules/analysis_rule.dart';
+import '../utils/extensions/logger.dart';
 import '../warnings/sorting_members.dart';
 import 'essential_lint_fixes.dart';
 import 'fix.dart';
-
-final _logger = Logger('SortMembersFix');
 
 /// A member that needs to be moved, along with where to insert it.
 class _MemberToMove {
@@ -37,9 +38,14 @@ class _MemberToMove {
 /// A fix that sorts the members of a class, mixin, enum, extension or extension
 /// type according to the defined sorting rules.
 /// {@endtemplate}
-class SortMembersFix extends ResolvedCorrectionProducer with WarningFix {
+@staticLoggerEnforcement
+class SortMembersFix extends CorrectionProducerLogger with WarningFix {
   /// {@macro sort_members_fix}
-  SortMembersFix({required super.context});
+  SortMembersFix({required super.context}) : super(_logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'SortMembersFix',
+  );
 
   @override
   CorrectionApplicability get applicability => .acrossSingleFile;

@@ -2,17 +2,26 @@ import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../rules/analysis_rule.dart';
 import '../utils/double_literal_parser.dart';
+import '../utils/extensions/logger.dart';
 import 'essential_lint_fixes.dart';
 import 'fix.dart';
 
 /// {@template numeric_constant_style}
 /// A fix that formats double literals to adhere to a consistent style.
 /// {@endtemplate}
-class NumericConstantStyleFix extends ResolvedCorrectionProducer with LintFix {
+@staticLoggerEnforcement
+class NumericConstantStyleFix extends CorrectionProducerLogger with LintFix {
   /// {@macro numeric_constant_style}
-  NumericConstantStyleFix({required super.context});
+  NumericConstantStyleFix({required super.context}) : super(_logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'NumericConstantStyleFix',
+  );
 
   @override
   CorrectionApplicability get applicability => .acrossSingleFile;

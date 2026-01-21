@@ -88,4 +88,20 @@ class C {
 }
 ''');
   }
+
+  Future<void> test_ok_enum() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/src/_internal/static_enforcement.dart';
+
+@StaticEnforcement(#staticMethod)
+enum E {
+  value1;
+
+  const E();
+
+  void instanceMethod() {}
+  static void staticMethod() {}
+}
+''');
+  }
 }

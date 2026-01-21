@@ -4,8 +4,12 @@ import 'package:analyzer/src/workspace/workspace.dart'; // ignore: implementatio
 import 'package:analyzer_plugin/src/utilities/change_builder/change_builder_dart.dart'; // ignore: implementation_imports, needed for imports
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../rules/analysis_rule.dart';
 import '../rules/same_package_direct_import.dart';
+import '../utils/extensions/logger.dart';
 import 'essential_lint_fixes.dart';
 import 'fix.dart';
 
@@ -13,10 +17,14 @@ import 'fix.dart';
 /// A fix that replaces indirect imports within the same package with direct
 /// imports.
 /// {@endtemplate}
-class SamePackageDirectImportFix extends ResolvedCorrectionProducer
-    with LintFix {
+@staticLoggerEnforcement
+class SamePackageDirectImportFix extends CorrectionProducerLogger with LintFix {
   /// {@macro same_package_direct_import_fix}
-  SamePackageDirectImportFix({required super.context});
+  SamePackageDirectImportFix({required super.context}) : super(_logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'SamePackageDirectImportFix',
+  );
 
   @override
   CorrectionApplicability get applicability => .acrossSingleFile;

@@ -3,20 +3,29 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
+import 'package:logging/logging.dart';
 
 import '../fixes/essential_lint_fixes.dart';
 import '../fixes/fix.dart';
+import '../plugin.dart';
+import '../rules/analysis_rule.dart';
 import '../utils/extensions/ast.dart';
+import '../utils/extensions/logger.dart';
 import 'assist.dart';
 import 'essential_lint_assists.dart';
 
 /// {@template swap_cases}
 /// Assist to remove useless else statements.
 /// {@endtemplate}
-class RemoveUselessElseAssistFix extends ResolvedCorrectionProducer
+@staticLoggerEnforcement
+class RemoveUselessElseAssistFix extends CorrectionProducerLogger
     with Assist, LintFix {
   /// {@macro swap_cases}
-  RemoveUselessElseAssistFix({required super.context});
+  RemoveUselessElseAssistFix({required super.context}) : super(_logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'RemoveUselessElseAssistFix',
+  );
 
   @override
   CorrectionApplicability get applicability => .acrossSingleFile;

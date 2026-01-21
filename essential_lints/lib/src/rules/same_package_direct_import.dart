@@ -5,15 +5,24 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/src/dart/resolver/scope.dart'; // ignore: implementation_imports, not exported
 import 'package:analyzer/workspace/workspace.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../utils/extensions/logger.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template same_package_direct_import}
 /// A lint rule that enforces direct imports within the same package.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class SamePackageDirectImportRule extends LintRule {
   /// {@macro same_package_direct_import}
-  SamePackageDirectImportRule() : super(.samePackageDirectImport);
+  SamePackageDirectImportRule() : super(.samePackageDirectImport, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'SamePackageDirectImportRule',
+  );
 
   @override
   void registerNodeProcessors(

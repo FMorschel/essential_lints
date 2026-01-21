@@ -3,17 +3,26 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
 import '../utils/extensions/ast.dart';
+import '../utils/extensions/logger.dart';
 import '../utils/extensions/object.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template complete_error_no_stack}
 /// Checks for `Completer.completeError` without stack traces.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class CompleterErrorNoStackRule extends LintRule {
   /// {@macro complete_error_no_stack}
-  CompleterErrorNoStackRule() : super(.completerErrorNoStack);
+  CompleterErrorNoStackRule() : super(.completerErrorNoStack, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'CompleterErrorNoStackRule',
+  );
 
   @override
   void registerNodeProcessors(

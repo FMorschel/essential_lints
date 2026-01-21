@@ -1,4 +1,15 @@
 import 'package:analyzer/error/error.dart';
+import 'package:essential_lints_annotations/essential_lints_annotations.dart'
+    as annotation;
+// ignore: implementation_imports internal
+import 'package:essential_lints_annotations/src/_internal/static_enforcement.dart';
+
+/// Enforcement to ensure a static list of all diagnostics is present in all
+/// multi-lint rules.
+const staticAllEnforcement = StaticEnforcement(
+  #all,
+  annotation.th<List<EnumDiagnostic>>(),
+);
 
 /// {@template enum_diagnostic}
 /// A mixin for enums that provide a diagnostic code.
@@ -132,7 +143,12 @@ enum EssentialMultiWarnings<T extends SubWarnings> with EnumDiagnostic {
 }
 
 /// The list of sub-warnings for the GettersInMemberList warning.
-enum GettersInMemberList with EnumDiagnostic, SubWarnings {
+@staticAllEnforcement
+@StaticEnforcement(
+  #base,
+  annotation.th<EssentialMultiWarnings>(),
+)
+enum GettersInMemberList with EnumDiagnostic, SubDiagnostic, SubWarnings {
   /// An instance member list is missing to include getters/fields.
   missingList(
     WarningCode(
@@ -202,15 +218,23 @@ enum GettersInMemberList with EnumDiagnostic, SubWarnings {
 
   const GettersInMemberList(this.code);
 
-  @override
-  final EssentialMultiWarnings base = .gettersInMemberList;
+  /// The list of all SubtypeNaming sub-warnings.
+  static const List<EnumDiagnostic> all = [...values, base];
+
+  /// The base warning.
+  static const EssentialMultiWarnings base = .gettersInMemberList;
 
   @override
   final WarningCode code;
 }
 
 /// The list of sub-warnings for the SubtypeAnnotating warning.
-enum SubtypeAnnotating with EnumDiagnostic, SubWarnings {
+@staticAllEnforcement
+@StaticEnforcement(
+  #base,
+  annotation.th<EssentialMultiWarnings>(),
+)
+enum SubtypeAnnotating with EnumDiagnostic, SubDiagnostic, SubWarnings {
   /// The annotation does not specify any required annotations.
   missingAnnotation(
     WarningCode(
@@ -246,15 +270,23 @@ enum SubtypeAnnotating with EnumDiagnostic, SubWarnings {
 
   const SubtypeAnnotating(this.code);
 
-  @override
-  final EssentialMultiWarnings base = .subtypeAnnotating;
+  /// The list of all SubtypeAnnotating sub-warnings.
+  static const List<EnumDiagnostic> all = [...values, base];
+
+  /// The base warning.
+  static const EssentialMultiWarnings base = .subtypeAnnotating;
 
   @override
   final WarningCode code;
 }
 
 /// The list of sub-warnings for the SubtypeNaming warning.
-enum SubtypeNaming with EnumDiagnostic, SubWarnings {
+@staticAllEnforcement
+@StaticEnforcement(
+  #base,
+  annotation.th<EssentialMultiWarnings>(),
+)
+enum SubtypeNaming with EnumDiagnostic, SubDiagnostic, SubWarnings {
   /// The annotation does not specify any naming conventions.
   missingNameDefinition(
     WarningCode(
@@ -275,8 +307,11 @@ enum SubtypeNaming with EnumDiagnostic, SubWarnings {
 
   const SubtypeNaming(this.code);
 
-  @override
-  final EssentialMultiWarnings base = .subtypeNaming;
+  /// The list of all SubtypeNaming sub-warnings.
+  static const List<EnumDiagnostic> all = [...values, base];
+
+  /// The base warning.
+  static const EssentialMultiWarnings base = .subtypeNaming;
 
   @override
   final WarningCode code;
@@ -285,10 +320,28 @@ enum SubtypeNaming with EnumDiagnostic, SubWarnings {
 /// {@template sub_warnings}
 /// A grouping of sub-warnings under a base warning.
 /// {@endtemplate}
-mixin SubWarnings on EnumDiagnostic {
-  /// The base warning.
-  EssentialMultiWarnings get base;
+@annotation.SubtypeAnnotating(
+  annotations: [
+    StaticEnforcement(
+      #base,
+      annotation.th<EssentialMultiWarnings>(),
+    ),
+  ],
+  option: .onlyInstantiable,
+)
+mixin SubWarnings on SubDiagnostic {
+  @override
+  WarningCode get code;
+}
 
+/// {@template sub_warnings}
+/// A grouping of sub-warnings under a base warning.
+/// {@endtemplate}
+@annotation.SubtypeAnnotating(
+  annotations: [staticAllEnforcement],
+  option: .onlyInstantiable,
+)
+mixin SubDiagnostic on EnumDiagnostic {
   @override
   WarningCode get code;
 }

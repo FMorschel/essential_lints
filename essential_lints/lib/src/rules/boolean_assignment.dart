@@ -2,15 +2,24 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../utils/extensions/logger.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template boolean_assignment}
 /// Checks for assignments where a condition was expected.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class BooleanAssignmentRule extends LintRule {
   /// {@macro boolean_assignment}
-  BooleanAssignmentRule() : super(.booleanAssignment);
+  BooleanAssignmentRule() : super(.booleanAssignment, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'BooleanAssignmentRule',
+  );
 
   @override
   void registerNodeProcessors(

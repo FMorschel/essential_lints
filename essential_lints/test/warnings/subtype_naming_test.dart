@@ -239,4 +239,41 @@ import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 class MyClass {}
 ''');
   }
+
+  Future<void> test_onlyInstantiable_abstract() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeNaming(prefix: 'My', option: .onlyInstantiable)
+class MyClass {}
+
+abstract class MyOtherClass extends MyClass {}
+''');
+  }
+
+  Future<void> test_onlyInstantiable_mixin() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeNaming(prefix: 'My', option: .onlyInstantiable)
+class MyClass {}
+
+mixin MyOtherClass on MyClass {}
+''');
+  }
+
+  Future<void> test_onlyInstantiable_instantiable() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeNaming(prefix: 'My', option: .onlyInstantiable)
+class MyClass {}
+
+class OtherClass extends MyClass {}
+mixin class MixinClass implements MyClass {}
+''',
+      [lint(160, 10), lint(202, 10)],
+    );
+  }
 }

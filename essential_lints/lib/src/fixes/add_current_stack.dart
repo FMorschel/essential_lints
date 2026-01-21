@@ -1,7 +1,11 @@
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../rules/analysis_rule.dart';
+import '../utils/extensions/logger.dart';
 import 'essential_lint_fixes.dart';
 import 'fix.dart';
 
@@ -9,9 +13,14 @@ import 'fix.dart';
 /// A fix that adds the current stack trace when completing a Completer with an
 /// error.
 /// {@endtemplate}
-class AddCurrentStackFix extends ResolvedCorrectionProducer with LintFix {
+@staticLoggerEnforcement
+class AddCurrentStackFix extends CorrectionProducerLogger with LintFix {
   /// {@macro add_current_stack_fix}
-  AddCurrentStackFix({required super.context});
+  AddCurrentStackFix({required super.context}) : super(_logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'AddCurrentStackFix',
+  );
 
   @override
   CorrectionApplicability get applicability => .acrossSingleFile;

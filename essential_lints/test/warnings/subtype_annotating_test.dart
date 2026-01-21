@@ -260,4 +260,41 @@ class OtherClass extends MyClass {}
       [lint(180, 12), lint(219, 10)],
     );
   }
+
+  Future<void> test_onlyInstantiable_abstract() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeAnnotating(annotations: [SubtypeAnnotating], option: .onlyInstantiable)
+class MyClass {}
+
+abstract class MyOtherClass extends MyClass {}
+''');
+  }
+
+  Future<void> test_onlyInstantiable_mixin() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeAnnotating(annotations: [SubtypeAnnotating], option: .onlyInstantiable)
+class MyClass {}
+
+mixin MyOtherClass on MyClass {}
+''');
+  }
+
+  Future<void> test_onlyInstantiable_instantiable() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeAnnotating(annotations: [SubtypeAnnotating], option: .onlyInstantiable)
+class MyClass {}
+
+class OtherClass extends MyClass {}
+mixin class MixinClass implements MyClass {}
+''',
+      [lint(184, 10), lint(226, 10)],
+    );
+  }
 }

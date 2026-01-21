@@ -4,16 +4,25 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
 import '../utils/extensions/ast.dart';
+import '../utils/extensions/logger.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template mutable_tearoff}
 /// Checks for mutable tear-offs.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class MutableTearoffRule extends LintRule {
   /// {@macro mutable_tearoff}
-  MutableTearoffRule() : super(.mutableTearoff);
+  MutableTearoffRule() : super(.mutableTearoff, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'MutableTearoffRule',
+  );
 
   @override
   void registerNodeProcessors(

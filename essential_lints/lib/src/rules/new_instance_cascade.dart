@@ -3,16 +3,25 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../utils/extensions/logger.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template new_instance_cascade}
 /// A lint rule that warns against using cascades on members that return new
 /// instances.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class NewInstanceCascadeRule extends LintRule {
   /// {@macro new_instance_cascade}
-  NewInstanceCascadeRule() : super(.newInstanceCascade);
+  NewInstanceCascadeRule() : super(.newInstanceCascade, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'NewInstanceCascadeRule',
+  );
 
   @override
   void registerNodeProcessors(

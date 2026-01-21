@@ -1,57 +1,20 @@
-import 'package:analyzer/analysis_rule/rule_context.dart';
-import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
-import 'package:essential_lints_annotations/essential_lints_annotations.dart';
-import 'package:meta/meta.dart';
-
 import '../rules/analysis_rule.dart';
 import 'essential_lint_warnings.dart'
-    show
-        EnumDiagnostic,
-        EssentialLintWarnings,
-        EssentialMultiWarnings,
-        SubWarnings;
-
-/// {@template rule}
-/// The base class for all essential multi-warnings rules.
-/// {@endtemplate}
-@SubtypeNaming(suffix: 'Rule')
-abstract class MultiWarningRule<T extends SubWarnings>
-    extends EssentialMultiAnalysisRule {
-  /// {@macro rule}
-  MultiWarningRule(EssentialMultiWarnings<T> super.rule);
-
-  @override
-  List<EnumDiagnostic> get diagnosticCodes => [
-    rule,
-    ...subWarnings,
-  ];
-
-  /// The list of sub-warnings associated with this analysis rule.
-  List<T> get subWarnings;
-
-  @override
-  @mustBeOverridden
-  void registerNodeProcessors(
-    RuleVisitorRegistry registry,
-    RuleContext context,
-  );
-}
+    show EssentialLintWarnings, EssentialMultiWarnings, SubWarnings;
 
 /// {@template rule}
 /// The base class for all essential warning rules.
 /// {@endtemplate}
-@SubtypeNaming(suffix: 'Rule')
 abstract class WarningRule extends EssentialAnalysisRule {
   /// {@macro rule}
-  WarningRule(EssentialLintWarnings super.rule);
+  WarningRule(EssentialLintWarnings super.rule, super.logger);
+}
 
-  @override
-  EnumDiagnostic get diagnosticCode => rule;
-
-  @override
-  @mustBeOverridden
-  void registerNodeProcessors(
-    RuleVisitorRegistry registry,
-    RuleContext context,
-  );
+/// {@template rule}
+/// The base class for all essential multi-warnings rules.
+/// {@endtemplate}
+abstract class MultiWarningRule<T extends SubWarnings>
+    extends EssentialMultiAnalysisRule {
+  /// {@macro rule}
+  MultiWarningRule(EssentialMultiWarnings<T> super.rule, super.logger);
 }

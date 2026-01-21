@@ -4,16 +4,25 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../rules/analysis_rule.dart';
+import '../utils/extensions/logger.dart';
 import 'essential_lint_fixes.dart';
 import 'fix.dart';
 
 /// {@template create_getter_fix}
 /// A fix that creates a getter for a missing getter reference.
 /// {@endtemplate}
-class CreateGetterFix extends ResolvedCorrectionProducer with WarningFix {
+@staticLoggerEnforcement
+class CreateGetterFix extends CorrectionProducerLogger with WarningFix {
   /// {@macro create_getter_fix}
-  CreateGetterFix({required super.context});
+  CreateGetterFix({required super.context}) : super(_logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'CreateGetterFix',
+  );
 
   static final _memberPattern = RegExp(r"('(([$]|\w)+)')");
 

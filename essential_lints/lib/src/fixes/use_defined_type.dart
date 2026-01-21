@@ -3,7 +3,11 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../rules/analysis_rule.dart';
+import '../utils/extensions/logger.dart';
 import 'essential_lint_fixes.dart';
 import 'fix.dart';
 
@@ -11,9 +15,14 @@ import 'fix.dart';
 /// A fix that changes the type annotation of a closure parameter
 /// to use the defined type.
 /// {@endtemplate}
-class UseDefinedTypeFix extends ResolvedCorrectionProducer with LintFix {
+@staticLoggerEnforcement
+class UseDefinedTypeFix extends CorrectionProducerLogger with LintFix {
   /// {@macro use_defined_type_fix}
-  UseDefinedTypeFix({required super.context});
+  UseDefinedTypeFix({required super.context}) : super(_logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'UseDefinedTypeFix',
+  );
 
   @override
   CorrectionApplicability get applicability => .acrossSingleFile;

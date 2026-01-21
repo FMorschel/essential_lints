@@ -2,16 +2,25 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
 import '../utils/extensions/list.dart';
+import '../utils/extensions/logger.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template equal_statement}
 /// A lint rule for equal statements under switch cases.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class EqualStatementRule extends LintRule {
   /// {@macro equal_statement}
-  EqualStatementRule() : super(.equalStatement);
+  EqualStatementRule() : super(.equalStatement, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'EqualStatementRule',
+  );
 
   @override
   void registerNodeProcessors(

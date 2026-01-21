@@ -9,9 +9,13 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:collection/collection.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
 import '../utils/extensions/ast.dart';
+import '../utils/extensions/logger.dart';
 import '../utils/extensions/object.dart';
+import 'analysis_rule.dart';
 import 'essential_lint_rules.dart';
 import 'rule.dart';
 
@@ -19,12 +23,17 @@ import 'rule.dart';
 /// A lint rule that detects pending listeners and reminds developers to
 /// remove them.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class PendingListenerRule extends MultiLintRule<PendingListener> {
   /// {@macro pending_listener_rule}
-  PendingListenerRule() : super(.pendingListener);
+  PendingListenerRule() : super(.pendingListener, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'PendingListenerRule',
+  );
 
   @override
-  List<PendingListener> get subLints => PendingListener.values;
+  List<PendingListener> get subDiagnostics => PendingListener.values;
 
   @override
   void registerNodeProcessors(

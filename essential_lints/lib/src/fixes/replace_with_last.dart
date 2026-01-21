@@ -1,16 +1,25 @@
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../rules/analysis_rule.dart';
+import '../utils/extensions/logger.dart';
 import 'essential_lint_fixes.dart';
 import 'fix.dart';
 
 /// {@template replace_with_last_fix}
 /// A fix that replaces `[length - 1]` with `.last`.
 /// {@endtemplate}
-class ReplaceWithLastFix extends ResolvedCorrectionProducer with LintFix {
+@staticLoggerEnforcement
+class ReplaceWithLastFix extends CorrectionProducerLogger with LintFix {
   /// {@macro replace_with_last_fix}
-  ReplaceWithLastFix({required super.context});
+  ReplaceWithLastFix({required super.context}) : super(_logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'ReplaceWithLastFix',
+  );
 
   @override
   CorrectionApplicability get applicability => .acrossSingleFile;

@@ -5,15 +5,24 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../utils/extensions/logger.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template border_all_rule}
 /// A lint rule that checks for the use of `Border.all` in Flutter widgets.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class BorderAllRule extends LintRule {
   /// {@macro border_all_rule}
-  BorderAllRule() : super(.borderAll);
+  BorderAllRule() : super(.borderAll, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'BorderAllRule',
+  );
 
   @override
   void registerNodeProcessors(
