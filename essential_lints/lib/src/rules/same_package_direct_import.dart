@@ -8,7 +8,6 @@ import 'package:analyzer/workspace/workspace.dart';
 import 'package:logging/logging.dart';
 
 import '../plugin.dart';
-import '../utils/extensions/logger.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
 
@@ -20,7 +19,7 @@ class SamePackageDirectImportRule extends LintRule {
   /// {@macro same_package_direct_import}
   SamePackageDirectImportRule() : super(.samePackageDirectImport, _logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'SamePackageDirectImportRule',
   );
 

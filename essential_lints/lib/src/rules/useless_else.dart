@@ -6,7 +6,6 @@ import 'package:logging/logging.dart';
 
 import '../plugin.dart';
 import '../utils/extensions/ast.dart';
-import '../utils/extensions/logger.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
 
@@ -18,7 +17,7 @@ class UselessElseRule extends LintRule {
   /// {@macro useless_else}
   UselessElseRule() : super(.uselessElse, _logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'UselessElseRule',
   );
 

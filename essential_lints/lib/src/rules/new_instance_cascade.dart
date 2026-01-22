@@ -6,7 +6,6 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:logging/logging.dart';
 
 import '../plugin.dart';
-import '../utils/extensions/logger.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
 
@@ -19,7 +18,7 @@ class NewInstanceCascadeRule extends LintRule {
   /// {@macro new_instance_cascade}
   NewInstanceCascadeRule() : super(.newInstanceCascade, _logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'NewInstanceCascadeRule',
   );
 

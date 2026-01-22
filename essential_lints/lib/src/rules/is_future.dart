@@ -6,7 +6,6 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:logging/logging.dart';
 
 import '../plugin.dart';
-import '../utils/extensions/logger.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
 
@@ -19,7 +18,7 @@ class IsFutureRule extends LintRule {
   /// {@macro is_future}
   IsFutureRule() : super(.isFuture, _logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'IsFutureRule',
   );
 

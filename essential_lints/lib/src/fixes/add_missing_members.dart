@@ -5,7 +5,6 @@ import 'package:logging/logging.dart';
 
 import '../plugin.dart';
 import '../rules/analysis_rule.dart';
-import '../utils/extensions/logger.dart';
 import '../utils/extensions/object.dart';
 import 'essential_lint_fixes.dart';
 import 'fix.dart';
@@ -18,7 +17,7 @@ class AddMissingMembersFix extends CorrectionProducerLogger with WarningFix {
   /// {@macro add_missing_members}
   AddMissingMembersFix({required super.context}) : super(_logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'AddMissingMembersFix',
   );
 

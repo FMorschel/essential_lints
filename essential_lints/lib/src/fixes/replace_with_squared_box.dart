@@ -5,7 +5,6 @@ import 'package:logging/logging.dart';
 
 import '../plugin.dart';
 import '../rules/analysis_rule.dart';
-import '../utils/extensions/logger.dart';
 import 'essential_lint_fixes.dart';
 import 'fix.dart';
 
@@ -17,7 +16,7 @@ class ReplaceWithSizedBoxFix extends CorrectionProducerLogger with LintFix {
   /// {@macro replace_with_squared_box_fix}
   ReplaceWithSizedBoxFix({required super.context}) : super(_logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'ReplaceWithSizedBoxFix',
   );
 

@@ -12,7 +12,6 @@ import 'package:logging/logging.dart';
 
 import '../plugin.dart';
 import '../utils/extensions/ast.dart';
-import '../utils/extensions/logger.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
 
@@ -25,7 +24,7 @@ class LastGetterRule extends LintRule {
   /// {@macro last_getter}
   LastGetterRule() : super(.lastGetter, _logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'LastGetterRule',
   );
 

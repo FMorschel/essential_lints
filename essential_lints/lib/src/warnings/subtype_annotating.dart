@@ -13,7 +13,6 @@ import '../plugin.dart';
 import '../rules/analysis_rule.dart';
 import '../utils/dart_object_to_string.dart';
 import '../utils/extensions/list.dart';
-import '../utils/extensions/logger.dart';
 import 'essential_lint_warnings.dart';
 import 'warning.dart';
 
@@ -25,7 +24,7 @@ class SubtypeAnnotatingRule extends MultiWarningRule<SubtypeAnnotating> {
   /// {@macro subtype_annotating_rule}
   SubtypeAnnotatingRule() : super(.subtypeAnnotating, _logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'SubtypeAnnotatingRule',
   );
 

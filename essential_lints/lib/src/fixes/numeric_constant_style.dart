@@ -7,7 +7,6 @@ import 'package:logging/logging.dart';
 import '../plugin.dart';
 import '../rules/analysis_rule.dart';
 import '../utils/double_literal_parser.dart';
-import '../utils/extensions/logger.dart';
 import 'essential_lint_fixes.dart';
 import 'fix.dart';
 
@@ -19,7 +18,7 @@ class NumericConstantStyleFix extends CorrectionProducerLogger with LintFix {
   /// {@macro numeric_constant_style}
   NumericConstantStyleFix({required super.context}) : super(_logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'NumericConstantStyleFix',
   );
 

@@ -9,7 +9,6 @@ import 'package:logging/logging.dart';
 
 import '../plugin.dart';
 import '../utils/double_literal_parser.dart';
-import '../utils/extensions/logger.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
 
@@ -22,7 +21,7 @@ class NumericConstantStyleRule extends LintRule {
   /// {@macro numeric_constant_style}
   NumericConstantStyleRule() : super(.numericConstantStyle, _logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'NumericConstantStyleRule',
   );
 

@@ -54,7 +54,6 @@ import 'rules/standard_comment_style.dart';
 import 'rules/unnecessary_setstate.dart';
 import 'rules/useless_else.dart';
 import 'rules/variable_shadowing.dart';
-import 'utils/extensions/logger.dart';
 import 'warnings/essential_lint_warnings.dart';
 import 'warnings/getters_in_member_list.dart';
 import 'warnings/sorting_members.dart';
@@ -71,7 +70,7 @@ typedef FixGenerator =
 /// Mixin to integrate plugin fixes.
 mixin AssistsPluginIntegration {
   /// The logger for the assists integration.
-  static final Logger logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger logger = EssentialLintsPlugin.newLogger(
     'AssistsPluginIntegration',
   );
 
@@ -113,7 +112,7 @@ mixin AssistsPluginIntegration {
 /// Mixin to integrate plugin fixes.
 mixin FixesPluginIntegration {
   /// The logger for the fixes integration.
-  static final Logger logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger logger = EssentialLintsPlugin.newLogger(
     'FixesPluginIntegration',
   );
 
@@ -259,7 +258,7 @@ mixin FixesPluginIntegration {
 /// Mixin to integrate plugin rules.
 mixin RulesPluginIntegration {
   /// The logger for the rules integration.
-  static final Logger logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger logger = EssentialLintsPlugin.newLogger(
     'RulesPluginIntegration',
   );
 
@@ -331,7 +330,7 @@ mixin RulesPluginIntegration {
 /// Mixin to integrate plugin rules.
 mixin WarningsPluginIntegration {
   /// The logger for the warnings integration.
-  static final Logger logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger logger = EssentialLintsPlugin.newLogger(
     'WarningsPluginIntegration',
   );
 

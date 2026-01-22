@@ -8,7 +8,6 @@ import 'package:logging/logging.dart';
 
 import '../plugin.dart';
 import '../rules/analysis_rule.dart';
-import '../utils/extensions/logger.dart';
 import 'essential_lint_fixes.dart';
 import 'fix.dart';
 
@@ -20,7 +19,7 @@ class CreateGetterFix extends CorrectionProducerLogger with WarningFix {
   /// {@macro create_getter_fix}
   CreateGetterFix({required super.context}) : super(_logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'CreateGetterFix',
   );
 

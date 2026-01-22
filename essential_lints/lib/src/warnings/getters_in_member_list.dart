@@ -12,7 +12,6 @@ import 'package:logging/logging.dart';
 import '../plugin.dart';
 import '../rules/analysis_rule.dart';
 import '../utils/extensions/list.dart';
-import '../utils/extensions/logger.dart';
 import '../utils/extensions/object.dart';
 import 'essential_lint_warnings.dart';
 import 'warning.dart';
@@ -25,7 +24,7 @@ class GettersInMemberListRule extends MultiWarningRule<GettersInMemberList> {
   /// {@macro getters_in_member_list_rule}
   GettersInMemberListRule() : super(.gettersInMemberList, _logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'GettersInMemberListRule',
   );
 

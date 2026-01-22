@@ -15,7 +15,6 @@ import 'package:meta/meta.dart';
 
 import '../plugin.dart';
 import '../rules/analysis_rule.dart';
-import '../utils/extensions/logger.dart';
 import 'warning.dart';
 
 /// {@template sorting_members_rule}
@@ -26,7 +25,7 @@ class SortingMembersRule extends WarningRule {
   /// {@macro sorting_members_rule}
   SortingMembersRule() : super(.sortingMembers, _logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'SortingMembersRule',
   );
 

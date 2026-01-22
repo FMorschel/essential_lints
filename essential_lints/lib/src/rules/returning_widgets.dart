@@ -12,7 +12,6 @@ import 'package:logging/logging.dart';
 import '../plugin.dart';
 import '../utils/extensions/ast.dart';
 import '../utils/extensions/element.dart';
-import '../utils/extensions/logger.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
 
@@ -24,7 +23,7 @@ class ReturningWidgetsRule extends LintRule {
   /// {@macro returning_widgets_rule}
   ReturningWidgetsRule() : super(.returningWidgets, _logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'ReturningWidgetsRule',
   );
 

@@ -9,7 +9,6 @@ import 'package:logging/logging.dart';
 
 import '../plugin.dart';
 import '../rules/analysis_rule.dart';
-import '../utils/extensions/logger.dart';
 import '../warnings/sorting_members.dart';
 import 'essential_lint_fixes.dart';
 import 'fix.dart';
@@ -43,7 +42,7 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
   /// {@macro sort_members_fix}
   SortMembersFix({required super.context}) : super(_logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'SortMembersFix',
   );
 

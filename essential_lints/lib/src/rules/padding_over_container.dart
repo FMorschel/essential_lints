@@ -9,7 +9,6 @@ import 'package:logging/logging.dart';
 
 import '../plugin.dart';
 import '../utils/extensions/element.dart';
-import '../utils/extensions/logger.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
 
@@ -21,7 +20,7 @@ class PaddingOverContainerRule extends LintRule {
   /// {@macro padding_over_container_rule}
   PaddingOverContainerRule() : super(.paddingOverContainer, _logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'PaddingOverContainerRule',
   );
 

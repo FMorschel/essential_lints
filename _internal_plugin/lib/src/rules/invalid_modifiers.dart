@@ -3,7 +3,6 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:essential_lints/src/plugin.dart';
-import 'package:essential_lints/src/utils/extensions/logger.dart';
 import 'package:logging/logging.dart';
 
 import 'diagnostic.dart';
@@ -16,7 +15,7 @@ class InvalidModifiersRule extends AnalysisRule {
         description: 'Modifiers that are invalid for a given modifier.',
       );
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'InvalidModifiersRule',
   );
 

@@ -7,7 +7,6 @@ import 'package:logging/logging.dart';
 
 import '../plugin.dart';
 import '../utils/extensions/ast.dart';
-import '../utils/extensions/logger.dart';
 import '../utils/extensions/object.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
@@ -20,7 +19,7 @@ class CompleterErrorNoStackRule extends LintRule {
   /// {@macro complete_error_no_stack}
   CompleterErrorNoStackRule() : super(.completerErrorNoStack, _logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'CompleterErrorNoStackRule',
   );
 

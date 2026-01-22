@@ -9,7 +9,6 @@ import 'package:logging/logging.dart';
 import '../plugin.dart';
 import '../rules/analysis_rule.dart';
 import '../rules/essential_lint_rules.dart';
-import '../utils/extensions/logger.dart';
 import 'essential_lint_fixes.dart';
 import 'fix.dart';
 
@@ -21,7 +20,7 @@ class RemoveExpressionFix extends CorrectionProducerLogger with WarningFix {
   /// {@macro remove_expression_fix}
   RemoveExpressionFix({required super.context}) : super(_logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'RemoveExpressionFix',
   );
 

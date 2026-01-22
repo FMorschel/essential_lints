@@ -13,7 +13,6 @@ import 'package:logging/logging.dart';
 
 import '../plugin.dart';
 import '../utils/extensions/ast.dart';
-import '../utils/extensions/logger.dart';
 import '../utils/extensions/object.dart';
 import 'analysis_rule.dart';
 import 'essential_lint_rules.dart';
@@ -28,7 +27,7 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
   /// {@macro pending_listener_rule}
   PendingListenerRule() : super(.pendingListener, _logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'PendingListenerRule',
   );
 

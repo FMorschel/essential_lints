@@ -9,7 +9,6 @@ import 'package:logging/logging.dart';
 import '../plugin.dart';
 import '../rules/analysis_rule.dart';
 import '../utils/extensions/element.dart';
-import '../utils/extensions/logger.dart';
 import 'essential_lint_fixes.dart';
 import 'fix.dart';
 
@@ -22,7 +21,7 @@ class UsePaddingPropertyFix extends CorrectionProducerLogger with LintFix {
   /// {@macro use_padding_property_fix}
   UsePaddingPropertyFix({required super.context}) : super(_logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'UsePaddingPropertyFix',
   );
 

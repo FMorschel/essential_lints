@@ -9,7 +9,6 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:logging/logging.dart';
 
 import '../plugin.dart';
-import '../utils/extensions/logger.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
 
@@ -21,7 +20,7 @@ class StandardCommentStyleRule extends LintRule {
   /// {@macro standard_comment_style}
   StandardCommentStyleRule() : super(.standardCommentStyle, _logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'StandardCommentStyleRule',
   );
 

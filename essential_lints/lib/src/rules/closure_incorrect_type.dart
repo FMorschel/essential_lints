@@ -6,7 +6,6 @@ import 'package:analyzer/src/dart/ast/ast.dart'; // ignore: implementation_impor
 import 'package:logging/logging.dart';
 
 import '../plugin.dart';
-import '../utils/extensions/logger.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
 
@@ -18,7 +17,7 @@ class ClosureIncorrectTypeRule extends LintRule {
   /// {@macro closure_incorrect_type}
   ClosureIncorrectTypeRule() : super(.closureIncorrectType, _logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'ClosureIncorrectTypeRule',
   );
 

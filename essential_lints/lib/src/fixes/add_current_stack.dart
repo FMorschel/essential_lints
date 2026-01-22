@@ -5,7 +5,6 @@ import 'package:logging/logging.dart';
 
 import '../plugin.dart';
 import '../rules/analysis_rule.dart';
-import '../utils/extensions/logger.dart';
 import 'essential_lint_fixes.dart';
 import 'fix.dart';
 
@@ -18,7 +17,7 @@ class AddCurrentStackFix extends CorrectionProducerLogger with LintFix {
   /// {@macro add_current_stack_fix}
   AddCurrentStackFix({required super.context}) : super(_logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'AddCurrentStackFix',
   );
 

@@ -12,7 +12,6 @@ import '../plugin.dart';
 import '../utils/diagnostic_message.dart';
 import '../utils/extensions/ast.dart';
 import '../utils/extensions/element.dart';
-import '../utils/extensions/logger.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
 
@@ -24,7 +23,7 @@ class UnnecessarySetstateRule extends LintRule {
   /// {@macro unnecessary_setstate_rule}
   UnnecessarySetstateRule() : super(.unnecessarySetstate, _logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'UnnecessarySetstateRule',
   );
 

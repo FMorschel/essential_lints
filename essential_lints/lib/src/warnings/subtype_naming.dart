@@ -10,7 +10,6 @@ import 'package:logging/logging.dart';
 
 import '../plugin.dart';
 import '../rules/analysis_rule.dart';
-import '../utils/extensions/logger.dart';
 import 'essential_lint_warnings.dart';
 import 'warning.dart';
 
@@ -22,7 +21,7 @@ class SubtypeNamingRule extends MultiWarningRule<SubtypeNaming> {
   /// {@macro subtype_naming_rule}
   SubtypeNamingRule() : super(.subtypeNaming, _logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'SubtypeNamingRule',
   );
 

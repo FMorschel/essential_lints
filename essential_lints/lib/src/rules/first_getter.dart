@@ -9,7 +9,6 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:logging/logging.dart';
 
 import '../plugin.dart';
-import '../utils/extensions/logger.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
 
@@ -22,7 +21,7 @@ class FirstGetterRule extends LintRule {
   /// {@macro first_getter}
   FirstGetterRule() : super(.firstGetter, _logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'FirstGetterRule',
   );
 

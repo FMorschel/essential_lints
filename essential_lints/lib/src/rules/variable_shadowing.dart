@@ -11,7 +11,6 @@ import 'package:logging/logging.dart';
 
 import '../plugin.dart';
 import '../utils/diagnostic_message.dart';
-import '../utils/extensions/logger.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
 
@@ -24,7 +23,7 @@ class VariableShadowingRule extends LintRule {
   /// {@macro variable_shadowing}
   VariableShadowingRule() : super(.variableShadowing, _logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'VariableShadowingRule',
   );
 

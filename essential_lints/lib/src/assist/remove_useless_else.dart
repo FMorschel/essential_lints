@@ -10,7 +10,6 @@ import '../fixes/fix.dart';
 import '../plugin.dart';
 import '../rules/analysis_rule.dart';
 import '../utils/extensions/ast.dart';
-import '../utils/extensions/logger.dart';
 import 'assist.dart';
 import 'essential_lint_assists.dart';
 
@@ -23,7 +22,7 @@ class RemoveUselessElseAssistFix extends CorrectionProducerLogger
   /// {@macro swap_cases}
   RemoveUselessElseAssistFix({required super.context}) : super(_logger);
 
-  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
     'RemoveUselessElseAssistFix',
   );
 

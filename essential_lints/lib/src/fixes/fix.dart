@@ -3,6 +3,7 @@ import 'package:analyzer_plugin/utilities/fixes/fixes.dart';
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 import 'package:logging/logging.dart';
 
+import '../plugin.dart';
 import '../rules/analysis_rule.dart';
 import 'essential_lint_fixes.dart';
 
@@ -25,22 +26,38 @@ abstract class CorrectionProducerLogger extends ResolvedCorrectionProducer {
 /// The base class for all essential lint fixes.
 /// {@endtemplate}
 @SubtypeNaming(suffix: 'Fix')
-mixin LintFix on ResolvedCorrectionProducer {
+@staticLoggerEnforcement
+mixin LintFix on CorrectionProducerLogger {
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
+    'LintFix',
+  );
+
   /// The essential lint fix associated with this correction producer.
   EssentialLintFixes get fix;
 
   @override
-  FixKind get fixKind => fix.fixKind;
+  FixKind get fixKind {
+    _logger.log(.INFO, 'Setting fix kind for ${fix.name}');
+    return fix.fixKind;
+  }
 }
 
 /// {@template warning_fix}
 /// The base class for all essential warning fixes.
 /// {@endtemplate}
 @SubtypeNaming(suffix: 'Fix')
-mixin WarningFix on ResolvedCorrectionProducer {
+@staticLoggerEnforcement
+mixin WarningFix on CorrectionProducerLogger {
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
+    'WarningFix',
+  );
+
   /// The essential warning fix associated with this correction producer.
   EssentialLintWarningFixes get fix;
 
   @override
-  FixKind get fixKind => fix.fixKind;
+  FixKind get fixKind {
+    _logger.log(.INFO, 'Setting fix kind for ${fix.name}');
+    return fix.fixKind;
+  }
 }
