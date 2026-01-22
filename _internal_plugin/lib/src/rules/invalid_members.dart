@@ -2,12 +2,12 @@ import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:essential_lints/src/plugin.dart';
+import 'package:essential_lints/src/utils/extensions/logger.dart';
 import 'package:logging/logging.dart';
 
 import 'diagnostic.dart';
 import 'invalid_base_visitor.dart';
-
-final _log = Logger('InvalidMembersRule');
 
 class InvalidMembersRule extends AnalysisRule {
   InvalidMembersRule()
@@ -15,6 +15,12 @@ class InvalidMembersRule extends AnalysisRule {
         name: _diagnostic.lowerCaseUniqueName,
         description: 'Members that are invalid for a given modifier.',
       );
+
+  static final Logger _logger = EssentialLintsPlugin.logger.newChild(
+    'InvalidMembersRule',
+  );
+
+  Logger get logger => _logger;
 
   static const _diagnostic = InternalDiagnosticCode(
     name: 'invalid_members',
@@ -40,7 +46,7 @@ class InvalidMembersRule extends AnalysisRule {
 
 class _InvalidMembersVisitor extends InvalidBaseVisitor {
   _InvalidMembersVisitor(InvalidMembersRule rule, RuleContext context)
-    : super(context, rule, _log);
+    : super(context, rule, rule.logger);
 
   @override
   String get annotationName => 'InvalidMembers';

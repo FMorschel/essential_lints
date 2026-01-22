@@ -12,7 +12,10 @@ class EssentialLintsPlugin extends Plugin
         AssistsPluginIntegration,
         WarningsPluginIntegration {
   /// The logger for the Essential Lints plugin.
-  static final logger = Logger('EssentialLintsPlugin');
+  static final Logger logger = () {
+    hierarchicalLoggingEnabled = true;
+    return Logger('EssentialLintsPlugin')..level = .OFF;
+  }();
 
   @override
   String get name => 'essential_lints';
@@ -35,4 +38,10 @@ class EssentialLintsPlugin extends Plugin
     registerAssists(registry);
     logger.info('Registered assists');
   }
+}
+
+/// Extension on [EssentialLintsPlugin] to provide easy access to the logger.
+extension LoggerExtension on EssentialLintsPlugin {
+  /// The logger for the Essential Lints plugin.
+  Logger get logger => EssentialLintsPlugin.logger;
 }

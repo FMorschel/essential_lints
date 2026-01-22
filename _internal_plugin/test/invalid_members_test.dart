@@ -1,12 +1,13 @@
 import 'package:_internal_plugin/src/rules/invalid_members.dart';
 import 'package:_internal_testing/dependencies.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
+import 'package:essential_lints/src/plugin.dart';
 import 'package:logging/logging.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 void main() {
   // Set up logging to print to console
-  Logger.root.level = Level.ALL;
+  EssentialLintsPlugin.logger.level = Level.ALL;
   Logger.root.onRecord.listen((record) {
     print('${record.level.name}: ${record.time}: ${record.message}');
   });
