@@ -98,7 +98,7 @@ class _SyncCallVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitPropertyAccess(PropertyAccess node) {
     var containing = node.enclosingExecutableElementIfSync;
-    if (containing != null) {
+    if (containing != null && node.propertyName.element is! MethodElement) {
       _handleInvocation(
         node.propertyName.element,
         containing,
@@ -112,7 +112,7 @@ class _SyncCallVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
     var containing = node.enclosingExecutableElementIfSync;
-    if (containing != null) {
+    if (containing != null && node.element is! MethodElement) {
       _handleInvocation(
         node.element,
         containing,

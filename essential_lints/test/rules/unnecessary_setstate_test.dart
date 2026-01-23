@@ -64,6 +64,46 @@ abstract class MyState extends State {
     );
   }
 
+  Future<void> test_inBuild_tearoff() async {
+    await assertNoDiagnostics(
+      '''
+import 'package:flutter/widgets.dart';
+
+abstract class MyState extends State {
+  @override
+  Widget build(BuildContext context) {
+    other;
+    return Container();
+  }
+
+  void other() {
+    setState(() {});
+  }
+}
+'''
+    );
+  }
+
+  Future<void> test_inBuild_inClosure() async {
+    await assertNoDiagnostics(
+      '''
+import 'package:flutter/widgets.dart';
+
+abstract class MyState extends State {
+  @override
+  Widget build(BuildContext context) {
+    (){other;};
+    return Container();
+  }
+
+  void other() {
+    setState(() {});
+  }
+}
+'''
+    );
+  }
+
   Future<void> test_inBuild_other_async() async {
     await assertNoDiagnostics('''
 import 'package:flutter/widgets.dart';
