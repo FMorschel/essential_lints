@@ -34,11 +34,14 @@
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 
 mixin FlutterDependencyMixin on AnalysisRuleTest {
+  @override
+  bool get addFlutterPackageDep => true;
+
   void createFlutterMock() {
-    newPackage('flutter')
-      ..addFile(
-        join('lib', 'src', 'widgets', 'framework.dart'),
-        '''
+    var flutterRootPath = addFlutter().parent.path;
+    newFile(
+      join(flutterRootPath, 'lib', 'src', 'widgets', 'framework.dart'),
+      '''
 abstract class BuildContext {}
 abstract class Widget {
   const Widget();
@@ -59,10 +62,10 @@ abstract class State<T extends StatefulWidget> {
   Widget build(BuildContext context);
 }
 ''',
-      )
-      ..addFile(
-        join('lib', 'src', 'widgets', 'container.dart'),
-        '''
+    );
+    newFile(
+      join(flutterRootPath, 'lib', 'src', 'widgets', 'container.dart'),
+      '''
 import 'framework.dart';
 import '../painting/edge_insets.dart';
 
@@ -70,10 +73,10 @@ class Container extends Widget {
   Container({Widget? child, EdgeInsets? padding});
 }
 ''',
-      )
-      ..addFile(
-        join('lib', 'src', 'widgets', 'basic.dart'),
-        '''
+    );
+    newFile(
+      join(flutterRootPath, 'lib', 'src', 'widgets', 'basic.dart'),
+      '''
 import 'framework.dart';
 import '../painting/edge_insets.dart';
 
@@ -88,15 +91,16 @@ class SizedBox extends Widget {
   const SizedBox.shrink();
 }
 ''',
-      )
-      ..addFile(
-        join(
-          'lib',
-          'src',
-          'foundation',
-          'change_notifier.dart',
-        ),
-        '''
+    );
+    newFile(
+      join(
+        flutterRootPath,
+        'lib',
+        'src',
+        'foundation',
+        'change_notifier.dart',
+      ),
+      '''
 typedef VoidCallback = void Function();
 
 abstract class Listenable {
@@ -109,27 +113,28 @@ mixin class ChangeNotifier implements Listenable {
   void dispose() {}
 }
 ''',
-      )
-      ..addFile(
-        join(
-          'lib',
-          'foundation.dart',
-        ),
-        '''
+    );
+    newFile(
+      join(
+        flutterRootPath,
+        'lib',
+        'foundation.dart',
+      ),
+      '''
 export 'src/foundation/change_notifier.dart';
 ''',
-      )
-      ..addFile(
-        join('lib', 'src', 'painting', 'edge_insets.dart'),
-        '''
+    );
+    newFile(
+      join(flutterRootPath, 'lib', 'src', 'painting', 'edge_insets.dart'),
+      '''
 class EdgeInsets {
   const EdgeInsets.all(double value);
 }
 ''',
-      )
-      ..addFile(
-        join('lib', 'src', 'painting', 'border_radius.dart'),
-        '''
+    );
+    newFile(
+      join(flutterRootPath, 'lib', 'src', 'painting', 'border_radius.dart'),
+      '''
 import 'basic_types.dart';
 
 class BorderRadius {
@@ -137,18 +142,18 @@ class BorderRadius {
   BorderRadius.circular(double radius);
 }
 ''',
-      )
-      ..addFile(
-        join('lib', 'src', 'painting', 'basic_types.dart'),
-        '''
+    );
+    newFile(
+      join(flutterRootPath, 'lib', 'src', 'painting', 'basic_types.dart'),
+      '''
 class Radius {
   const Radius.circular(double radius);
 }
 ''',
-      )
-      ..addFile(
-        join('lib', 'src', 'painting', 'borders.dart'),
-        '''
+    );
+    newFile(
+      join(flutterRootPath, 'lib', 'src', 'painting', 'borders.dart'),
+      '''
 enum BorderStyle { none, solid, }
 
 class BorderSide {
@@ -162,10 +167,10 @@ class BorderSide {
   static const double strokeAlignInside = -1.0;
 }
 ''',
-      )
-      ..addFile(
-        join('lib', 'src', 'painting', 'box_border.dart'),
-        '''
+    );
+    newFile(
+      join(flutterRootPath, 'lib', 'src', 'painting', 'box_border.dart'),
+      '''
 import 'borders.dart';
 
 class Border {
@@ -181,18 +186,18 @@ class Border {
   const Border.fromBorderSide(BorderSide side);
 }
 ''',
-      )
-      ..addFile(
-        join('lib', 'painting.dart'),
-        '''
+    );
+    newFile(
+      join(flutterRootPath, 'lib', 'painting.dart'),
+      '''
 export 'src/painting/basic_types.dart';
 export 'src/painting/border_radius.dart';
 export 'src/painting/borders.dart';
 export 'src/painting/box_border.dart';
 export 'src/painting/edge_insets.dart';
 ''',
-      )
-      ..addFile(join('lib', 'widgets.dart'), '''
+    );
+    newFile(join(flutterRootPath, 'lib', 'widgets.dart'), '''
 export 'src/widgets/framework.dart';
 export 'src/widgets/container.dart';
 export 'src/widgets/basic.dart';
