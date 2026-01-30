@@ -110,18 +110,18 @@ class MyStateState extends State {
       '''
 import 'package:flutter/widgets.dart';
 
-class MyState extends StatefulWidget {
+abstract class MyState extends StatefulWidget {
   Container other() => Container();
 }
 
-class MyStateState extends State {
+abstract class MyStateState extends State {
   @override
   Widget build(BuildContext context) {
     return Container();
   }
 }
 ''',
-      [lint(91, 5)],
+      [lint(100, 5)],
     );
   }
 

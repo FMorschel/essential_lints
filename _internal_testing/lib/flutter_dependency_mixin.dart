@@ -64,35 +64,6 @@ abstract class State<T extends StatefulWidget> {
 ''',
     );
     newFile(
-      join(flutterRootPath, 'lib', 'src', 'widgets', 'container.dart'),
-      '''
-import 'framework.dart';
-import '../painting/edge_insets.dart';
-
-class Container extends Widget {
-  Container({Widget? child, EdgeInsets? padding});
-}
-''',
-    );
-    newFile(
-      join(flutterRootPath, 'lib', 'src', 'widgets', 'basic.dart'),
-      '''
-import 'framework.dart';
-import '../painting/edge_insets.dart';
-
-export '../../painting.dart';
-export '../../foundation.dart' show Listenable;
-
-class Padding extends Widget {
-  const Padding({required EdgeInsets padding, Widget? child});
-}
-
-class SizedBox extends Widget {
-  const SizedBox.shrink();
-}
-''',
-    );
-    newFile(
       join(
         flutterRootPath,
         'lib',
@@ -114,93 +85,5 @@ mixin class ChangeNotifier implements Listenable {
 }
 ''',
     );
-    newFile(
-      join(
-        flutterRootPath,
-        'lib',
-        'foundation.dart',
-      ),
-      '''
-export 'src/foundation/change_notifier.dart';
-''',
-    );
-    newFile(
-      join(flutterRootPath, 'lib', 'src', 'painting', 'edge_insets.dart'),
-      '''
-class EdgeInsets {
-  const EdgeInsets.all(double value);
-}
-''',
-    );
-    newFile(
-      join(flutterRootPath, 'lib', 'src', 'painting', 'border_radius.dart'),
-      '''
-import 'basic_types.dart';
-
-class BorderRadius {
-  const BorderRadius.all(Radius radius);
-  BorderRadius.circular(double radius);
-}
-''',
-    );
-    newFile(
-      join(flutterRootPath, 'lib', 'src', 'painting', 'basic_types.dart'),
-      '''
-class Radius {
-  const Radius.circular(double radius);
-}
-''',
-    );
-    newFile(
-      join(flutterRootPath, 'lib', 'src', 'painting', 'borders.dart'),
-      '''
-enum BorderStyle { none, solid, }
-
-class BorderSide {
-  const BorderSide({
-    Color color = const Color(0xFF000000),
-    double width = 1.0,
-    BorderStyle style = BorderStyle.solid,
-    double strokeAlign = strokeAlignInside,
-  });
-
-  static const double strokeAlignInside = -1.0;
-}
-''',
-    );
-    newFile(
-      join(flutterRootPath, 'lib', 'src', 'painting', 'box_border.dart'),
-      '''
-import 'borders.dart';
-
-class Border {
-  const Border();
-
-  factory Border.all({
-    Color color = const Color(0xFF000000),
-    double width = 1.0,
-    BorderStyle style = BorderStyle.solid,
-    double strokeAlign = BorderSide.strokeAlignInside,
-  }) => Border();
-
-  const Border.fromBorderSide(BorderSide side);
-}
-''',
-    );
-    newFile(
-      join(flutterRootPath, 'lib', 'painting.dart'),
-      '''
-export 'src/painting/basic_types.dart';
-export 'src/painting/border_radius.dart';
-export 'src/painting/borders.dart';
-export 'src/painting/box_border.dart';
-export 'src/painting/edge_insets.dart';
-''',
-    );
-    newFile(join(flutterRootPath, 'lib', 'widgets.dart'), '''
-export 'src/widgets/framework.dart';
-export 'src/widgets/container.dart';
-export 'src/widgets/basic.dart';
-''');
   }
 }

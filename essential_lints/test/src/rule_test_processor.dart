@@ -20,7 +20,6 @@ abstract class LintTestProcessor extends AnalysisRuleTest {
   @override
   void setUp() {
     Registry.ruleRegistry.registerLintRule(rule);
-    super.setUp();
     newAnalysisOptionsYamlFile(testPackageRootPath, '''
 ${analysisOptionsContent()}
 optional-checks:
@@ -43,7 +42,6 @@ abstract class MultiLintTestProcessor<T extends SubLints>
   @override
   void setUp() {
     Registry.ruleRegistry.registerLintRule(rule);
-    super.setUp();
     newAnalysisOptionsYamlFile(testPackageRootPath, '''
 ${analysisOptionsContent()}
 optional-checks:

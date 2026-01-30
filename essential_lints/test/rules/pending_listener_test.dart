@@ -21,8 +21,8 @@ class PendingListenerTest extends MultiLintTestProcessor<PendingListener>
 
   @override
   void setUp() {
-    createFlutterMock();
     super.setUp();
+    createFlutterMock();
   }
 
   Future<void> test_added_cascade() async {

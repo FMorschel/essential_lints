@@ -20,8 +20,8 @@ class UnnecessarySetstateTest extends LintTestProcessor
 
   @override
   void setUp() {
-    createFlutterMock();
     super.setUp();
+    createFlutterMock();
   }
 
   Future<void> test_inBuild() async {
