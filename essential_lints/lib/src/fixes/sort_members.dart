@@ -763,13 +763,11 @@ extension on ClassBody {
   Token? get leftBracket => switch (this) {
     BlockClassBody(:var leftBracket) => leftBracket,
     EmptyClassBody() => null,
-    _ => null,
   };
 
   Token? get rightBracket => switch (this) {
     BlockClassBody(:var rightBracket) => rightBracket,
     EmptyClassBody() => null,
-    _ => null,
   };
 }
 

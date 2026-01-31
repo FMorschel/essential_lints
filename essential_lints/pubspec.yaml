@@ -23,7 +23,7 @@ keywords:
 
 dependencies:
   analysis_server_plugin: ^0.3.6
-  analyzer: ^10.0.0
+  analyzer: ^10.0.2
   analyzer_plugin: ^0.14.0
   args: ^2.0.0
   collection: ^1.16.0

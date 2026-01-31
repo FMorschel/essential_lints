@@ -14,7 +14,7 @@ environment:
 dependencies:
 
 dev_dependencies:
-  analyzer: ^10.0.0
+  analyzer: ^10.0.2
   dartdoc: ^9.0.2
   essential_lints_annotations:
     path: ../essential_lints_annotations

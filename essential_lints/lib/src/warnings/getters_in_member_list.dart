@@ -384,6 +384,5 @@ extension on ClassBody {
   List<ClassMember>? get membersOrNull => switch (this) {
     BlockClassBody(:var members) => members,
     EmptyClassBody() => null,
-    _ => null,
   };
 }

@@ -17,7 +17,7 @@ workspace:
 
 dependencies:
   analysis_server_plugin: ^0.3.6
-  analyzer: ^10.0.0
+  analyzer: ^10.0.2
   # essential_lints_annotations: ^0.1.1+2
   essential_lints_annotations:
     path: essential_lints_annotations

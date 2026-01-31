@@ -119,7 +119,6 @@ extension on AstNode {
       return switch (body) {
         BlockClassBody(:var leftBracket) => leftBracket,
         EmptyClassBody() => null,
-        _ => null,
       };
     }
     return null;
@@ -132,7 +131,6 @@ extension on AstNode {
       return switch (body) {
         BlockClassBody(:var rightBracket) => rightBracket,
         EmptyClassBody() => null,
-        _ => null,
       };
     }
     return null;
