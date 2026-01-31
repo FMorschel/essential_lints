@@ -65,8 +65,7 @@ abstract class MyState extends State {
   }
 
   Future<void> test_inBuild_tearoff() async {
-    await assertNoDiagnostics(
-      '''
+    await assertNoDiagnostics('''
 import 'package:flutter/widgets.dart';
 
 abstract class MyState extends State {
@@ -80,13 +79,11 @@ abstract class MyState extends State {
     setState(() {});
   }
 }
-'''
-    );
+''');
   }
 
   Future<void> test_inBuild_inClosure() async {
-    await assertNoDiagnostics(
-      '''
+    await assertNoDiagnostics('''
 import 'package:flutter/widgets.dart';
 
 abstract class MyState extends State {
@@ -100,8 +97,7 @@ abstract class MyState extends State {
     setState(() {});
   }
 }
-'''
-    );
+''');
   }
 
   Future<void> test_inBuild_other_async() async {
