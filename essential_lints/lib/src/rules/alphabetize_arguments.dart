@@ -25,8 +25,10 @@ class AlphabetizeArgumentsRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
+    logger.fine('Registering node processors for AlphabetizeArgumentsRule');
     var visitor = _AlphabetizeArgumentsVisitor(this);
     registry.addArgumentList(this, visitor);
+    logger.fine('Registered node processors for AlphabetizeArgumentsRule');
   }
 }
 

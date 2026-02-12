@@ -91,8 +91,7 @@ mixin AssistsPluginIntegration {
 
   /// Registers all assists with the given registry.
   void registerAssists(PluginRegistry registry) {
-    logger.info('Registering assists');
-    for (var generator in assists) {
+    void register(fix_generators.ProducerGenerator generator) {
       try {
         registry.registerAssist(generator);
         // ignore: avoid_catches_without_on_clauses, handles integration
@@ -105,6 +104,9 @@ mixin AssistsPluginIntegration {
         );
       }
     }
+
+    logger.info('Registering assists');
+    assists.forEach(register);
     logger.info('Registered assists');
   }
 }
@@ -117,9 +119,9 @@ mixin FixesPluginIntegration {
   );
 
   /// Returns the list of registered lint fixes.
-  Map<EnumDiagnostic, List<FixGenerator>> get lintFixes {
+  Map<EssentialLintRules, List<FixGenerator>> get lintFixes {
     logger.info('Mapping lint fixes');
-    var fixes = <EnumDiagnostic, List<FixGenerator>>{};
+    var fixes = <EssentialLintRules, List<FixGenerator>>{};
 
     void addFixTo(FixGenerator generator, List<EssentialLintRules> rules) {
       for (var rule in rules) {
@@ -217,8 +219,10 @@ mixin FixesPluginIntegration {
 
   /// Registers all fixes with the given registry.
   void registerFixes(PluginRegistry registry) {
-    logger.info('Registering lint fixes');
-    lintFixes.forEach((diagnosticCode, generators) {
+    void register(
+      DiagnosticCode diagnosticCode,
+      List<FixGenerator> generators,
+    ) {
       for (var generator in generators) {
         try {
           registry.registerFixForRule(diagnosticCode, generator);
@@ -232,25 +236,14 @@ mixin FixesPluginIntegration {
           );
         }
       }
-    });
+    }
+
+    logger.info('Registering lint fixes');
+    lintFixes.forEach(register);
     logger
       ..info('Registered lint fixes')
       ..info('Registering warning fixes');
-    warningFixes.forEach((diagnosticCode, generators) {
-      for (var generator in generators) {
-        try {
-          registry.registerFixForRule(diagnosticCode, generator);
-          // ignore: avoid_catches_without_on_clauses, handles integration
-        } catch (e, st) {
-          logger.severe(
-            'Failed to register fix for rule '
-            "'${diagnosticCode.lowerCaseUniqueName}'",
-            e,
-            st,
-          );
-        }
-      }
-    });
+    warningFixes.forEach(register);
     logger.info('Registered warning fixes');
   }
 }
@@ -309,8 +302,7 @@ mixin RulesPluginIntegration {
 
   /// Registers all lint rules with the given registry.
   void registerRules(PluginRegistry registry) {
-    logger.info('Registering lint rules');
-    for (var rule in rules) {
+    void register(AbstractAnalysisRule rule) {
       try {
         registry.registerLintRule(rule);
         // ignore: avoid_catches_without_on_clauses, handles integration
@@ -323,6 +315,9 @@ mixin RulesPluginIntegration {
         );
       }
     }
+
+    logger.info('Registering lint rules');
+    rules.forEach(register);
     logger.info('Registered lint rules');
   }
 }
@@ -366,19 +361,26 @@ mixin WarningsPluginIntegration {
 
   /// Registers all lint rules with the given registry.
   void registerWarnings(PluginRegistry registry) {
-    logger.info('Registering warning rules');
-    for (var rule in [...multiWarnings, ...warnings]) {
+    void register(AbstractAnalysisRule rule) {
       try {
         registry.registerWarningRule(rule);
         // ignore: avoid_catches_without_on_clauses, handles integration
       } catch (e, st) {
         logger.severe(
-          'Failed to register warning rule',
+          'Failed to register warning rule '
+          "'${rule.name}'",
           e,
           st,
         );
       }
     }
-    logger.info('Registered warning rules');
+
+    logger.info('Registering warning rules');
+    warnings.forEach(register);
+    logger
+      ..info('Registered warning rules')
+      ..info('Registering multi warning rules');
+    multiWarnings.forEach(register);
+    logger.info('Registered multi warning rules');
   }
 }
