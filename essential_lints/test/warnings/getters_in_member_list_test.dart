@@ -331,11 +331,41 @@ class A {
       [
         error(
           GettersInMemberList.nonMemberIn,
-          277,
-          12,
+          278,
+          11,
         ),
       ],
     );
+  }
+
+  Future<void> test_findsAnnotation_nullable() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: #members)
+class A {
+  A(this.value, this.value2);
+  final int? value;
+  final int value2;
+
+  List<int> get members => [?value, value2];
+}
+''');
+  }
+
+  Future<void> test_findsAnnotation_spread() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: #members)
+class A {
+  A(this.value, this.value2);
+  final List<int>? value;
+  final List<int> value2;
+
+  List<int> get members => [...?value, ...value2];
+}
+''');
   }
 
   Future<void> test_findsAnnotation_static() async {
@@ -382,6 +412,24 @@ class A {
         ),
       ],
     );
+  }
+
+  Future<void> test_findsAnnotation_superField() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: #members)
+class B extends A {
+  B(super.value);
+
+  List<int> get members => [value];
+}
+
+class A {
+  A(this.value);
+  final int value;
+}
+''');
   }
 
   Future<void> test_findsAnnotation_worksWithDifferentName() async {
@@ -446,38 +494,6 @@ class A {
     );
   }
 
-  Future<void> test_staticOnly() async {
-    await assertNoDiagnostics('''
-import 'package:essential_lints_annotations/essential_lints_annotations.dart';
-
-@GettersInMemberList(memberListName: #members, membersOption: .static)
-class A {
-  A(this.value);
-  final int value;
-
-  static const int staticValue = 0;
-
-  List<Object?> get members => [staticValue];
-}
-''');
-  }
-
-  Future<void> test_staticOnly_diagnostic() async {
-    await assertDiagnostics(
-      '''
-import 'package:essential_lints_annotations/essential_lints_annotations.dart';
-
-@GettersInMemberList(memberListName: #members, membersOption: .static)
-class A {
-  static const int staticValue = 0;
-
-  List<Object?> get members => [];
-}
-''',
-      [lint(218, 7, correctionContains: 'staticValue')],
-    );
-  }
-
   Future<void> test_staticAndInstance() async {
     await assertDiagnostics(
       '''
@@ -535,6 +551,38 @@ class A {
           correctionContains: RegExp(r'^(?!.*an instance).+$'),
         ),
       ],
+    );
+  }
+
+  Future<void> test_staticOnly() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: #members, membersOption: .static)
+class A {
+  A(this.value);
+  final int value;
+
+  static const int staticValue = 0;
+
+  List<Object?> get members => [staticValue];
+}
+''');
+  }
+
+  Future<void> test_staticOnly_diagnostic() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: #members, membersOption: .static)
+class A {
+  static const int staticValue = 0;
+
+  List<Object?> get members => [];
+}
+''',
+      [lint(218, 7, correctionContains: 'staticValue')],
     );
   }
 

@@ -138,7 +138,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
           diagnosticCode: GettersInMemberList.missingList,
           arguments: [
             memberListName,
-            if (annotation.instance) 'an instance' else '',
+            if (annotation.instance) /*a*/ 'n instance' else '',
           ],
         );
         continue;
@@ -175,7 +175,14 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
       if (expression == null) {
         continue;
       }
-      var getters = element.getters.toList()..remove(memberElement);
+      var getters = [
+        ...element.getters,
+        for (var element in element.inheritedConcreteMembers.values)
+          if (element case GetterElement(
+            :var enclosingElement,
+          ) when enclosingElement != context.typeProvider.objectElement)
+            element,
+      ]..remove(memberElement);
       var missing = _handleMemberList(getters, annotation, expression);
       if (missing.isNotEmpty) {
         rule.reportAtToken(
@@ -256,6 +263,15 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
   ) {
     var literalElements = <(CollectionElement, Element)>[];
     for (var expression in list.elements) {
+      if (expression case ParenthesizedExpression(expression: var value)) {
+        expression = value.unParenthesized;
+      }
+      if (expression
+          case NullAwareElement(:var value) ||
+              ParenthesizedExpression(expression: var value) ||
+              SpreadElement(expression: var value)) {
+        expression = value.unParenthesized;
+      }
       SimpleIdentifier? getterIdentifier;
       if (expression
           case SimpleIdentifier identifier ||
