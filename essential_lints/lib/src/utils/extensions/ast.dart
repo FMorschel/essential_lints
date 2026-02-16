@@ -35,25 +35,24 @@ extension AstExtension on AstNode {
     for (var ancestor in withAncestors) {
       switch (ancestor) {
         case MethodDeclaration(
-                  declaredFragment: ExecutableFragment(:var element),
-                  :var body,
-                ) ||
-                FunctionExpression(
-                  parent: FunctionDeclaration(
-                    declaredFragment: ExecutableFragment(:var element),
-                  ),
-                  :var body,
-                ) ||
-                FunctionExpression(
-                  declaredFragment: ExecutableFragment(:var element),
-                  :var body,
-                ) ||
-                ConstructorDeclaration(
-                  declaredFragment: ExecutableFragment(:var element),
-                  :var body,
-                )
-            when body.isSynchronous:
-          return element;
+              declaredFragment: ExecutableFragment(:var element),
+              :var body,
+            ) ||
+            FunctionExpression(
+              parent: FunctionDeclaration(
+                declaredFragment: ExecutableFragment(:var element),
+              ),
+              :var body,
+            ) ||
+            FunctionExpression(
+              declaredFragment: ExecutableFragment(:var element),
+              :var body,
+            ) ||
+            ConstructorDeclaration(
+              declaredFragment: ExecutableFragment(:var element),
+              :var body,
+            ):
+          return body.isSynchronous ? element : null;
       }
     }
     return null;

@@ -118,6 +118,31 @@ abstract class MyState extends State {
 ''');
   }
 
+  Future<void> test_inBuild_other_anotherAsync_closure() async {
+    await assertNoDiagnostics('''
+import 'package:flutter/widgets.dart';
+
+abstract class MyState extends State {
+  @override
+  Widget build(BuildContext context) {
+    var _ = () async {
+      setState(() {});
+      await another();
+    };
+    return Container();
+  }
+
+  Future<void> another() async {
+    other();
+  }
+
+  void other() {
+    setState(() {});
+  }
+}
+''');
+  }
+
   Future<void> test_inBuild_other_generator() async {
     await assertDiagnostics(
       '''
