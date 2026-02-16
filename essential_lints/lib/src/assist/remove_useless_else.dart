@@ -37,22 +37,33 @@ class RemoveUselessElseAssistFix extends CorrectionProducerLogger
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
+    logger.info('RemoveUselessElseAssistFix.compute() started');
     var node = this.node;
-    if (node is! IfStatement) return;
+    if (node is! IfStatement) {
+      logger.finer('Node is not an IfStatement, returning');
+      return;
+    }
+    logger.fine('Node is an IfStatement');
     Statement elseStatement;
     if (node.elseStatement case var statement?) {
       elseStatement = statement;
+      logger.fine('Found else statement: ${statement.runtimeType}');
     } else {
+      logger.finer('No else statement found, returning');
       return;
     }
     if (!node.elseKeyword!.contains(selectionOffset, selectionEnd)) {
       // The selection is not on the else keyword.
+      logger.finer('Selection is not on else keyword, returning');
       return;
     }
+    logger.fine('Selection is on else keyword');
     if (!node.thenStatement.alwaysExits) {
       // The then statement does not always exit.
+      logger.finer('Then statement does not always exit, returning');
       return;
     }
+    logger.fine('Then statement always exits, proceeding with edit');
     await builder.addDartFileEdit(file, (builder) {
       var prefix = utils.getLinePrefix(elseStatement.end);
       var elseRange = range.startOffsetEndOffset(
@@ -65,6 +76,7 @@ class RemoveUselessElseAssistFix extends CorrectionProducerLogger
           ..write(prefix);
       });
       if (elseStatement is Block) {
+        logger.fine('Else statement is a block, adjusting indentation');
         var offset = elseStatement.leftBracket.next!.offset;
         var end = elseStatement.rightBracket.previous!.end;
         var source = utils.getText(
@@ -80,6 +92,7 @@ class RemoveUselessElseAssistFix extends CorrectionProducerLogger
           source,
         );
         if (elseStatement.rightBracket.next case var next?) {
+          logger.fine('Adjusting indentation for code after else block');
           var finalPrefix = utils.getLinePrefix(
             next.offset,
           );
@@ -93,6 +106,7 @@ class RemoveUselessElseAssistFix extends CorrectionProducerLogger
         }
       }
     });
+    logger.info('RemoveUselessElseAssistFix.compute() completed successfully');
   }
 }
 

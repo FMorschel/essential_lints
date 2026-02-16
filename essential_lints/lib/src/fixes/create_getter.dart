@@ -33,41 +33,60 @@ class CreateGetterFix extends CorrectionProducerLogger with WarningFix {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
+    logger.info('CreateGetterFix.compute() started');
     var diagnostic = this.diagnostic;
     if (diagnostic == null) {
+      logger.finer('Diagnostic is null, returning');
       return;
     }
+    logger.fine('Diagnostic found');
     var getterName = _memberPattern.firstMatch(
       diagnostic.correctionMessage ?? '',
     );
     if (getterName == null) {
+      logger.finer('No getter name found in correction message, returning');
       return;
     }
+    logger.fine('Getter name pattern matched');
     var name = getterName.group(2);
     if (name == null) {
+      logger.finer('Extracted getter name is null, returning');
       return;
     }
+    logger.fine('Extracted getter name: $name');
     var node = this.node.thisOrAncestorOfType<ClassDeclaration>();
     if (node == null) {
+      logger.finer('No ClassDeclaration ancestor found, returning');
       return;
     }
+    logger.fine('Found ClassDeclaration node');
     if (node.declaredFragment!.element case ClassElement(:var getters)) {
       if (getters.any((g) => g.name == name)) {
+        logger.fine('Getter $name already exists in class, returning');
         return;
       }
     }
+    logger.fine('Getter $name does not exist, proceeding with creation');
     await builder.addDartFileEdit(file, (builder) {
       var offset = node.lastMemberOrNull?.end ?? node.closeBraceToken?.offset;
       var needsNewLine =
           offset == node.openBraceToken?.end || node.lastMemberOrNull != null;
       var needsClosingBrace = offset == null;
+      logger.finer(
+        'Insertion point calculated: offset=$offset, '
+        'needsNewLine=$needsNewLine, needsClosingBrace=$needsClosingBrace',
+      );
       if (offset == null) {
         if (node.body case EmptyClassBody body) {
           offset = body.semicolon.end;
+          logger.finer(
+            'EmptyClassBody found, replacing semicolon with opening brace',
+          );
           builder.addReplacement(range.token(body.semicolon), (builder) {
             builder.write(' {');
           });
         } else {
+          logger.finer('Cannot determine insertion offset, returning');
           assert(false, 'Cannot determine where to insert the getter.');
           return;
         }
@@ -76,6 +95,7 @@ class CreateGetterFix extends CorrectionProducerLogger with WarningFix {
         if (needsNewLine) {
           builder.writeln();
         }
+        logger.finer('Writing getter declaration for $name');
         builder
           ..write(utils.oneIndent)
           ..writeGetterDeclaration(
@@ -93,6 +113,7 @@ class CreateGetterFix extends CorrectionProducerLogger with WarningFix {
         }
       });
     });
+    logger.info('CreateGetterFix.compute() completed successfully');
   }
 }
 

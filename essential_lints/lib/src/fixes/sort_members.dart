@@ -54,12 +54,16 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
+    logger.info('SortMembersFix.compute() started');
     if (diagnostic == null) {
+      logger.finer('Diagnostic is null, returning');
       return;
     }
+    logger.fine('Diagnostic found');
     var node = this.node;
     var enclosingInstanceDeclaration = node.enclosingInstanceDeclaration;
     if (enclosingInstanceDeclaration == null) {
+      logger.finer('No enclosing instance declaration found, returning');
       assert(
         false,
         'How did we get a diagnostic for sorting members without being inside '
@@ -67,6 +71,10 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
       );
       return;
     }
+    logger.fine(
+      'Found enclosing instance declaration: '
+      '${enclosingInstanceDeclaration.runtimeType}',
+    );
 
     // Find the @SortingMembers annotation
     ElementAnnotation? sortingMembersAnnotation;
@@ -80,11 +88,13 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
                 'package:essential_lints_annotations/src/sorting_members.dart',
               )) {
         sortingMembersAnnotation = element;
+        logger.fine('Found @SortingMembers annotation');
         break;
       }
     }
 
     if (sortingMembersAnnotation == null) {
+      logger.finer('@SortingMembers annotation not found, returning');
       return;
     }
 
@@ -92,6 +102,7 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
     var validatorFromAnnotation = ValidatorFromAnnotation.fromAnnotation(
       sortingMembersAnnotation,
     );
+    logger.fine('Validator configuration loaded');
 
     // Create a tracking visitor to collect and sort all members
     var trackingVisitor = TrackingMemberVisitor(unit, validatorFromAnnotation);
@@ -100,6 +111,10 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
     // Get the sorted members
     var sortedMembers = trackingVisitor.sortedMembers;
     var originalMembers = trackingVisitor.members;
+    logger.fine(
+      'Collected ${originalMembers.length} original members, '
+      '${sortedMembers.length} sorted members',
+    );
 
     // Deduplicate members with the same node (happens with multi-variable field
     // declarations)
@@ -122,19 +137,27 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
       }
     }
     sortedMembers = uniqueSorted;
+    logger.fine(
+      'After deduplication: ${originalMembers.length} original, '
+      '${sortedMembers.length} sorted',
+    );
 
     // Check if already sorted
     var needsSorting = false;
     for (var i = 0; i < originalMembers.length; i++) {
       if (originalMembers[i] != sortedMembers[i]) {
         needsSorting = true;
+        logger.fine('Members out of order at index $i');
         break;
       }
     }
 
     if (!needsSorting) {
+      logger.fine('Members are already sorted, returning');
       return;
     }
+
+    logger.info('Sorting required, collecting edits');
 
     // Collect all edits first
     var edits = <({int start, int end, String replacement})>[];
@@ -146,13 +169,19 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
       enclosingInstanceDeclaration,
       validatorFromAnnotation,
     );
+    logger.fine('Found ${membersToMove.length} members to move');
 
     // Build a set of nodes being moved for quick lookup
     var nodesBeingMoved = membersToMove.map((m) => m.member.node).toSet();
-
-    // Add deletions for members that will be moved
+    logger
+      ..finer('Built set of ${nodesBeingMoved.length} nodes being moved')
+      // Add deletions for members that will be moved
+      ..finer('Processing ${membersToMove.length} members for deletion');
     for (var moveInfo in membersToMove) {
       var node = moveInfo.member.node;
+      logger.finer(
+        '  Processing deletion for: ${node.toString().split('\n').first}',
+      );
 
       // Deletion should normally start at the node's line start. Only extend
       // the start offset to include blank lines if the previous member is
@@ -171,6 +200,10 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
         var prevEndLine = unit.lineInfo.getLocation(prevEnd).lineNumber;
         var blankLinesBetween = nodeStartLine - prevEndLine - 1;
         if (blankLinesBetween > 0) {
+          logger.finer(
+            '    Blank lines before member: $blankLinesBetween, extending '
+            'delete start',
+          );
           // There are blank lines between prev and this node.
           // Whether prev is moving or not, we should clean up these blanks
           // since this member is being moved away.
@@ -185,6 +218,7 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
         var candidateLine = unit.lineInfo.getLocation(candidate).lineNumber;
         var blankLinesBetween = nodeStartLine - candidateLine - 1;
         if (blankLinesBetween > 0) {
+          logger.finer('    First member with blank lines: $blankLinesBetween');
           deleteStart = candidate;
         } else {
           deleteStart = nodeFirstLineStart;
@@ -206,12 +240,16 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
         var nextStartLine = unit.lineInfo.getLocation(nextStart);
         var blankLinesBetween = nextStartLine.lineNumber - nodeEndLine;
         if (blankLinesBetween > 0) {
+          logger.finer(
+            '    First member with blank lines after: $blankLinesBetween',
+          );
           deleteEnd = unit.lineInfo.getOffsetOfLine(
             nextStartLine.lineNumber - 1,
           );
         }
       }
 
+      logger.finer('    Delete range: $deleteStart to $deleteEnd');
       edits.add((start: deleteStart, end: deleteEnd, replacement: ''));
     }
 
@@ -222,6 +260,10 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
           .putIfAbsent(moveInfo.insertOffset, () => [])
           .add(moveInfo);
     }
+    logger.finer(
+      'Grouped ${membersToMove.length} members by ${membersByOffset.length} '
+      'insertion offsets',
+    );
 
     // Handle multi-variable field declarations that need reordering
     await _handleMultiVariableFields(
@@ -232,15 +274,26 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
     );
 
     // Group members by their insert offset to handle spacing correctly
+    logger.finer(
+      'Building insertions for members at ${membersByOffset.length} offsets',
+    );
     for (var entry in membersByOffset.entries) {
       var offset = entry.key;
       var members = entry.value;
+      logger.finer(
+        '  Insertion at offset $offset for ${members.length} members',
+      );
 
       // Build a single insertion for all members at this offset
       var buffer = StringBuffer();
       for (var i = 0; i < members.length; i++) {
         var moveInfo = members[i];
         var requiredLinesBefore = moveInfo.requiredLinesBefore ?? 0;
+        logger.finer(
+          '    Member ${i + 1}: '
+          '${moveInfo.member.node.toString().split('\n').first}, lines before: '
+          '$requiredLinesBefore',
+        );
 
         // Add the line break and any required blank lines before this member
         buffer.write(builder.defaultEol);
@@ -259,6 +312,7 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
           var variables = fieldDecl.fields.variables;
           if (variables.length > 1 &&
               _shouldReorderMultiVariableDeclaration(variables)) {
+            logger.finer('      Reordering multi-variable field declaration');
             // Rebuild the field declaration with sorted variables
             memberText = _buildReorderedFieldDeclaration(fieldDecl);
           }
@@ -283,6 +337,10 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
         // If next member was not moved and has spacing requirements,
         // add that spacing after this insertion
         if (!nextWasMoved && nextMember.requiredLinesBefore != null) {
+          logger.finer(
+            '    Adding spacing after last member: '
+            '${nextMember.requiredLinesBefore} lines',
+          );
           for (var j = 0; j < nextMember.requiredLinesBefore!; j++) {
             buffer.write(builder.defaultEol);
           }
@@ -297,6 +355,7 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
     }
 
     // Fix spacing for members that weren't moved but need spacing adjustments
+    logger.finer('Fixing spacing for stationary members');
     for (var i = 1; i < sortedMembers.length; i++) {
       var currentMember = sortedMembers[i];
       var previousMember = sortedMembers[i - 1];
@@ -349,6 +408,12 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
       }
 
       if (actualBlankLines != requiredLines) {
+        logger.finer(
+          '  Adjusting spacing between '
+          '${previousMember.node.toString().split('\n').first} and '
+          '${currentMember.node.toString().split('\n').first}: '
+          'actual=$actualBlankLines -> required=$requiredLines',
+        );
         // Need to adjust spacing
         var prevEnd = previousMember.node.end;
 
@@ -373,6 +438,7 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
     }
 
     // Clean up trailing blank lines
+    logger.finer('Cleaning up trailing blank lines');
     // Find the last member that is staying in place (not being moved)
     // We need to use the original position of the last stationary member
     MemberResult? lastStationaryMember;
@@ -380,6 +446,10 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
       var member = originalMembers[i];
       if (!nodesBeingMoved.contains(member.node)) {
         lastStationaryMember = member;
+        logger.finer(
+          '  Found last stationary member: '
+          '${member.node.toString().split('\n').first}',
+        );
         break;
       }
     }
@@ -408,6 +478,7 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
             lineBeforeRightBracketEnd - lastMemberEnd,
           );
           if (currentContent != builder.defaultEol) {
+            logger.finer('  Cleaning blank lines before right bracket');
             edits.add((
               start: lastMemberEnd,
               end: lineBeforeRightBracketEnd,
@@ -416,9 +487,12 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
           }
         }
       }
+    } else {
+      logger.finer('  No stationary members found - all members were moved');
     }
 
     // Merge overlapping edits
+    logger.finer('Merging ${edits.length} edits');
     edits.sort((a, b) => a.start.compareTo(b.start));
     var mergedEdits = <({int start, int end, String replacement})>[];
     for (var edit in edits) {
@@ -427,6 +501,7 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
       } else {
         var last = mergedEdits.last;
         if (edit.start <= last.end) {
+          logger.finer('  Merging overlapping edits at ${edit.start}');
           // Overlapping or adjacent - merge them
           // Determine how to combine replacements based on edit types
           String mergedReplacement;
@@ -457,10 +532,16 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
       }
     }
 
+    logger.fine('Prepared ${mergedEdits.length} merged edits');
+
     // Apply edits to builder
     await builder.addDartFileEdit(file, (builder) {
-      if (sortedMembers.isEmpty) return;
+      if (sortedMembers.isEmpty) {
+        logger.fine('No sorted members to apply');
+        return;
+      }
 
+      logger.fine('Applying ${mergedEdits.length} edits to file');
       // Apply deletions and replacements
       for (var edit in mergedEdits) {
         if (edit.replacement.isEmpty) {
@@ -473,6 +554,8 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
         }
       }
     });
+
+    logger.info('SortMembersFix.compute() completed successfully');
   }
 
   /// Finds members that need to be moved by identifying members that are
@@ -592,7 +675,14 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
   /// Finds the longest increasing subsequence and returns the indices
   /// of elements in the original list that form this subsequence.
   List<int> _longestIncreasingSubsequence(List<int> nums) {
-    if (nums.isEmpty) return [];
+    logger.fine(
+      'Computing longest increasing subsequence for ${nums.length} positions: '
+      '$nums',
+    );
+    if (nums.isEmpty) {
+      logger.finer('  Input is empty, returning empty list');
+      return [];
+    }
 
     var n = nums.length;
     var dp = List.filled(n, 1);
@@ -607,6 +697,8 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
       }
     }
 
+    logger.finer('  DP lengths: $dp');
+
     // Find the index with maximum length
     var maxLength = 0;
     var maxIndex = 0;
@@ -617,6 +709,8 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
       }
     }
 
+    logger.finer('  Max length: $maxLength at index $maxIndex');
+
     // Backtrack to find the indices
     var result = <int>[];
     var current = maxIndex;
@@ -625,19 +719,37 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
       current = prev[current];
     }
 
-    return result.reversed.toList();
+    result = result.reversed.toList();
+    logger.fine('  LIS result: $result (length: ${result.length})');
+    return result;
   }
 
   /// Builds the text for a field declaration with variables reordered
   /// alphabetically.
   String _buildReorderedFieldDeclaration(FieldDeclaration fieldDecl) {
     var variables = fieldDecl.fields.variables;
+    logger.finer(
+      'Building reordered field declaration with ${variables.length} variables',
+    );
+
     var sortedVariables = variables.toList()
       ..sort((a, b) {
         var nameA = a.declaredFragment?.element.name ?? '';
         var nameB = b.declaredFragment?.element.name ?? '';
         return nameA.toLowerCase().compareTo(nameB.toLowerCase());
       });
+
+    logger
+      ..finer(
+        '  Original order: '
+        '${variables // Formatting hack.
+        .map((v) => v.declaredFragment?.element.name ?? '?').toList()}',
+      )
+      ..finer(
+        '  Sorted order: '
+        '${sortedVariables // Formatting hack.
+        .map((v) => v.declaredFragment?.element.name ?? '?').toList()}',
+      );
 
     // Get the text before the first variable (type, modifiers, etc.)
     var firstVar = variables.first;
@@ -663,15 +775,20 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
   bool _shouldReorderMultiVariableDeclaration(
     NodeList<VariableDeclaration> variables,
   ) {
+    logger.finer('Checking if ${variables.length} variables need reordering');
+
     // Check if variables are already in alphabetical order
     for (var i = 1; i < variables.length; i++) {
       var prevName = variables[i - 1].declaredFragment?.element.name ?? '';
       var currName = variables[i].declaredFragment?.element.name ?? '';
       if (prevName.toLowerCase().compareTo(currName.toLowerCase()) > 0) {
         // Found a pair that's out of order
+        logger.finer('  Found out-of-order pair: $prevName > $currName');
         return true;
       }
     }
+
+    logger.finer('  Variables are already in alphabetical order');
     // Already in order
     return false;
   }
@@ -683,21 +800,46 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
     List<({int start, int end, String replacement})> edits,
     Set<AstNode> nodesBeingMoved,
   ) async {
+    logger.finer('Handling multi-variable field reordering');
+
+    var fieldsProcessed = 0;
+    var fieldsReordered = 0;
+
     enclosingDeclaration.visitChildren(
       _FieldDeclarationVisitor((node) {
+        fieldsProcessed++;
+        logger.finer('  Processing field declaration $fieldsProcessed');
+
         // Skip if this field declaration is being moved
-        if (nodesBeingMoved.contains(node)) return;
+        if (nodesBeingMoved.contains(node)) {
+          logger.finer('    Field is being moved, skipping');
+          return;
+        }
 
         var variables = node.fields.variables;
-        if (variables.length <= 1) return;
+        if (variables.length <= 1) {
+          logger.finer(
+            '    Field has ${variables.length} variable(s), skipping',
+          );
+          return;
+        }
 
         // Check if alphabetization is enabled
-        if (!validatorFromAnnotation.alphabetizeSortedMembers) return;
+        if (!validatorFromAnnotation.alphabetizeSortedMembers) {
+          logger.finer('    Alphabetization not enabled, skipping');
+          return;
+        }
 
         // Check if reordering is needed
         if (!_shouldReorderMultiVariableDeclaration(variables)) {
           return;
         }
+
+        fieldsReordered++;
+        logger.fine(
+          '    Reordering field $fieldsReordered with ${variables.length} '
+          'variables',
+        );
 
         // Sort the variables by name
         var sortedVariables = variables.toList()
@@ -722,7 +864,13 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
           end: lastVar.end,
           replacement: buffer.toString(),
         ));
+        logger.finer('      Added reordering edit for variables');
       }),
+    );
+
+    logger.fine(
+      'Multi-variable field handling complete: processed=$fieldsProcessed, '
+      'reordered=$fieldsReordered',
     );
   }
 }

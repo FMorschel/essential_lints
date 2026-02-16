@@ -27,7 +27,7 @@ class ReplaceWithBorderRadiusAllTest extends LintFixTestProcessor
     super.setUp();
   }
 
-  Future<void> test_withParameters() async {
+  Future<void> test_withLiteralParameter() async {
     await resolveTestCode('''
 import 'package:flutter/widgets.dart';
 
@@ -37,6 +37,36 @@ var border = BorderRadius.circular(2.0);
 import 'package:flutter/widgets.dart';
 
 var border = const BorderRadius.all(Radius.circular(2.0));
+''');
+  }
+
+  Future<void> test_constantVar() async {
+    await resolveTestCode('''
+import 'package:flutter/widgets.dart';
+
+const radius = 2.0;
+
+var border = BorderRadius.circular(radius);
+''');
+    await assertHasFix('''
+import 'package:flutter/widgets.dart';
+
+const radius = 2.0;
+
+var border = const BorderRadius.all(Radius.circular(radius));
+''');
+  }
+
+  Future<void> test_withParameters_notConstant() async {
+    await resolveTestCode('''
+import 'package:flutter/widgets.dart';
+
+BorderRadius border(double value) => BorderRadius.circular(value);
+''');
+    await assertHasFix('''
+import 'package:flutter/widgets.dart';
+
+BorderRadius border(double value) => BorderRadius.all(Radius.circular(value));
 ''');
   }
 }

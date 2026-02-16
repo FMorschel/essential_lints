@@ -36,26 +36,39 @@ class SamePackageDirectImportFix extends CorrectionProducerLogger with LintFix {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
+    logger.info('SamePackageDirectImportFix.compute() started');
     if (diagnostic == null) {
+      logger.finer('Diagnostic is null, returning');
       return;
     }
+    logger.fine('Diagnostic found');
     var node = this.node.parent;
+    logger.finer('Parent node type: ${node.runtimeType}');
     if (node is! ImportDirective) {
+      logger.finer('Parent node is not ImportDirective, returning');
       return;
     }
+    logger.fine('Parent node is ImportDirective');
     var libraryPackage = _workspace.findPackageFor(
       unitResult.libraryElement.firstFragment.source.fullName,
     );
     if (libraryPackage == null) {
+      logger.finer('Library package not found in workspace, returning');
       return;
     }
+    logger.fine('Found library package: ${libraryPackage.root}');
     var uris = SamePackageDirectImportVisitor.uris(node, libraryPackage);
     if (uris.isEmpty) {
+      logger.finer('No direct import URIs found, returning');
       return;
     }
+    logger.fine('Found ${uris.length} direct import URIs');
     var options = getCodeStyleOptions(unitResult.file);
     var package = options.usePackageUris;
     var relative = options.useRelativeUris;
+    logger.fine(
+      'Code style options: usePackageUris=$package, useRelativeUris=$relative',
+    );
     await builder.addDartFileEdit(file, createEditsForImports: false, (
       builder,
     ) {
@@ -63,8 +76,10 @@ class SamePackageDirectImportFix extends CorrectionProducerLogger with LintFix {
       for (var uri in uris) {
         if (builder is DartFileEditBuilderImpl) {
           if (package || !relative) {
+            logger.finer('  Adding absolute URI: $uri');
             imports.add(builder.importLibraryWithAbsoluteUri(uri));
           } else {
+            logger.finer('  Adding relative URI: $uri');
             imports.add(builder.importLibraryWithRelativeUri(uri));
           }
         }
@@ -73,7 +88,11 @@ class SamePackageDirectImportFix extends CorrectionProducerLogger with LintFix {
       var prefix = node.prefix?.name ?? '';
       if (prefix.isNotEmpty) {
         prefix = ' as $prefix';
+        logger.finer('Import has prefix: $prefix');
       }
+      logger.fine(
+        'Writing ${imports.length} import statements with quote style: $quote',
+      );
       builder.addReplacement(range.node(node), (builder) {
         for (var (index, import) in imports.indexed) {
           builder.write('import $quote$import$quote$prefix;');
@@ -83,5 +102,6 @@ class SamePackageDirectImportFix extends CorrectionProducerLogger with LintFix {
         }
       });
     });
+    logger.info('SamePackageDirectImportFix.compute() completed successfully');
   }
 }

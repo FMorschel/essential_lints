@@ -30,21 +30,35 @@ class NumericConstantStyleFix extends CorrectionProducerLogger with LintFix {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
+    logger.info('NumericConstantStyleFix.compute() started');
     var node = this.node;
+    logger.finer('Node type: ${node.runtimeType}');
     if (node is! DoubleLiteral) {
+      logger.finer('Node is not DoubleLiteral, returning');
       return;
     }
+    logger.fine('Node is DoubleLiteral: ${node.literal.lexeme}');
     var parsed = DoubleLiteralParser(node.literal.lexeme);
+    logger.fine(
+      'Parsed literal: '
+      'hasIntegerPart=${parsed.hasIntegerPart}, '
+      'hasLeadingZeros=${parsed.hasLeadingZeros}, '
+      'hasTrailingZeros=${parsed.hasTrailingZeros}, '
+      'hasExponentLeadingZeros=${parsed.hasExponentLeadingZeros}',
+    );
     if (parsed.hasIntegerPart &&
         !parsed.hasLeadingZeros &&
         !parsed.hasTrailingZeros &&
         !parsed.hasExponentLeadingZeros) {
       // No fix needed
+      logger.fine('No fixes needed for this literal, returning');
       return;
     }
+    logger.fine('Literal requires formatting');
     // Remove the unnecessary zeros:
     var buffer = StringBuffer();
     if (!parsed.hasIntegerPart) {
+      logger.finer('Missing integer part, adding leading 0');
       buffer.write('0');
     }
     buffer
@@ -52,8 +66,11 @@ class NumericConstantStyleFix extends CorrectionProducerLogger with LintFix {
       ..write(parsed.exponent)
       ..write(parsed.exponentNumber);
     var fixedLexeme = buffer.toString();
+    logger.fine('Original: ${node.literal.lexeme}, Fixed: $fixedLexeme');
     await builder.addDartFileEdit(file, (builder) {
+      logger.finer('Applying replacement');
       builder.addSimpleReplacement(range.token(node.literal), fixedLexeme);
     });
+    logger.info('NumericConstantStyleFix.compute() completed successfully');
   }
 }

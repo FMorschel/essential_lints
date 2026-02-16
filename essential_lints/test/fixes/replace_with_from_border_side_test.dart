@@ -52,4 +52,17 @@ import 'package:flutter/widgets.dart';
 var border = const Border.fromBorderSide(BorderSide(width: 2.0));
 ''');
   }
+
+  Future<void> test_withNonConstant() async {
+    await resolveTestCode('''
+import 'package:flutter/widgets.dart';
+
+Border border(double value) => Border.all(width: value);
+''');
+    await assertHasFix('''
+import 'package:flutter/widgets.dart';
+
+Border border(double value) => Border.fromBorderSide(BorderSide(width: value));
+''');
+  }
 }

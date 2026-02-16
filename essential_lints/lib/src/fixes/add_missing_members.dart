@@ -31,26 +31,31 @@ class AddMissingMembersFix extends CorrectionProducerLogger with WarningFix {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
+    logger.info('AddMissingMembersFix.compute() started');
     var diagnostic = this.diagnostic;
     if (diagnostic == null) {
-      logger.info('No diagnostic found for AddMissingMembersFix.');
+      logger.finer('No diagnostic found for AddMissingMembersFix.');
       return;
     }
+    logger.fine('Diagnostic found');
     var matches = _memberPattern.allMatches(diagnostic.correctionMessage ?? '');
     if (matches.isEmpty) {
-      logger.info(
+      logger.finer(
         'No member names could be parsed in correction message for '
         'AddMissingMembersFix.',
       );
       return;
     }
+    logger.fine('Found member matches in correction message');
     var membersNames = matches.map((e) => e.group(2)).nonNulls.toList();
     var node = this.node;
-    logger.info(
-      'Applying AddMissingMembersFix for members: $membersNames at node: '
-      '${node.runtimeType}.',
+    logger.fine(
+      'Parsed members: $membersNames at node type: ${node.runtimeType}',
     );
     if (node case MethodDeclaration(:var body)) {
+      logger.finer(
+        'Node is MethodDeclaration, extracting expression from body',
+      );
       var expression = switch (body) {
         ExpressionFunctionBody(:var expression) => expression,
         BlockFunctionBody(:var block) =>
@@ -60,24 +65,39 @@ class AddMissingMembersFix extends CorrectionProducerLogger with WarningFix {
         EmptyFunctionBody() || NativeFunctionBody() => null,
       };
       if (expression != null) {
+        logger.finer('  Found expression, updating node');
         node = expression;
+      } else {
+        logger.finer('  No expression found in method body');
       }
     } else if (node case VariableDeclaration(:var initializer?)) {
+      logger.finer(
+        'Node is VariableDeclaration with initializer, updating node',
+      );
       node = initializer;
+    } else {
+      logger.finer(
+        'Node does not match MethodDeclaration or VariableDeclaration patterns',
+      );
     }
     if (node is! ListLiteral) {
-      logger.info(
+      logger.finer(
         'The resolved node for AddMissingMembersFix is not a ListLiteral: '
-        '${node.runtimeType}.',
+        '${node.runtimeType}',
       );
       return;
     }
+    logger.fine('Node is ListLiteral, proceeding with insertion');
     var offset = node.elements.isEmpty
         ? node.rightBracket.offset
         : node.elements.last.end;
     var prefix = node.elements.isEmpty ? '' : ', ';
+    logger.finer(
+      'List has ${node.elements.length} elements, inserting at offset: $offset',
+    );
     await builder.addDartFileEdit(file, (builder) {
       builder.addSimpleInsertion(offset, prefix + membersNames.join(', '));
     });
+    logger.info('AddMissingMembersFix.compute() completed successfully');
   }
 }

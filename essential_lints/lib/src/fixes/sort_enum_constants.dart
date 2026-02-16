@@ -29,12 +29,27 @@ class SortEnumConstantsFix extends CorrectionProducerLogger with LintFix {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
-    if (diagnostic == null) return;
+    logger.info('SortEnumConstantsFix.compute() started');
+    if (diagnostic == null) {
+      logger.finer('Diagnostic is null, returning');
+      return;
+    }
+    logger.fine('Diagnostic found');
     var enumDeclaration = node.thisOrAncestorOfType<EnumDeclaration>();
-    if (enumDeclaration == null) return;
+    if (enumDeclaration == null) {
+      logger.finer('No EnumDeclaration ancestor found, returning');
+      return;
+    }
+    logger.fine(
+      'Found EnumDeclaration: ${enumDeclaration.namePart.typeName.lexeme}',
+    );
     await builder.addDartFileEdit(file, (builder) {
       var sortedConstants = enumDeclaration.body.constants.toList()
         ..sort((a, b) => a.name.lexeme.compareTo(b.name.lexeme));
+      logger.fine(
+        'Enum has ${enumDeclaration.body.constants.length} constants, '
+        'building sorted replacement',
+      );
       builder.addReplacement(
         range.startEnd(
           enumDeclaration.body.constants.first,
@@ -44,6 +59,9 @@ class SortEnumConstantsFix extends CorrectionProducerLogger with LintFix {
           var writeIndent = false;
           for (var i = 0; i < sortedConstants.length; i++) {
             var constant = sortedConstants[i];
+            logger.finer(
+              '  Writing constant ${i + 1}: ${constant.name.lexeme}',
+            );
             if (writeIndent) {
               builder.writeIndent();
             }
@@ -58,5 +76,6 @@ class SortEnumConstantsFix extends CorrectionProducerLogger with LintFix {
         },
       );
     });
+    logger.info('SortEnumConstantsFix.compute() completed successfully');
   }
 }

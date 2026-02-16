@@ -28,9 +28,18 @@ class ReplaceWithFirstFix extends CorrectionProducerLogger with LintFix {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
+    logger.info('ReplaceWithFirstFix.compute() started');
     var diagnostic = this.diagnostic;
-    if (diagnostic == null) return;
+    if (diagnostic == null) {
+      logger.finer('Diagnostic is null, returning');
+      return;
+    }
+    logger.fine(
+      'Diagnostic found at offset ${diagnostic.offset}, length '
+      '${diagnostic.length}',
+    );
     await builder.addDartFileEdit(file, (builder) {
+      logger.finer('Applying replacement of [0] with .first');
       builder.addSimpleReplacement(
         range.startOffsetEndOffset(
           diagnostic.offset,
@@ -39,5 +48,6 @@ class ReplaceWithFirstFix extends CorrectionProducerLogger with LintFix {
         '.first',
       );
     });
+    logger.info('ReplaceWithFirstFix.compute() completed successfully');
   }
 }

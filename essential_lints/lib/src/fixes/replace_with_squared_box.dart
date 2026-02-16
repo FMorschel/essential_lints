@@ -30,7 +30,7 @@ class ReplaceWithSizedBoxFix extends CorrectionProducerLogger with LintFix {
   Future<void> compute(ChangeBuilder builder) async {
     if (diagnostic == null) return;
     await builder.addDartFileEdit(file, (builder) {
-      builder.addSimpleReplacement(range.node(node), 'SizedBox.shrink');
+      builder.addSimpleReplacement(range.node(node), 'const SizedBox.shrink');
     });
   }
 }

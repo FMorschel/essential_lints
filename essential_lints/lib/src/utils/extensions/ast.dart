@@ -121,3 +121,30 @@ extension StatementExt on Statement {
     };
   }
 }
+
+/// Extension to determine if an expression can be a constant expression.
+extension ExpressionExt on Expression {
+  /// Returns `true` if the expression can be a constant expression, otherwise
+  /// returns `false`.
+  bool get canBeConstant {
+    return switch (this) {
+      NamedExpression(:var expression) => expression.canBeConstant,
+      Literal() => true,
+      Identifier(:var element) =>
+        element is PropertyAccessorElement && element.variable.isConst,
+      ConditionalExpression(
+        :var condition,
+        :var thenExpression,
+        :var elseExpression,
+      ) =>
+        condition.canBeConstant &&
+            thenExpression.canBeConstant &&
+            elseExpression.canBeConstant,
+      BinaryExpression(:var leftOperand, :var rightOperand) =>
+        leftOperand.canBeConstant && rightOperand.canBeConstant,
+      PropertyAccess(:var target, :var propertyName) =>
+        target != null && target.canBeConstant && propertyName.name == 'length',
+      _ => canBeConst,
+    };
+  }
+}
