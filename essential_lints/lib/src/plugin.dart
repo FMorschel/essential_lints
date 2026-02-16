@@ -92,12 +92,6 @@ class EssentialLintsPlugin extends Plugin
         error: event.error,
         stackTrace: event.stackTrace,
       );
-    } else {
-      // ignore: avoid_print single print location for debug logging
-      print(
-        '[${event.level.name}] ${event.time}: ${event.loggerName}: '
-        '${event.message}',
-      );
     }
   }
 }
