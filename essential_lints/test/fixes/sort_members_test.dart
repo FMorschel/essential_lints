@@ -1,19 +1,12 @@
 import 'package:_internal_testing/dependencies.dart';
 import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
-import 'package:essential_lints/src/plugin.dart';
 import 'package:essential_lints/src/rules/analysis_rule.dart';
 import 'package:essential_lints/src/warnings/sorting_members.dart';
-import 'package:logging/logging.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import '../src/fix_test_processor.dart';
 
 void main() {
-  EssentialLintsPlugin.logger.level = Level.ALL;
-  Logger.root.onRecord.listen((record) {
-    print('${record.level.name}: ${record.time}: ${record.message}');
-  });
-
   defineReflectiveSuite(() {
     defineReflectiveTests(SortMembersTest);
   });
