@@ -44,8 +44,20 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
       ..addMethodInvocation(this, visitor)
       ..afterLibrary(this, () {
         var addedListeners = visitor.addedListeners;
+        var addedListenersFilteringDisposed =
+            visitor.addedListenersFilteringDisposed;
         var removedListeners = visitor.removedListeners;
-        _reportFor(addedListeners, removedListeners, rule);
+        _logger.info(
+          'Analysis complete: ${addedListeners.length} element(s) with added '
+          'listeners (${addedListenersFilteringDisposed.length} after '
+          'filtering disposed), ${removedListeners.length} element(s) with '
+          'removed listeners',
+        );
+        // Report closures based on disposal status
+        visitor.reportPendingClosures();
+        // Check for pending listeners (filter out disposed elements)
+        _reportFor(addedListenersFilteringDisposed, removedListeners, rule);
+        // Check for unnecessary removes (use all added listeners)
         _reportFor(
           removedListeners,
           addedListeners,
@@ -59,50 +71,105 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
     Map<Element, List<Expression>> compareMap,
     DiagnosticCode code,
   ) {
+    _logger.fine(
+      'Reporting for code: ${code.lowerCaseName} with ${controllMap.length} '
+      'element(s)',
+    );
     for (var entry in controllMap.keys) {
       var controlListeners = controllMap[entry]!;
       var compareListeners = [...?compareMap[entry]];
-      var comparedIdentifiers = compareListeners.whereType<Identifier>().map(
-        (i) => i.element,
+      _logger.fine(
+        'Processing element: ${entry.displayName}, '
+        'control count: ${controlListeners.length}, '
+        'compare count: ${compareListeners.length}',
       );
-      for (var control in controlListeners.whereType<Identifier>()) {
-        if (!comparedIdentifiers.contains(control.element)) {
-          reportAtNode(control, diagnosticCode: code);
+      for (var control in controlListeners) {
+        var hasMatch = false;
+        for (var compare in compareListeners) {
+          if (_expressionsMatch(control, compare)) {
+            hasMatch = true;
+            _logger.finer(
+              'Expression matched: ${control.toSource()}',
+            );
+            break;
+          }
         }
-      }
-      var comparedPropertyAccesses = compareListeners
-          .whereType<PropertyAccess>()
-          .map(
-            (i) => (
-              target: i.target?.toSource(),
-              property: i.propertyName.element,
-            ),
+        if (!hasMatch) {
+          _logger.fine(
+            'Reporting unmatched expression: ${control.toSource()} '
+            'for ${code.lowerCaseName}',
           );
-      for (var control in controlListeners.whereType<PropertyAccess>()) {
-        if (!comparedPropertyAccesses.contains((
-          target: control.target?.toSource(),
-          property: control.propertyName.element,
-        ))) {
-          reportAtNode(control, diagnosticCode: code);
-        }
-      }
-      var comparedPrefixedIdentifiers = compareListeners
-          .whereType<PrefixedIdentifier>()
-          .map(
-            (i) => (
-              prefix: i.prefix.element,
-              identifier: i.identifier.element,
-            ),
-          );
-      for (var control in controlListeners.whereType<PrefixedIdentifier>()) {
-        if (!comparedPrefixedIdentifiers.contains((
-          prefix: control.prefix.element,
-          identifier: control.identifier.element,
-        ))) {
           reportAtNode(control, diagnosticCode: code);
         }
       }
     }
+  }
+
+  /// Extracts a chain of elements from an expression.
+  /// For `a.b.c`, returns a list with [c element, b element, a element].
+  static List<Element> _extractElementChain(Expression expression) {
+    var chain = <Element>[];
+    Expression? current = expression;
+
+    while (current != null) {
+      if (current is Identifier) {
+        if (current.element != null) {
+          chain.add(current.element!);
+          // Check if we need to add enclosing type
+          var element = current.element!;
+          if (!_isTopLevelOrLocal(element)) {
+            if (element.enclosingElement case var enclosing?) {
+              chain.add(enclosing);
+            }
+          }
+        }
+        current = null; // End of chain
+      } else if (current is PropertyAccess) {
+        if (current.propertyName.element != null) {
+          chain.add(current.propertyName.element!);
+        }
+        current = current.target; // Continue with target
+      } else if (current is PrefixedIdentifier) {
+        if (current.identifier.element != null) {
+          chain.add(current.identifier.element!);
+        }
+        if (current.prefix.element != null) {
+          chain.add(current.prefix.element!);
+        }
+        current = null; // End of chain
+      } else {
+        current = null; // Unknown type, end chain
+      }
+    }
+
+    return chain;
+  }
+
+  /// Checks if an element is a top-level or local element.
+  static bool _isTopLevelOrLocal(Element element) {
+    return element is TopLevelVariableElement ||
+        element is TopLevelFunctionElement ||
+        element is LocalFunctionElement ||
+        element is LocalVariableElement ||
+        element is FormalParameterElement;
+  }
+
+  /// Checks if two expressions reference the same chain of elements.
+  static bool _expressionsMatch(Expression expr1, Expression expr2) {
+    var chain1 = _extractElementChain(expr1);
+    var chain2 = _extractElementChain(expr2);
+
+    if (chain1.length != chain2.length) {
+      return false;
+    }
+
+    for (var i = 0; i < chain1.length; i++) {
+      if (chain1[i] != chain2[i]) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }
 
@@ -125,14 +192,63 @@ class _PendingListenerVisitor extends SimpleAstVisitor<void> {
   final _addedListeners = <Element, List<Expression>>{};
   final _removedListeners = <Element, List<Expression>>{};
   final _disposedElements = <Element>{};
+  final _addedClosures = <Element, List<({int offset, int length})>>{};
+  final _removedClosures = <({int offset, int length})>[];
 
-  Map<Element, List<Expression>> get addedListeners => {
-    for (final key in _addedListeners.keys.whereNot(_disposedElements.contains))
-      key: _addedListeners[key]!,
-  };
+  /// All added listeners, including those on disposed elements.
+  Map<Element, List<Expression>> get addedListeners =>
+      Map.unmodifiable(_addedListeners);
+
+  /// Added listeners with disposed elements filtered out.
+  /// Use this when checking for pending listeners.
+  Map<Element, List<Expression>> get addedListenersFilteringDisposed {
+    var filtered = {
+      for (final key in _addedListeners.keys.whereNot(
+        _disposedElements.contains,
+      ))
+        key: _addedListeners[key]!,
+    };
+    if (_disposedElements.isNotEmpty) {
+      rule.logger.fine(
+        'Filtered out ${_disposedElements.length} disposed element(s) from '
+        'added listeners: '
+        '${_disposedElements.map((e) => e.displayName).join(", ")}',
+      );
+    }
+    return Map.unmodifiable(filtered);
+  }
 
   Map<Element, List<Expression>> get removedListeners =>
-      .from(_removedListeners);
+      Map.unmodifiable(_removedListeners);
+
+  void reportPendingClosures() {
+    // Report closures added to non-disposed elements
+    for (var entry in _addedClosures.entries) {
+      if (!_disposedElements.contains(entry.key)) {
+        for (var closure in entry.value) {
+          rule.logger.fine(
+            'Reporting closure on non-disposed element: '
+            '${entry.key.displayName}',
+          );
+          rule.reportAtOffset(
+            closure.offset,
+            closure.length,
+            diagnosticCode: PendingListener.closuresCannotBeMatched,
+          );
+        }
+      }
+    }
+
+    // Always report closures in removeListener
+    for (var closure in _removedClosures) {
+      rule.logger.fine('Reporting closure in removeListener');
+      rule.reportAtOffset(
+        closure.offset,
+        closure.length,
+        diagnosticCode: PendingListener.closuresCannotBeMatched,
+      );
+    }
+  }
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
@@ -140,40 +256,83 @@ class _PendingListenerVisitor extends SimpleAstVisitor<void> {
         .whenTypeOrNull<InterfaceType>();
     var targetElement = _targetElement(node);
     if (targetElement == null) {
+      rule.logger.finer(
+        'Could not determine target element for method invocation: '
+        '${node.toSource()}',
+      );
       return;
     }
+    rule.logger.finer(
+      'Processing method invocation on ${targetElement.displayName}: '
+      '${node.methodName.name}',
+    );
     if (_isDisposeFromChangeNotifier(node.methodName, targetType)) {
       _disposedElements.add(targetElement);
+      rule.logger.fine(
+        'Marked element as disposed: ${targetElement.displayName}',
+      );
     }
     if (_methodNames.contains(node.methodName.name) &&
         targetType != null &&
         (_isListenableType(targetType) ||
             targetType.allSupertypes.any(_isListenableType))) {
+      rule.logger.fine(
+        'Processing listener method ${node.methodName.name} on Listenable: '
+        '${targetType.getDisplayString()}',
+      );
       var firstArgument = node.argumentList.arguments.firstOrNull;
       if (firstArgument == null) {
         // No arguments provided yet.
+        rule.logger.finer(
+          'No arguments provided to ${node.methodName.name} on '
+          '${targetElement.displayName}',
+        );
       } else if (firstArgument case FunctionExpression(
         :var body,
         :var offset,
       )) {
-        // Closures can't ever be matched so always report.
+        // Track closures, report later based on disposal status
         var length = body.offset - offset;
-        rule.reportAtOffset(
-          offset,
-          length,
-          diagnosticCode: PendingListener.closuresCannotBeMatched,
+        rule.logger.fine(
+          'Detected closure in ${node.methodName.name} on '
+          '${targetElement.displayName}',
         );
+        if (node.methodName.name == _addListenerName) {
+          _addedClosures.putIfAbsent(targetElement, () => []).add((
+            offset: offset,
+            length: length,
+          ));
+        } else if (node.methodName.name == _removeListenerName) {
+          _removedClosures.add((offset: offset, length: length));
+        }
       } else if (node.methodName.name == _addListenerName) {
         // Argument is being added.
+        rule.logger.finer(
+          'Adding listener to ${targetElement.displayName}: '
+          '${firstArgument.toSource()}',
+        );
         _addFor(targetElement, firstArgument);
       } else if (node.methodName.name == _removeListenerName) {
         // Argument is being removed.
+        rule.logger.finer(
+          'Removing listener from ${targetElement.displayName}: '
+          '${firstArgument.toSource()}',
+        );
         _removeFor(targetElement, firstArgument);
       }
+    } else if (_methodNames.contains(node.methodName.name)) {
+      rule.logger.finer(
+        'Method ${node.methodName.name} on '
+        '${targetElement.displayName} is not a Listenable type or type is null',
+      );
     }
   }
 
   void _addFor(Element element, Expression expression) {
+    rule.logger.finer(
+      'Tracking added listener on ${element.displayName}: '
+      '${expression.toSource()}',
+    );
     _addedListeners.putIfAbsent(element, () => []).add(expression);
   }
 
@@ -200,21 +359,46 @@ class _PendingListenerVisitor extends SimpleAstVisitor<void> {
       type.element.library.uri == _flutterChangeNotifierUri;
 
   void _removeFor(Element element, Expression expression) {
+    rule.logger.finer(
+      'Tracking removed listener from ${element.displayName}: '
+      '${expression.toSource()}',
+    );
     _removedListeners.putIfAbsent(element, () => []).add(expression);
   }
 
   Element? _targetElement(MethodInvocation node) {
-    var target = node.target;
+    var target = node.realTarget;
+    Element? result;
     if (target case Identifier(:var element)) {
-      return element;
+      result = element;
+      rule.logger.finer(
+        'Resolved target element from Identifier: ${element?.displayName}',
+      );
     } else if (target case PropertyAccess(:var propertyName)) {
-      return propertyName.element;
+      result = propertyName.element;
+      rule.logger.finer(
+        'Resolved target element from PropertyAccess: '
+        '${propertyName.element?.displayName}',
+      );
     } else if (target case PrefixedIdentifier(:var identifier)) {
-      return identifier.element;
+      result = identifier.element;
+      rule.logger.finer(
+        'Resolved target element from PrefixedIdentifier: '
+        '${identifier.element?.displayName}',
+      );
     } else if (node.enclosingTypeElement case var enclosingType?) {
-      return enclosingType;
+      result = enclosingType;
+      rule.logger.finer(
+        'Resolved target element from enclosing type: '
+        '${enclosingType.displayName}',
+      );
     }
-    assert(false, 'Unable to determine target element for $node');
-    return null;
+    if (result == null) {
+      assert(false, 'Unable to determine target element for $node');
+      rule.logger.warning(
+        'Unable to determine target element for: ${node.toSource()}',
+      );
+    }
+    return result;
   }
 }

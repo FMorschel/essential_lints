@@ -77,6 +77,39 @@ class C {
 ''');
   }
 
+  Future<void> test_disposed_cascade() async {
+    await assertNoDiagnostics('''
+import 'package:flutter/foundation.dart';
+
+class C {
+  C(this.listenable);
+  final ChangeNotifier listenable;
+
+  void a() {
+    listenable.addListener(a);
+    listenable..dispose();
+  }
+}
+''');
+  }
+
+  Future<void> test_removed_twice() async {
+    await assertNoDiagnostics('''
+import 'package:flutter/foundation.dart';
+
+class C {
+  C(this.listenable);
+  final ChangeNotifier listenable;
+
+  void a() {
+    listenable.addListener(a);
+    listenable.removeListener(a);
+    listenable.removeListener(a);
+  }
+}
+''');
+  }
+
   Future<void> test_added_closure() async {
     await assertDiagnostics(
       '''
@@ -186,6 +219,328 @@ class C {
 }
 ''',
       [error(PendingListener.closuresCannotBeMatched, 150, 3)],
+    );
+  }
+
+  Future<void> test_dispose_prevents_pending_listener_warning() async {
+    await assertNoDiagnostics('''
+import 'package:flutter/foundation.dart';
+
+class C {
+  C(this.listenable);
+  final ChangeNotifier listenable;
+
+  void a() {
+    listenable.addListener(a);
+    // No removeListener, but dispose cleans up
+    listenable.dispose();
+  }
+}
+''');
+  }
+
+  Future<void> test_remove_then_dispose_no_unnecessary_warning() async {
+    await assertNoDiagnostics('''
+import 'package:flutter/foundation.dart';
+
+class C {
+  C(this.listenable);
+  final ChangeNotifier listenable;
+
+  void a() {
+    listenable.addListener(a);
+    listenable.removeListener(a);
+    listenable.dispose();
+  }
+}
+''');
+  }
+
+  Future<void> test_dispose_does_not_justify_unnecessary_remove() async {
+    await assertDiagnostics(
+      '''
+import 'package:flutter/foundation.dart';
+
+class C {
+  C(this.listenable);
+  final ChangeNotifier listenable;
+
+  void a() {
+    // No addListener, so removeListener is unnecessary
+    listenable.removeListener(a);
+    listenable.dispose();
+  }
+}
+''',
+      [error(PendingListener.unnecessaryRemove, 210, 1)],
+    );
+  }
+
+  Future<void> test_multiple_listeners_with_dispose() async {
+    await assertDiagnostics(
+      '''
+import 'package:flutter/foundation.dart';
+
+class C {
+  C(this.listenable);
+  final ChangeNotifier listenable;
+
+  void a() {}
+  void b() {}
+
+  void setup() {
+    listenable.addListener(a);
+    listenable.addListener(b);
+    listenable.removeListener(a);
+    // b is not removed, but dispose cleans up
+    listenable.dispose();
+  }
+}
+''',
+      [],
+    );
+  }
+
+  Future<void> test_property_access_matched() async {
+    await assertNoDiagnostics('''
+import 'package:flutter/foundation.dart';
+
+class Widget {
+  final Listenable controller = ChangeNotifier();
+}
+
+class C {
+  C(this.widget);
+  final Widget widget;
+
+  void listener() {}
+
+  void setup() {
+    widget.controller.addListener(listener);
+    widget.controller.removeListener(listener);
+  }
+}
+''');
+  }
+
+  Future<void> test_property_access_unmatched() async {
+    await assertDiagnostics(
+      '''
+import 'package:flutter/foundation.dart';
+
+class Widget {
+  final Listenable controller1 = ChangeNotifier();
+  final Listenable controller2 = ChangeNotifier();
+}
+
+class C {
+  C(this.widget);
+  final Widget widget;
+
+  void listener() {}
+
+  void setup() {
+    widget.controller1.addListener(listener);
+    widget.controller2.removeListener(listener);
+  }
+}
+''',
+      [
+        lint(289, 8),
+        error(PendingListener.unnecessaryRemove, 338, 8),
+      ],
+    );
+  }
+
+  Future<void> test_nested_property_access_matched() async {
+    await assertNoDiagnostics('''
+import 'package:flutter/foundation.dart';
+
+class Controller {
+  final Listenable notifier = ChangeNotifier();
+}
+
+class Widget {
+  final Controller controller = Controller();
+}
+
+class C {
+  C(this.widget);
+  final Widget widget;
+
+  void listener() {}
+
+  void setup() {
+    widget.controller.notifier.addListener(listener);
+    widget.controller.notifier.removeListener(listener);
+  }
+}
+''');
+  }
+
+  Future<void> test_nested_property_access_unmatched() async {
+    await assertDiagnostics(
+      '''
+import 'package:flutter/foundation.dart';
+
+class Controller {
+  final Listenable notifier1 = ChangeNotifier();
+  final Listenable notifier2 = ChangeNotifier();
+}
+
+class Widget {
+  final Controller controller = Controller();
+}
+
+class C {
+  C(this.widget);
+  final Widget widget;
+
+  void listener() {}
+
+  void setup() {
+    widget.controller.notifier1.addListener(listener);
+    widget.controller.notifier2.removeListener(listener);
+  }
+}
+''',
+      [
+        lint(362, 8),
+        error(PendingListener.unnecessaryRemove, 420, 8),
+      ],
+    );
+  }
+
+  Future<void> test_this_property_access_matched() async {
+    await assertNoDiagnostics('''
+import 'package:flutter/foundation.dart';
+
+class C {
+  C(this.listenable);
+  final Listenable listenable;
+
+  void listener() {}
+
+  void setup() {
+    this.listenable.addListener(listener);
+    this.listenable.removeListener(listener);
+  }
+}
+''');
+  }
+
+  Future<void> test_mixed_property_access_forms() async {
+    await assertNoDiagnostics('''
+import 'package:flutter/foundation.dart';
+
+class C {
+  C(this.listenable);
+  final Listenable listenable;
+
+  void listener() {}
+
+  void setup() {
+    listenable.addListener(listener);
+    this.listenable.removeListener(listener);
+  }
+}
+''');
+  }
+
+  Future<void> test_same_name_differentElements() async {
+    await assertDiagnostics(
+      '''
+import 'package:flutter/foundation.dart';
+
+class C {
+  C(this.listenable);
+  final Listenable listenable;
+
+  void listener() {}
+
+  void setup() {
+    listenable.addListener(listener);
+    {
+      void listener() {}
+      listenable.removeListener(listener);
+    }
+  }
+}
+''',
+      [
+        lint(173, 8),
+        error(PendingListener.unnecessaryRemove, 247, 8),
+      ],
+    );
+  }
+
+  Future<void> test_added_closure_with_dispose() async {
+    await assertNoDiagnostics('''
+import 'package:flutter/foundation.dart';
+
+class C {
+  C(this.listenable);
+  final ChangeNotifier listenable;
+
+  void a() {
+    listenable.addListener(() {});
+    listenable.dispose();
+  }
+}
+''');
+  }
+
+  Future<void> test_removed_closure_always_warns() async {
+    await assertDiagnostics(
+      '''
+import 'package:flutter/foundation.dart';
+
+class C {
+  C(this.listenable);
+  final ChangeNotifier listenable;
+
+  void a() {
+    listenable.removeListener(() {});
+    listenable.dispose();
+  }
+}
+''',
+      [error(PendingListener.closuresCannotBeMatched, 154, 3)],
+    );
+  }
+
+  Future<void> test_multiple_closures_with_dispose() async {
+    await assertNoDiagnostics('''
+import 'package:flutter/foundation.dart';
+
+class C {
+  C(this.listenable);
+  final ChangeNotifier listenable;
+
+  void setup() {
+    listenable.addListener(() {});
+    listenable.addListener(() {});
+    listenable.dispose();
+  }
+}
+''');
+  }
+
+  Future<void> test_closure_without_dispose_still_warns() async {
+    await assertDiagnostics(
+      '''
+import 'package:flutter/foundation.dart';
+
+class C {
+  C(this.listenable);
+  final Listenable listenable;
+
+  void a() {
+    listenable.addListener(() {});
+  }
+}
+''',
+      [error(PendingListener.closuresCannotBeMatched, 147, 3)],
     );
   }
 }
