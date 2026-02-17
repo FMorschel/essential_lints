@@ -43,7 +43,12 @@ class _SyncCallVisitor extends RecursiveAstVisitor<void> {
     this._executableElement,
     this._invoked,
     this._visitedElements,
-  );
+  ) {
+    UnnecessarySetstateRule._logger.finer(
+      '_SyncCallVisitor created for executable: '
+      '${_executableElement.displayName}',
+    );
+  }
 
   static const _initStateName = 'initState';
   static const _didChangeDependenciesName = 'didChangeDependencies';
@@ -162,7 +167,13 @@ class _SyncCallVisitor extends RecursiveAstVisitor<void> {
     ClassDeclaration classDeclaration, {
     Set<ExecutableElement>? visitedElements,
   }) {
+    UnnecessarySetstateRule._logger.finer(
+      'findLifecycleCallSites() started for: ${element.displayName}',
+    );
     if (visitedElements != null && visitedElements.contains(element)) {
+      UnnecessarySetstateRule._logger.finer(
+        'Already visited element: ${element.displayName}, returning empty',
+      );
       return [];
     }
     var visitor = _SyncCallVisitor._(
@@ -172,12 +183,18 @@ class _SyncCallVisitor extends RecursiveAstVisitor<void> {
       visitedElements ?? {},
     );
     classDeclaration.accept(visitor);
+    UnnecessarySetstateRule._logger.finer(
+      'findLifecycleCallSites() found ${visitor._callSites.length} call '
+      'site(s) for: ${element.displayName}',
+    );
     return visitor._callSites;
   }
 }
 
 class _UnnecessarySetstateVisitor extends SimpleAstVisitor<void> {
-  _UnnecessarySetstateVisitor(this.rule, this.context);
+  _UnnecessarySetstateVisitor(this.rule, this.context) {
+    rule.logger.info('_UnnecessarySetstateVisitor() created');
+  }
 
   static const _setStateName = 'setState';
 
@@ -187,7 +204,9 @@ class _UnnecessarySetstateVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
+    rule.logger.info('visitMethodInvocation() started for: ${node.toSource()}');
     if (foundOneSetState) {
+      rule.logger.finer('Already reported once; skipping further checks');
       return;
     }
     var methodName = node.methodName;
@@ -199,24 +218,37 @@ class _UnnecessarySetstateVisitor extends SimpleAstVisitor<void> {
         // If the setState is not from this State class, skip.
         node.target != null && node.target is! ThisExpression ||
         element is! MethodElement) {
+      rule.logger.finer(
+        'Invocation is not a matching setState call or not in '
+        'State class; skipping',
+      );
       return;
     }
     var enclosingExecutable = node.enclosingExecutableElementIfSync;
     if (enclosingExecutable == null) {
+      rule.logger.finer('No enclosing executable element (sync), skipping');
       return;
     }
     var classDeclaration = node.thisOrAncestorOfType<ClassDeclaration>();
     if (classDeclaration == null) {
       assert(false, 'Class declaration should not be null here.');
+      rule.logger.warning(
+        'Expected class declaration not found for setState invocation',
+      );
       return;
     }
+    rule.logger.fine(
+      'Detected setState invocation; searching lifecycle call sites',
+    );
     foundOneSetState = true;
     var nodes = _SyncCallVisitor.findLifecycleCallSites(
       element,
       null,
       classDeclaration,
     );
+    rule.logger.fine('Found ${nodes.length} lifecycle call site(s) to report');
     for (var node in nodes) {
+      rule.logger.fine('Reporting call site: ${node.toSource()}');
       rule.reportAtNode(
         node,
         contextMessages: [

@@ -18,3 +18,9 @@ Future<Directory> essentialLintsAnnotationsPackage() async {
     'package:essential_lints_annotations/essential_lints_annotations.dart',
   );
 }
+
+Future<Directory> essentialLintsAnnotationsTestPackage() async {
+  return await packageDir(
+    'package:_essential_lints_annotations_test/placeholder.dart',
+  );
+}

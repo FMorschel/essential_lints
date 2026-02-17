@@ -39,19 +39,42 @@ class _AlphabetizeArgumentsVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitArgumentList(ArgumentList node) {
+    rule.logger.info(
+      'AlphabetizeArgumentsRule.visitArgumentList() started at offset '
+      '${node.offset}',
+    );
+
     var arguments = node.arguments;
     var argumentNames = arguments.whereType<NamedExpression>().toList();
+    rule.logger.fine('Found ${argumentNames.length} named arguments');
+
+    if (argumentNames.length < 2) {
+      rule.logger.finer('Less than two named arguments, nothing to check');
+      rule.logger.info(
+        'AlphabetizeArgumentsRule.visitArgumentList() completed',
+      );
+      return;
+    }
+
     for (var i = 1; i < argumentNames.length; i++) {
       var previousName = argumentNames[i - 1].name.label.name;
       var currentName = argumentNames[i].name.label.name;
+      rule.logger.finer(
+        'Comparing previous="$previousName" with '
+        'current="$currentName" at index ${i - 1} -> $i',
+      );
       if (previousName.compareTo(currentName) > 0) {
-        rule.reportAtNode(
-          argumentNames[i].name.label,
+        rule.logger.fine(
+          'Alphabetical order violation: "$previousName" > "$currentName" — '
+          'reporting at node',
         );
+        rule.reportAtNode(argumentNames[i].name.label);
         // Stop after the first violation to avoid multiple reports for the same
         // argument list.
         break;
       }
     }
+
+    rule.logger.info('AlphabetizeArgumentsRule.visitArgumentList() completed');
   }
 }

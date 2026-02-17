@@ -40,22 +40,50 @@ class _IsFutureVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitIsExpression(covariant IsExpression node) {
+    rule.logger.info('visitIsExpression() started');
+
     var expressionType = node.expression.staticType;
     if (expressionType == null) {
+      rule.logger.finer('Expression staticType is null — skipping');
       return;
     }
+
+    rule.logger.finer('Expression type: ${expressionType.getDisplayString()}');
     if (expressionType is InterfaceType && expressionType.isDartAsyncFutureOr) {
-      if (!context.typeSystem.isAssignableTo(
+      rule.logger.finer(
+        'Expression is FutureOr with typeArgs: '
+        '${expressionType.typeArguments // Formatting hack.
+        .map((t) => t.getDisplayString()).join(', ')}',
+      );
+
+      var bound = expressionType.typeArguments.first.finalBound;
+      var isAssignable = context.typeSystem.isAssignableTo(
         context.typeProvider.futureDynamicType,
-        expressionType.typeArguments.first.finalBound,
-      )) {
-        // Not a `Future` so skip.
+        bound,
+      );
+      rule.logger.finer(
+        'Is Future assignable to bound ${bound.getDisplayString()}: '
+        '$isAssignable',
+      );
+      if (!isAssignable) {
+        rule.logger.finer('Not a Future-compatible FutureOr — skipping');
         return;
       }
+
       var type = node.type.type;
+      rule.logger.finer(
+        'Checked `is` target type: ${type?.getDisplayString() ?? 'null'}',
+      );
       if (type != null && type.isDartAsyncFuture) {
+        rule.logger.fine(
+          'Reporting `is Future` used on FutureOr that accepts Future',
+        );
         rule.reportAtNode(node.type);
+      } else {
+        rule.logger.finer('`is` target is not Future — no report');
       }
+    } else {
+      rule.logger.finer('Expression type is not FutureOr — skipping');
     }
   }
 }

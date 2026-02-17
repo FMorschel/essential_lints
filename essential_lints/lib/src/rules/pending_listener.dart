@@ -79,10 +79,12 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
     RuleContext context,
     DiagnosticCode code,
   ) {
-    logger.fine(
-      'Reporting for code: ${code.lowerCaseName} with ${controllMap.length} '
-      'element(s)',
-    );
+    logger
+      ..info('_reportFor() started for: ${code.lowerCaseName}')
+      ..fine(
+        'Reporting for code: ${code.lowerCaseName} with ${controllMap.length} '
+        'element(s)',
+      );
     var library = context.libraryElement;
     if (library == null) {
       logger.warning(
@@ -144,6 +146,9 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
     UriConverter uriConverter,
     Element entry,
   ) {
+    logger.info(
+      '_setReporterForLibraryFragment() started for: ${entry.displayName}',
+    );
     var uri = libraryFragment.source.uri;
     var unit = context.allUnits.firstWhereOrNull(
       (unit) =>
@@ -167,6 +172,9 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
   /// Extracts a chain of elements from an expression.
   /// For `a.b.c`, returns a list with [c element, b element, a element].
   static List<Element> _extractElementChain(Expression expression) {
+    _logger.info(
+      '_extractElementChain() started for: ${expression.toSource()}',
+    );
     var chain = <Element>[];
     Expression? current = expression;
 
@@ -201,33 +209,55 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
       }
     }
 
+    // Log after extraction
+    _logger.finer(
+      'Extracted element chain (length: ${chain.length}) for: '
+      '${expression.toSource()}',
+    );
     return chain;
   }
 
   /// Checks if an element is a top-level or local element.
   static bool _isTopLevelOrLocal(Element element) {
-    return element is TopLevelVariableElement ||
+    var result =
+        element is TopLevelVariableElement ||
         element is TopLevelFunctionElement ||
         element is LocalFunctionElement ||
         element is LocalVariableElement ||
         element is FormalParameterElement;
+    _logger.finer(
+      'Checked top-level/local for ${element.displayName}: $result',
+    );
+    return result;
   }
 
   /// Checks if two expressions reference the same chain of elements.
   static bool _expressionsMatch(Expression expr1, Expression expr2) {
+    _logger.finer(
+      'Comparing expressions: ${expr1.toSource()} vs ${expr2.toSource()}',
+    );
     var chain1 = _extractElementChain(expr1);
     var chain2 = _extractElementChain(expr2);
 
     if (chain1.length != chain2.length) {
+      _logger.finer(
+        'Expressions do not match: different lengths ${chain1.length} vs '
+        '${chain2.length}',
+      );
       return false;
     }
 
     for (var i = 0; i < chain1.length; i++) {
       if (chain1[i] != chain2[i]) {
+        _logger.finer(
+          'Expressions do not match at index $i: ${chain1[i].displayName} != '
+          '${chain2[i].displayName}',
+        );
         return false;
       }
     }
 
+    _logger.finer('Expressions match (length: ${chain1.length})');
     return true;
   }
 }
@@ -281,6 +311,7 @@ class _PendingListenerVisitor extends SimpleAstVisitor<void> {
       Map.unmodifiable(_removedListeners);
 
   void reportPendingClosures() {
+    rule.logger.info('reportPendingClosures() started');
     // Report closures added to non-disposed elements
     for (var entry in _addedClosures.entries) {
       if (!_disposedElements.contains(entry.key)) {
@@ -307,10 +338,12 @@ class _PendingListenerVisitor extends SimpleAstVisitor<void> {
         diagnosticCode: PendingListener.closuresCannotBeMatched,
       );
     }
+    rule.logger.info('reportPendingClosures() completed');
   }
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
+    rule.logger.info('visitMethodInvocation() started for: ${node.toSource()}');
     var targetType = node.realTarget?.staticType
         .whenTypeOrNull<InterfaceType>();
     var targetElement = _targetElement(node);

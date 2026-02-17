@@ -28,8 +28,10 @@ class BorderAllRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
+    logger.fine('Registering node processors for BorderAllRule');
     var visitor = _BorderAllVisitor(this, context);
     registry.addInstanceCreationExpression(this, visitor);
+    logger.fine('Registered node processors for BorderAllRule');
   }
 }
 
@@ -48,13 +50,50 @@ class _BorderAllVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    rule.logger.info(
+      'BorderAllRule.visitInstanceCreationExpression() started at offset '
+      '${node.offset}',
+    );
+
     var element = node.constructorName.element;
-    if (element == null ||
-        element.enclosingElement.name != _borderName ||
-        element.name != _allName ||
-        element.library.uri != _boxBorderUri) {
+    if (element == null) {
+      rule.logger.finer(
+        'Constructor element is null for instance creation at offset '
+        '${node.offset}',
+      );
       return;
     }
+
+    if (element.enclosingElement.name != _borderName) {
+      rule.logger.finer(
+        'Enclosing element "${element.enclosingElement.name}" is not '
+        '"$_borderName" — skipping',
+      );
+      return;
+    }
+
+    if (element.name != _allName) {
+      rule.logger.finer(
+        'Constructor name "${element.name}" is not "$_allName" — skipping',
+      );
+      return;
+    }
+
+    if (element.library.uri != _boxBorderUri) {
+      rule.logger.finer(
+        'Library uri "${element.library.uri}" does not match $_boxBorderUri — '
+        'skipping',
+      );
+      return;
+    }
+
+    rule.logger.fine(
+      'Detected Border.all instance — reporting at constructor name',
+    );
     rule.reportAtNode(node.constructorName);
+    rule.logger.info(
+      'BorderAllRule.visitInstanceCreationExpression() completed (violation '
+      'reported)',
+    );
   }
 }

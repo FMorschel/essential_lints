@@ -29,8 +29,10 @@ class BorderRadiusAllRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
+    logger.fine('Registering node processors for BorderRadiusAllRule');
     var visitor = _BorderRadiusAllVisitor(this, context);
     registry.addInstanceCreationExpression(this, visitor);
+    logger.fine('Registered node processors for BorderRadiusAllRule');
   }
 }
 
@@ -49,13 +51,47 @@ class _BorderRadiusAllVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    rule.logger.info(
+      'BorderRadiusAllRule.visitInstanceCreationExpression() started at offset '
+      '${node.offset}',
+    );
+
     var element = node.constructorName.element;
-    if (element == null ||
-        element.enclosingElement.name != _borderRadiusName ||
-        element.name != _circularName ||
-        element.library.uri != _borderRadiusUri) {
+    if (element == null) {
+      rule.logger.finer('Constructor element is null at offset ${node.offset}');
       return;
     }
+
+    if (element.enclosingElement.name != _borderRadiusName) {
+      rule.logger.finer(
+        'Enclosing element "${element.enclosingElement.name}" is not '
+        '"$_borderRadiusName" — skipping',
+      );
+      return;
+    }
+
+    if (element.name != _circularName) {
+      rule.logger.finer(
+        'Constructor name "${element.name}" is not "$_circularName" — skipping',
+      );
+      return;
+    }
+
+    if (element.library.uri != _borderRadiusUri) {
+      rule.logger.finer(
+        'Library uri "${element.library.uri}" does not match $_borderRadiusUri '
+        '— skipping',
+      );
+      return;
+    }
+
+    rule.logger.fine(
+      'Detected BorderRadius.circular instance — reporting at constructor name',
+    );
     rule.reportAtNode(node.constructorName);
+    rule.logger.info(
+      'BorderRadiusAllRule.visitInstanceCreationExpression() completed '
+      '(violation reported)',
+    );
   }
 }

@@ -45,62 +45,99 @@ class _MutableTearoffsVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitFunctionReference(FunctionReference node) {
+    rule.logger.info('visitFunctionReference() started');
     if (node.parent case PrefixedIdentifier(
       :var prefix,
     ) when prefix.unParenthesized != node) {
+      rule.logger.finer(
+        'FunctionReference is part of a PrefixedIdentifier but not direct — '
+        'skipping',
+      );
       return;
     }
     if (node.parent case PropertyAccess(
       :var target,
     ) when target?.unParenthesized != node) {
+      rule.logger.finer(
+        'FunctionReference is part of a PropertyAccess but not direct — '
+        'skipping',
+      );
       return;
     }
   }
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    rule.logger.info(
+      'visitInstanceCreationExpression() started for: '
+      '${node.constructorName.toSource()}',
+    );
+    rule.logger.fine(
+      'Reporting instance creation constructor as mutable tear-off',
+    );
     rule.reportAtNode(node.constructorName);
   }
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
+    rule.logger.info(
+      'visitMethodInvocation() started: ${node.methodName.name}',
+    );
+    rule.logger.fine('Reporting method invocation as mutable tear-off');
     rule.reportAtNode(node.methodName);
   }
 
   @override
   void visitParenthesizedExpression(ParenthesizedExpression node) {
+    rule.logger.finer(
+      'visitParenthesizedExpression() delegating to inner expression',
+    );
     node.expression.accept(this);
   }
 
   @override
   void visitPrefixedIdentifier(PrefixedIdentifier node) {
+    rule.logger.info('visitPrefixedIdentifier() started: ${node.toSource()}');
     if (node.identifier.element is! MethodElement) {
+      rule.logger.finer(
+        'PrefixedIdentifier identifier is not a MethodElement — skipping',
+      );
       return;
     }
     var target = node.prefix;
     if (target is ThisExpression || target is SuperExpression) {
+      rule.logger.finer('Prefix is This or Super — delegating to identifier');
       node.identifier.accept(this);
       return;
     }
+    rule.logger.finer('Delegating to prefix for further analysis');
     target.accept(this);
   }
 
   @override
   void visitPropertyAccess(PropertyAccess node) {
+    rule.logger.info('visitPropertyAccess() started: ${node.toSource()}');
     if (node.propertyName.element is! MethodElement) {
+      rule.logger.finer(
+        'PropertyAccess propertyName is not a MethodElement — skipping',
+      );
       return;
     }
     var target = node.target;
     if (target is ThisExpression || target is SuperExpression) {
+      rule.logger.finer('Target is This or Super — delegating to propertyName');
       node.propertyName.accept(this);
       return;
     }
+    rule.logger.finer('Delegating to target for further analysis');
     target?.accept(this);
   }
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
+    rule.logger.info('visitSimpleIdentifier() started: ${node.name}');
     if (node.thisOrAncestorOfType<CommentReference>() != null) {
+      rule.logger.finer('Identifier is within a CommentReference — skipping');
       return;
     }
     var parent = node.parent;
@@ -111,6 +148,9 @@ class _MutableTearoffsVisitor extends SimpleAstVisitor<void> {
       var element = node.element;
       if (element is! PropertyAccessorElement ||
           !element.variable.type.isFunction) {
+        rule.logger.finer(
+          'Not a property accessor returning a function — skipping',
+        );
         return;
       }
     }
@@ -118,36 +158,56 @@ class _MutableTearoffsVisitor extends SimpleAstVisitor<void> {
       :var prefix,
       expressionType: var lastMemberType,
     ) when prefix.unParenthesized != node || !lastMemberType.isFunction) {
+      rule.logger.finer(
+        'PrefixedIdentifier parent does not match expected shape or is not '
+        'function typed — skipping',
+      );
       return;
     }
     if (parent case PropertyAccess(
       :var target,
       expressionType: var lastMemberType,
     ) when target?.unParenthesized != node || !lastMemberType.isFunction) {
+      rule.logger.finer(
+        'PropertyAccess parent does not match expected shape or is not '
+        'function typed — skipping',
+      );
       return;
     }
     if (parent is MethodInvocation) {
+      rule.logger.finer(
+        'Identifier is used as a method invocation target — skipping',
+      );
       return;
     }
     if (node.element is MethodElement && parent is ArgumentList) {
+      rule.logger.finer(
+        'Identifier is a method element used in arguments — skipping',
+      );
       return;
     }
+    rule.logger.finer('Identifier passes guards, checking mutability');
     _reportIfMayBeMutable(node);
   }
 
   void _reportIfMayBeMutable(SimpleIdentifier node) {
-    // See whether this is a local variable or field or getter or what.
-    // If it is a final field and the enclosing type is private, then it's ok.
-    // If it is a local variable or parameter, then it's ok.
-    // If it is a const variable, then it's ok.
-    // If it is a getter then report a lint.
+    rule.logger.finer(
+      '_reportIfMayBeMutable() started for identifier: ${node.name}',
+    );
     var element = node.element;
     if (element is PropertyAccessorElement &&
         !element.variable.isOriginDeclaration) {
+      rule.logger.fine(
+        'PropertyAccessorElement is not origin declaration — reporting',
+      );
       rule.reportAtNode(node);
       return;
     }
     if (element is! PropertyAccessorElement && element is! MethodElement) {
+      rule.logger.finer(
+        'Element is neither PropertyAccessorElement nor MethodElement — '
+        'skipping',
+      );
       return;
     }
     if (element is PropertyAccessorElement &&
@@ -159,13 +219,21 @@ class _MutableTearoffsVisitor extends SimpleAstVisitor<void> {
         !element.enclosingElement.isImmutable &&
         !element.enclosingElement.isFinal &&
         element.isPublic) {
+      rule.logger.fine(
+        'Mutable property accessor on public enclosing element — reporting',
+      );
       rule.reportAtNode(node);
     } else if (element is MethodElement &&
         !element.isStatic &&
         element.enclosingElement == node.enclosingTypeElement &&
         element.enclosingElement!.isPublic &&
         element.isPublic) {
+      rule.logger.fine(
+        'Non-static public method on public enclosing element — reporting',
+      );
       rule.reportAtNode(node);
+    } else {
+      rule.logger.finer('Conditions for reporting not met');
     }
   }
 }
@@ -189,9 +257,17 @@ extension on Element {
   bool _isImmutable(ElementAnnotation annotation) {
     var object = annotation.computeConstantValue();
     if (object?.type case var type?) {
-      return type.element?.name == 'Immutable' &&
-          type.element?.library?.uri == .parse('package:meta/meta.dart');
+      var isImmutable =
+          type.element?.name == 'Immutable' &&
+          type.element?.library?.uri == Uri.parse('package:meta/meta.dart');
+      MutableTearoffRule._logger.finer(
+        'Annotation computed as Immutable: $isImmutable',
+      );
+      return isImmutable;
     }
+    MutableTearoffRule._logger.finer(
+      'Annotation computeConstantValue() returned null type',
+    );
     return false;
   }
 }

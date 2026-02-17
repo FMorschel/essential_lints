@@ -44,17 +44,33 @@ class _PaddingOverContainerVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    rule.logger.info(
+      'visitInstanceCreationExpression() started: '
+      '${node.constructorName.toSource()}',
+    );
     if (node.constructorName.type.element.isPadding) {
+      rule.logger.finer('Found Padding constructor, checking arguments');
       var argumentList = node.argumentList;
       for (var argument in argumentList.arguments) {
         if (argument is NamedExpression && argument.name.label.name == _child) {
           var expression = argument.expression;
+          rule.logger.finer('Found child argument: ${expression.runtimeType}');
           if (expression is InstanceCreationExpression &&
               expression.constructorName.type.element.isContainer) {
+            rule.logger.fine(
+              'Reporting Padding over Container at token: '
+              '${node.constructorName.type.name}',
+            );
             rule.reportAtToken(node.constructorName.type.name);
+          } else {
+            rule.logger.finer(
+              'Child expression is not a Container instance — no report',
+            );
           }
         }
       }
+    } else {
+      rule.logger.finer('Instance creation is not Padding — skipping');
     }
     super.visitInstanceCreationExpression(node);
   }

@@ -43,27 +43,91 @@ class _NewInstanceCascadeVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitCascadeExpression(CascadeExpression node) {
+    rule.logger.info('visitCascadeExpression() started');
     var targetType = node.target.staticType;
-    if (targetType == null) return;
+    if (targetType == null) {
+      rule.logger.finer('Target staticType is null — skipping cascade check');
+      return;
+    }
+    rule.logger.finer(
+      'Target type: ${targetType.getDisplayString()}, sections: '
+      '${node.cascadeSections.length}',
+    );
+
     for (var section in node.cascadeSections) {
       if (section is MethodInvocation) {
         var element = section.methodName.element;
+        rule.logger.finer(
+          'Processing MethodInvocation: ${section.methodName.name}, element: '
+          '${element?.runtimeType}',
+        );
         if (element is ExecutableElement) {
-          if (context.typeSystem.isSubtypeOf(element.returnType, targetType)) {
+          var isSubtype = context.typeSystem.isSubtypeOf(
+            element.returnType,
+            targetType,
+          );
+          rule.logger.finer(
+            'Method returnType: ${element.returnType.getDisplayString()} — '
+            'isSubtypeOf target: $isSubtype',
+          );
+          if (isSubtype) {
+            rule.logger.fine(
+              'Reporting method invocation returning new instance: '
+              '${section.methodName.name}',
+            );
             rule.reportAtNode(section.methodName);
           }
         }
       } else if (section is PropertyAccess) {
         var element = section.propertyName.element;
+        rule.logger.finer(
+          'Processing PropertyAccess: ${section.propertyName.name}, element: '
+          '${element?.runtimeType}',
+        );
         if (element is ExecutableElement) {
-          if (context.typeSystem.isSubtypeOf(element.returnType, targetType)) {
+          var isSubtype = context.typeSystem.isSubtypeOf(
+            element.returnType,
+            targetType,
+          );
+          rule.logger.finer(
+            'Property getter returnType: '
+            '${element.returnType.getDisplayString()} — isSubtypeOf target: '
+            '$isSubtype',
+          );
+          if (isSubtype) {
+            rule.logger.fine(
+              'Reporting property getter returning new instance: '
+              '${section.propertyName.name}',
+            );
             rule.reportAtNode(section.propertyName);
           }
         } else if (element is PropertyInducingElement) {
-          if (context.typeSystem.isSubtypeOf(element.type, targetType)) {
+          var isSubtype = context.typeSystem.isSubtypeOf(
+            element.type,
+            targetType,
+          );
+          rule.logger.finer(
+            'Property type: ${element.type.getDisplayString()} — isSubtypeOf '
+            'target: $isSubtype',
+          );
+          if (isSubtype) {
+            rule.logger.fine(
+              'Reporting property inducing element returning new instance: '
+              '${section.propertyName.name}',
+            );
             rule.reportAtNode(section.propertyName);
           }
+        } else {
+          rule.logger.finer(
+            'PropertyAccess element is not ExecutableElement or '
+            'PropertyInducingElement — skipping',
+          );
         }
+      } else {
+        rule.logger.finer(
+          'Cascade section is not MethodInvocation or PropertyAccess — '
+          'skipping: ${section.runtimeType}',
+        );
       }
     }
   }

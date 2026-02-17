@@ -32,19 +32,27 @@ class UselessElseRule extends LintRule {
 }
 
 class _UselessElseVisitor extends SimpleAstVisitor<void> {
-  _UselessElseVisitor(this.rule, this.context);
+  _UselessElseVisitor(this.rule, this.context) {
+    rule.logger.info('_UselessElseVisitor() created');
+  }
 
   final UselessElseRule rule;
   final RuleContext context;
 
   @override
   void visitIfStatement(IfStatement node) {
+    rule.logger.info('visitIfStatement() started for: ${node.toSource()}');
     var elseKeyword = node.elseKeyword;
     if (elseKeyword == null) {
+      rule.logger.finer('No else keyword present, skipping');
       return;
     }
     if (node.thenStatement.alwaysExits) {
+      rule.logger.fine(
+        'Then-statement always exits; reporting else at ${elseKeyword.lexeme}',
+      );
       rule.reportAtToken(elseKeyword);
     }
+    rule.logger.info('visitIfStatement() completed for: ${node.toSource()}');
   }
 }

@@ -42,15 +42,28 @@ class _PreferExplicitlyNamedParametersVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitGenericFunctionType(GenericFunctionType node) {
+    rule.logger.info(
+      'visitGenericFunctionType() started for: ${node.toSource()}',
+    );
     for (var parameter in node.parameters.parameters) {
       if (parameter.isNamed) {
+        rule.logger.finer(
+          'Skipping named parameter: ${parameter.name?.lexeme ?? "<unnamed>"}',
+        );
         continue;
       }
       var name = parameter.name;
       if (name == null || name.lexeme.isEmpty) {
+        rule.logger.fine(
+          'Reporting unnamed positional parameter in function type: '
+          '${node.toSource()}',
+        );
         rule.reportAtNode(parameter);
       }
     }
+    rule.logger.info(
+      'visitGenericFunctionType() completed for: ${node.toSource()}',
+    );
     super.visitGenericFunctionType(node);
   }
 }

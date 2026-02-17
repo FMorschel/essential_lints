@@ -40,18 +40,32 @@ class _OptionalPositionalParametersVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitFormalParameterList(FormalParameterList node) {
+    rule.logger.info(
+      'visitFormalParameterList() started with ${node.parameters.length} '
+      'parameter(s)',
+    );
     if (node.parameters.firstWhereOrNull((p) => p.isOptionalPositional)
         case var parameter?) {
+      rule.logger.finer(
+        'Found optional positional parameter: ${parameter.toSource()}',
+      );
       if (parameter case DefaultFormalParameter(
         parameter: SuperFormalParameter(),
       )) {
+        rule.logger.finer('Parameter is a super formal parameter — skipping');
         return;
       }
       if (parameter.name case var name?) {
+        rule.logger.fine(
+          'Reporting optional positional parameter at token: ${name.lexeme}',
+        );
         rule.reportAtToken(name);
       } else {
+        rule.logger.fine('Reporting optional positional parameter at node');
         rule.reportAtNode(parameter);
       }
+    } else {
+      rule.logger.finer('No optional positional parameters found');
     }
   }
 }

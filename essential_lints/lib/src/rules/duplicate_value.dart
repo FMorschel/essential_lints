@@ -42,32 +42,49 @@ class _DuplicateValueVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitBinaryExpression(BinaryExpression node) {
+    rule.logger.info(
+      'visitBinaryExpression() started: operator=${node.operator.type}',
+    );
+
     if (node.operator.type != TokenType.AMPERSAND_AMPERSAND &&
         node.operator.type != TokenType.BAR_BAR &&
         node.operator.type != TokenType.EQ_EQ &&
         node.operator.type != TokenType.BANG_EQ &&
         (node.operator.type != TokenType.CARET ||
             !(node.leftOperand.staticType?.isDartCoreBool ?? false))) {
+      rule.logger.finer(
+        'Operator ${node.operator.type} not subject to duplicate-value rule — '
+        'skipping',
+      );
       return;
     }
+
     var left = node.leftOperand.toSource();
     var right = node.rightOperand.toSource();
+    rule.logger.finer('Left: "$left", Right: "$right"');
     if (left == right) {
+      rule.logger.fine('Detected duplicate value in binary expression: $left');
       rule.reportAtNode(node.rightOperand);
     }
   }
 
   @override
   void visitSwitchExpressionCase(SwitchExpressionCase node) {
+    rule.logger.info('visitSwitchExpressionCase() started');
     _handlePattern(node.guardedPattern.pattern);
   }
 
   @override
   void visitSwitchPatternCase(SwitchPatternCase node) {
+    rule.logger.info('visitSwitchPatternCase() started');
     _handlePattern(node.guardedPattern.pattern);
   }
 
   void _handlePattern(DartPattern pattern) {
+    rule.logger.info(
+      '_handlePattern() started for pattern: ${pattern.runtimeType}',
+    );
+
     DartPattern leftPattern;
     DartPattern rightPattern;
     if (pattern
@@ -76,9 +93,15 @@ class _DuplicateValueVisitor extends SimpleAstVisitor<void> {
       leftPattern = leftOperand;
       rightPattern = rightOperand;
     } else {
+      rule.logger.finer('Pattern is not LogicalOr/LogicalAnd — skipping');
       return;
     }
-    if (leftPattern.toSource() == rightPattern.toSource()) {
+
+    var leftSrc = leftPattern.toSource();
+    var rightSrc = rightPattern.toSource();
+    rule.logger.finer('Left pattern: "$leftSrc", Right pattern: "$rightSrc"');
+    if (leftSrc == rightSrc) {
+      rule.logger.fine('Detected duplicate value in pattern: $leftSrc');
       rule.reportAtNode(rightPattern);
     }
   }
