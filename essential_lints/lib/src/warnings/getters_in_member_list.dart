@@ -208,16 +208,24 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
         rule.logger.finer('Could not calculate list, skipping');
         continue;
       }
-      var getters = [
-        ...element.getters,
-        for (var element in element.inheritedConcreteMembers.values)
-          if (element case GetterElement(
-            :var enclosingElement,
-          ) when enclosingElement != context.typeProvider.objectElement)
-            element,
-      ]..remove(memberElement);
+      var getters = {
+        for (var getter in element.getters) getter.displayName: getter,
+      };
+      for (var element in element.inheritedConcreteMembers.values) {
+        if (element case GetterElement(:var enclosingElement)
+            when enclosingElement != context.typeProvider.objectElement &&
+                !getters.keys.contains(element.displayName)) {
+          getters.addAll({
+            element.displayName: element,
+          });
+        }
+      }
       rule.logger.fine('Total getters to check: ${getters.length}');
-      var missing = _handleMemberList(getters, annotation, expression);
+      var missing = _handleMemberList(
+        getters.values.toList(),
+        annotation,
+        expression,
+      );
       rule.logger.fine('Missing members: ${missing.length}');
       if (missing.isNotEmpty) {
         rule.logger.finer('Reporting missing members: ${missing.join(", ")}');
@@ -326,7 +334,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
   ///
   /// Returns a list of missing member names, or an empty list if all are
   /// present.
-  List<String> _handleMemberList(
+  Set<String> _handleMemberList(
     List<GetterElement> getters,
     _GettersInMemberListAnnotation annotation,
     ListLiteral list,
@@ -408,7 +416,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
         );
       }
     }
-    var missing = <String>[];
+    var missing = <String>{};
     var elements = literalElements.map((e) => e.$2).toList();
     for (var element in validGetters) {
       if (!elements.contains(element)) {
@@ -419,6 +427,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
     rule.logger.fine(
       '_handleMemberList() completed, found ${missing.length} missing members',
     );
+    missing.remove(annotation.memberListName);
     return missing;
   }
 

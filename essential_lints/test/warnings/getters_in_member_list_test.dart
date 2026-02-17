@@ -432,6 +432,26 @@ class A {
 ''');
   }
 
+  Future<void> test_findsAnnotation_superField_notItself() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: #members)
+class B extends A {
+  B(super.value);
+  int get value => super.value;
+  List<int> get members => [value];
+}
+
+@GettersInMemberList(memberListName: #members)
+class A {
+  A(this.value);
+  final int value;
+  List<int> get members => [value];
+}
+''');
+  }
+
   Future<void> test_findsAnnotation_worksWithDifferentName() async {
     await assertDiagnostics(
       '''
