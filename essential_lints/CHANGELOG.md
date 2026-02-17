@@ -2,7 +2,7 @@
 
 ## 0.1.8
 
-Released on: 2026-02-16
+Released on: 2026-02-17
 
 - **Analyzer**: Updated to analyzer v10.0.0.
 - **Logging capabilities scaffold**: Added the base logging capabilities to the plugin, which will be used in future releases to possibly log various information during lint analysis, fixes and assists.
