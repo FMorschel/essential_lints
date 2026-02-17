@@ -61,6 +61,29 @@ class C {
     );
   }
 
+  Future<void> test_added_part() async {
+    var mainPath = join(testPackageLibPath, 'main.dart');
+    newFile(mainPath, '''
+import 'package:flutter/foundation.dart';
+
+part 'test.dart';
+''');
+    newFile(testFile.path, '''
+part of 'main.dart';
+
+class C {
+  C(this.listenable);
+  final Listenable listenable;
+
+  void a() {
+    listenable.addListener(a);
+  }
+}
+''');
+    await assertDiagnosticsInFile(testFile.path, [lint(126, 1)]);
+    await assertNoDiagnosticsInFile(mainPath);
+  }
+
   Future<void> test_disposed() async {
     await assertNoDiagnostics('''
 import 'package:flutter/foundation.dart';

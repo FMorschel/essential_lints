@@ -3,6 +3,7 @@
 
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+import 'package:analyzer/dart/analysis/uri_converter.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
@@ -47,7 +48,7 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
         var addedListenersFilteringDisposed =
             visitor.addedListenersFilteringDisposed;
         var removedListeners = visitor.removedListeners;
-        _logger.info(
+        logger.info(
           'Analysis complete: ${addedListeners.length} element(s) with added '
           'listeners (${addedListenersFilteringDisposed.length} after '
           'filtering disposed), ${removedListeners.length} element(s) with '
@@ -56,11 +57,17 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
         // Report closures based on disposal status
         visitor.reportPendingClosures();
         // Check for pending listeners (filter out disposed elements)
-        _reportFor(addedListenersFilteringDisposed, removedListeners, rule);
+        _reportFor(
+          addedListenersFilteringDisposed,
+          removedListeners,
+          context,
+          rule,
+        );
         // Check for unnecessary removes (use all added listeners)
         _reportFor(
           removedListeners,
           addedListeners,
+          context,
           PendingListener.unnecessaryRemove,
         );
       });
@@ -69,16 +76,42 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
   void _reportFor(
     Map<Element, List<Expression>> controllMap,
     Map<Element, List<Expression>> compareMap,
+    RuleContext context,
     DiagnosticCode code,
   ) {
-    _logger.fine(
+    logger.fine(
       'Reporting for code: ${code.lowerCaseName} with ${controllMap.length} '
       'element(s)',
     );
+    var library = context.libraryElement;
+    if (library == null) {
+      logger.warning(
+        'No library element found in context, cannot report '
+        '${code.lowerCaseName}',
+      );
+      return;
+    }
+    var uriConverter = library.session.uriConverter;
     for (var entry in controllMap.keys) {
+      var libraryFragment = entry.firstFragment.libraryFragment;
+      if (libraryFragment == null) {
+        logger.warning(
+          'No library fragment found for element: ${entry.displayName}, '
+          'skipping reporting for this element.',
+        );
+        continue;
+      }
+      if (!_setReporterForLibraryFragment(
+        libraryFragment,
+        context,
+        uriConverter,
+        entry,
+      )) {
+        continue;
+      }
       var controlListeners = controllMap[entry]!;
       var compareListeners = [...?compareMap[entry]];
-      _logger.fine(
+      logger.fine(
         'Processing element: ${entry.displayName}, '
         'control count: ${controlListeners.length}, '
         'compare count: ${compareListeners.length}',
@@ -88,14 +121,14 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
         for (var compare in compareListeners) {
           if (_expressionsMatch(control, compare)) {
             hasMatch = true;
-            _logger.finer(
+            logger.finer(
               'Expression matched: ${control.toSource()}',
             );
             break;
           }
         }
         if (!hasMatch) {
-          _logger.fine(
+          logger.fine(
             'Reporting unmatched expression: ${control.toSource()} '
             'for ${code.lowerCaseName}',
           );
@@ -103,6 +136,32 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
         }
       }
     }
+  }
+
+  bool _setReporterForLibraryFragment(
+    LibraryFragment libraryFragment,
+    RuleContext context,
+    UriConverter uriConverter,
+    Element entry,
+  ) {
+    var uri = libraryFragment.source.uri;
+    var unit = context.allUnits.firstWhereOrNull(
+      (unit) =>
+          uriConverter.uriToPath(unit.file.toUri()) ==
+          uriConverter.uriToPath(uri),
+    );
+    if (unit == null) {
+      logger.warning(
+        'Could not find compilation unit for element: ${entry.displayName} '
+        'with URI: $uri',
+      );
+      return false;
+    }
+    reporter = unit.diagnosticReporter;
+    logger.finer(
+      'Set reporter for element: ${entry.displayName} with URI: $uri',
+    );
+    return true;
   }
 
   /// Extracts a chain of elements from an expression.
