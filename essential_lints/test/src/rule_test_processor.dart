@@ -11,7 +11,7 @@ import 'package:test_reflective_loader/test_reflective_loader.dart';
 @SubtypeAnnotating(annotations: [reflectiveTest], option: .onlyConcrete)
 abstract class LintTestProcessor extends AnalysisRuleTest {
   @override
-  String get analysisRule => rule.rule.code.name;
+  String get analysisRule => rule.rule.lowerCaseUniqueName;
 
   @override
   @mustBeOverridden
@@ -20,7 +20,6 @@ abstract class LintTestProcessor extends AnalysisRuleTest {
   @override
   void setUp() {
     Registry.ruleRegistry.registerLintRule(rule);
-    super.setUp();
     newAnalysisOptionsYamlFile(testPackageRootPath, '''
 ${analysisOptionsContent()}
 optional-checks:
@@ -35,7 +34,7 @@ optional-checks:
 abstract class MultiLintTestProcessor<T extends SubLints>
     extends AnalysisRuleTest {
   @override
-  String get analysisRule => rule.rule.code.name;
+  String get analysisRule => rule.rule.lowerCaseUniqueName;
 
   @override
   MultiLintRule<T> get rule;
@@ -43,7 +42,6 @@ abstract class MultiLintTestProcessor<T extends SubLints>
   @override
   void setUp() {
     Registry.ruleRegistry.registerLintRule(rule);
-    super.setUp();
     newAnalysisOptionsYamlFile(testPackageRootPath, '''
 ${analysisOptionsContent()}
 optional-checks:

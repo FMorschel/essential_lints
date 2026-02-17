@@ -6,15 +6,23 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template standard_comment_style}
 /// A rule that checks for proper formatting of comments.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class StandardCommentStyleRule extends LintRule {
   /// {@macro standard_comment_style}
-  StandardCommentStyleRule() : super(.standardCommentStyle);
+  StandardCommentStyleRule() : super(.standardCommentStyle, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
+    'StandardCommentStyleRule',
+  );
 
   @override
   void registerNodeProcessors(
@@ -27,7 +35,9 @@ class StandardCommentStyleRule extends LintRule {
 }
 
 class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
-  _StandardCommentStyleVisitor(this.rule, this.context);
+  _StandardCommentStyleVisitor(this.rule, this.context) {
+    rule.logger.info('_StandardCommentStyleVisitor() created');
+  }
 
   static const _punctuation = {'.', '!', '?', ':', ';'};
   static final _startingComment = RegExp(r'^((///?)|/\*)');
@@ -47,11 +57,14 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitCompilationUnit(CompilationUnit node) {
+    rule.logger.info('visitCompilationUnit() started');
     _gatherComments(node.beginToken);
+    rule.logger.info('visitCompilationUnit() completed');
     super.visitCompilationUnit(node);
   }
 
   void _gatherComments(Token? token) {
+    rule.logger.info('_gatherComments() started');
     var list = <CommentToken>[];
     while (token != null && (!token.isEof || token.precedingComments != null)) {
       var current = token;
@@ -61,6 +74,9 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
         token = commentToken = commentToken.next ?? current;
       }
       if (list.isNotEmpty) {
+        rule.logger.finer(
+          'Found ${list.length} comment token(s), handling group',
+        );
         _handleCommentList(list);
         list.clear();
       }
@@ -69,36 +85,52 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
       }
       token = token?.next;
     }
+    rule.logger.info('_gatherComments() completed');
   }
 
   void _handleCommentList(List<CommentToken> list) {
+    rule.logger.info(
+      '_handleCommentList() started with ${list.length} comment(s)',
+    );
     var textComment = <(String, CommentToken)>[];
     for (var comment in list) {
       var commentText = comment.lexeme
           .replaceFirst(_startingComment, '')
           .trimRight();
+      rule.logger.finer(
+        'Processing comment token: ${commentText.length} chars',
+      );
       if (_ignore.hasMatch(commentText.trim()) ||
           _ignoreForFile.hasMatch(commentText.trim())) {
+        rule.logger.finer(
+          'Ignoring comment due to ignore directive: '
+          '${commentText.trim().split("\n").first}',
+        );
         continue;
       }
       if (comment.type == .MULTI_LINE_COMMENT) {
         commentText = commentText.replaceFirst(_endOfComment, '').trimRight();
       }
       if (commentText.isNotEmpty && commentText.startsWith(_nonWhitespace)) {
+        rule.logger.fine('Reporting non-leading-whitespace comment at token');
         rule.reportAtToken(comment);
         return;
       }
       textComment.add((commentText.trim(), comment));
     }
+    rule.logger.finer('Collected ${textComment.length} text comment(s)');
     var commentText = textComment.map((e) => e.$1).join('\n');
     if (commentText.isEmpty) {
+      rule.logger.finer('Combined comment text empty, skipping');
       return;
     }
     if (commentText.trim().startsWith(_noLetter)) {
+      rule.logger.finer('Comment starts with no letter, skipping');
       return;
     }
     for (var (:String paragraph, :CommentToken firstComment)
         in textComment.paragraphs) {
+      rule.logger.finer('Processing paragraph: ${paragraph.length} chars');
       if (paragraph.startsWith(_dartdocCompatible)) {
         paragraph = paragraph
             .substring(
@@ -107,12 +139,19 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
             .trim();
       }
       if (paragraph.isEmpty) {
+        rule.logger.finer('Paragraph empty after dartdoc strip, skipping');
         continue;
       }
       if (paragraph.startsWith(_mdCompatible)) {
+        rule.logger.finer(
+          'Paragraph starts with markdown-compatible token, skipping',
+        );
         continue;
       }
       if (paragraph.startsWith(_noUppercaseLetter)) {
+        rule.logger.fine(
+          'Reporting paragraph starting without uppercase letter',
+        );
         rule.reportAtToken(firstComment);
         continue;
       }
@@ -124,6 +163,7 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
         }
       }
       if (!hasPunctuation) {
+        rule.logger.fine('Reporting paragraph missing end punctuation');
         rule.reportAtToken(firstComment);
       }
     }
@@ -132,6 +172,9 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
 
 extension on List<(String, CommentToken)> {
   List<({String paragraph, CommentToken firstComment})> get paragraphs {
+    StandardCommentStyleRule._logger.finer(
+      'Extracting paragraphs from $length comment parts',
+    );
     var result = <({String paragraph, CommentToken firstComment})>[];
     var buffer = StringBuffer();
     CommentToken? firstComment;
@@ -149,6 +192,9 @@ extension on List<(String, CommentToken)> {
     }
 
     for (var (text, comment) in this) {
+      StandardCommentStyleRule._logger.finer(
+        'Paragraph builder processing comment fragment length ${text.length}',
+      );
       if (text.trim().isEmpty) {
         flushParagraph();
         continue;
@@ -159,6 +205,7 @@ extension on List<(String, CommentToken)> {
       if (text.trim().startsWith(
         _StandardCommentStyleVisitor._codeBlockDelimitor,
       )) {
+        StandardCommentStyleRule._logger.finer('Found code block delimiter');
         flushParagraph();
         foundCodeBlock = !foundCodeBlock;
         if (!foundCodeBlock) {
@@ -167,6 +214,9 @@ extension on List<(String, CommentToken)> {
       }
       if (foundCodeBlock) {
         /// Skip warnings inside code blocks.
+        StandardCommentStyleRule._logger.finer(
+          'Inside code block, skipping fragment',
+        );
         continue;
       }
       buffer.write(text);

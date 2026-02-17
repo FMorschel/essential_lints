@@ -5,23 +5,33 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template border_all_rule}
 /// A lint rule that checks for the use of `Border.all` in Flutter widgets.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class BorderAllRule extends LintRule {
   /// {@macro border_all_rule}
-  BorderAllRule() : super(.borderAll);
+  BorderAllRule() : super(.borderAll, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
+    'BorderAllRule',
+  );
 
   @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
+    logger.fine('Registering node processors for BorderAllRule');
     var visitor = _BorderAllVisitor(this, context);
     registry.addInstanceCreationExpression(this, visitor);
+    logger.fine('Registered node processors for BorderAllRule');
   }
 }
 
@@ -40,13 +50,50 @@ class _BorderAllVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    rule.logger.info(
+      'BorderAllRule.visitInstanceCreationExpression() started at offset '
+      '${node.offset}',
+    );
+
     var element = node.constructorName.element;
-    if (element == null ||
-        element.enclosingElement.name != _borderName ||
-        element.name != _allName ||
-        element.library.uri != _boxBorderUri) {
+    if (element == null) {
+      rule.logger.finer(
+        'Constructor element is null for instance creation at offset '
+        '${node.offset}',
+      );
       return;
     }
+
+    if (element.enclosingElement.name != _borderName) {
+      rule.logger.finer(
+        'Enclosing element "${element.enclosingElement.name}" is not '
+        '"$_borderName" — skipping',
+      );
+      return;
+    }
+
+    if (element.name != _allName) {
+      rule.logger.finer(
+        'Constructor name "${element.name}" is not "$_allName" — skipping',
+      );
+      return;
+    }
+
+    if (element.library.uri != _boxBorderUri) {
+      rule.logger.finer(
+        'Library uri "${element.library.uri}" does not match $_boxBorderUri — '
+        'skipping',
+      );
+      return;
+    }
+
+    rule.logger.fine(
+      'Detected Border.all instance — reporting at constructor name',
+    );
     rule.reportAtNode(node.constructorName);
+    rule.logger.info(
+      'BorderAllRule.visitInstanceCreationExpression() completed (violation '
+      'reported)',
+    );
   }
 }

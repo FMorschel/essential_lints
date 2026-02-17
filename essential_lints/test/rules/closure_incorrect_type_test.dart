@@ -140,4 +140,16 @@ class B extends A {
 }
 ''');
   }
+
+  Future<void> test_noType() async {
+    await assertNoDiagnostics('''
+void foo(void Function(int) x) => foo((n) {});
+''');
+  }
+
+  Future<void> test_null() async {
+    await assertNoDiagnostics('''
+void foo<T>(void Function(T) x) => foo<Null>((_) {});
+''');
+  }
 }

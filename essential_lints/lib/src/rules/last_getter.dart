@@ -8,17 +8,25 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
 import '../utils/extensions/ast.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template last_getter}
 /// A rule that suggests using `last` property instead of accessing
 /// the last element of a list-like object using length - 1 index.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class LastGetterRule extends LintRule {
   /// {@macro last_getter}
-  LastGetterRule() : super(.lastGetter);
+  LastGetterRule() : super(.lastGetter, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
+    'LastGetterRule',
+  );
 
   @override
   void registerNodeProcessors(
@@ -41,6 +49,7 @@ class _PreferLastVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitIndexExpression(IndexExpression node) {
+    rule.logger.info('visitIndexExpression() started');
     var target = node.target;
     DartType? type;
     Element? targetElement;
@@ -54,18 +63,26 @@ class _PreferLastVisitor extends SimpleAstVisitor<void> {
       targetElement = element;
       type = staticType;
     }
+
     var element = type?.element;
+    rule.logger.finer(
+      'Resolved targetElement: ${targetElement?.name ?? 'null'}, element type: '
+      '${type?.getDisplayString() ?? 'null'}',
+    );
     if (element == null || targetElement == null) {
+      rule.logger.finer('Missing element or targetElement — skipping');
       super.visitIndexExpression(node);
       return;
     }
     if (_elementDoesntContainLast(element)) {
+      rule.logger.finer('Element does not contain `last` — skipping');
       super.visitIndexExpression(node);
       return;
     }
     var expression = node.index;
     var offset = node.leftBracket.offset;
     var endOffset = node.rightBracket.end;
+    rule.logger.finer('Checking index expression for length - 1 pattern');
     _reportWhenLengthMinusOne(
       expression,
       targetElement,
@@ -78,28 +95,42 @@ class _PreferLastVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
+    rule.logger.info(
+      'visitMethodInvocation() started: ${node.methodName.name}',
+    );
     var target = node.target;
     if (target is! SimpleIdentifier) {
+      rule.logger.finer('Target is not SimpleIdentifier — skipping');
       super.visitMethodInvocation(node);
       return;
     }
     var targetElement = target.element;
     var targetTypeElement = target.staticType?.element;
+    rule.logger.finer(
+      'Resolved targetElement: ${targetElement?.name ?? 'null'}, '
+      'targetTypeElement: ${targetTypeElement?.name ?? 'null'}',
+    );
     if (targetTypeElement == null || targetElement == null) {
+      rule.logger.finer('Missing target/type element — skipping');
       super.visitMethodInvocation(node);
       return;
     }
     if (_elementDoesntContainLast(targetTypeElement)) {
+      rule.logger.finer('Target type does not contain `last` — skipping');
       super.visitMethodInvocation(node);
       return;
     }
     if (!_methodIsIterableElementAt(node)) {
+      rule.logger.finer('Method is not iterable.elementAt(...) — skipping');
       super.visitMethodInvocation(node);
       return;
     }
     var expression = node.argumentList.arguments.first;
     var offset = node.methodName.offset;
     var endOffset = node.methodName.end;
+    rule.logger.finer(
+      'Checking method invocation arguments for length - 1 pattern',
+    );
     _reportWhenLengthMinusOne(
       expression,
       targetElement,
@@ -111,32 +142,42 @@ class _PreferLastVisitor extends SimpleAstVisitor<void> {
   }
 
   bool _elementDoesntContainLast(Element element) {
-    return element is! InterfaceElement ||
-        !element.interfaceMembers.entries
+    var contains =
+        element is InterfaceElement &&
+        element.interfaceMembers.entries
             .map((entry) => entry.key.name)
             .contains('last');
+    rule.logger.finer(
+      '_elementDoesntContainLast(${element.name}) -> ${!contains}',
+    );
+    return !contains;
   }
 
   bool _methodIsIterableElementAt(MethodInvocation node) {
+    rule.logger.finer(
+      '_methodIsIterableElementAt() started for ${node.methodName.name}',
+    );
     var element = node.methodName.element;
     if (element == null) {
+      rule.logger.finer('Method element is null -> false');
       return false;
     }
     var typeElement = element.enclosingElement;
     if (typeElement is! InterfaceElement) {
+      rule.logger.finer('Enclosing element is not InterfaceElement -> false');
       return false;
     }
     var isIterable = context.typeSystem.isAssignableTo(
       typeElement.thisType,
       context.typeProvider.iterableDynamicType,
     );
+    rule.logger.finer('Is enclosing element iterable: $isIterable');
     if (!isIterable) {
       return false;
     }
-    if (node.methodName.name != 'elementAt') {
-      return false;
-    }
-    return true;
+    var isElementAt = node.methodName.name == 'elementAt';
+    rule.logger.finer('Method name is elementAt: $isElementAt');
+    return isElementAt;
   }
 
   void _reportWhenLengthMinusOne(
@@ -146,6 +187,10 @@ class _PreferLastVisitor extends SimpleAstVisitor<void> {
     int offset,
     int endOffset,
   ) {
+    rule.logger.finer(
+      '_reportWhenLengthMinusOne() checking expression: '
+      '${expression.runtimeType}',
+    );
     if (expression case BinaryExpression(
       :var operator,
       :Expression leftOperand,
@@ -158,6 +203,10 @@ class _PreferLastVisitor extends SimpleAstVisitor<void> {
             )
             when staticType?.element == targetTypeElement &&
                 targetElement == element:
+          rule.logger.fine(
+            'Reporting use of length - 1 on prefixed identifier for type '
+            '${targetTypeElement.name}',
+          );
           rule.reportAtOffset(offset, endOffset - offset);
         case SimpleIdentifier(
               name: 'length',
@@ -166,8 +215,14 @@ class _PreferLastVisitor extends SimpleAstVisitor<void> {
             )
             when enclosingTypeElement == targetTypeElement &&
                 targetElement == enclosingTypeElement:
+          rule.logger.fine(
+            'Reporting use of length - 1 on simple identifier for type '
+            '${targetTypeElement.name}',
+          );
           rule.reportAtOffset(offset, endOffset - offset);
       }
+    } else {
+      rule.logger.finer('Expression does not match length - 1 pattern');
     }
   }
 }

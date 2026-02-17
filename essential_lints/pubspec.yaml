@@ -22,12 +22,12 @@ keywords:
   - linters
 
 dependencies:
-  analysis_server_plugin: ^0.3.4
-  analyzer: ^9.0.0
-  analyzer_plugin: ^0.13.10
+  analysis_server_plugin: ^0.3.8
+  analyzer: ^10.0.2
+  analyzer_plugin: ^0.14.0
   args: ^2.0.0
   collection: ^1.16.0
-  essential_lints_annotations: ^0.1.1+2
+  essential_lints_annotations: ^0.1.2
   logging: ^1.0.0
   meta: ^1.9.0
 
@@ -35,6 +35,7 @@ dev_dependencies:
   _internal_testing:
     path: ../_internal_testing
   analyzer_testing: any
+  frontend_server_client: ^4.0.0 # Test bug https://github.com/dart-lang/test/issues/2516
   test: any
   test_reflective_loader: any
   very_good_analysis: any

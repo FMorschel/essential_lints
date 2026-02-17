@@ -20,8 +20,8 @@ class UnnecessarySetstateTest extends LintTestProcessor
 
   @override
   void setUp() {
-    createFlutterMock();
     super.setUp();
+    createFlutterMock();
   }
 
   Future<void> test_inBuild() async {
@@ -64,6 +64,42 @@ abstract class MyState extends State {
     );
   }
 
+  Future<void> test_inBuild_tearoff() async {
+    await assertNoDiagnostics('''
+import 'package:flutter/widgets.dart';
+
+abstract class MyState extends State {
+  @override
+  Widget build(BuildContext context) {
+    other;
+    return Container();
+  }
+
+  void other() {
+    setState(() {});
+  }
+}
+''');
+  }
+
+  Future<void> test_inBuild_inClosure() async {
+    await assertNoDiagnostics('''
+import 'package:flutter/widgets.dart';
+
+abstract class MyState extends State {
+  @override
+  Widget build(BuildContext context) {
+    (){other;};
+    return Container();
+  }
+
+  void other() {
+    setState(() {});
+  }
+}
+''');
+  }
+
   Future<void> test_inBuild_other_async() async {
     await assertNoDiagnostics('''
 import 'package:flutter/widgets.dart';
@@ -76,6 +112,31 @@ abstract class MyState extends State {
   }
 
   void other() async {
+    setState(() {});
+  }
+}
+''');
+  }
+
+  Future<void> test_inBuild_other_anotherAsync_closure() async {
+    await assertNoDiagnostics('''
+import 'package:flutter/widgets.dart';
+
+abstract class MyState extends State {
+  @override
+  Widget build(BuildContext context) {
+    var _ = () async {
+      setState(() {});
+      await another();
+    };
+    return Container();
+  }
+
+  Future<void> another() async {
+    other();
+  }
+
+  void other() {
     setState(() {});
   }
 }

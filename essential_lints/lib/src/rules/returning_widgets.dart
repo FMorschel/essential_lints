@@ -6,17 +6,26 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:collection/collection.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
 import '../utils/extensions/ast.dart';
 import '../utils/extensions/element.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template returning_widgets_rule}
 /// A rule that prevents returning widgets from functions/methods.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class ReturningWidgetsRule extends LintRule {
   /// {@macro returning_widgets_rule}
-  ReturningWidgetsRule() : super(.returningWidgets);
+  ReturningWidgetsRule() : super(.returningWidgets, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
+    'ReturningWidgetsRule',
+  );
 
   @override
   void registerNodeProcessors(
@@ -31,37 +40,71 @@ class ReturningWidgetsRule extends LintRule {
 }
 
 class _ReturningWidgetsVisitor extends SimpleAstVisitor<void> {
-  _ReturningWidgetsVisitor(this.rule, this.context);
-
-  static const _buildName = 'build';
+  _ReturningWidgetsVisitor(this.rule, this.context) {
+    rule.logger.info('_ReturningWidgetsVisitor() created');
+  }
 
   ReturningWidgetsRule rule;
   RuleContext context;
 
   bool isWidgetType(TypeAnnotation? returnType) {
-    if (returnType == null) return false;
+    if (returnType == null) {
+      rule.logger.finer('isWidgetType() returning false: returnType is null');
+      return false;
+    }
     var type = returnType.type;
-    if (type == null) return false;
-    return type is InterfaceType && type.element.isWidget;
+    if (type == null) {
+      rule.logger.finer(
+        'isWidgetType() returning false: resolved type is null for '
+        '${returnType.toSource()}',
+      );
+      return false;
+    }
+    var result = type is InterfaceType && type.element.isWidget;
+    rule.logger.fine('isWidgetType(${returnType.toSource()}) => $result');
+    return result;
   }
 
   @override
   void visitFunctionDeclaration(FunctionDeclaration node) {
+    rule.logger.info(
+      'visitFunctionDeclaration() started for: ${node.name.lexeme}',
+    );
     if (isWidgetType(node.returnType)) {
+      rule.logger.fine(
+        'Reporting function returning widget: ${node.name.lexeme}',
+      );
       rule.reportAtToken(node.name);
     }
+    rule.logger.info(
+      'visitFunctionDeclaration() completed for: ${node.name.lexeme}',
+    );
   }
 
   @override
   void visitMethodDeclaration(MethodDeclaration node) {
-    if (isWidgetType(node.returnType) && node.notInStateOrStateless ||
-        node.name.lexeme != _buildName) {
+    rule.logger.info(
+      'visitMethodDeclaration() started for: ${node.name.lexeme}',
+    );
+    var element = node.enclosingTypeElement;
+    var shouldReport =
+        isWidgetType(node.returnType) &&
+        (element?.inheritedMembers.entries.none(
+              (entry) =>
+                  entry.key.name == node.declaredFragment?.element.lookupName,
+            ) ??
+            true);
+    rule.logger.finer(
+      'Method shouldReport=$shouldReport for ${node.name.lexeme}',
+    );
+    if (shouldReport) {
+      rule.logger.fine(
+        'Reporting method returning widget: ${node.name.lexeme}',
+      );
       rule.reportAtToken(node.name);
     }
+    rule.logger.info(
+      'visitMethodDeclaration() completed for: ${node.name.lexeme}',
+    );
   }
-}
-
-extension on MethodDeclaration {
-  bool get notInStateOrStateless =>
-      !enclosingTypeElement.isState && !enclosingTypeElement.isStatelessWidget;
 }

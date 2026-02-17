@@ -13,16 +13,21 @@ import 'package:essential_lints_annotations/src/sorting_members/sort_declaration
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 
+import '../plugin.dart';
+import '../rules/analysis_rule.dart';
 import 'warning.dart';
-
-final _logger = Logger('sorting_members_rule');
 
 /// {@template sorting_members_rule}
 /// The rule for sorting_members warning.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class SortingMembersRule extends WarningRule {
   /// {@macro sorting_members_rule}
-  SortingMembersRule() : super(.sortingMembers);
+  SortingMembersRule() : super(.sortingMembers, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
+    'SortingMembersRule',
+  );
 
   @override
   void registerNodeProcessors(
@@ -213,24 +218,40 @@ class _LintingMemberVisitor extends _BaseMemberVisitor {
     Element element,
     String memberName,
   ) {
+    rule.logger.finer('_checkAlphabeticalSorted() for: $memberName');
     if (previousMemberName != null &&
         validatorFromAnnotation.alphabetizeSortedMembers) {
+      rule.logger.finer(
+        '  Checking alphabetical order against previous: $previousMemberName',
+      );
       // Special case: "new" (unnamed constructor) always comes first
       if (previousMemberName == 'new' && memberName != 'new') {
+        rule.logger.finer(
+          '  Previous is "new", current is not - correct order',
+        );
         // Previous was unnamed constructor, current is not - correct order
       } else if (memberName == 'new' && previousMemberName != 'new') {
+        rule.logger.fine(
+          '  Current is "new" but previous is not - wrong order',
+        );
         // Current is unnamed constructor, previous was not - wrong order
         _reportAt(node, element);
         return;
       } else {
+        rule.logger.finer(
+          '  Comparing alphabetically: $memberName vs $previousMemberName',
+        );
         // Both are "new" or neither is "new" - use regular alphabetical
         // comparison
         if (memberName.toLowerCase().compareTo(
               previousMemberName!.toLowerCase(),
             ) <
             0) {
+          rule.logger.fine('  Out of alphabetical order');
           _reportAt(node, element);
           return;
+        } else {
+          rule.logger.finer('  Alphabetical order correct');
         }
       }
     }
@@ -241,24 +262,42 @@ class _LintingMemberVisitor extends _BaseMemberVisitor {
     Element element,
     String memberName,
   ) {
+    rule.logger.finer('_checkAlphabeticalUnsorted() for: $memberName');
     if (previousUnsortedMemberName != null &&
         validatorFromAnnotation.alphabetizeUnsortedMembers) {
+      rule.logger.finer(
+        '  Checking alphabetical order against previous: '
+        '$previousUnsortedMemberName',
+      );
       // Special case: "new" (unnamed constructor) always comes first
       if (previousUnsortedMemberName == 'new' && memberName != 'new') {
+        rule.logger.finer(
+          '  Previous is "new", current is not - correct order',
+        );
         // Previous was unnamed constructor, current is not - correct order
       } else if (memberName == 'new' && previousUnsortedMemberName != 'new') {
+        rule.logger.fine(
+          '  Current is "new" but previous is not - wrong order',
+        );
         // Current is unnamed constructor, previous was not - wrong order
         _reportAt(node, element);
         return;
       } else {
+        rule.logger.finer(
+          '  Comparing alphabetically: $memberName vs '
+          '$previousUnsortedMemberName',
+        );
         // Both are "new" or neither is "new" - use regular alphabetical
         // comparison
         if (memberName.toLowerCase().compareTo(
               previousUnsortedMemberName!.toLowerCase(),
             ) <
             0) {
+          rule.logger.fine('  Out of alphabetical order');
           _reportAt(node, element);
           return;
+        } else {
+          rule.logger.finer('  Alphabetical order correct');
         }
       }
     }
@@ -266,10 +305,17 @@ class _LintingMemberVisitor extends _BaseMemberVisitor {
 
   @override
   void handleMember(AstNode node, Element element) {
-    if (reported) return;
+    rule.logger.fine(
+      '_LintingMemberVisitor.handleMember() started for: ${element.name}',
+    );
+    if (reported) {
+      rule.logger.finer('Already reported, skipping');
+      return;
+    }
 
     // If there are no validators, all members are unsorted
     if (validatorFromAnnotation.validators.isEmpty) {
+      rule.logger.finer('No validators, treating as unsorted');
       var memberName = _getMemberName(node, element);
       _checkSpacing(node, element, validatorIndex: -1, isSorted: false);
       if (reported) return;
@@ -281,15 +327,23 @@ class _LintingMemberVisitor extends _BaseMemberVisitor {
       previousDeclarationLastLine = _getDeclarationLastLine(node);
       previousValidatorIndex = -1;
       previousWasSorted = false;
+      rule.logger.finer('Set as unsorted member: $memberName');
       return;
     }
 
-    if (current >= validatorFromAnnotation.validators.length) return;
+    if (current >= validatorFromAnnotation.validators.length) {
+      rule.logger.finer('Current index exceeds validators length');
+      return;
+    }
 
     var validator = validatorFromAnnotation.validators[current];
     var memberName = _getMemberName(node, element);
+    rule.logger.finer(
+      'Checking member: $memberName against validator index: $current',
+    );
 
     if (validator.isValid(node, element)) {
+      rule.logger.fine('Member matches current validator');
       // Check spacing before alphabetical/order checks
       _checkSpacing(node, element, validatorIndex: current, isSorted: true);
       if (reported) return;
@@ -304,9 +358,13 @@ class _LintingMemberVisitor extends _BaseMemberVisitor {
         var otherValidator = validatorFromAnnotation.validators[i];
         if (otherValidator.isValid(node, element) &&
             otherValidator.isMoreSpecificThan(validator)) {
+          rule.logger.finer('Found more specific validator at index: $i');
           // There's a more specific validator elsewhere
           if (i > current) {
             // More specific validator is ahead - jump to it
+            rule.logger.fine(
+              'More specific validator ahead, jumping to index: $i',
+            );
             current = i;
             previousMemberName = null;
             previousDeclarationLastLine = _getDeclarationLastLine(node);
@@ -315,6 +373,9 @@ class _LintingMemberVisitor extends _BaseMemberVisitor {
             return;
           } else {
             // More specific validator is behind - member is out of order
+            rule.logger.fine(
+              'More specific validator behind, member out of order',
+            );
             _reportAt(node, element);
             return;
           }
@@ -323,19 +384,25 @@ class _LintingMemberVisitor extends _BaseMemberVisitor {
       // No more specific validator found - this is the right match
       // Reset previousMemberName if validator changed
       if (previousValidatorIndex != current) {
+        rule.logger.finer('Validator changed, resetting previousMemberName');
         previousMemberName = null;
       }
       previousMemberName = memberName;
       previousDeclarationLastLine = _getDeclarationLastLine(node);
       previousValidatorIndex = current;
       previousWasSorted = true;
+      rule.logger.fine('Member accepted at current validator');
       return;
     }
 
+    rule.logger.finer('Member does not match current validator');
     // Member doesn't match current validator.
     // Check if member matches any previous validators (wrong order)
     for (var i = 0; i < current; i++) {
       if (validatorFromAnnotation.validators[i].isValid(node, element)) {
+        rule.logger.fine(
+          'Member matches previous validator at index $i, wrong order',
+        );
         // Member matches a previous validator - report error
         _reportAt(node, element);
         return;
@@ -350,6 +417,9 @@ class _LintingMemberVisitor extends _BaseMemberVisitor {
       i++
     ) {
       if (validatorFromAnnotation.validators[i].isValid(node, element)) {
+        rule.logger.fine(
+          'Member matches validator at index $i ahead, moving to it',
+        );
         // Found a matching validator ahead - check spacing before moving to it
         _checkSpacing(node, element, validatorIndex: i, isSorted: true);
         if (reported) return;
@@ -365,6 +435,7 @@ class _LintingMemberVisitor extends _BaseMemberVisitor {
       }
     }
 
+    rule.logger.fine('No matching validator found, treating as unsorted');
     // No matching validator found - this is an unsorted member
     // Now check spacing and alphabetical constraints for unsorted members.
     _checkSpacing(node, element, validatorIndex: -1, isSorted: false);
@@ -384,24 +455,38 @@ class _LintingMemberVisitor extends _BaseMemberVisitor {
   }
 
   void _reportAt(AstNode node, Element element) {
+    rule.logger.fine('_reportAt() called for: ${element.name}');
     switch (node) {
       case MethodDeclaration(:var name):
+        rule.logger.finer('Reporting at method: ${name.lexeme}');
         rule.reportAtToken(name);
       case FieldDeclaration(:var fields):
+        rule.logger.finer(
+          'Reporting at field with ${fields.variables.length} variables',
+        );
         for (var variable in fields.variables) {
           if (variable.declaredFragment?.element == element) {
+            rule.logger.finer('Found variable: ${variable.name.lexeme}');
             rule.reportAtToken(variable.name);
             break;
           }
         }
       case ConstructorDeclaration(:var name):
+        rule.logger.finer(
+          'Reporting at constructor: ${name?.lexeme ?? "unnamed"}',
+        );
         if (name != null) {
           rule.reportAtToken(name);
         } else {
-          rule.reportAtNode(node.returnType);
+          rule.reportAtNode(node.typeName);
         }
       default:
-        _logger.severe('Unexpected node type for member: $node');
+        rule.logger.severe(
+          'Unexpected node type for member: ${node.runtimeType}',
+        );
+        rule.logger.severe(
+          'Unexpected node type for member: $node',
+        );
         assert(false, 'Unexpected node type for member: $node');
         rule.reportAtNode(node);
     }
@@ -427,7 +512,11 @@ class TrackingMemberVisitor extends _BaseMemberVisitor {
 
   @override
   void handleMember(AstNode node, Element element) {
+    SortingMembersRule._logger.finer(
+      'TrackingMemberVisitor.handleMember() for: ${element.name}',
+    );
     var index = validatorFromAnnotation.match(node, element);
+    SortingMembersRule._logger.finer('  Matched validator index: $index');
     members.add(
       MemberResult(
         node: node,
@@ -442,6 +531,9 @@ class TrackingMemberVisitor extends _BaseMemberVisitor {
   /// Returns the members sorted according to the validator indices and, if
   /// needed, alphabetically, with spacing information.
   List<MemberResult> get sortedMembers {
+    SortingMembersRule._logger.info(
+      'TrackingMemberVisitor.sortedMembers started',
+    );
     var sorted = <MemberResult>[];
 
     // Separate sorted and unsorted members
@@ -455,11 +547,18 @@ class TrackingMemberVisitor extends _BaseMemberVisitor {
         unsortedMembers.add(member);
       }
     }
+    SortingMembersRule._logger.fine(
+      'Separated members: ${sortedMembers.length} sorted, '
+      '${unsortedMembers.length} unsorted',
+    );
 
     // If alphabetizeUnsortedMembers is true, group all unsorted members
     // together
     if (validatorFromAnnotation.alphabetizeUnsortedMembers ||
         validatorFromAnnotation.validators.isEmpty) {
+      SortingMembersRule._logger.fine(
+        'Grouping mode: alphabetize unsorted or no validators',
+      );
       // Group sorted members by validator index
       var membersByValidator = <int, List<MemberResult>>{};
       for (var member in sortedMembers) {
@@ -467,27 +566,43 @@ class TrackingMemberVisitor extends _BaseMemberVisitor {
             .putIfAbsent(member.validatorIndex!, () => [])
             .add(member);
       }
+      SortingMembersRule._logger.finer(
+        'Grouped into ${membersByValidator.length} validator groups',
+      );
 
       // Sort members within each validator group if needed
       for (var validatorIndex in membersByValidator.keys) {
         if (validatorFromAnnotation.alphabetizeSortedMembers) {
+          SortingMembersRule._logger.finer(
+            'Alphabetizing validator group $validatorIndex',
+          );
           membersByValidator[validatorIndex]!.sort(_compareAlphabetical);
         }
       }
 
       // Process validators in order
       var sortedValidatorIndices = membersByValidator.keys.toList()..sort();
+      SortingMembersRule._logger.finer(
+        'Processing validators in order: $sortedValidatorIndices',
+      );
 
       for (var validatorIndex in sortedValidatorIndices) {
         sorted.addAll(membersByValidator[validatorIndex]!);
       }
 
       // Add all unsorted members at the end
+      SortingMembersRule._logger.finer(
+        'Adding ${unsortedMembers.length} unsorted members',
+      );
       if (validatorFromAnnotation.alphabetizeUnsortedMembers) {
+        SortingMembersRule._logger.finer('Alphabetizing unsorted members');
         unsortedMembers.sort(_compareAlphabetical);
       }
       sorted.addAll(unsortedMembers);
     } else {
+      SortingMembersRule._logger.fine(
+        'Grouping mode: keep unsorted attached to sorted',
+      );
       // Keep unsorted members attached to the specific sorted member before
       // them
       var unsortedAttachments = <MemberResult?, List<MemberResult>>{};
@@ -502,9 +617,15 @@ class TrackingMemberVisitor extends _BaseMemberVisitor {
               .add(member);
         }
       }
+      SortingMembersRule._logger.finer(
+        'Created ${unsortedAttachments.length} unsorted attachment groups',
+      );
 
       // First, add any unsorted members that came before any sorted members
       if (unsortedAttachments.containsKey(null)) {
+        SortingMembersRule._logger.finer(
+          'Adding ${unsortedAttachments[null]!.length} pre-sorted members',
+        );
         sorted.addAll(unsortedAttachments[null]!);
       }
 
@@ -515,25 +636,42 @@ class TrackingMemberVisitor extends _BaseMemberVisitor {
             .putIfAbsent(member.validatorIndex!, () => [])
             .add(member);
       }
+      SortingMembersRule._logger.finer(
+        'Grouped into ${membersByValidator.length} validator groups',
+      );
 
       // Sort members within each validator group if needed
       for (var validatorIndex in membersByValidator.keys) {
         if (validatorFromAnnotation.alphabetizeSortedMembers) {
+          SortingMembersRule._logger.finer(
+            'Alphabetizing validator group $validatorIndex',
+          );
           membersByValidator[validatorIndex]!.sort(_compareAlphabetical);
         }
       }
 
       // Process validators in order
       var sortedValidatorIndices = membersByValidator.keys.toList()..sort();
+      SortingMembersRule._logger.finer(
+        'Processing validators in order: $sortedValidatorIndices',
+      );
 
       for (var validatorIndex in sortedValidatorIndices) {
         var membersWithValidator = membersByValidator[validatorIndex]!;
+        SortingMembersRule._logger.finer(
+          'Adding ${membersWithValidator.length} members for validator '
+          '$validatorIndex',
+        );
 
         for (var member in membersWithValidator) {
           sorted.add(member);
 
           // Add any unsorted members that follow this specific sorted member
           if (unsortedAttachments.containsKey(member)) {
+            SortingMembersRule._logger.finer(
+              'Adding ${unsortedAttachments[member]!.length} unsorted members '
+              'after ${member.element.name}',
+            );
             sorted.addAll(unsortedAttachments[member]!);
           }
         }
@@ -541,6 +679,9 @@ class TrackingMemberVisitor extends _BaseMemberVisitor {
     }
 
     // Calculate required spacing for each member
+    SortingMembersRule._logger.fine(
+      'Calculating spacing for ${sorted.length} members',
+    );
     var sortedWithSpacing = <MemberResult>[];
     for (var i = 0; i < sorted.length; i++) {
       var member = sorted[i];
@@ -576,6 +717,10 @@ class TrackingMemberVisitor extends _BaseMemberVisitor {
       );
     }
 
+    SortingMembersRule._logger.info(
+      'TrackingMemberVisitor.sortedMembers completed with '
+      '${sortedWithSpacing.length} members',
+    );
     return sortedWithSpacing;
   }
 
@@ -583,6 +728,9 @@ class TrackingMemberVisitor extends _BaseMemberVisitor {
     int? prevIndex,
     int? currIndex,
   ) {
+    SortingMembersRule._logger.finer(
+      '_calculateRequiredBlankLines(prev=$prevIndex, curr=$currIndex)',
+    );
     // Both sorted (matched validators)
     if (prevIndex != null &&
         currIndex != null &&
@@ -590,17 +738,29 @@ class TrackingMemberVisitor extends _BaseMemberVisitor {
         currIndex != -1) {
       if (prevIndex == currIndex) {
         // Same validator
-        return validatorFromAnnotation.linesBetweenSameSortMembers;
+        var required = validatorFromAnnotation.linesBetweenSameSortMembers;
+        SortingMembersRule._logger.finer(
+          '  Same validator: required=$required',
+        );
+        return required;
       } else {
         // Different validators
-        return validatorFromAnnotation.linesAroundSortedMembers;
+        var required = validatorFromAnnotation.linesAroundSortedMembers;
+        SortingMembersRule._logger.finer(
+          '  Different validators: required=$required',
+        );
+        return required;
       }
     }
 
     // Transition between sorted and unsorted
     if ((prevIndex == null || prevIndex == -1) !=
         (currIndex == null || currIndex == -1)) {
-      return validatorFromAnnotation.linesAroundUnsortedMembers;
+      var required = validatorFromAnnotation.linesAroundUnsortedMembers;
+      SortingMembersRule._logger.finer(
+        '  Transition sorted/unsorted: required=$required',
+      );
+      return required;
     }
 
     // Both unsorted
@@ -612,22 +772,47 @@ class TrackingMemberVisitor extends _BaseMemberVisitor {
       // 2. There are no validators at all (all members are unsorted)
       if (validatorFromAnnotation.alphabetizeUnsortedMembers ||
           validatorFromAnnotation.validators.isEmpty) {
-        return validatorFromAnnotation.linesAroundUnsortedMembers;
+        var required = validatorFromAnnotation.linesAroundUnsortedMembers;
+        SortingMembersRule._logger.finer('  Both unsorted: required=$required');
+        return required;
       }
     }
 
     // Default: no spacing requirement
+    SortingMembersRule._logger.finer('  No spacing requirement (default null)');
     return null;
   }
 
   int _compareAlphabetical(MemberResult a, MemberResult b) {
+    var declarationA = a.node.thisOrAncestorOfType<FieldDeclaration>();
+    var declarationB = b.node.thisOrAncestorOfType<FieldDeclaration>();
+    if (declarationA != null &&
+        declarationB != null &&
+        // If both are fields
+        declarationA != declarationB &&
+        // The fields are not from the same multi-declaration
+        (declarationA.fields.variables.length != 1 ||
+            declarationB.fields.variables.length != 1)
+    // If either is from a multi-declaration
+    ) {
+      // Compare based on first alphabetical variable name in each declaration
+      var firstAlphabeticalFieldA =
+          declarationA.fields.variables.map((v) => v.name.lexeme).toList()
+            ..sort();
+      var firstAlphabeticalFieldB =
+          declarationB.fields.variables.map((v) => v.name.lexeme).toList()
+            ..sort();
+      return firstAlphabeticalFieldA.first.compareTo(
+        firstAlphabeticalFieldB.first,
+      );
+    }
     var nameA = _getMemberName(a.node, a.element);
     var nameB = _getMemberName(b.node, b.element);
 
     if (nameA == 'new' && nameB != 'new') return -1;
     if (nameA != 'new' && nameB == 'new') return 1;
 
-    return nameA.toLowerCase().compareTo(nameB.toLowerCase());
+    return nameA.compareTo(nameB);
   }
 }
 
@@ -647,14 +832,23 @@ class _SortingMembersVisitor extends SimpleAstVisitor<void> {
   }
 
   void _handleAnnotatedNode(AnnotatedNode node) {
+    rule.logger.fine(
+      '_handleAnnotatedNode() started for: ${node.runtimeType}',
+    );
     for (var annotation in node.metadata) {
       var element = annotation.elementAnnotation;
       if (element == null) {
+        rule.logger.finer('Annotation element is null, skipping');
         continue;
       }
       if (_isSortingMembers(element)) {
+        rule.logger.fine('Found SortingMembers annotation');
         var validatorFromAnnotation = ValidatorFromAnnotation.fromAnnotation(
           element,
+        );
+        rule.logger.fine(
+          'Created ValidatorFromAnnotation with '
+          '${validatorFromAnnotation.validators.length} validators',
         );
         var visitor = _LintingMemberVisitor(
           rule,
@@ -662,6 +856,7 @@ class _SortingMembersVisitor extends SimpleAstVisitor<void> {
           validatorFromAnnotation,
         );
         node.visitChildren(visitor);
+        rule.logger.fine('Finished processing annotated node');
       }
     }
   }
@@ -696,20 +891,11 @@ class _SortingMembersVisitor extends SimpleAstVisitor<void> {
 /// Configuration extracted from a SortingMembers annotation.
 /// {@endtemplate}
 class ValidatorFromAnnotation {
-  ValidatorFromAnnotation._({
-    required this.annotation,
-    required this.validators,
-    required this.linesBetweenSameSortMembers,
-    required this.linesAroundSortedMembers,
-    required this.linesAroundUnsortedMembers,
-    required this.alphabetizeSortedMembers,
-    required this.alphabetizeUnsortedMembers,
-  });
-
   /// {@macro validator_from_annotation}
   factory ValidatorFromAnnotation.fromAnnotation(
     ElementAnnotation annotation,
   ) {
+    _logger.info('ValidatorFromAnnotation.fromAnnotation() started');
     var constantValue = annotation.computeConstantValue();
     if (constantValue == null) {
       throw ArgumentError(
@@ -718,6 +904,7 @@ class ValidatorFromAnnotation {
     }
     var declarations = constantValue.getField('declarations')?.toSetValue();
     var validators = <ListMemberTypeValidator>[];
+    _logger.fine('Found ${declarations?.length ?? 0} declarations');
     for (var declaration in {...?declarations}) {
       var list = <MemberTypeValidator>[];
       DartObject? current = declaration;
@@ -823,7 +1010,7 @@ class ValidatorFromAnnotation {
           case '_New':
             list.add(const _NewMemberTypeValidator());
           default:
-            _logger.severe('Unknown member type: $typeName');
+            SortingMembersRule._logger.severe('Unknown member type: $typeName');
             assert(false, 'Unknown member type: $typeName');
         }
         current =
@@ -831,6 +1018,10 @@ class ValidatorFromAnnotation {
       } while (current != null);
       validators.add(ListMemberTypeValidator(validators: list));
     }
+    _logger.info(
+      'ValidatorFromAnnotation.fromAnnotation() completed with '
+      '${validators.length} validators',
+    );
     return ValidatorFromAnnotation._(
       annotation: annotation,
       validators: validators,
@@ -851,6 +1042,19 @@ class ValidatorFromAnnotation {
           false,
     );
   }
+  ValidatorFromAnnotation._({
+    required this.annotation,
+    required this.validators,
+    required this.linesBetweenSameSortMembers,
+    required this.linesAroundSortedMembers,
+    required this.linesAroundUnsortedMembers,
+    required this.alphabetizeSortedMembers,
+    required this.alphabetizeUnsortedMembers,
+  });
+
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
+    'ValidatorFromAnnotation',
+  );
 
   /// The annotation from which this configuration was extracted.
   final ElementAnnotation annotation;
@@ -879,13 +1083,18 @@ class ValidatorFromAnnotation {
   /// Returns the index of the most specific validator that matches,
   /// or null if no validator matches.
   int? match(AstNode node, Element element) {
+    _logger.finer('match() for: ${element.name}');
     var matches = <int>[];
     for (var i = 0; i < validators.length; i++) {
       if (validators[i].isValid(node, element)) {
         matches.add(i);
       }
     }
-    if (matches.isEmpty) return null;
+    _logger.finer('  Found ${matches.length} matching validator(s): $matches');
+    if (matches.isEmpty) {
+      _logger.finer('  No matches, returning null');
+      return null;
+    }
 
     // Find the best match
     // A match is better if it is more specific.
@@ -894,16 +1103,21 @@ class ValidatorFromAnnotation {
 
     var bestIndex = matches[0];
     var bestValidator = validators[bestIndex];
+    _logger.finer('  Initial best match: $bestIndex');
 
     for (var i = 1; i < matches.length; i++) {
       var currentIndex = matches[i];
       var currentValidator = validators[currentIndex];
 
       if (currentValidator.isMoreSpecificThan(bestValidator)) {
+        _logger.finer(
+          '  Validator $currentIndex is more specific than $bestIndex',
+        );
         bestIndex = currentIndex;
         bestValidator = currentValidator;
       }
     }
+    _logger.fine('  Final best match: $bestIndex');
     return bestIndex;
   }
 }

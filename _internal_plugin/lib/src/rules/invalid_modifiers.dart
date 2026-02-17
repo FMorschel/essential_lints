@@ -2,20 +2,24 @@ import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart';
+import 'package:essential_lints/src/plugin.dart';
 import 'package:logging/logging.dart';
 
 import 'diagnostic.dart';
 import 'invalid_base_visitor.dart';
 
-final _log = Logger('InvalidModifiersRule');
-
 class InvalidModifiersRule extends AnalysisRule {
   InvalidModifiersRule()
     : super(
-        name: _diagnostic.name,
+        name: _diagnostic.lowerCaseUniqueName,
         description: 'Modifiers that are invalid for a given modifier.',
       );
+
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
+    'InvalidModifiersRule',
+  );
+
+  Logger get logger => _logger;
 
   static const _diagnostic = InternalDiagnosticCode(
     name: 'invalid_modifiers',
@@ -25,7 +29,7 @@ class InvalidModifiersRule extends AnalysisRule {
   );
 
   @override
-  final DiagnosticCode diagnosticCode = _diagnostic;
+  final InternalDiagnosticCode diagnosticCode = _diagnostic;
 
   @override
   void registerNodeProcessors(
@@ -41,7 +45,7 @@ class InvalidModifiersRule extends AnalysisRule {
 
 class _InvalidModifiersVisitor extends InvalidBaseVisitor {
   _InvalidModifiersVisitor(InvalidModifiersRule rule, RuleContext context)
-    : super(context, rule, _log);
+    : super(context, rule, rule.logger);
 
   @override
   String get annotationName => 'InvalidModifiers';

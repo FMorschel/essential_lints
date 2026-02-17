@@ -1,68 +1,20 @@
-import 'package:analyzer/analysis_rule/analysis_rule.dart';
-import 'package:analyzer/analysis_rule/rule_context.dart';
-import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
-import 'package:analyzer/error/error.dart';
-import 'package:essential_lints_annotations/essential_lints_annotations.dart';
-import 'package:meta/meta.dart';
-
+import '../rules/analysis_rule.dart';
 import 'essential_lint_warnings.dart'
     show EssentialLintWarnings, EssentialMultiWarnings, SubWarnings;
 
 /// {@template rule}
-/// The base class for all essential multi-warnings rules.
+/// The base class for all essential warning rules.
 /// {@endtemplate}
-@SubtypeNaming(suffix: 'Rule')
-abstract class MultiWarningRule<T extends SubWarnings>
-    extends MultiAnalysisRule {
+abstract class WarningRule extends EssentialAnalysisRule {
   /// {@macro rule}
-  MultiWarningRule(this.rule)
-    : super(
-        name: rule.code.name,
-        description: rule.code.description,
-      );
-
-  /// The essential warning rule associated with this analysis rule.
-  final EssentialMultiWarnings<T> rule;
-
-  @override
-  List<DiagnosticCode> get diagnosticCodes => [
-    rule,
-    ...subWarnings,
-  ];
-
-  /// The list of sub-warnings associated with this analysis rule.
-  List<T> get subWarnings;
-
-  @override
-  @mustBeOverridden
-  void registerNodeProcessors(
-    RuleVisitorRegistry registry,
-    RuleContext context,
-  );
+  WarningRule(EssentialLintWarnings super.rule, super.logger);
 }
 
 /// {@template rule}
-/// The base class for all essential warning rules.
+/// The base class for all essential multi-warnings rules.
 /// {@endtemplate}
-@SubtypeNaming(suffix: 'Rule')
-abstract class WarningRule extends AnalysisRule {
+abstract class MultiWarningRule<T extends SubWarnings>
+    extends EssentialMultiAnalysisRule {
   /// {@macro rule}
-  WarningRule(this.rule)
-    : super(
-        name: rule.code.name,
-        description: rule.code.description,
-      );
-
-  /// The essential warning rule associated with this analysis rule.
-  final EssentialLintWarnings rule;
-
-  @override
-  DiagnosticCode get diagnosticCode => rule;
-
-  @override
-  @mustBeOverridden
-  void registerNodeProcessors(
-    RuleVisitorRegistry registry,
-    RuleContext context,
-  );
+  MultiWarningRule(EssentialMultiWarnings<T> super.rule, super.logger);
 }

@@ -35,25 +35,24 @@ extension AstExtension on AstNode {
     for (var ancestor in withAncestors) {
       switch (ancestor) {
         case MethodDeclaration(
-                  declaredFragment: ExecutableFragment(:var element),
-                  :var body,
-                ) ||
-                FunctionExpression(
-                  parent: FunctionDeclaration(
-                    declaredFragment: ExecutableFragment(:var element),
-                  ),
-                  :var body,
-                ) ||
-                FunctionExpression(
-                  declaredFragment: ExecutableFragment(:var element),
-                  :var body,
-                ) ||
-                ConstructorDeclaration(
-                  declaredFragment: ExecutableFragment(:var element),
-                  :var body,
-                )
-            when body.isSynchronous:
-          return element;
+              declaredFragment: ExecutableFragment(:var element),
+              :var body,
+            ) ||
+            FunctionExpression(
+              parent: FunctionDeclaration(
+                declaredFragment: ExecutableFragment(:var element),
+              ),
+              :var body,
+            ) ||
+            FunctionExpression(
+              declaredFragment: ExecutableFragment(:var element),
+              :var body,
+            ) ||
+            ConstructorDeclaration(
+              declaredFragment: ExecutableFragment(:var element),
+              :var body,
+            ):
+          return body.isSynchronous ? element : null;
       }
     }
     return null;
@@ -118,6 +117,33 @@ extension StatementExt on Statement {
       _ =>
         // Other statements are not considered to always exit.
         false,
+    };
+  }
+}
+
+/// Extension to determine if an expression can be a constant expression.
+extension ExpressionExt on Expression {
+  /// Returns `true` if the expression can be a constant expression, otherwise
+  /// returns `false`.
+  bool get canBeConstant {
+    return switch (this) {
+      NamedExpression(:var expression) => expression.canBeConstant,
+      Literal() => true,
+      Identifier(:var element) =>
+        element is PropertyAccessorElement && element.variable.isConst,
+      ConditionalExpression(
+        :var condition,
+        :var thenExpression,
+        :var elseExpression,
+      ) =>
+        condition.canBeConstant &&
+            thenExpression.canBeConstant &&
+            elseExpression.canBeConstant,
+      BinaryExpression(:var leftOperand, :var rightOperand) =>
+        leftOperand.canBeConstant && rightOperand.canBeConstant,
+      PropertyAccess(:var target, :var propertyName) =>
+        target != null && target.canBeConstant && propertyName.name == 'length',
+      _ => canBeConst,
     };
   }
 }

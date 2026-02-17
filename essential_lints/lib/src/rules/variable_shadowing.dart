@@ -7,62 +7,25 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/scope.dart';
 import 'package:analyzer/src/generated/resolver.dart' // ignore: implementation_imports, not exposed api
     show ScopeResolverVisitor;
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
 import '../utils/diagnostic_message.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
-
-Element? _resolveNameInPreviousScope(String id, AstNode node) {
-  Scope? scope;
-  var skipNext = true;
-  for (AstNode? context = node; context != null; context = context.parent) {
-    if (context.parent is CompilationUnit ||
-        context.parent is CompilationUnitMember) {
-      // Reached the top-level scope.
-      break;
-    }
-    if (context case BlockFunctionBody(:var parent)) {
-      FormalParameterList? declaredParameters;
-      if (parent case FunctionExpression(:var parameters)) {
-        declaredParameters = parameters;
-      } else if (parent case MethodDeclaration(:var parameters)) {
-        declaredParameters = parameters;
-      } else if (parent case ConstructorDeclaration(:var parameters)) {
-        declaredParameters = parameters;
-      }
-      if (declaredParameters != null) {
-        for (var parameter in declaredParameters.parameters) {
-          if (parameter.declaredFragment?.element.displayName == id) {
-            return parameter.declaredFragment?.element;
-          }
-        }
-      }
-    }
-    var nodeScope = ScopeResolverVisitor.getNodeNameScope(context);
-    if (nodeScope != null) {
-      if (skipNext) {
-        skipNext = false;
-        continue;
-      }
-      scope = nodeScope;
-      break;
-    }
-  }
-
-  if (scope != null) {
-    var ScopeLookupResult(:getter, :setter) = scope.lookup(id);
-    return getter ?? setter;
-  }
-
-  return null;
-}
 
 /// {@template variable_shadowing}
 /// Checks for variable declarations that shadow other variables in the same
 /// scope.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class VariableShadowingRule extends LintRule {
   /// {@macro variable_shadowing}
-  VariableShadowingRule() : super(.variableShadowing);
+  VariableShadowingRule() : super(.variableShadowing, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
+    'VariableShadowingRule',
+  );
 
   @override
   void registerNodeProcessors(
@@ -77,25 +40,42 @@ class VariableShadowingRule extends LintRule {
 }
 
 class _VariableShadowingVisitor extends SimpleAstVisitor<void> {
-  _VariableShadowingVisitor(this.rule, this.context);
+  _VariableShadowingVisitor(this.rule, this.context) {
+    rule.logger.info('_VariableShadowingVisitor() created');
+  }
 
   final VariableShadowingRule rule;
   final RuleContext context;
 
   @override
   void visitDeclaredVariablePattern(DeclaredVariablePattern node) {
+    rule.logger.info(
+      'visitDeclaredVariablePattern() started for: ${node.toSource()}',
+    );
     var element = _resolveNameInPreviousScope(
       node.declaredFragment!.element.displayName,
       node,
     );
     if (element != null) {
+      rule.logger.fine('Found previous declaration: ${element.displayName}');
       reportForTokenIfValid(node.name, element);
+    } else {
+      rule.logger.finer(
+        'No previous declaration found for: '
+        '${node.declaredFragment!.element.displayName}',
+      );
     }
   }
 
   @override
   void visitVariableDeclaration(VariableDeclaration node) {
+    rule.logger.info(
+      'visitVariableDeclaration() started for: ${node.toSource()}',
+    );
     if (node.thisOrAncestorOfType<FieldDeclaration>() != null) {
+      rule.logger.finer(
+        'Declaration is a field; skipping variable shadowing check',
+      );
       return;
     }
     var element = _resolveNameInPreviousScope(
@@ -103,7 +83,13 @@ class _VariableShadowingVisitor extends SimpleAstVisitor<void> {
       node,
     );
     if (element != null) {
+      rule.logger.fine('Found previous declaration: ${element.displayName}');
       reportForTokenIfValid(node.name, element);
+    } else {
+      rule.logger.finer(
+        'No previous declaration found for: '
+        '${node.declaredFragment!.element.displayName}',
+      );
     }
   }
 
@@ -111,8 +97,16 @@ class _VariableShadowingVisitor extends SimpleAstVisitor<void> {
     if (element is PropertyAccessorElement &&
             element.enclosingElement is InstanceElement ||
         element.enclosingElement is LibraryElement) {
+      rule.logger.finer(
+        'Previous declaration is a property accessor or top-level; skipping '
+        'report for: ${element.displayName}',
+      );
       return;
     }
+    rule.logger.fine(
+      'Reporting shadowed variable at token: ${token.lexeme} (previous: '
+      '${element.displayName})',
+    );
     rule.reportAtToken(
       token,
       contextMessages: [
@@ -127,4 +121,72 @@ class _VariableShadowingVisitor extends SimpleAstVisitor<void> {
       ],
     );
   }
+}
+
+Element? _resolveNameInPreviousScope(String id, AstNode node) {
+  VariableShadowingRule._logger.finer(
+    'Resolving previous scope for id: $id at node: ${node.runtimeType}',
+  );
+  Scope? scope;
+  var skipNext = true;
+  for (AstNode? context = node; context != null; context = context.parent) {
+    if (context.parent is CompilationUnit ||
+        context.parent is CompilationUnitMember) {
+      // Reached the top-level scope.
+      VariableShadowingRule._logger.finer(
+        'Reached top-level scope while resolving $id, stopping traversal',
+      );
+      break;
+    }
+    if (context case BlockFunctionBody(:var parent)) {
+      FormalParameterList? declaredParameters;
+      if (parent case FunctionExpression(:var parameters)) {
+        declaredParameters = parameters;
+      } else if (parent case MethodDeclaration(:var parameters)) {
+        declaredParameters = parameters;
+      } else if (parent case ConstructorDeclaration(:var parameters)) {
+        declaredParameters = parameters;
+      }
+      if (declaredParameters != null) {
+        for (var parameter in declaredParameters.parameters) {
+          if (parameter.declaredFragment?.element.displayName == id) {
+            VariableShadowingRule._logger.finer(
+              'Found matching parameter declaration in current scope for $id',
+            );
+            return parameter.declaredFragment?.element;
+          }
+        }
+      }
+    }
+    var nodeScope = ScopeResolverVisitor.getNodeNameScope(context);
+    if (nodeScope != null) {
+      if (skipNext) {
+        skipNext = false;
+        continue;
+      }
+      scope = nodeScope;
+      VariableShadowingRule._logger.finer(
+        'Found candidate scope while resolving $id',
+      );
+      break;
+    }
+  }
+
+  if (scope != null) {
+    var ScopeLookupResult(:getter, :setter) = scope.lookup(id);
+    var result = getter ?? setter;
+    if (result != null) {
+      VariableShadowingRule._logger.fine(
+        'Resolved previous declaration for $id: ${result.displayName}',
+      );
+    } else {
+      VariableShadowingRule._logger.finer(
+        'No previous declaration found in scope for $id',
+      );
+    }
+    return result;
+  }
+
+  VariableShadowingRule._logger.finer('No scope found while resolving $id');
+  return null;
 }

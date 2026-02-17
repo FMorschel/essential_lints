@@ -7,7 +7,10 @@ import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import '../rules/analysis_rule.dart';
 import '../utils/extensions/list.dart';
 import '../utils/extensions/object.dart';
 import 'essential_lint_warnings.dart';
@@ -16,12 +19,17 @@ import 'warning.dart';
 /// {@template getters_in_member_list_rule}
 /// A lint rule that ensures getters/fields are included in member lists.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class GettersInMemberListRule extends MultiWarningRule<GettersInMemberList> {
   /// {@macro getters_in_member_list_rule}
-  GettersInMemberListRule() : super(.gettersInMemberList);
+  GettersInMemberListRule() : super(.gettersInMemberList, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
+    'GettersInMemberListRule',
+  );
 
   @override
-  List<GettersInMemberList> get subWarnings => GettersInMemberList.values;
+  List<GettersInMemberList> get subDiagnostics => GettersInMemberList.values;
 
   @override
   void registerNodeProcessors(
@@ -88,13 +96,20 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitAnnotation(Annotation node) {
+    rule.logger.info('GettersInMemberListVisitor.visitAnnotation() started');
     if (_isGettersInMemberListAnnotation(node.elementAnnotation)) {
+      rule.logger.fine('Found GettersInMemberList annotation');
       var annotation = _mapKnownArguments(node.elementAnnotation);
       if (annotation == null) {
+        rule.logger.finer('Annotation mapping failed');
         assert(false, 'The annotation should not be null here.');
         return;
       }
+      rule.logger.fine(
+        'Annotation mapped: memberListName="${annotation.memberListName}"',
+      );
       if (annotation.memberListName.isEmpty) {
+        rule.logger.finer('Member list name is empty, reporting error');
         rule.reportAtNode(
           node.arguments?.arguments
                   .firstWhereOrNull(_isMemberListName)
@@ -105,38 +120,57 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
         );
       }
     }
+    rule.logger.info('GettersInMemberListVisitor.visitAnnotation() completed');
   }
 
   @override
   void visitClassDeclaration(ClassDeclaration node) {
+    rule.logger.info(
+      'GettersInMemberListVisitor.visitClassDeclaration() started',
+    );
     var element = node.declaredFragment?.element;
     if (element == null) {
+      rule.logger.finer('Class element is null, returning');
       return;
     }
+    rule.logger.fine('Processing class: ${node.namePart.typeName.lexeme}');
     var relevant = element.metadata.annotations
         .where(_isGettersInMemberListAnnotation)
         .map(_mapKnownArguments)
         .nonNulls;
+    rule.logger.fine(
+      'Found ${relevant.length} relevant GettersInMemberList annotations',
+    );
     for (var annotation in relevant) {
       var memberListName = annotation.memberListName;
+      rule.logger.finer(
+        'Processing annotation for member list: $memberListName',
+      );
       if (annotation.memberListName.isEmpty) {
+        rule.logger.finer('Member list name is empty, skipping');
         continue;
       }
       var getterMember = element.getGetter(memberListName);
+      rule.logger.finer(
+        'Looking for getter: $memberListName, found: ${getterMember != null}',
+      );
       if (getterMember == null ||
           getterMember.isStatic && annotation.instanceOnly) {
+        rule.logger.fine(
+          'Getter missing or static-only mismatch, reporting missing list',
+        );
         rule.reportAtToken(
-          node.name,
+          node.namePart.typeName,
           diagnosticCode: GettersInMemberList.missingList,
           arguments: [
             memberListName,
-            if (annotation.instance) 'an instance' else '',
+            if (annotation.instance) /*a*/ 'n instance' else '',
           ],
         );
         continue;
       }
-      var member = node.members
-          .where((rule, getterMember).whereMatches)
+      var member = node.body.membersOrNull
+          ?.where((rule, getterMember).whereMatches)
           .singleOrNull;
       Token? memberName;
       Element? memberElement;
@@ -145,6 +179,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
         :var name,
         declaredFragment: Fragment(:var element),
       )) {
+        rule.logger.finer('Found getter method: ${name.lexeme}');
         memberElement = element;
         memberName = name;
       } else if (member case FieldDeclaration(
@@ -152,6 +187,9 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
           :var variables,
         ),
       )) {
+        rule.logger.finer(
+          'Found field declaration with ${variables.length} variables',
+        );
         for (var variable in variables) {
           if (variable.declaredFragment?.element == getterMember.variable) {
             memberElement = getterMember;
@@ -161,15 +199,36 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
         }
       }
       if (memberName == null || memberElement == null) {
+        rule.logger.finer('Member name or element not found, skipping');
         continue;
       }
+      rule.logger.fine('Member found: ${memberName.lexeme}');
       var expression = _calculateList(member, memberName);
       if (expression == null) {
+        rule.logger.finer('Could not calculate list, skipping');
         continue;
       }
-      var getters = element.getters.toList()..remove(memberElement);
-      var missing = _handleMemberList(getters, annotation, expression);
+      var getters = {
+        for (var getter in element.getters) getter.displayName: getter,
+      };
+      for (var element in element.inheritedConcreteMembers.values) {
+        if (element case GetterElement(:var enclosingElement)
+            when enclosingElement != context.typeProvider.objectElement &&
+                !getters.keys.contains(element.displayName)) {
+          getters.addAll({
+            element.displayName: element,
+          });
+        }
+      }
+      rule.logger.fine('Total getters to check: ${getters.length}');
+      var missing = _handleMemberList(
+        getters.values.toList(),
+        annotation,
+        expression,
+      );
+      rule.logger.fine('Missing members: ${missing.length}');
       if (missing.isNotEmpty) {
+        rule.logger.finer('Reporting missing members: ${missing.join(", ")}');
         rule.reportAtToken(
           memberName,
           diagnosticCode: EssentialMultiWarnings.gettersInMemberList,
@@ -180,23 +239,47 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
         );
       }
     }
+    rule.logger.info(
+      'GettersInMemberListVisitor.visitClassDeclaration() completed',
+    );
   }
 
   ListLiteral? _calculateList(ClassMember? member, Token memberName) {
+    rule.logger.fine(
+      '_calculateList() started for member: ${memberName.lexeme}',
+    );
     Expression? expression;
     if (member case MethodDeclaration(:var body, isGetter: true)) {
+      rule.logger.finer('Member is getter method, checking body type');
       switch (body) {
         case BlockFunctionBody(:var block):
+          rule.logger.finer(
+            'Body is BlockFunctionBody with ${block.statements.length} '
+            'statements',
+          );
           var statement = block.statements.last;
           if (statement is! ReturnStatement) {
+            rule.logger.finer(
+              'Last statement is not ReturnStatement: ${statement.runtimeType}',
+            );
             // We don't know how to handle this case.
             return null;
           }
+          rule.logger.finer('Extracted expression from return statement');
           expression = statement.expression;
         case ExpressionFunctionBody(expression: var expressionBody):
+          rule.logger.finer('Body is ExpressionFunctionBody');
           expression = expressionBody;
         case EmptyFunctionBody():
+          rule.logger.fine('Body is EmptyFunctionBody, reporting error');
+          rule.reportAtToken(
+            member.name,
+            diagnosticCode: GettersInMemberList.invalidMemberList,
+            arguments: [memberName.lexeme],
+          );
+          return null;
         case NativeFunctionBody():
+          rule.logger.fine('Body is NativeFunctionBody, reporting error');
           rule.reportAtToken(
             member.name,
             diagnosticCode: GettersInMemberList.invalidMemberList,
@@ -209,14 +292,21 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
         :var variables,
       ),
     )) {
+      rule.logger.finer(
+        'Member is field declaration with ${variables.length} variables',
+      );
       for (var variable in variables) {
         if (variable.initializer != null) {
+          rule.logger.finer(
+            'Found variable with initializer: ${variable.name.lexeme}',
+          );
           expression = variable.initializer;
           break;
         }
       }
     }
     if (expression == null) {
+      rule.logger.fine('Expression is null, reporting error');
       rule.reportAtNode(
         member,
         diagnosticCode: GettersInMemberList.invalidMemberList,
@@ -224,7 +314,9 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
       );
       return null;
     }
+    rule.logger.finer('Expression type: ${expression.runtimeType}');
     if (expression is! ListLiteral) {
+      rule.logger.fine('Expression is not ListLiteral, reporting error');
       rule.reportAtOffset(
         expression.offset,
         1,
@@ -234,6 +326,7 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
       // We don't know how to handle this case.
       return null;
     }
+    rule.logger.fine('Successfully extracted ListLiteral');
     return expression;
   }
 
@@ -241,13 +334,30 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
   ///
   /// Returns a list of missing member names, or an empty list if all are
   /// present.
-  List<String> _handleMemberList(
+  Set<String> _handleMemberList(
     List<GetterElement> getters,
     _GettersInMemberListAnnotation annotation,
     ListLiteral list,
   ) {
+    rule.logger.fine(
+      '_handleMemberList() started with ${getters.length} getters to check',
+    );
     var literalElements = <(CollectionElement, Element)>[];
+    rule.logger.finer('Processing ${list.elements.length} list elements');
     for (var expression in list.elements) {
+      if (expression case ParenthesizedExpression(expression: var value)) {
+        rule.logger.finer('Unwrapping ParenthesizedExpression');
+        expression = value.unParenthesized;
+      }
+      if (expression
+          case NullAwareElement(:var value) ||
+              ParenthesizedExpression(expression: var value) ||
+              SpreadElement(expression: var value)) {
+        rule.logger.finer(
+          'Unwrapping NullAwareElement/ParenthesizedExpression/SpreadElement',
+        );
+        expression = value.unParenthesized;
+      }
       SimpleIdentifier? getterIdentifier;
       if (expression
           case SimpleIdentifier identifier ||
@@ -255,7 +365,15 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
         getterIdentifier = identifier;
       }
       var getterElement = getterIdentifier?.element;
+      rule.logger.finer(
+        'List element: ${getterIdentifier?.name ?? "<unknown>"}, element '
+        'found: ${getterElement != null}',
+      );
       if (getterElement == null) {
+        rule.logger.finer(
+          'No element found for: ${getterIdentifier?.name ?? "unknown"}, '
+          'reporting error',
+        );
         rule.reportAtNode(
           expression,
           diagnosticCode: GettersInMemberList.nonMemberIn,
@@ -268,8 +386,8 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
     bool valid(GetterElement element) {
       if ((!annotation.static && element.isStatic) ||
           (!annotation.instance && !element.isStatic) ||
-          !annotation.getters && element.variable.isSynthetic ||
-          !annotation.fields && !element.variable.isSynthetic ||
+          !annotation.getters && !element.variable.isOriginDeclaration ||
+          !annotation.fields && element.variable.isOriginDeclaration ||
           annotation.types.isNotEmpty &&
               !annotation.types.contains(element.returnType) ||
           annotation.superTypes.isNotEmpty &&
@@ -285,21 +403,31 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
     }
 
     var validGetters = getters.where(valid).toList();
+    rule.logger.fine('Valid getters after filtering: ${validGetters.length}');
     for (var (expression, element) in literalElements) {
       if (!validGetters.contains(element)) {
+        rule.logger.finer(
+          'List element ${element.displayName} is not in valid getters, '
+          'reporting error',
+        );
         rule.reportAtNode(
           expression,
           diagnosticCode: GettersInMemberList.nonMemberIn,
         );
       }
     }
-    var missing = <String>[];
+    var missing = <String>{};
     var elements = literalElements.map((e) => e.$2).toList();
     for (var element in validGetters) {
       if (!elements.contains(element)) {
+        rule.logger.finer('Missing member: ${element.displayName}');
         missing.add(element.displayName);
       }
     }
+    rule.logger.fine(
+      '_handleMemberList() completed, found ${missing.length} missing members',
+    );
+    missing.remove(annotation.memberListName);
     return missing;
   }
 
@@ -319,8 +447,12 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
   _GettersInMemberListAnnotation? _mapKnownArguments(
     ElementAnnotation? annotation,
   ) {
+    rule.logger.fine('_mapKnownArguments() started');
     var type = annotation?.computeConstantValue();
-    if (type == null) return .empty;
+    if (type == null) {
+      rule.logger.finer('Constant value is null, returning empty');
+      return .empty;
+    }
     var memberListNameString = type.getField('memberListName')?.toSymbolValue();
     var getters = type.getField('getters')?.toBoolValue();
     var fields = type.getField('fields')?.toBoolValue();
@@ -328,7 +460,12 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
     var superTypes = type.getField('superTypes')?.toListValue();
     var membersOption = type.getField('membersOption');
 
-    return _GettersInMemberListAnnotation(
+    rule.logger.finer(
+      'Extracted annotation fields: memberListName=$memberListNameString, '
+      'getters=$getters, fields=$fields, types_count=${types?.length}, '
+      'superTypes_count=${superTypes?.length}',
+    );
+    var result = _GettersInMemberListAnnotation(
       memberListName: memberListNameString ?? '',
       getters: getters ?? true,
       fields: fields ?? false,
@@ -338,6 +475,11 @@ class _GettersInMemberListVisitor extends SimpleAstVisitor<void> {
       ],
       membersOption: membersOption,
     );
+    rule.logger.fine(
+      '_mapKnownArguments() completed with result: getters=${result.getters}, '
+      'fields=${result.fields}',
+    );
+    return result;
   }
 }
 
@@ -370,4 +512,11 @@ extension on DartType? {
     }
     return null;
   }
+}
+
+extension on ClassBody {
+  List<ClassMember>? get membersOrNull => switch (this) {
+    BlockClassBody(:var members) => members,
+    EmptyClassBody() => null,
+  };
 }

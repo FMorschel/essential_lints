@@ -1,3 +1,4 @@
+import 'package:_internal_testing/meta_dependency.dart';
 import 'package:essential_lints/src/rules/mutable_tearoff.dart';
 import 'package:essential_lints/src/rules/rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
@@ -11,9 +12,15 @@ void main() {
 }
 
 @reflectiveTest
-class MutableTearoffTest extends LintTestProcessor {
+class MutableTearoffTest extends LintTestProcessor with MetaDependencyMixin {
   @override
   LintRule get rule => MutableTearoffRule();
+
+  @override
+  Future<void> setUp() async {
+    await addMetaDependency();
+    super.setUp();
+  }
 
   Future<void> test_constructorTearoff() async {
     await assertNoDiagnostics('''
@@ -278,6 +285,33 @@ class A {
 void Function() field = () {};
 
 class A {
+  void foo(void Function() f) {
+    foo(field);
+  }
+}
+''');
+  }
+
+  Future<void> test_finalField_immutableClass() async {
+    await assertNoDiagnostics('''
+import 'package:meta/meta.dart';
+
+@immutable
+class A {
+  final void Function() field = () {};
+
+  void foo(void Function() f) {
+    foo(field);
+  }
+}
+''');
+  }
+
+  Future<void> test_finalField_finalClass() async {
+    await assertNoDiagnostics('''
+final class A {
+  final void Function() field = () {};
+
   void foo(void Function() f) {
     foo(field);
   }

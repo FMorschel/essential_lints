@@ -1,5 +1,4 @@
 import 'package:_internal_testing/dependencies.dart';
-import 'package:analyzer/src/error/codes.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:essential_lints/src/warnings/sorting_members.dart';
 import 'package:essential_lints/src/warnings/warning.dart';
@@ -1200,7 +1199,7 @@ class A extends Base {
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
 abstract class Base {
-  int field;
+  int? field;
 }
 
 @SortingMembers({
@@ -1210,16 +1209,11 @@ abstract class Base {
 class A extends Base {
   int regularField = 0;
   @override
-  int field = 1;
+  int? field = 1;
 }
 ''',
       [
-        error(
-          CompileTimeErrorCode.notInitializedNonNullableInstanceField,
-          108,
-          5,
-        ),
-        error(rule.diagnosticCode, 239, 5),
+        error(rule.diagnosticCode, 241, 5),
       ],
     );
   }
@@ -1253,7 +1247,7 @@ class A extends Base {
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
 abstract class Base {
-  int field;
+  int? field;
 }
 
 @SortingMembers({
@@ -1262,17 +1256,12 @@ abstract class Base {
 })
 class A extends Base {
   @override
-  int field = 1;
+  int? field = 1;
   int newField = 0;
 }
 ''',
       [
-        error(
-          CompileTimeErrorCode.notInitializedNonNullableInstanceField,
-          108,
-          5,
-        ),
-        error(rule.diagnosticCode, 226, 8),
+        error(rule.diagnosticCode, 228, 8),
       ],
     );
   }

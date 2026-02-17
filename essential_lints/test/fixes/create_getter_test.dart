@@ -27,6 +27,23 @@ class CreateGetterTest extends MultiWarningFixTestProcessor
     super.setUp();
   }
 
+  Future<void> test_emptyClassBody() async {
+    await resolveTestCode('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: #members)
+class A();
+''');
+    await assertHasFix('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: #members)
+class A() {
+  List<Object?> get members => [];
+}
+''');
+  }
+
   Future<void> test_createGetter_containsMember() async {
     await resolveTestCode('''
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';

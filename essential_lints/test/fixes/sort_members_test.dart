@@ -1,18 +1,12 @@
 import 'package:_internal_testing/dependencies.dart';
-import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
+import 'package:essential_lints/src/rules/analysis_rule.dart';
 import 'package:essential_lints/src/warnings/sorting_members.dart';
-import 'package:logging/logging.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import '../src/fix_test_processor.dart';
 
 void main() {
-  Logger.root.level = Level.ALL;
-  Logger.root.onRecord.listen((record) {
-    print('${record.level.name}: ${record.time}: ${record.message}');
-  });
-
   defineReflectiveSuite(() {
     defineReflectiveTests(SortMembersTest);
   });
@@ -25,7 +19,7 @@ class SortMembersTest extends WarningFixTestProcessor
   EssentialLintWarningFixes get fix => .sortMembers;
 
   @override
-  AnalysisRule get rule => SortingMembersRule();
+  EssentialAnalysisRule get rule => SortingMembersRule();
 
   @override
   Future<void> setUp() async {
@@ -637,8 +631,8 @@ import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 
 @SortingMembers({.fields}, alphabetizeSortedMembers: true)
 class MyClass {
-  int field3 = 0, field1 = 0;
   int field2 = 0;
+  int field3 = 0, field1 = 0;
 }
 ''');
     await assertHasFix('''

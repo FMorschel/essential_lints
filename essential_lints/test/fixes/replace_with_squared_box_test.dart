@@ -36,7 +36,7 @@ var widget = Container();
     await assertHasFix('''
 import 'package:flutter/widgets.dart';
 
-var widget = SizedBox.shrink();
+var widget = const SizedBox.shrink();
 ''');
   }
 
@@ -56,7 +56,7 @@ import 'package:flutter/widgets.dart';
 
 List<Widget> build(BuildContext context) {
   return [
-    SizedBox.shrink(),
+    const SizedBox.shrink(),
     Padding(padding: EdgeInsets.all(8.0)),
   ];
 }
@@ -75,7 +75,7 @@ void foo({Widget? child}) {
 import 'package:flutter/widgets.dart';
 
 void foo({Widget? child}) {
-  foo(child: SizedBox.shrink());
+  foo(child: const SizedBox.shrink());
 }
 ''');
   }
@@ -92,7 +92,7 @@ void foo([Widget? child]) {
 import 'package:flutter/widgets.dart';
 
 void foo([Widget? child]) {
-  foo(SizedBox.shrink());
+  foo(const SizedBox.shrink());
 }
 ''');
   }
@@ -109,7 +109,7 @@ void foo({required Widget child}) {
 import 'package:flutter/widgets.dart';
 
 void foo({required Widget child}) {
-  foo(child: SizedBox.shrink());
+  foo(child: const SizedBox.shrink());
 }
 ''');
   }
@@ -126,7 +126,7 @@ void foo(Widget child) {
 import 'package:flutter/widgets.dart';
 
 void foo(Widget child) {
-  foo(SizedBox.shrink());
+  foo(const SizedBox.shrink());
 }
 ''');
   }
@@ -143,7 +143,7 @@ Widget build() {
 import 'package:flutter/widgets.dart';
 
 Widget build() {
-  return SizedBox.shrink();
+  return const SizedBox.shrink();
 }
 ''');
   }
@@ -160,7 +160,7 @@ Iterable<Widget> build() sync* {
 import 'package:flutter/widgets.dart';
 
 Iterable<Widget> build() sync* {
-  yield SizedBox.shrink();
+  yield const SizedBox.shrink();
 }
 ''');
   }

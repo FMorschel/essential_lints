@@ -33,6 +33,27 @@ var container = Container();
     );
   }
 
+  Future<void> test_emptyContainer_statement() async {
+    await assertDiagnostics(
+      '''
+import 'package:flutter/widgets.dart';
+
+void f() {
+  Container();
+}
+''',
+      [lint(53, 9)],
+    );
+  }
+
+  Future<void> test_emptyContainer_toContainer() async {
+    await assertNoDiagnostics('''
+import 'package:flutter/widgets.dart';
+
+Container container = Container();
+''');
+  }
+
   Future<void> test_container_withParameters() async {
     await assertNoDiagnostics('''
 import 'package:flutter/widgets.dart';

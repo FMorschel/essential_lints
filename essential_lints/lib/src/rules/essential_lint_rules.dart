@@ -1,4 +1,8 @@
 import 'package:analyzer/error/error.dart';
+import 'package:essential_lints_annotations/essential_lints_annotations.dart'
+    as annotation;
+// ignore: implementation_imports internal
+import 'package:essential_lints_annotations/src/_internal/static_enforcement.dart';
 
 import '../warnings/essential_lint_warnings.dart';
 
@@ -405,7 +409,12 @@ class LintRuleCode extends WarningCode implements LintCode {
 /// {@template pending_listener}
 /// Sub-lints for the PendingListener lint rule.
 /// {@endtemplate}
-enum PendingListener with EnumDiagnostic, SubLints {
+@staticAllEnforcement
+@StaticEnforcement(
+  #base,
+  annotation.th<EssentialMultiLints>(),
+)
+enum PendingListener with EnumDiagnostic, SubDiagnostic, SubLints {
   /// Closures used as listeners cannot be matched for removal.
   closuresCannotBeMatched(
     LintRuleCode(
@@ -437,8 +446,11 @@ enum PendingListener with EnumDiagnostic, SubLints {
 
   const PendingListener(this.code);
 
-  @override
-  final EssentialMultiLints base = .pendingListener;
+  /// All the diagnostics associated with this multi-lint.
+  static final List<EnumDiagnostic> all = [...values, base];
+
+  /// The base lint rule.
+  static const EssentialMultiLints base = .pendingListener;
 
   @override
   final LintRuleCode code;
@@ -447,10 +459,17 @@ enum PendingListener with EnumDiagnostic, SubLints {
 /// {@template sub_warnings}
 /// A grouping of sub-warnings under a base warning.
 /// {@endtemplate}
-mixin SubLints on EnumDiagnostic implements LintCode {
-  /// The base warning.
-  EssentialMultiLints get base;
 
+@annotation.SubtypeAnnotating(
+  annotations: [
+    StaticEnforcement(
+      #base,
+      annotation.th<EssentialMultiLints>(),
+    ),
+  ],
+  option: .onlyInstantiable,
+)
+mixin SubLints on SubDiagnostic implements LintCode {
   @override
   LintRuleCode get code;
 }

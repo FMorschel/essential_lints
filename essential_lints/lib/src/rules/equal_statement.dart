@@ -2,16 +2,24 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
 import '../utils/extensions/list.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template equal_statement}
 /// A lint rule for equal statements under switch cases.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class EqualStatementRule extends LintRule {
   /// {@macro equal_statement}
-  EqualStatementRule() : super(.equalStatement);
+  EqualStatementRule() : super(.equalStatement, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
+    'EqualStatementRule',
+  );
 
   @override
   void registerNodeProcessors(
@@ -33,28 +41,40 @@ class _EqualStatementVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitSwitchExpression(SwitchExpression node) {
+    rule.logger.info(
+      'visitSwitchExpression() started with ${node.cases.length} case(s)',
+    );
     if (node.cases.length < 2) {
+      rule.logger.finer('Less than 2 cases — nothing to compare');
       return;
     }
+
     var equals = <String, List<SwitchExpressionCase>>{};
     for (var i = 0; i < node.cases.length; i++) {
       var comparingExpression = node.cases[i].expression;
-      if (equals.containsKey(comparingExpression.toSource())) {
+      var key = comparingExpression.toSource();
+      if (equals.containsKey(key)) {
+        rule.logger.finer('Already processed expression: $key');
         continue;
       }
       for (var switchCase in node.cases) {
-        if (switchCase.expression.toSource() ==
-            comparingExpression.toSource()) {
-          equals
-              .putIfAbsent(switchCase.expression.toSource(), () => [])
-              .add(switchCase);
+        if (switchCase.expression.toSource() == key) {
+          equals.putIfAbsent(key, () => []).add(switchCase);
         }
       }
+      rule.logger.finer(
+        'Collected ${equals[key]?.length ?? 0} entry(ies) for expression: $key',
+      );
     }
+
     for (var entry in equals.entries) {
       if (entry.value.length < 2) {
         continue;
       }
+      rule.logger.fine(
+        'Reporting equal switch expression for ${entry.key} with '
+        '${entry.value.length} occurrences',
+      );
       rule.reportAtToken(
         entry.value[1].arrow,
         arguments: [
@@ -68,14 +88,24 @@ class _EqualStatementVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitSwitchStatement(SwitchStatement node) {
+    rule.logger.info(
+      'visitSwitchStatement() started with ${node.members.length} member(s)',
+    );
     if (node.members.length < 2) {
+      rule.logger.finer('Less than 2 members — nothing to compare');
       return;
     }
+
     var equals = <String, List<SwitchMember>>{};
     for (var i = 0; i < node.members.length; i++) {
       var member = node.members[i];
+      if (member.statements.isEmpty) {
+        rule.logger.finer('Member $i has no statements — skipping');
+        continue;
+      }
       var statementsSource = member.statements.map((e) => e.toSource()).join();
       if (equals.containsKey(statementsSource)) {
+        rule.logger.finer('Statements source already processed for member $i');
         continue;
       }
       for (var switchCase in node.members) {
@@ -86,11 +116,20 @@ class _EqualStatementVisitor extends SimpleAstVisitor<void> {
           equals.putIfAbsent(statementsSource, () => []).add(switchCase);
         }
       }
+      rule.logger.finer(
+        'Collected ${equals[statementsSource]?.length ?? 0} member(s) for '
+        'statementsSource at member $i',
+      );
     }
+
     for (var entry in equals.entries) {
       if (entry.value.length < 2) {
         continue;
       }
+      rule.logger.fine(
+        'Reporting equal switch statement with ${entry.value.length} '
+        'occurrences',
+      );
       rule.reportAtToken(
         entry.value[1].keyword,
         arguments: [

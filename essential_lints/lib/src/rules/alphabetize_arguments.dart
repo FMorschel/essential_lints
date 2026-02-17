@@ -2,23 +2,33 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:logging/logging.dart';
 
+import '../plugin.dart';
+import 'analysis_rule.dart';
 import 'rule.dart';
 
 /// {@template alphabetize_arguments}
 /// A lint rule that enforces alphabetical ordering of function arguments.
 /// {@endtemplate}
+@staticLoggerEnforcement
 class AlphabetizeArgumentsRule extends LintRule {
   /// {@macro alphabetize_arguments}
-  AlphabetizeArgumentsRule() : super(.alphabetizeArguments);
+  AlphabetizeArgumentsRule() : super(.alphabetizeArguments, _logger);
+
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
+    'AlphabetizeArgumentsRule',
+  );
 
   @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
+    logger.fine('Registering node processors for AlphabetizeArgumentsRule');
     var visitor = _AlphabetizeArgumentsVisitor(this);
     registry.addArgumentList(this, visitor);
+    logger.fine('Registered node processors for AlphabetizeArgumentsRule');
   }
 }
 
@@ -29,19 +39,42 @@ class _AlphabetizeArgumentsVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitArgumentList(ArgumentList node) {
+    rule.logger.info(
+      'AlphabetizeArgumentsRule.visitArgumentList() started at offset '
+      '${node.offset}',
+    );
+
     var arguments = node.arguments;
     var argumentNames = arguments.whereType<NamedExpression>().toList();
+    rule.logger.fine('Found ${argumentNames.length} named arguments');
+
+    if (argumentNames.length < 2) {
+      rule.logger.finer('Less than two named arguments, nothing to check');
+      rule.logger.info(
+        'AlphabetizeArgumentsRule.visitArgumentList() completed',
+      );
+      return;
+    }
+
     for (var i = 1; i < argumentNames.length; i++) {
       var previousName = argumentNames[i - 1].name.label.name;
       var currentName = argumentNames[i].name.label.name;
+      rule.logger.finer(
+        'Comparing previous="$previousName" with '
+        'current="$currentName" at index ${i - 1} -> $i',
+      );
       if (previousName.compareTo(currentName) > 0) {
-        rule.reportAtNode(
-          argumentNames[i].name.label,
+        rule.logger.fine(
+          'Alphabetical order violation: "$previousName" > "$currentName" — '
+          'reporting at node',
         );
+        rule.reportAtNode(argumentNames[i].name.label);
         // Stop after the first violation to avoid multiple reports for the same
         // argument list.
         break;
       }
     }
+
+    rule.logger.info('AlphabetizeArgumentsRule.visitArgumentList() completed');
   }
 }

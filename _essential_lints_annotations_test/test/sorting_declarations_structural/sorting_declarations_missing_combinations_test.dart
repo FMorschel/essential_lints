@@ -216,10 +216,11 @@ Set<_Nested> _extractTestedCombinations(
 
 Future<void> main() async {
   // Load all the data upfront
-  var currentPackageDir = await essentialLintsAnnotationsPackage();
+  var essentialLintsAnnotationDir = await essentialLintsAnnotationsPackage();
+  var currentPackageDir = await essentialLintsAnnotationsTestPackage();
   var sortDeclarationsPath = path.normalize(
     path.join(
-      currentPackageDir.path,
+      essentialLintsAnnotationDir.path,
       'lib',
       'src',
       'sorting_members',

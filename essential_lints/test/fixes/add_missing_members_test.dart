@@ -103,4 +103,62 @@ class A {
 }
 ''');
   }
+
+  Future<void> test_addsMissingGetters_oneInline() async {
+    await resolveTestCode('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: #members)
+class A {
+  A(this.value, this.value2);
+  final int value;
+  final int value2;
+
+  List<Object?> get members => [value];
+}
+''');
+    await assertHasFix('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: #members)
+class A {
+  A(this.value, this.value2);
+  final int value;
+  final int value2;
+
+  List<Object?> get members => [value, value2];
+}
+''');
+  }
+
+  Future<void> test_addsMissingGetters_oneNewLine() async {
+    await resolveTestCode('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: #members)
+class A {
+  A(this.value, this.value2);
+  final int value;
+  final int value2;
+
+  List<Object?> get members => [
+    value,
+  ];
+}
+''');
+    await assertHasFix('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@GettersInMemberList(memberListName: #members)
+class A {
+  A(this.value, this.value2);
+  final int value;
+  final int value2;
+
+  List<Object?> get members => [
+    value, value2,
+  ];
+}
+''');
+  }
 }

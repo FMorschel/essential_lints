@@ -76,7 +76,7 @@ class MyState extends State {
 ''');
   }
 
-  Future<void> test_stateStateless() async {
+  Future<void> test_statelessBuild() async {
     await assertNoDiagnostics('''
 import 'package:flutter/widgets.dart';
 
@@ -86,5 +86,60 @@ class MyState extends StatelessWidget {
   }
 }
 ''');
+  }
+
+  Future<void> test_statefulCreateState() async {
+    await assertNoDiagnostics('''
+import 'package:flutter/widgets.dart';
+
+class MyState extends StatefulWidget {
+  State createState() => MyStateState();
+}
+
+class MyStateState extends State {
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
+''');
+  }
+
+  Future<void> test_statefulOther() async {
+    await assertDiagnostics(
+      '''
+import 'package:flutter/widgets.dart';
+
+abstract class MyState extends StatefulWidget {
+  Container other() => Container();
+}
+
+abstract class MyStateState extends State {
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
+''',
+      [lint(100, 5)],
+    );
+  }
+
+  Future<void> test_stateOther() async {
+    await assertDiagnostics(
+      '''
+import 'package:flutter/widgets.dart';
+
+class MyStateState extends State {
+  Container other() => Container();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
+''',
+      [lint(87, 5)],
+    );
   }
 }
