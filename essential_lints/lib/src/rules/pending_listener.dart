@@ -74,8 +74,8 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
   }
 
   void _reportFor(
-    Map<Element, List<Expression>> controllMap,
-    Map<Element, List<Expression>> compareMap,
+    Map<_ElementChain, List<Expression>> controllMap,
+    Map<_ElementChain, List<Expression>> compareMap,
     RuleContext context,
     DiagnosticCode code,
   ) {
@@ -95,10 +95,19 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
     }
     var uriConverter = library.session.uriConverter;
     for (var entry in controllMap.keys) {
-      var libraryFragment = entry.firstFragment.libraryFragment;
+      var lastElement = entry.last;
+      if (lastElement == null) {
+        logger.warning(
+          'No last element found in chain for entry: '
+          '${entry.element?.displayName}, '
+          'skipping reporting for this entry.',
+        );
+        continue;
+      }
+      var libraryFragment = lastElement.firstFragment.libraryFragment;
       if (libraryFragment == null) {
         logger.warning(
-          'No library fragment found for element: ${entry.displayName}, '
+          'No library fragment found for element: ${lastElement.displayName}, '
           'skipping reporting for this element.',
         );
         continue;
@@ -107,14 +116,20 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
         libraryFragment,
         context,
         uriConverter,
-        entry,
+        lastElement,
       )) {
         continue;
       }
-      var controlListeners = controllMap[entry]!;
-      var compareListeners = [...?compareMap[entry]];
+      var controlListeners = [
+        for (var e in controllMap.entries)
+          if (e.key.matches(entry)) ...e.value,
+      ];
+      var compareListeners = [
+        for (var e in compareMap.entries)
+          if (e.key.matches(entry)) ...e.value,
+      ];
       logger.fine(
-        'Processing element: ${entry.displayName}, '
+        'Processing element: ${entry.last?.displayName}, '
         'control count: ${controlListeners.length}, '
         'compare count: ${compareListeners.length}',
       );
@@ -171,19 +186,61 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
 
   /// Extracts a chain of elements from an expression.
   /// For `a.b.c`, returns a list with [c element, b element, a element].
-  static List<Element> _extractElementChain(Expression expression) {
+  _ElementChain _extractElementChain(Expression expression) {
     _logger.info(
       '_extractElementChain() started for: ${expression.toSource()}',
     );
-    var chain = <Element>[];
+    _ElementChain? chain;
     Expression? current = expression;
 
     while (current != null) {
-      if (current is Identifier) {
-        if (current.element != null) {
-          chain.add(current.element!);
+      if (current is PropertyAccess) {
+        if (current.propertyName.element?.baseElement case var element?) {
+          if (chain == null) {
+            chain = _ElementChain(element);
+          } else {
+            chain.add(element);
+          }
+          // If target is 'this', also add enclosing type (treat like implicit
+          // this)
+          if (current.target is ThisExpression) {
+            if (!_isTopLevelOrLocal(element)) {
+              if (element.enclosingElement case var enclosing?) {
+                chain.add(enclosing);
+              }
+            }
+          }
+        }
+        // If target is 'this', we've handled it above, so stop
+        if (current.target is ThisExpression) {
+          current = null;
+        } else {
+          current = current.target; // Continue with target
+        }
+      } else if (current is PrefixedIdentifier) {
+        if (current.identifier.element?.baseElement case var element?) {
+          if (chain == null) {
+            chain = _ElementChain(element);
+          } else {
+            chain.add(element);
+          }
+        }
+        if (current.prefix.element?.baseElement case var element?) {
+          if (chain == null) {
+            chain = _ElementChain(element);
+          } else {
+            chain.add(element);
+          }
+        }
+        current = null; // End of chain
+      } else if (current is Identifier) {
+        if (current.element?.baseElement case var element?) {
+          if (chain == null) {
+            chain = _ElementChain(element);
+          } else {
+            chain.add(element);
+          }
           // Check if we need to add enclosing type
-          var element = current.element!;
           if (!_isTopLevelOrLocal(element)) {
             if (element.enclosingElement case var enclosing?) {
               chain.add(enclosing);
@@ -191,23 +248,12 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
           }
         }
         current = null; // End of chain
-      } else if (current is PropertyAccess) {
-        if (current.propertyName.element != null) {
-          chain.add(current.propertyName.element!);
-        }
-        current = current.target; // Continue with target
-      } else if (current is PrefixedIdentifier) {
-        if (current.identifier.element != null) {
-          chain.add(current.identifier.element!);
-        }
-        if (current.prefix.element != null) {
-          chain.add(current.prefix.element!);
-        }
-        current = null; // End of chain
       } else {
         current = null; // Unknown type, end chain
       }
     }
+
+    chain ??= _ElementChain.nullElement;
 
     // Log after extraction
     _logger.finer(
@@ -218,7 +264,7 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
   }
 
   /// Checks if an element is a top-level or local element.
-  static bool _isTopLevelOrLocal(Element element) {
+  static bool _isTopLevelOrLocal(Element? element) {
     var result =
         element is TopLevelVariableElement ||
         element is TopLevelFunctionElement ||
@@ -226,13 +272,13 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
         element is LocalVariableElement ||
         element is FormalParameterElement;
     _logger.finer(
-      'Checked top-level/local for ${element.displayName}: $result',
+      'Checked top-level/local for ${element?.displayName}: $result',
     );
     return result;
   }
 
   /// Checks if two expressions reference the same chain of elements.
-  static bool _expressionsMatch(Expression expr1, Expression expr2) {
+  bool _expressionsMatch(Expression expr1, Expression expr2) {
     _logger.finer(
       'Comparing expressions: ${expr1.toSource()} vs ${expr2.toSource()}',
     );
@@ -250,14 +296,52 @@ class PendingListenerRule extends MultiLintRule<PendingListener> {
     for (var i = 0; i < chain1.length; i++) {
       if (chain1[i] != chain2[i]) {
         _logger.finer(
-          'Expressions do not match at index $i: ${chain1[i].displayName} != '
-          '${chain2[i].displayName}',
+          'Expressions do not match at index $i: ${chain1[i]?.displayName} != '
+          '${chain2[i]?.displayName}',
         );
         return false;
       }
     }
 
     _logger.finer('Expressions match (length: ${chain1.length})');
+    return true;
+  }
+}
+
+class _ElementChain {
+  _ElementChain(this.element);
+
+  static final nullElement = _ElementChain(null);
+
+  final Element? element;
+  _ElementChain? parent;
+
+  int get length => element == null ? 0 : 1 + (parent?.length ?? 0);
+
+  bool get isEmpty => length == 0;
+
+  Element? get last => parent?.last ?? element;
+
+  void add(Element? element) {
+    if (element == null) return;
+    if (parent case var parent?) {
+      parent.add(element);
+    } else {
+      parent = _ElementChain(element);
+    }
+  }
+
+  Element? operator [](int index) {
+    if (index < 0) return null;
+    if (index == 0) return element;
+    return parent?[index - 1];
+  }
+
+  bool matches(_ElementChain? other) {
+    if (length != other?.length) return false;
+    for (var i = length - 1; i >= 0; i--) {
+      if (this[i] != other?[i]) return false;
+    }
     return true;
   }
 }
@@ -278,22 +362,22 @@ class _PendingListenerVisitor extends SimpleAstVisitor<void> {
   final PendingListenerRule rule;
   final RuleContext context;
 
-  final _addedListeners = <Element, List<Expression>>{};
-  final _removedListeners = <Element, List<Expression>>{};
-  final _disposedElements = <Element>{};
-  final _addedClosures = <Element, List<({int offset, int length})>>{};
+  final _addedListeners = <_ElementChain, List<Expression>>{};
+  final _removedListeners = <_ElementChain, List<Expression>>{};
+  final _disposedElements = <_ElementChain>{};
+  final _addedClosures = <_ElementChain, List<({int offset, int length})>>{};
   final _removedClosures = <({int offset, int length})>[];
 
   /// All added listeners, including those on disposed elements.
-  Map<Element, List<Expression>> get addedListeners =>
+  Map<_ElementChain, List<Expression>> get addedListeners =>
       Map.unmodifiable(_addedListeners);
 
   /// Added listeners with disposed elements filtered out.
   /// Use this when checking for pending listeners.
-  Map<Element, List<Expression>> get addedListenersFilteringDisposed {
+  Map<_ElementChain, List<Expression>> get addedListenersFilteringDisposed {
     var filtered = {
       for (final key in _addedListeners.keys.whereNot(
-        _disposedElements.contains,
+        (key) => _disposedElements.any(key.matches),
       ))
         key: _addedListeners[key]!,
     };
@@ -301,24 +385,24 @@ class _PendingListenerVisitor extends SimpleAstVisitor<void> {
       rule.logger.fine(
         'Filtered out ${_disposedElements.length} disposed element(s) from '
         'added listeners: '
-        '${_disposedElements.map((e) => e.displayName).join(", ")}',
+        '${_disposedElements.map((e) => e.element?.displayName).join(", ")}',
       );
     }
     return Map.unmodifiable(filtered);
   }
 
-  Map<Element, List<Expression>> get removedListeners =>
+  Map<_ElementChain, List<Expression>> get removedListeners =>
       Map.unmodifiable(_removedListeners);
 
   void reportPendingClosures() {
     rule.logger.info('reportPendingClosures() started');
     // Report closures added to non-disposed elements
     for (var entry in _addedClosures.entries) {
-      if (!_disposedElements.contains(entry.key)) {
+      if (!_disposedElements.any((chain) => chain.matches(entry.key))) {
         for (var closure in entry.value) {
           rule.logger.fine(
             'Reporting closure on non-disposed element: '
-            '${entry.key.displayName}',
+            '${entry.key.element?.displayName}',
           );
           rule.reportAtOffset(
             closure.offset,
@@ -355,77 +439,76 @@ class _PendingListenerVisitor extends SimpleAstVisitor<void> {
       return;
     }
     rule.logger.finer(
-      'Processing method invocation on ${targetElement.displayName}: '
+      'Processing method invocation on ${targetElement.element?.displayName}: '
       '${node.methodName.name}',
     );
     if (_isDisposeFromChangeNotifier(node.methodName, targetType)) {
       _disposedElements.add(targetElement);
       rule.logger.fine(
-        'Marked element as disposed: ${targetElement.displayName}',
+        'Marked element as disposed: ${targetElement.element?.displayName}',
       );
+    } else if (!_methodNames.contains(node.methodName.name) ||
+        targetType == null ||
+        !_isListenableType(targetType) &&
+            !targetType.allSupertypes.any(_isListenableType)) {
+      return;
     }
-    if (_methodNames.contains(node.methodName.name) &&
-        targetType != null &&
-        (_isListenableType(targetType) ||
-            targetType.allSupertypes.any(_isListenableType))) {
-      rule.logger.fine(
-        'Processing listener method ${node.methodName.name} on Listenable: '
-        '${targetType.getDisplayString()}',
-      );
-      var firstArgument = node.argumentList.arguments.firstOrNull;
-      if (firstArgument == null) {
-        // No arguments provided yet.
-        rule.logger.finer(
-          'No arguments provided to ${node.methodName.name} on '
-          '${targetElement.displayName}',
-        );
-      } else if (firstArgument case FunctionExpression(
-        :var body,
-        :var offset,
-      )) {
-        // Track closures, report later based on disposal status
-        var length = body.offset - offset;
-        rule.logger.fine(
-          'Detected closure in ${node.methodName.name} on '
-          '${targetElement.displayName}',
-        );
-        if (node.methodName.name == _addListenerName) {
-          _addedClosures.putIfAbsent(targetElement, () => []).add((
-            offset: offset,
-            length: length,
-          ));
-        } else if (node.methodName.name == _removeListenerName) {
-          _removedClosures.add((offset: offset, length: length));
-        }
-      } else if (node.methodName.name == _addListenerName) {
-        // Argument is being added.
-        rule.logger.finer(
-          'Adding listener to ${targetElement.displayName}: '
-          '${firstArgument.toSource()}',
-        );
-        _addFor(targetElement, firstArgument);
-      } else if (node.methodName.name == _removeListenerName) {
-        // Argument is being removed.
-        rule.logger.finer(
-          'Removing listener from ${targetElement.displayName}: '
-          '${firstArgument.toSource()}',
-        );
-        _removeFor(targetElement, firstArgument);
-      }
-    } else if (_methodNames.contains(node.methodName.name)) {
+    rule.logger.fine(
+      'Processing listener method ${node.methodName.name} on Listenable: '
+      '${targetType?.getDisplayString()}',
+    );
+    var firstArgument = node.argumentList.arguments.firstOrNull;
+    if (firstArgument == null) {
+      // No arguments provided yet.
       rule.logger.finer(
-        'Method ${node.methodName.name} on '
-        '${targetElement.displayName} is not a Listenable type or type is null',
+        'No arguments provided to ${node.methodName.name} on '
+        '${targetElement.element?.displayName}',
       );
+      return;
+    }
+    if (firstArgument case FunctionExpression(
+      :var body,
+      :var offset,
+    )) {
+      // Track closures, report later based on disposal status
+      var length = body.offset - offset;
+      rule.logger.fine(
+        'Detected closure in ${node.methodName.name} on '
+        '${targetElement.element?.displayName}',
+      );
+      if (node.methodName.name == _addListenerName) {
+        _addedClosures.putIfNoMatch(targetElement, () => []).add((
+          offset: offset,
+          length: length,
+        ));
+      } else if (node.methodName.name == _removeListenerName) {
+        _removedClosures.add((offset: offset, length: length));
+      }
+      return;
+    }
+    if (node.methodName.name == _addListenerName) {
+      // Argument is being added.
+      rule.logger.finer(
+        'Adding listener to ${targetElement.element?.displayName}: '
+        '${firstArgument.toSource()}',
+      );
+      _addFor(targetElement, firstArgument);
+    } else if (node.methodName.name == _removeListenerName) {
+      // Argument is being removed.
+      rule.logger.finer(
+        'Removing listener from ${targetElement.element?.displayName}: '
+        '${firstArgument.toSource()}',
+      );
+      _removeFor(targetElement, firstArgument);
     }
   }
 
-  void _addFor(Element element, Expression expression) {
+  void _addFor(_ElementChain element, Expression expression) {
     rule.logger.finer(
-      'Tracking added listener on ${element.displayName}: '
+      'Tracking added listener on ${element.element?.displayName}: '
       '${expression.toSource()}',
     );
-    _addedListeners.putIfAbsent(element, () => []).add(expression);
+    _addedListeners.putIfNoMatch(element, () => []).add(expression);
   }
 
   bool _isChangeNotifier(InterfaceType type) =>
@@ -450,47 +533,59 @@ class _PendingListenerVisitor extends SimpleAstVisitor<void> {
       type.element.displayName == _listenableTypeName &&
       type.element.library.uri == _flutterChangeNotifierUri;
 
-  void _removeFor(Element element, Expression expression) {
+  void _removeFor(_ElementChain element, Expression expression) {
     rule.logger.finer(
-      'Tracking removed listener from ${element.displayName}: '
+      'Tracking removed listener from ${element.element?.displayName}: '
       '${expression.toSource()}',
     );
-    _removedListeners.putIfAbsent(element, () => []).add(expression);
+    _removedListeners.putIfNoMatch(element, () => []).add(expression);
   }
 
-  Element? _targetElement(MethodInvocation node) {
+  _ElementChain? _targetElement(MethodInvocation node) {
     var target = node.realTarget;
-    Element? result;
-    if (target case Identifier(:var element)) {
-      result = element;
-      rule.logger.finer(
-        'Resolved target element from Identifier: ${element?.displayName}',
-      );
-    } else if (target case PropertyAccess(:var propertyName)) {
-      result = propertyName.element;
-      rule.logger.finer(
-        'Resolved target element from PropertyAccess: '
-        '${propertyName.element?.displayName}',
-      );
-    } else if (target case PrefixedIdentifier(:var identifier)) {
-      result = identifier.element;
-      rule.logger.finer(
-        'Resolved target element from PrefixedIdentifier: '
-        '${identifier.element?.displayName}',
-      );
-    } else if (node.enclosingTypeElement case var enclosingType?) {
-      result = enclosingType;
-      rule.logger.finer(
-        'Resolved target element from enclosing type: '
-        '${enclosingType.displayName}',
-      );
+
+    // If there's no explicit target, use the enclosing type
+    if (target == null) {
+      var result = node.enclosingTypeElement;
+      if (result != null) {
+        rule.logger.finer(
+          'Resolved target element from enclosing type: '
+          '${result.displayName}',
+        );
+      }
+      return _ElementChain(result);
     }
-    if (result == null) {
-      assert(false, 'Unable to determine target element for $node');
+
+    // Extract the full element chain from the target expression
+    // This ensures widget.controller and oldWidget.controller are tracked
+    // as different elements
+    var chain = rule._extractElementChain(target);
+
+    if (chain.isEmpty) {
       rule.logger.warning(
-        'Unable to determine target element for: ${node.toSource()}',
+        'Unable to extract element chain for target: ${target.toSource()}',
       );
+      return null;
     }
-    return result;
+
+    // Use the first element in the chain (the most specific one)
+    // For widget.controller, this would be the controller property
+    rule.logger.finer(
+      'Resolved target element from expression chain (length ${chain.length}): '
+      '${chain.element?.displayName}',
+    );
+
+    return chain;
+  }
+}
+
+extension<K extends _ElementChain, V> on Map<K, V> {
+  /// Adds a value to the list for the given key, creating the list if it
+  /// doesn't exist. If a matching key already exists (based on .matches), it
+  /// adds to that key's list instead.
+  V putIfNoMatch(K key, V Function() create) {
+    var existingKey = keys.firstWhereOrNull(key.matches) ?? key;
+    var list = this[existingKey] ?? create();
+    return this[existingKey] = list;
   }
 }

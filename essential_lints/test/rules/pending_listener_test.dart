@@ -300,8 +300,7 @@ class C {
   }
 
   Future<void> test_multiple_listeners_with_dispose() async {
-    await assertDiagnostics(
-      '''
+    await assertNoDiagnostics('''
 import 'package:flutter/foundation.dart';
 
 class C {
@@ -319,9 +318,7 @@ class C {
     listenable.dispose();
   }
 }
-''',
-      [],
-    );
+''');
   }
 
   Future<void> test_property_access_matched() async {
@@ -329,7 +326,7 @@ class C {
 import 'package:flutter/foundation.dart';
 
 class Widget {
-  final Listenable controller = ChangeNotifier();
+  final Listenable changeNotifier = ChangeNotifier();
 }
 
 class C {
@@ -339,8 +336,8 @@ class C {
   void listener() {}
 
   void setup() {
-    widget.controller.addListener(listener);
-    widget.controller.removeListener(listener);
+    widget.changeNotifier.addListener(listener);
+    widget.changeNotifier.removeListener(listener);
   }
 }
 ''');
@@ -352,8 +349,8 @@ class C {
 import 'package:flutter/foundation.dart';
 
 class Widget {
-  final Listenable controller1 = ChangeNotifier();
-  final Listenable controller2 = ChangeNotifier();
+  final Listenable changeNotifier1 = ChangeNotifier();
+  final Listenable changeNotifier2 = ChangeNotifier();
 }
 
 class C {
@@ -363,14 +360,14 @@ class C {
   void listener() {}
 
   void setup() {
-    widget.controller1.addListener(listener);
-    widget.controller2.removeListener(listener);
+    widget.changeNotifier1.addListener(listener);
+    widget.changeNotifier2.removeListener(listener);
   }
 }
 ''',
       [
-        lint(289, 8),
-        error(PendingListener.unnecessaryRemove, 338, 8),
+        lint(301, 8),
+        error(PendingListener.unnecessaryRemove, 354, 8),
       ],
     );
   }
@@ -564,6 +561,58 @@ class C {
 }
 ''',
       [error(PendingListener.closuresCannotBeMatched, 147, 3)],
+    );
+  }
+
+  Future<void> test_widget_oldWidget_different_instances() async {
+    // This test reproduces the issue where widget.listenable and
+    // oldWidget.listenable are incorrectly treated as the same element.
+    // In didUpdateWidget, we should flag removing from oldWidget.listenable
+    // since there's no corresponding addListener on oldWidget.listenable.
+    await assertDiagnostics(
+      '''
+import 'package:flutter/material.dart';
+
+abstract class ValueListenable<T> extends Listenable {}
+
+abstract class Generic<T> extends StatefulWidget {
+  const Generic({this.listenable});
+
+  final ValueListenable<T>? listenable;
+}
+
+abstract class _GenericState<T> extends State<Generic<T>> {
+  Generic<T> get widget;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.listenable?.addListener(_listenableListener);
+  }
+
+  @override
+  void didUpdateWidget(covariant Generic<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.listenable != widget.listenable) {
+      oldWidget.listenable?.removeListener(_listenableListener);
+      widget.listenable?.addListener(_listenableListener);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.listenable?.removeListener(_listenableListener);
+    super.dispose();
+  }
+
+  void _listenableListener() {}
+}
+''',
+      [
+        // Should report unnecessary remove from oldWidget.listenable
+        // since there's no addListener on oldWidget.listenable
+        error(PendingListener.unnecessaryRemove, 636, 19),
+      ],
     );
   }
 }
