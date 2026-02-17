@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1+3
+
+Released on: 2026-02-16
+
+- Adds an internal annotation that is used on `essential_lints` package.
+
 ## 0.1.1+2
 
 Released on: 2026-01-09
