@@ -19,8 +19,7 @@ dependencies:
   collection: ^1.19.1
   essential_lints:
     path: ../essential_lints
-  essential_lints_annotations:
-    path: ../essential_lints_annotations
+  essential_lints_annotations: any
   logging: any
   meta: any
 
