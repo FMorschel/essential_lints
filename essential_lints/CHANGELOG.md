@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.8
+
+Released on: 2026-02-16
+
+- **Analyzer**: Updated to analyzer v10.0.0.
+- **Logging capabilities scaffold**: Added the base logging capabilities to the plugin, which will be used in future releases to possibly log various information during lint analysis, fixes and assists.
+- **GettersInMemberList:** Improved handling of nullable and spread elements.
+- **pending_listeners:**:
+  - Add tests to handle disposed listeners and multiple removals.
+  - Fixes reporting for `part` files.
+- **unnecessary_setstate:** Fixes `unnecessary_setstate` false-positive.
+
 ## 0.1.7
 
 Released on: 2026-01-09
