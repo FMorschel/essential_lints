@@ -5,10 +5,10 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:logging/logging.dart';
 
 import '../plugin.dart';
+import '../utils/base_visitor.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
 
@@ -16,7 +16,7 @@ import 'rule.dart';
 /// A rule that checks for proper formatting of comments.
 /// {@endtemplate}
 @staticLoggerEnforcement
-class StandardCommentStyleRule extends LintRule {
+class StandardCommentStyleRule extends LintRule<StandardCommentStyleRule> {
   /// {@macro standard_comment_style}
   StandardCommentStyleRule() : super(.standardCommentStyle, _logger);
 
@@ -34,10 +34,9 @@ class StandardCommentStyleRule extends LintRule {
   }
 }
 
-class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
-  _StandardCommentStyleVisitor(this.rule, this.context) {
-    rule.logger.info('_StandardCommentStyleVisitor() created');
-  }
+class _StandardCommentStyleVisitor
+    extends BaseVisitor<StandardCommentStyleRule> {
+  _StandardCommentStyleVisitor(super.rule, super.context);
 
   static const _punctuation = {'.', '!', '?', ':', ';'};
   static final _startingComment = RegExp(r'^((///?)|/\*)');
@@ -51,20 +50,16 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
   static final _ignoreForFile = RegExp('^ignore_for_file:');
   static final _ignore = RegExp('^ignore:');
 
-  final StandardCommentStyleRule rule;
-
-  final RuleContext context;
-
   @override
   void visitCompilationUnit(CompilationUnit node) {
-    rule.logger.info('visitCompilationUnit() started');
+    logger.info('visitCompilationUnit() started');
     _gatherComments(node.beginToken);
-    rule.logger.info('visitCompilationUnit() completed');
+    logger.info('visitCompilationUnit() completed');
     super.visitCompilationUnit(node);
   }
 
   void _gatherComments(Token? token) {
-    rule.logger.info('_gatherComments() started');
+    logger.info('_gatherComments() started');
     var list = <CommentToken>[];
     while (token != null && (!token.isEof || token.precedingComments != null)) {
       var current = token;
@@ -74,7 +69,7 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
         token = commentToken = commentToken.next ?? current;
       }
       if (list.isNotEmpty) {
-        rule.logger.finer(
+        logger.finer(
           'Found ${list.length} comment token(s), handling group',
         );
         _handleCommentList(list);
@@ -85,11 +80,11 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
       }
       token = token?.next;
     }
-    rule.logger.info('_gatherComments() completed');
+    logger.info('_gatherComments() completed');
   }
 
   void _handleCommentList(List<CommentToken> list) {
-    rule.logger.info(
+    logger.info(
       '_handleCommentList() started with ${list.length} comment(s)',
     );
     var textComment = <(String, CommentToken)>[];
@@ -97,12 +92,12 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
       var commentText = comment.lexeme
           .replaceFirst(_startingComment, '')
           .trimRight();
-      rule.logger.finer(
+      logger.finer(
         'Processing comment token: ${commentText.length} chars',
       );
       if (_ignore.hasMatch(commentText.trim()) ||
           _ignoreForFile.hasMatch(commentText.trim())) {
-        rule.logger.finer(
+        logger.finer(
           'Ignoring comment due to ignore directive: '
           '${commentText.trim().split("\n").first}',
         );
@@ -112,25 +107,25 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
         commentText = commentText.replaceFirst(_endOfComment, '').trimRight();
       }
       if (commentText.isNotEmpty && commentText.startsWith(_nonWhitespace)) {
-        rule.logger.fine('Reporting non-leading-whitespace comment at token');
+        logger.fine('Reporting non-leading-whitespace comment at token');
         rule.reportAtToken(comment);
         return;
       }
       textComment.add((commentText.trim(), comment));
     }
-    rule.logger.finer('Collected ${textComment.length} text comment(s)');
+    logger.finer('Collected ${textComment.length} text comment(s)');
     var commentText = textComment.map((e) => e.$1).join('\n');
     if (commentText.isEmpty) {
-      rule.logger.finer('Combined comment text empty, skipping');
+      logger.finer('Combined comment text empty, skipping');
       return;
     }
     if (commentText.trim().startsWith(_noLetter)) {
-      rule.logger.finer('Comment starts with no letter, skipping');
+      logger.finer('Comment starts with no letter, skipping');
       return;
     }
     for (var (:String paragraph, :CommentToken firstComment)
         in textComment.paragraphs) {
-      rule.logger.finer('Processing paragraph: ${paragraph.length} chars');
+      logger.finer('Processing paragraph: ${paragraph.length} chars');
       if (paragraph.startsWith(_dartdocCompatible)) {
         paragraph = paragraph
             .substring(
@@ -139,17 +134,17 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
             .trim();
       }
       if (paragraph.isEmpty) {
-        rule.logger.finer('Paragraph empty after dartdoc strip, skipping');
+        logger.finer('Paragraph empty after dartdoc strip, skipping');
         continue;
       }
       if (paragraph.startsWith(_mdCompatible)) {
-        rule.logger.finer(
+        logger.finer(
           'Paragraph starts with markdown-compatible token, skipping',
         );
         continue;
       }
       if (paragraph.startsWith(_noUppercaseLetter)) {
-        rule.logger.fine(
+        logger.fine(
           'Reporting paragraph starting without uppercase letter',
         );
         rule.reportAtToken(firstComment);
@@ -163,7 +158,7 @@ class _StandardCommentStyleVisitor extends SimpleAstVisitor<void> {
         }
       }
       if (!hasPunctuation) {
-        rule.logger.fine('Reporting paragraph missing end punctuation');
+        logger.fine('Reporting paragraph missing end punctuation');
         rule.reportAtToken(firstComment);
       }
     }

@@ -4,10 +4,10 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:logging/logging.dart';
 
 import '../plugin.dart';
+import '../utils/base_visitor.dart';
 import '../utils/extensions/element.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
@@ -16,7 +16,7 @@ import 'rule.dart';
 /// A rule that prevents using Padding widget over Container widget.
 /// {@endtemplate}
 @staticLoggerEnforcement
-class PaddingOverContainerRule extends LintRule {
+class PaddingOverContainerRule extends LintRule<PaddingOverContainerRule> {
   /// {@macro padding_over_container_rule}
   PaddingOverContainerRule() : super(.paddingOverContainer, _logger);
 
@@ -34,43 +34,41 @@ class PaddingOverContainerRule extends LintRule {
   }
 }
 
-class _PaddingOverContainerVisitor extends SimpleAstVisitor<void> {
-  _PaddingOverContainerVisitor(this.rule, this.context);
+class _PaddingOverContainerVisitor
+    extends BaseVisitor<PaddingOverContainerRule> {
+  _PaddingOverContainerVisitor(super.rule, super.context);
 
   static const _child = 'child';
 
-  PaddingOverContainerRule rule;
-  RuleContext context;
-
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    rule.logger.info(
+    logger.info(
       'visitInstanceCreationExpression() started: '
       '${node.constructorName.toSource()}',
     );
     if (node.constructorName.type.element.isPadding) {
-      rule.logger.finer('Found Padding constructor, checking arguments');
+      logger.finer('Found Padding constructor, checking arguments');
       var argumentList = node.argumentList;
       for (var argument in argumentList.arguments) {
         if (argument is NamedExpression && argument.name.label.name == _child) {
           var expression = argument.expression;
-          rule.logger.finer('Found child argument: ${expression.runtimeType}');
+          logger.finer('Found child argument: ${expression.runtimeType}');
           if (expression is InstanceCreationExpression &&
               expression.constructorName.type.element.isContainer) {
-            rule.logger.fine(
+            logger.fine(
               'Reporting Padding over Container at token: '
               '${node.constructorName.type.name}',
             );
             rule.reportAtToken(node.constructorName.type.name);
           } else {
-            rule.logger.finer(
+            logger.finer(
               'Child expression is not a Container instance — no report',
             );
           }
         }
       }
     } else {
-      rule.logger.finer('Instance creation is not Padding — skipping');
+      logger.finer('Instance creation is not Padding — skipping');
     }
     super.visitInstanceCreationExpression(node);
   }

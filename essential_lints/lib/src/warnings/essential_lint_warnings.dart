@@ -17,6 +17,7 @@ const staticAllEnforcement = StaticEnforcement(
 mixin EnumDiagnostic
     implements
         DiagnosticCode,
+        WarningCode,
         // TODO(FMorschel): Remove this once the new version of
         //  `analysis_server_plugin` is released.
         LintCode {
@@ -58,7 +59,7 @@ mixin EnumDiagnostic
   @override
   DiagnosticType get type => code.type;
 
-  /// A detailed description of the lint rule.
+  @override
   String get description => code.description;
 
   @override
@@ -97,9 +98,10 @@ enum EssentialLintWarnings with EnumDiagnostic {
 }
 
 /// The list of all essential lint rules.
-enum EssentialMultiWarnings<T extends SubWarnings> with EnumDiagnostic {
+enum EssentialMultiWarnings<T extends SubWarnings>
+    with EnumDiagnostic, SuperDiagnostic<T> {
   /// Getters should be included in member lists.
-  gettersInMemberList<GettersInMemberList>(
+  gettersInMemberList(
     WarningCode(
       name: 'getters_in_member_list',
       problemMessage: 'All {0} should be included in member lists.',
@@ -108,10 +110,11 @@ enum EssentialMultiWarnings<T extends SubWarnings> with EnumDiagnostic {
           'A lint rule that ensures getters/fields are included in the member '
           'list.',
     ),
+    GettersInMemberList.values,
   ),
 
   /// Subtypes should follow specific naming conventions.
-  subtypeNaming<SubtypeNaming>(
+  subtypeNaming(
     WarningCode(
       name: 'subtype_naming',
       problemMessage:
@@ -124,10 +127,11 @@ enum EssentialMultiWarnings<T extends SubWarnings> with EnumDiagnostic {
           'conventions such as required prefixes, suffixes, or containing '
           'names.',
     ),
+    SubtypeNaming.values,
   ),
 
   /// Subtypes should be annotated with specific annotations.
-  subtypeAnnotating<SubtypeAnnotating>(
+  subtypeAnnotating(
     WarningCode(
       name: 'subtype_annotating',
       problemMessage:
@@ -138,13 +142,28 @@ enum EssentialMultiWarnings<T extends SubWarnings> with EnumDiagnostic {
           'A rule that ensures subtypes are annotated with specific '
           'annotations as defined by the @SubtypeAnnotating annotation.',
     ),
+    SubtypeAnnotating.values,
   ),
   ;
 
-  const EssentialMultiWarnings(this.code);
+  const EssentialMultiWarnings(this.code, this.subDiagnostics);
 
   @override
   final WarningCode code;
+
+  @override
+  final List<T> subDiagnostics;
+}
+
+/// Represents a base diagnostic for mutlti diagnostic rules that have
+/// sub-diagnostics.
+mixin SuperDiagnostic<Base extends SubDiagnostic> implements EnumDiagnostic {
+  /// Sub diagnostics associated with this diagnostic.
+  List<Base> get subDiagnostics;
+
+  /// All diagnostics associated with this diagnostic, including
+  /// sub-diagnostics.
+  List<EnumDiagnostic> get all => [...subDiagnostics, this];
 }
 
 /// The list of sub-warnings for the GettersInMemberList warning.

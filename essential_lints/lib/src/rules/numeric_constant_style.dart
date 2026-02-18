@@ -4,10 +4,10 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:logging/logging.dart';
 
 import '../plugin.dart';
+import '../utils/base_visitor.dart';
 import '../utils/double_literal_parser.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
@@ -17,7 +17,7 @@ import 'rule.dart';
 /// in the codebase.
 /// {@endtemplate}
 @staticLoggerEnforcement
-class NumericConstantStyleRule extends LintRule {
+class NumericConstantStyleRule extends LintRule<NumericConstantStyleRule> {
   /// {@macro numeric_constant_style}
   NumericConstantStyleRule() : super(.numericConstantStyle, _logger);
 
@@ -30,21 +30,20 @@ class NumericConstantStyleRule extends LintRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _NumericConstantStyleVisitor(this);
+    var visitor = _NumericConstantStyleVisitor(this, context);
     registry.addDoubleLiteral(this, visitor);
   }
 }
 
-class _NumericConstantStyleVisitor extends SimpleAstVisitor<void> {
-  _NumericConstantStyleVisitor(this.rule);
-
-  final NumericConstantStyleRule rule;
+class _NumericConstantStyleVisitor
+    extends BaseVisitor<NumericConstantStyleRule> {
+  _NumericConstantStyleVisitor(super.rule, super.context);
 
   @override
   void visitDoubleLiteral(DoubleLiteral node) {
-    rule.logger.info('visitDoubleLiteral() started: ${node.literal.lexeme}');
+    logger.info('visitDoubleLiteral() started: ${node.literal.lexeme}');
     var parsed = DoubleLiteralParser(node.literal.lexeme);
-    rule.logger.finer(
+    logger.finer(
       'Parsed double: isValid=${parsed.isValidDouble}, '
       'hasLeadingZeros=${parsed.hasLeadingZeros}, '
       'hasDecimalPoint=${parsed.hasDecimalPoint}, '
@@ -54,21 +53,21 @@ class _NumericConstantStyleVisitor extends SimpleAstVisitor<void> {
     );
 
     if (!parsed.isValidDouble) {
-      rule.logger.finer('Invalid double literal format — skipping');
+      logger.finer('Invalid double literal format — skipping');
       super.visitDoubleLiteral(node);
       return;
     }
     if (parsed.hasLeadingZeros) {
-      rule.logger.fine('Reporting: unnecessary leading zeros');
+      logger.fine('Reporting: unnecessary leading zeros');
       rule.reportAtNode(node);
     } else if (parsed.hasDecimalPoint && !parsed.hasIntegerPart) {
-      rule.logger.fine('Reporting: missing explicit zero before decimal point');
+      logger.fine('Reporting: missing explicit zero before decimal point');
       rule.reportAtNode(node);
     } else if (parsed.hasTrailingZeros) {
-      rule.logger.fine('Reporting: trailing zeros after decimal point');
+      logger.fine('Reporting: trailing zeros after decimal point');
       rule.reportAtNode(node);
     } else if (parsed.hasExponentLeadingZeros) {
-      rule.logger.fine('Reporting: leading zeros in exponent');
+      logger.fine('Reporting: leading zeros in exponent');
       rule.reportAtNode(node);
     }
     super.visitDoubleLiteral(node);

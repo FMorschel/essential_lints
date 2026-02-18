@@ -9,6 +9,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:logging/logging.dart';
 
 import '../plugin.dart';
+import '../utils/base_visitor.dart';
 import '../utils/diagnostic_message.dart';
 import '../utils/extensions/ast.dart';
 import '../utils/extensions/element.dart';
@@ -19,7 +20,7 @@ import 'rule.dart';
 /// A rule that detects unnecessary calls to setState in Flutter widgets.
 /// {@endtemplate}
 @staticLoggerEnforcement
-class UnnecessarySetstateRule extends LintRule {
+class UnnecessarySetstateRule extends LintRule<UnnecessarySetstateRule> {
   /// {@macro unnecessary_setstate_rule}
   UnnecessarySetstateRule() : super(.unnecessarySetstate, _logger);
 
@@ -34,6 +35,77 @@ class UnnecessarySetstateRule extends LintRule {
   ) {
     var visitor = _UnnecessarySetstateVisitor(this, context);
     registry.addMethodInvocation(this, visitor);
+  }
+}
+
+class _UnnecessarySetstateVisitor extends BaseVisitor<UnnecessarySetstateRule> {
+  _UnnecessarySetstateVisitor(super.rule, super.context);
+
+  static const _setStateName = 'setState';
+
+  bool foundOneSetState = false;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    logger.info('visitMethodInvocation() started for: ${node.toSource()}');
+    if (foundOneSetState) {
+      logger.finer('Already reported once; skipping further checks');
+      return;
+    }
+    var methodName = node.methodName;
+    var element = methodName.element;
+    // Check if the method is `setState`.
+    if (methodName.name != _setStateName ||
+        // If not inside a State class, skip.
+        !node.enclosingTypeElement.isState ||
+        // If the setState is not from this State class, skip.
+        node.target != null && node.target is! ThisExpression ||
+        element is! MethodElement) {
+      logger.finer(
+        'Invocation is not a matching setState call or not in '
+        'State class; skipping',
+      );
+      return;
+    }
+    var enclosingExecutable = node.enclosingExecutableElementIfSync;
+    if (enclosingExecutable == null) {
+      logger.finer('No enclosing executable element (sync), skipping');
+      return;
+    }
+    var classDeclaration = node.thisOrAncestorOfType<ClassDeclaration>();
+    if (classDeclaration == null) {
+      assert(false, 'Class declaration should not be null here.');
+      logger.warning(
+        'Expected class declaration not found for setState invocation',
+      );
+      return;
+    }
+    logger.fine(
+      'Detected setState invocation; searching lifecycle call sites',
+    );
+    foundOneSetState = true;
+    var nodes = _SyncCallVisitor.findLifecycleCallSites(
+      element,
+      null,
+      classDeclaration,
+    );
+    logger.fine('Found ${nodes.length} lifecycle call site(s) to report');
+    for (var node in nodes) {
+      logger.fine('Reporting call site: ${node.toSource()}');
+      rule.reportAtNode(
+        node,
+        contextMessages: [
+          if (node.enclosingExecutableElement != enclosingExecutable)
+            DiagnosticMessageImpl(
+              filePath: context.definingUnit.file.path,
+              message: 'The call to `setState` happens here.',
+              offset: methodName.offset,
+              length: methodName.length,
+              url: null,
+            ),
+        ],
+      );
+    }
   }
 }
 
@@ -188,80 +260,5 @@ class _SyncCallVisitor extends RecursiveAstVisitor<void> {
       'site(s) for: ${element.displayName}',
     );
     return visitor._callSites;
-  }
-}
-
-class _UnnecessarySetstateVisitor extends SimpleAstVisitor<void> {
-  _UnnecessarySetstateVisitor(this.rule, this.context) {
-    rule.logger.info('_UnnecessarySetstateVisitor() created');
-  }
-
-  static const _setStateName = 'setState';
-
-  UnnecessarySetstateRule rule;
-  RuleContext context;
-  bool foundOneSetState = false;
-
-  @override
-  void visitMethodInvocation(MethodInvocation node) {
-    rule.logger.info('visitMethodInvocation() started for: ${node.toSource()}');
-    if (foundOneSetState) {
-      rule.logger.finer('Already reported once; skipping further checks');
-      return;
-    }
-    var methodName = node.methodName;
-    var element = methodName.element;
-    // Check if the method is `setState`.
-    if (methodName.name != _setStateName ||
-        // If not inside a State class, skip.
-        !node.enclosingTypeElement.isState ||
-        // If the setState is not from this State class, skip.
-        node.target != null && node.target is! ThisExpression ||
-        element is! MethodElement) {
-      rule.logger.finer(
-        'Invocation is not a matching setState call or not in '
-        'State class; skipping',
-      );
-      return;
-    }
-    var enclosingExecutable = node.enclosingExecutableElementIfSync;
-    if (enclosingExecutable == null) {
-      rule.logger.finer('No enclosing executable element (sync), skipping');
-      return;
-    }
-    var classDeclaration = node.thisOrAncestorOfType<ClassDeclaration>();
-    if (classDeclaration == null) {
-      assert(false, 'Class declaration should not be null here.');
-      rule.logger.warning(
-        'Expected class declaration not found for setState invocation',
-      );
-      return;
-    }
-    rule.logger.fine(
-      'Detected setState invocation; searching lifecycle call sites',
-    );
-    foundOneSetState = true;
-    var nodes = _SyncCallVisitor.findLifecycleCallSites(
-      element,
-      null,
-      classDeclaration,
-    );
-    rule.logger.fine('Found ${nodes.length} lifecycle call site(s) to report');
-    for (var node in nodes) {
-      rule.logger.fine('Reporting call site: ${node.toSource()}');
-      rule.reportAtNode(
-        node,
-        contextMessages: [
-          if (node.enclosingExecutableElement != enclosingExecutable)
-            DiagnosticMessageImpl(
-              filePath: context.definingUnit.file.path,
-              message: 'The call to `setState` happens here.',
-              offset: methodName.offset,
-              length: methodName.length,
-              url: null,
-            ),
-        ],
-      );
-    }
   }
 }

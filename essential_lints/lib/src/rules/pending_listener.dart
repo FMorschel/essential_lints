@@ -5,7 +5,6 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/analysis/uri_converter.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart';
@@ -13,6 +12,7 @@ import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
 
 import '../plugin.dart';
+import '../utils/base_visitor.dart';
 import '../utils/extensions/ast.dart';
 import '../utils/extensions/object.dart';
 import 'analysis_rule.dart';
@@ -24,16 +24,14 @@ import 'rule.dart';
 /// remove them.
 /// {@endtemplate}
 @staticLoggerEnforcement
-class PendingListenerRule extends MultiLintRule<PendingListener> {
+class PendingListenerRule
+    extends MultiLintRule<PendingListenerRule, PendingListener> {
   /// {@macro pending_listener_rule}
   PendingListenerRule() : super(.pendingListener, _logger);
 
   static final Logger _logger = EssentialLintsPlugin.newLogger(
     'PendingListenerRule',
   );
-
-  @override
-  List<PendingListener> get subDiagnostics => PendingListener.values;
 
   @override
   void registerNodeProcessors(
@@ -346,8 +344,8 @@ class _ElementChain {
   }
 }
 
-class _PendingListenerVisitor extends SimpleAstVisitor<void> {
-  _PendingListenerVisitor(this.rule, this.context);
+class _PendingListenerVisitor extends BaseVisitor<PendingListenerRule> {
+  _PendingListenerVisitor(super.rule, super.context);
 
   static const _addListenerName = 'addListener';
   static const _removeListenerName = 'removeListener';
@@ -358,9 +356,6 @@ class _PendingListenerVisitor extends SimpleAstVisitor<void> {
   static final Uri _flutterChangeNotifierUri = .parse(
     'package:flutter/src/foundation/change_notifier.dart',
   );
-
-  final PendingListenerRule rule;
-  final RuleContext context;
 
   final _addedListeners = <_ElementChain, List<Expression>>{};
   final _removedListeners = <_ElementChain, List<Expression>>{};
@@ -382,7 +377,7 @@ class _PendingListenerVisitor extends SimpleAstVisitor<void> {
         key: _addedListeners[key]!,
     };
     if (_disposedElements.isNotEmpty) {
-      rule.logger.fine(
+      logger.fine(
         'Filtered out ${_disposedElements.length} disposed element(s) from '
         'added listeners: '
         '${_disposedElements.map((e) => e.element?.displayName).join(", ")}',
@@ -395,12 +390,12 @@ class _PendingListenerVisitor extends SimpleAstVisitor<void> {
       Map.unmodifiable(_removedListeners);
 
   void reportPendingClosures() {
-    rule.logger.info('reportPendingClosures() started');
+    logger.info('reportPendingClosures() started');
     // Report closures added to non-disposed elements
     for (var entry in _addedClosures.entries) {
       if (!_disposedElements.any((chain) => chain.matches(entry.key))) {
         for (var closure in entry.value) {
-          rule.logger.fine(
+          logger.fine(
             'Reporting closure on non-disposed element: '
             '${entry.key.element?.displayName}',
           );
@@ -415,36 +410,36 @@ class _PendingListenerVisitor extends SimpleAstVisitor<void> {
 
     // Always report closures in removeListener
     for (var closure in _removedClosures) {
-      rule.logger.fine('Reporting closure in removeListener');
+      logger.fine('Reporting closure in removeListener');
       rule.reportAtOffset(
         closure.offset,
         closure.length,
         diagnosticCode: PendingListener.closuresCannotBeMatched,
       );
     }
-    rule.logger.info('reportPendingClosures() completed');
+    logger.info('reportPendingClosures() completed');
   }
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    rule.logger.info('visitMethodInvocation() started for: ${node.toSource()}');
+    logger.info('visitMethodInvocation() started for: ${node.toSource()}');
     var targetType = node.realTarget?.staticType
         .whenTypeOrNull<InterfaceType>();
     var targetElement = _targetElement(node);
     if (targetElement == null) {
-      rule.logger.finer(
+      logger.finer(
         'Could not determine target element for method invocation: '
         '${node.toSource()}',
       );
       return;
     }
-    rule.logger.finer(
+    logger.finer(
       'Processing method invocation on ${targetElement.element?.displayName}: '
       '${node.methodName.name}',
     );
     if (_isDisposeFromChangeNotifier(node.methodName, targetType)) {
       _disposedElements.add(targetElement);
-      rule.logger.fine(
+      logger.fine(
         'Marked element as disposed: ${targetElement.element?.displayName}',
       );
     } else if (!_methodNames.contains(node.methodName.name) ||
@@ -453,14 +448,14 @@ class _PendingListenerVisitor extends SimpleAstVisitor<void> {
             !targetType.allSupertypes.any(_isListenableType)) {
       return;
     }
-    rule.logger.fine(
+    logger.fine(
       'Processing listener method ${node.methodName.name} on Listenable: '
       '${targetType?.getDisplayString()}',
     );
     var firstArgument = node.argumentList.arguments.firstOrNull;
     if (firstArgument == null) {
       // No arguments provided yet.
-      rule.logger.finer(
+      logger.finer(
         'No arguments provided to ${node.methodName.name} on '
         '${targetElement.element?.displayName}',
       );
@@ -472,7 +467,7 @@ class _PendingListenerVisitor extends SimpleAstVisitor<void> {
     )) {
       // Track closures, report later based on disposal status
       var length = body.offset - offset;
-      rule.logger.fine(
+      logger.fine(
         'Detected closure in ${node.methodName.name} on '
         '${targetElement.element?.displayName}',
       );
@@ -488,14 +483,14 @@ class _PendingListenerVisitor extends SimpleAstVisitor<void> {
     }
     if (node.methodName.name == _addListenerName) {
       // Argument is being added.
-      rule.logger.finer(
+      logger.finer(
         'Adding listener to ${targetElement.element?.displayName}: '
         '${firstArgument.toSource()}',
       );
       _addFor(targetElement, firstArgument);
     } else if (node.methodName.name == _removeListenerName) {
       // Argument is being removed.
-      rule.logger.finer(
+      logger.finer(
         'Removing listener from ${targetElement.element?.displayName}: '
         '${firstArgument.toSource()}',
       );
@@ -504,7 +499,7 @@ class _PendingListenerVisitor extends SimpleAstVisitor<void> {
   }
 
   void _addFor(_ElementChain element, Expression expression) {
-    rule.logger.finer(
+    logger.finer(
       'Tracking added listener on ${element.element?.displayName}: '
       '${expression.toSource()}',
     );
@@ -534,7 +529,7 @@ class _PendingListenerVisitor extends SimpleAstVisitor<void> {
       type.element.library.uri == _flutterChangeNotifierUri;
 
   void _removeFor(_ElementChain element, Expression expression) {
-    rule.logger.finer(
+    logger.finer(
       'Tracking removed listener from ${element.element?.displayName}: '
       '${expression.toSource()}',
     );
@@ -548,7 +543,7 @@ class _PendingListenerVisitor extends SimpleAstVisitor<void> {
     if (target == null) {
       var result = node.enclosingTypeElement;
       if (result != null) {
-        rule.logger.finer(
+        logger.finer(
           'Resolved target element from enclosing type: '
           '${result.displayName}',
         );
@@ -562,7 +557,7 @@ class _PendingListenerVisitor extends SimpleAstVisitor<void> {
     var chain = rule._extractElementChain(target);
 
     if (chain.isEmpty) {
-      rule.logger.warning(
+      logger.warning(
         'Unable to extract element chain for target: ${target.toSource()}',
       );
       return null;
@@ -570,7 +565,7 @@ class _PendingListenerVisitor extends SimpleAstVisitor<void> {
 
     // Use the first element in the chain (the most specific one)
     // For widget.controller, this would be the controller property
-    rule.logger.finer(
+    logger.finer(
       'Resolved target element from expression chain (length ${chain.length}): '
       '${chain.element?.displayName}',
     );

@@ -1,6 +1,8 @@
 import 'package:analyzer/src/lint/registry.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:analyzer_testing/utilities/utilities.dart';
+import 'package:essential_lints/src/warnings/essential_lint_warnings.dart'
+    show SubWarnings;
 import 'package:essential_lints/src/warnings/warning.dart';
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 import 'package:meta/meta.dart';
@@ -14,7 +16,7 @@ abstract class MultiWarningTestProcessor extends AnalysisRuleTest {
 
   @override
   @mustBeOverridden
-  MultiWarningRule get rule;
+  MultiWarningRule<dynamic, SubWarnings> get rule;
 
   @override
   void setUp() {

@@ -1,24 +1,21 @@
-import 'package:analyzer/analysis_rule/analysis_rule.dart';
-import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/src/dart/ast/ast.dart';
-import 'package:logging/logging.dart';
+import 'package:essential_lints/src/utils/base_visitor.dart';
+
+import 'rule.dart';
 
 /// Base visitor for checking invalid modifiers/members in dot shorthand
 /// syntax.
 ///
 /// This visitor tracks types through the AST and checks if child types are
 /// invalid for parent constructors based on annotations.
-abstract class InvalidBaseVisitor extends SimpleAstVisitor<void> {
-  InvalidBaseVisitor(this.context, this.rule, this.log);
+abstract class InvalidBaseVisitor<Rule extends LintRule<Rule>>
+    extends BaseVisitor<Rule> {
+  InvalidBaseVisitor(super.rule, super.context, {super.logger});
 
-  final RuleContext context;
-  final AnalysisRule rule;
-  final Logger log;
   final _nodeToType = <AstNode, DartType>{};
 
   /// The name of the annotation to check for (e.g., 'InvalidModifiers' or
@@ -40,13 +37,13 @@ abstract class InvalidBaseVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitDotShorthandPropertyAccess(DotShorthandPropertyAccess node) {
-    log
+    logger
       ..fine('\n=== visitDotShorthandPropertyAccess ===')
       ..fine('Node: $node')
       ..fine('Property name: ${node.propertyName.name}')
       ..fine('Current _nodeToType before: $_nodeToType');
     var typeToProcess = node.staticType;
-    log.fine('Type to process: $typeToProcess');
+    logger.fine('Type to process: $typeToProcess');
     _process(typeToProcess, node.propertyName, node);
     node.parent?.accept(this);
     _nodeToType.clear();
@@ -57,27 +54,27 @@ abstract class InvalidBaseVisitor extends SimpleAstVisitor<void> {
     AstNode nodeForReporting,
     AstNode nodeForProcessing,
   ) {
-    log.fine('  _process called with type: $type');
+    logger.fine('  _process called with type: $type');
     if (type == null) {
-      log.fine('  Type is null, returning');
+      logger.fine('  Type is null, returning');
       return;
     }
     if (type.element case InterfaceElement(
       :var allSupertypes,
     ) when allSupertypes.any(_isTrackingType)) {
-      log.fine(
+      logger.fine(
         '  Type is a $trackingTypeName, adding to map: '
         '$nodeForReporting -> $type',
       );
       _nodeToType[nodeForReporting] = type;
     } else {
-      log.fine('  Type is NOT a $trackingTypeName');
+      logger.fine('  Type is NOT a $trackingTypeName');
     }
   }
 
   @override
   void visitArgumentList(ArgumentList node) {
-    log
+    logger
       ..fine('\n=== visitArgumentList ===')
       ..fine('Current _nodeToType: $_nodeToType');
     node.parent?.accept(this);
@@ -87,7 +84,7 @@ abstract class InvalidBaseVisitor extends SimpleAstVisitor<void> {
   void visitDotShorthandConstructorInvocation(
     DotShorthandConstructorInvocation node,
   ) {
-    log
+    logger
       ..fine('\n=== visitDotShorthandConstructorInvocation ===')
       ..fine('Node: $node')
       ..fine('Constructor name: ${node.constructorName.name}')
@@ -95,7 +92,7 @@ abstract class InvalidBaseVisitor extends SimpleAstVisitor<void> {
 
     var constructor = node.constructorName.element;
     if (constructor is! ConstructorElement) {
-      log.fine('Constructor element is not a ConstructorElement, skipping');
+      logger.fine('Constructor element is not a ConstructorElement, skipping');
       assert(
         false,
         'How can we have a DotShorthandConstructorInvocation '
@@ -103,18 +100,18 @@ abstract class InvalidBaseVisitor extends SimpleAstVisitor<void> {
       );
       return;
     }
-    log.fine('Constructor element: $constructor');
+    logger.fine('Constructor element: $constructor');
 
     // Follow redirected constructor chain if present
     var enclosing =
         (constructor.redirectedConstructor ?? constructor).enclosingElement;
-    log
+    logger
       ..fine('Enclosing element (after following redirects): $enclosing')
       ..fine('  Checking element: ${enclosing.name}');
     var invalidAnnotations = enclosing.metadata.annotations
         .where(_isInvalidAnnotation)
         .toList();
-    log.fine(
+    logger.fine(
       '  Found ${invalidAnnotations.length} @$annotationName annotations',
     );
     for (var annotation in invalidAnnotations) {
@@ -122,27 +119,27 @@ abstract class InvalidBaseVisitor extends SimpleAstVisitor<void> {
       if (constantValue == null) continue;
       var invalidSet = constantValue.getField(invalidFieldName)?.toSetValue();
       if (invalidSet == null) continue;
-      log.fine('  Checking ${invalidSet.length} invalid items');
+      logger.fine('  Checking ${invalidSet.length} invalid items');
       for (var member in invalidSet) {
-        log.fine('    Member type: ${member.type}');
+        logger.fine('    Member type: ${member.type}');
         // Check if ANY child type in the chain is invalid for current node
         if (member.type case InterfaceType(
           :var typeArguments,
         ) when typeArguments.length == 1) {
-          log.fine('    Type argument: ${typeArguments.first}');
+          logger.fine('    Type argument: ${typeArguments.first}');
           for (var entry in _nodeToType.entries) {
             var childNode = entry.key;
             var childType = entry.value;
-            var isAssignable = context.typeSystem.isAssignableTo(
+            var isAssignable = typeSystem.isAssignableTo(
               childType,
               typeArguments.first,
             );
-            log.fine(
+            logger.fine(
               '    Is $childType assignable to ${typeArguments.first}? '
               '$isAssignable',
             );
             if (isAssignable) {
-              log.fine('    REPORTING ERROR!');
+              logger.fine('    REPORTING ERROR!');
               reportError(childNode, node.constructorName.name);
               break; // Only report once per invalid type
             }
@@ -151,10 +148,10 @@ abstract class InvalidBaseVisitor extends SimpleAstVisitor<void> {
       }
     }
 
-    log.fine('Continuing traversal with current type');
+    logger.fine('Continuing traversal with current type');
     // Continue traversal with current node's type
     _process(enclosing.thisType, node.constructorName, node);
-    log.fine('Setting _node to current and traversing up');
+    logger.fine('Setting _node to current and traversing up');
     node.parent?.accept(this);
     _nodeToType.clear();
   }

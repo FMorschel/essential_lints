@@ -17,7 +17,7 @@ void main() {
 class SubtypeNamingTest extends MultiWarningTestProcessor
     with AnnotationsDependencyMixin {
   @override
-  MultiWarningRule<SubWarnings> get rule => SubtypeNamingRule();
+  MultiWarningRule<dynamic, SubWarnings> get rule => SubtypeNamingRule();
 
   @override
   Future<void> setUp() async {

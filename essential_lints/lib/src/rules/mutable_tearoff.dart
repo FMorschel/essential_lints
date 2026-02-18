@@ -1,12 +1,12 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:logging/logging.dart';
 
 import '../plugin.dart';
+import '../utils/base_visitor.dart';
 import '../utils/extensions/ast.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
@@ -15,7 +15,7 @@ import 'rule.dart';
 /// Checks for mutable tear-offs.
 /// {@endtemplate}
 @staticLoggerEnforcement
-class MutableTearoffRule extends LintRule {
+class MutableTearoffRule extends LintRule<MutableTearoffRule> {
   /// {@macro mutable_tearoff}
   MutableTearoffRule() : super(.mutableTearoff, _logger);
 
@@ -37,19 +37,16 @@ class MutableTearoffRule extends LintRule {
   }
 }
 
-class _MutableTearoffsVisitor extends SimpleAstVisitor<void> {
-  _MutableTearoffsVisitor(this.rule, this.context);
-
-  final MutableTearoffRule rule;
-  final RuleContext context;
+class _MutableTearoffsVisitor extends BaseVisitor<MutableTearoffRule> {
+  _MutableTearoffsVisitor(super.rule, super.context);
 
   @override
   void visitFunctionReference(FunctionReference node) {
-    rule.logger.info('visitFunctionReference() started');
+    logger.info('visitFunctionReference() started');
     if (node.parent case PrefixedIdentifier(
       :var prefix,
     ) when prefix.unParenthesized != node) {
-      rule.logger.finer(
+      logger.finer(
         'FunctionReference is part of a PrefixedIdentifier but not direct — '
         'skipping',
       );
@@ -58,7 +55,7 @@ class _MutableTearoffsVisitor extends SimpleAstVisitor<void> {
     if (node.parent case PropertyAccess(
       :var target,
     ) when target?.unParenthesized != node) {
-      rule.logger.finer(
+      logger.finer(
         'FunctionReference is part of a PropertyAccess but not direct — '
         'skipping',
       );
@@ -68,11 +65,11 @@ class _MutableTearoffsVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    rule.logger.info(
+    logger..info(
       'visitInstanceCreationExpression() started for: '
       '${node.constructorName.toSource()}',
-    );
-    rule.logger.fine(
+    )
+    ..fine(
       'Reporting instance creation constructor as mutable tear-off',
     );
     rule.reportAtNode(node.constructorName);
@@ -80,16 +77,16 @@ class _MutableTearoffsVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    rule.logger.info(
+    logger..info(
       'visitMethodInvocation() started: ${node.methodName.name}',
-    );
-    rule.logger.fine('Reporting method invocation as mutable tear-off');
+    )
+    ..fine('Reporting method invocation as mutable tear-off');
     rule.reportAtNode(node.methodName);
   }
 
   @override
   void visitParenthesizedExpression(ParenthesizedExpression node) {
-    rule.logger.finer(
+    logger.finer(
       'visitParenthesizedExpression() delegating to inner expression',
     );
     node.expression.accept(this);
@@ -97,47 +94,47 @@ class _MutableTearoffsVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitPrefixedIdentifier(PrefixedIdentifier node) {
-    rule.logger.info('visitPrefixedIdentifier() started: ${node.toSource()}');
+    logger.info('visitPrefixedIdentifier() started: ${node.toSource()}');
     if (node.identifier.element is! MethodElement) {
-      rule.logger.finer(
+      logger.finer(
         'PrefixedIdentifier identifier is not a MethodElement — skipping',
       );
       return;
     }
     var target = node.prefix;
     if (target is ThisExpression || target is SuperExpression) {
-      rule.logger.finer('Prefix is This or Super — delegating to identifier');
+      logger.finer('Prefix is This or Super — delegating to identifier');
       node.identifier.accept(this);
       return;
     }
-    rule.logger.finer('Delegating to prefix for further analysis');
+    logger.finer('Delegating to prefix for further analysis');
     target.accept(this);
   }
 
   @override
   void visitPropertyAccess(PropertyAccess node) {
-    rule.logger.info('visitPropertyAccess() started: ${node.toSource()}');
+    logger.info('visitPropertyAccess() started: ${node.toSource()}');
     if (node.propertyName.element is! MethodElement) {
-      rule.logger.finer(
+      logger.finer(
         'PropertyAccess propertyName is not a MethodElement — skipping',
       );
       return;
     }
     var target = node.target;
     if (target is ThisExpression || target is SuperExpression) {
-      rule.logger.finer('Target is This or Super — delegating to propertyName');
+      logger.finer('Target is This or Super — delegating to propertyName');
       node.propertyName.accept(this);
       return;
     }
-    rule.logger.finer('Delegating to target for further analysis');
+    logger.finer('Delegating to target for further analysis');
     target?.accept(this);
   }
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    rule.logger.info('visitSimpleIdentifier() started: ${node.name}');
+    logger.info('visitSimpleIdentifier() started: ${node.name}');
     if (node.thisOrAncestorOfType<CommentReference>() != null) {
-      rule.logger.finer('Identifier is within a CommentReference — skipping');
+      logger.finer('Identifier is within a CommentReference — skipping');
       return;
     }
     var parent = node.parent;
@@ -148,7 +145,7 @@ class _MutableTearoffsVisitor extends SimpleAstVisitor<void> {
       var element = node.element;
       if (element is! PropertyAccessorElement ||
           !element.variable.type.isFunction) {
-        rule.logger.finer(
+        logger.finer(
           'Not a property accessor returning a function — skipping',
         );
         return;
@@ -158,7 +155,7 @@ class _MutableTearoffsVisitor extends SimpleAstVisitor<void> {
       :var prefix,
       expressionType: var lastMemberType,
     ) when prefix.unParenthesized != node || !lastMemberType.isFunction) {
-      rule.logger.finer(
+      logger.finer(
         'PrefixedIdentifier parent does not match expected shape or is not '
         'function typed — skipping',
       );
@@ -168,43 +165,43 @@ class _MutableTearoffsVisitor extends SimpleAstVisitor<void> {
       :var target,
       expressionType: var lastMemberType,
     ) when target?.unParenthesized != node || !lastMemberType.isFunction) {
-      rule.logger.finer(
+      logger.finer(
         'PropertyAccess parent does not match expected shape or is not '
         'function typed — skipping',
       );
       return;
     }
     if (parent is MethodInvocation) {
-      rule.logger.finer(
+      logger.finer(
         'Identifier is used as a method invocation target — skipping',
       );
       return;
     }
     if (node.element is MethodElement && parent is ArgumentList) {
-      rule.logger.finer(
+      logger.finer(
         'Identifier is a method element used in arguments — skipping',
       );
       return;
     }
-    rule.logger.finer('Identifier passes guards, checking mutability');
+    logger.finer('Identifier passes guards, checking mutability');
     _reportIfMayBeMutable(node);
   }
 
   void _reportIfMayBeMutable(SimpleIdentifier node) {
-    rule.logger.finer(
+    logger.finer(
       '_reportIfMayBeMutable() started for identifier: ${node.name}',
     );
     var element = node.element;
     if (element is PropertyAccessorElement &&
         !element.variable.isOriginDeclaration) {
-      rule.logger.fine(
+      logger.fine(
         'PropertyAccessorElement is not origin declaration — reporting',
       );
       rule.reportAtNode(node);
       return;
     }
     if (element is! PropertyAccessorElement && element is! MethodElement) {
-      rule.logger.finer(
+      logger.finer(
         'Element is neither PropertyAccessorElement nor MethodElement — '
         'skipping',
       );
@@ -219,7 +216,7 @@ class _MutableTearoffsVisitor extends SimpleAstVisitor<void> {
         !element.enclosingElement.isImmutable &&
         !element.enclosingElement.isFinal &&
         element.isPublic) {
-      rule.logger.fine(
+      logger.fine(
         'Mutable property accessor on public enclosing element — reporting',
       );
       rule.reportAtNode(node);
@@ -228,12 +225,12 @@ class _MutableTearoffsVisitor extends SimpleAstVisitor<void> {
         element.enclosingElement == node.enclosingTypeElement &&
         element.enclosingElement!.isPublic &&
         element.isPublic) {
-      rule.logger.fine(
+      logger.fine(
         'Non-static public method on public enclosing element — reporting',
       );
       rule.reportAtNode(node);
     } else {
-      rule.logger.finer('Conditions for reporting not met');
+      logger.finer('Conditions for reporting not met');
     }
   }
 }

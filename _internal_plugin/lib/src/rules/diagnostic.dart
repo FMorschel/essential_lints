@@ -1,20 +1,14 @@
-import 'package:analyzer/error/error.dart';
+import 'package:essential_lints/src/warnings/essential_lint_warnings.dart';
 
-class InternalDiagnosticCode extends DiagnosticCode {
+class InternalDiagnosticCode extends WarningCode {
   const InternalDiagnosticCode({
     required super.name,
     required super.problemMessage,
-    String? uniqueName,
-    this.severity = .WARNING,
-    this.type = .STATIC_WARNING,
+    required super.description,
+    super.uniqueName,
+    super.severity = .WARNING,
+    super.type = .STATIC_WARNING,
     super.correctionMessage,
     super.hasPublishedDocs,
-    super.isUnresolvedIdentifier,
-  }) : super(uniqueName: uniqueName ?? name);
-
-  @override
-  final DiagnosticSeverity severity;
-
-  @override
-  final DiagnosticType type;
+  });
 }

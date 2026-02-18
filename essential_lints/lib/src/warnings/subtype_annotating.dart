@@ -3,7 +3,6 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/syntactic_entity.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
@@ -11,6 +10,7 @@ import 'package:logging/logging.dart';
 
 import '../plugin.dart';
 import '../rules/analysis_rule.dart';
+import '../utils/base_visitor.dart';
 import '../utils/dart_object_to_string.dart';
 import '../utils/extensions/list.dart';
 import 'essential_lint_warnings.dart';
@@ -20,16 +20,14 @@ import 'warning.dart';
 /// The rule for subtype_annotating warning.
 /// {@endtemplate}
 @staticLoggerEnforcement
-class SubtypeAnnotatingRule extends MultiWarningRule<SubtypeAnnotating> {
+class SubtypeAnnotatingRule
+    extends MultiWarningRule<SubtypeAnnotatingRule, SubtypeAnnotating> {
   /// {@macro subtype_annotating_rule}
   SubtypeAnnotatingRule() : super(.subtypeAnnotating, _logger);
 
   static final Logger _logger = EssentialLintsPlugin.newLogger(
     'SubtypeAnnotatingRule',
   );
-
-  @override
-  List<SubtypeAnnotating> get subDiagnostics => SubtypeAnnotating.values;
 
   @override
   void registerNodeProcessors(
@@ -46,8 +44,8 @@ class SubtypeAnnotatingRule extends MultiWarningRule<SubtypeAnnotating> {
   }
 }
 
-class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
-  _SubtypeAnnotatingVisitor(this.rule, this.context);
+class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule> {
+  _SubtypeAnnotatingVisitor(super.rule, super.context);
 
   static const _annotationName = 'SubtypeAnnotating';
 
@@ -55,43 +53,40 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
     'package:essential_lints_annotations/src/subtype_annotating.dart',
   );
 
-  final SubtypeAnnotatingRule rule;
-  final RuleContext context;
-
   @override
   void visitAnnotation(Annotation node) {
-    rule.logger.info('_SubtypeAnnotatingVisitor.visitAnnotation() started');
+    logger.info('_SubtypeAnnotatingVisitor.visitAnnotation() started');
     if (_isSubtypeNamingAnnotation(node.elementAnnotation)) {
-      rule.logger.fine('Found SubtypeAnnotating annotation');
+      logger.fine('Found SubtypeAnnotating annotation');
       var annotation = _mapKnownArguments(node.elementAnnotation);
-      rule.logger.finer(
+      logger.finer(
         'Annotation mapped with ${annotation.annotations.length} annotations',
       );
       for (var parameter in [...?node.arguments?.arguments]) {
         if (parameter case NamedExpression(
           :var name,
         ) when name.label.token.lexeme != 'annotations') {
-          rule.logger.finer(
+          logger.finer(
             'Skipping non-annotations parameter: ${name.label.token.lexeme}',
           );
           continue;
         }
         if (parameter is! NamedExpression) {
-          rule.logger.finer('Parameter is not NamedExpression, skipping');
+          logger.finer('Parameter is not NamedExpression, skipping');
           continue;
         }
         var list = parameter.expression;
-        rule.logger.finer('Parameter expression type: ${list.runtimeType}');
+        logger.finer('Parameter expression type: ${list.runtimeType}');
         if (list is! ListLiteral) {
-          rule.logger.finer('Expression is not ListLiteral, skipping');
+          logger.finer('Expression is not ListLiteral, skipping');
           continue;
         }
-        rule.logger.fine(
+        logger.fine(
           'Found annotations list with ${list.elements.length} elements',
         );
         for (var element in list.elements) {
           if (element is ConstructorReference) {
-            rule.logger.fine(
+            logger.fine(
               'Found ConstructorReference instead of type, reporting error',
             );
             rule.reportAtNode(
@@ -102,25 +97,25 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
         }
       }
       if (annotation.annotations.isEmpty) {
-        rule.logger.fine('Missing annotation list, reporting error');
+        logger.fine('Missing annotation list, reporting error');
         rule.reportAtNode(
           node.name,
           diagnosticCode: SubtypeAnnotating.missingAnnotation,
         );
       }
     }
-    rule.logger.info('_SubtypeAnnotatingVisitor.visitAnnotation() completed');
+    logger.info('_SubtypeAnnotatingVisitor.visitAnnotation() completed');
     super.visitAnnotation(node);
   }
 
   @override
   void visitClassDeclaration(ClassDeclaration node) {
-    rule.logger.fine(
+    logger.fine(
       'visitClassDeclaration() for: ${node.namePart.typeName.lexeme}',
     );
     var abstractOrSealed =
         node.abstractKeyword != null || node.sealedKeyword != null;
-    rule.logger.finer(
+    logger.finer(
       'Class is ${abstractOrSealed ? "abstract/sealed" : "concrete"}',
     );
     _verifySuperTypes(
@@ -134,7 +129,7 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitEnumDeclaration(EnumDeclaration node) {
-    rule.logger.fine(
+    logger.fine(
       'visitEnumDeclaration() for: ${node.namePart.typeName.lexeme}',
     );
     _verifySuperTypes(
@@ -147,7 +142,7 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitExtensionTypeDeclaration(ExtensionTypeDeclaration node) {
-    rule.logger.fine(
+    logger.fine(
       'visitExtensionTypeDeclaration() for: '
       '${node.primaryConstructor.typeName.lexeme}',
     );
@@ -161,7 +156,7 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitMixinDeclaration(MixinDeclaration node) {
-    rule.logger.fine('visitMixinDeclaration() for: ${node.name.lexeme}');
+    logger.fine('visitMixinDeclaration() for: ${node.name.lexeme}');
     _verifySuperTypes(node.name, node.declaredFragment?.element, node.metadata);
     super.visitMixinDeclaration(node);
   }
@@ -177,34 +172,34 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
   }
 
   _SubtypeNamingAnnotation _mapKnownArguments(ElementAnnotation? annotation) {
-    rule.logger.fine('_mapKnownArguments() started');
+    logger.fine('_mapKnownArguments() started');
     if (annotation == null) {
-      rule.logger.finer('Annotation is null, returning empty');
+      logger.finer('Annotation is null, returning empty');
       return .empty;
     }
 
     var element = annotation.element;
-    rule.logger.finer(
+    logger.finer(
       'Annotation element: ${element?.displayName ?? "null"}, type: '
       '${element.runtimeType}',
     );
     if (element is! ConstructorElement) {
-      rule.logger.finer('Element is not ConstructorElement, returning empty');
+      logger.finer('Element is not ConstructorElement, returning empty');
       return .empty;
     }
 
     var type = annotation.computeConstantValue();
-    rule.logger.finer(
+    logger.finer(
       'Computed constant value: ${type != null ? "success" : "null"}',
     );
     if (type == null) {
-      rule.logger.finer('Type is null, returning empty');
+      logger.finer('Type is null, returning empty');
       return .empty;
     }
     var annotations = [...?type.getField('annotations')?.toListValue()];
     var onlyConcrete = type.getField('option');
 
-    rule.logger.fine(
+    logger.fine(
       '_mapKnownArguments() returning ${annotations.length} annotations',
     );
     return _SubtypeNamingAnnotation(
@@ -219,35 +214,35 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
     NodeList<Annotation> metadata, {
     bool abstract = false,
   }) {
-    rule.logger.info('_verifySuperTypes() started');
+    logger.info('_verifySuperTypes() started');
     if (element == null) {
-      rule.logger.finer('Element is null, returning');
+      logger.finer('Element is null, returning');
       return;
     }
-    rule.logger.fine(
+    logger.fine(
       'Verifying supertypes for: ${element.name}, abstract=$abstract',
     );
     var annotations = <_SubtypeNamingAnnotation>[];
     var visitedElements = <InterfaceElement>{element};
-    rule.logger.finer('Processing ${element.allSupertypes.length} supertypes');
+    logger.finer('Processing ${element.allSupertypes.length} supertypes');
     for (var interface in element.allSupertypes) {
       var current = interface.element;
       if (!visitedElements.add(current)) {
-        rule.logger.finer('Already visited ${current.name}, skipping');
+        logger.finer('Already visited ${current.name}, skipping');
         continue;
       }
       var currentAnnotations = current.metadata.annotations
           .where(_isSubtypeNamingAnnotation)
           .map(_mapKnownArguments)
           .toList();
-      rule.logger.finer(
+      logger.finer(
         'Supertype ${current.name} has ${currentAnnotations.length} '
         'SubtypeAnnotating annotations',
       );
       annotations.addAll(currentAnnotations);
     }
 
-    rule.logger.fine('Total annotations to check: ${annotations.length}');
+    logger.fine('Total annotations to check: ${annotations.length}');
     bool existing(DartObject annotation) {
       for (var meta in metadata) {
         var value = meta.elementAnnotation?.computeConstantValue();
@@ -261,32 +256,32 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
 
     var missingCount = 0;
     for (var annotation in annotations) {
-      rule.logger.finer(
+      logger.finer(
         'Checking annotation with ${annotation.annotations.length} required '
         'annotations',
       );
       if (annotation.option?.variable?.name == 'onlyConcrete' && abstract) {
-        rule.logger.finer('  Skipping due to onlyConcrete with abstract type');
+        logger.finer('  Skipping due to onlyConcrete with abstract type');
         continue;
       } else if (annotation.option?.variable?.name == 'onlyAbstract' &&
           !abstract) {
-        rule.logger.finer('  Skipping due to onlyAbstract with concrete type');
+        logger.finer('  Skipping due to onlyAbstract with concrete type');
         continue;
       } else if (annotation.option?.variable?.name == 'onlyInstantiable' &&
           (abstract || element is MixinElement)) {
-        rule.logger.finer(
+        logger.finer(
           '  Skipping due to onlyInstantiable with non-instantiable type',
         );
         continue;
       }
       var missingAnnotations = annotation.annotations.whereNot(existing);
-      rule.logger.finer('  Missing ${missingAnnotations.length} annotations');
+      logger.finer('  Missing ${missingAnnotations.length} annotations');
       if (missingAnnotations.isNotEmpty) {
         missingCount += missingAnnotations.length;
         var annotationNames = missingAnnotations
             .map(dartObjectToString)
             .commaSeparatedWithAnd;
-        rule.logger.fine('Reporting missing annotations: $annotationNames');
+        logger.fine('Reporting missing annotations: $annotationNames');
         switch (name) {
           case Token():
             rule.reportAtToken(
@@ -303,7 +298,7 @@ class _SubtypeAnnotatingVisitor extends SimpleAstVisitor<void> {
         }
       }
     }
-    rule.logger.info(
+    logger.info(
       '_verifySuperTypes() completed, reported $missingCount missing '
       'annotations',
     );

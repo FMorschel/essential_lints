@@ -2,10 +2,10 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:logging/logging.dart';
 
 import '../plugin.dart';
+import '../utils/base_visitor.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
 
@@ -13,7 +13,7 @@ import 'rule.dart';
 /// A lint rule that detects duplicate values in comparisons like `&&` and `||`.
 /// {@endtemplate}
 @staticLoggerEnforcement
-class DuplicateValueRule extends LintRule {
+class DuplicateValueRule extends LintRule<DuplicateValueRule> {
   /// {@macro duplicate_value}
   DuplicateValueRule() : super(.duplicateValue, _logger);
 
@@ -34,15 +34,12 @@ class DuplicateValueRule extends LintRule {
   }
 }
 
-class _DuplicateValueVisitor extends SimpleAstVisitor<void> {
-  _DuplicateValueVisitor(this.rule, this.context);
-
-  final DuplicateValueRule rule;
-  final RuleContext context;
+class _DuplicateValueVisitor extends BaseVisitor<DuplicateValueRule> {
+  _DuplicateValueVisitor(super.rule, super.context);
 
   @override
   void visitBinaryExpression(BinaryExpression node) {
-    rule.logger.info(
+    logger.info(
       'visitBinaryExpression() started: operator=${node.operator.type}',
     );
 
@@ -52,7 +49,7 @@ class _DuplicateValueVisitor extends SimpleAstVisitor<void> {
         node.operator.type != TokenType.BANG_EQ &&
         (node.operator.type != TokenType.CARET ||
             !(node.leftOperand.staticType?.isDartCoreBool ?? false))) {
-      rule.logger.finer(
+      logger.finer(
         'Operator ${node.operator.type} not subject to duplicate-value rule — '
         'skipping',
       );
@@ -61,27 +58,27 @@ class _DuplicateValueVisitor extends SimpleAstVisitor<void> {
 
     var left = node.leftOperand.toSource();
     var right = node.rightOperand.toSource();
-    rule.logger.finer('Left: "$left", Right: "$right"');
+    logger.finer('Left: "$left", Right: "$right"');
     if (left == right) {
-      rule.logger.fine('Detected duplicate value in binary expression: $left');
+      logger.fine('Detected duplicate value in binary expression: $left');
       rule.reportAtNode(node.rightOperand);
     }
   }
 
   @override
   void visitSwitchExpressionCase(SwitchExpressionCase node) {
-    rule.logger.info('visitSwitchExpressionCase() started');
+    logger.info('visitSwitchExpressionCase() started');
     _handlePattern(node.guardedPattern.pattern);
   }
 
   @override
   void visitSwitchPatternCase(SwitchPatternCase node) {
-    rule.logger.info('visitSwitchPatternCase() started');
+    logger.info('visitSwitchPatternCase() started');
     _handlePattern(node.guardedPattern.pattern);
   }
 
   void _handlePattern(DartPattern pattern) {
-    rule.logger.info(
+    logger.info(
       '_handlePattern() started for pattern: ${pattern.runtimeType}',
     );
 
@@ -93,15 +90,15 @@ class _DuplicateValueVisitor extends SimpleAstVisitor<void> {
       leftPattern = leftOperand;
       rightPattern = rightOperand;
     } else {
-      rule.logger.finer('Pattern is not LogicalOr/LogicalAnd — skipping');
+      logger.finer('Pattern is not LogicalOr/LogicalAnd — skipping');
       return;
     }
 
     var leftSrc = leftPattern.toSource();
     var rightSrc = rightPattern.toSource();
-    rule.logger.finer('Left pattern: "$leftSrc", Right pattern: "$rightSrc"');
+    logger.finer('Left pattern: "$leftSrc", Right pattern: "$rightSrc"');
     if (leftSrc == rightSrc) {
-      rule.logger.fine('Detected duplicate value in pattern: $leftSrc');
+      logger.fine('Detected duplicate value in pattern: $leftSrc');
       rule.reportAtNode(rightPattern);
     }
   }

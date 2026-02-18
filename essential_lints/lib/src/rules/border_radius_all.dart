@@ -4,10 +4,10 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:logging/logging.dart';
 
 import '../plugin.dart';
+import '../utils/base_visitor.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
 
@@ -16,7 +16,7 @@ import 'rule.dart';
 /// using BorderRadius.all instead.
 /// {@endtemplate}
 @staticLoggerEnforcement
-class BorderRadiusAllRule extends LintRule {
+class BorderRadiusAllRule extends LintRule<BorderRadiusAllRule> {
   /// {@macro border_radius_all_rule}
   BorderRadiusAllRule() : super(.borderRadiusAll, _logger);
 
@@ -36,8 +36,8 @@ class BorderRadiusAllRule extends LintRule {
   }
 }
 
-class _BorderRadiusAllVisitor extends SimpleAstVisitor<void> {
-  _BorderRadiusAllVisitor(this.rule, this.context);
+class _BorderRadiusAllVisitor extends BaseVisitor<BorderRadiusAllRule> {
+  _BorderRadiusAllVisitor(super.rule, super.context);
 
   static const _borderRadiusName = 'BorderRadius';
   static const _circularName = 'circular';
@@ -46,24 +46,21 @@ class _BorderRadiusAllVisitor extends SimpleAstVisitor<void> {
     'package:flutter/src/painting/border_radius.dart',
   );
 
-  final BorderRadiusAllRule rule;
-  final RuleContext context;
-
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    rule.logger.info(
+    logger.info(
       'BorderRadiusAllRule.visitInstanceCreationExpression() started at offset '
       '${node.offset}',
     );
 
     var element = node.constructorName.element;
     if (element == null) {
-      rule.logger.finer('Constructor element is null at offset ${node.offset}');
+      logger.finer('Constructor element is null at offset ${node.offset}');
       return;
     }
 
     if (element.enclosingElement.name != _borderRadiusName) {
-      rule.logger.finer(
+      logger.finer(
         'Enclosing element "${element.enclosingElement.name}" is not '
         '"$_borderRadiusName" — skipping',
       );
@@ -71,25 +68,25 @@ class _BorderRadiusAllVisitor extends SimpleAstVisitor<void> {
     }
 
     if (element.name != _circularName) {
-      rule.logger.finer(
+      logger.finer(
         'Constructor name "${element.name}" is not "$_circularName" — skipping',
       );
       return;
     }
 
     if (element.library.uri != _borderRadiusUri) {
-      rule.logger.finer(
+      logger.finer(
         'Library uri "${element.library.uri}" does not match $_borderRadiusUri '
         '— skipping',
       );
       return;
     }
 
-    rule.logger.fine(
+    logger.fine(
       'Detected BorderRadius.circular instance — reporting at constructor name',
     );
     rule.reportAtNode(node.constructorName);
-    rule.logger.info(
+    logger.info(
       'BorderRadiusAllRule.visitInstanceCreationExpression() completed '
       '(violation reported)',
     );

@@ -1,10 +1,10 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:logging/logging.dart';
 
 import '../plugin.dart';
+import '../utils/base_visitor.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
 
@@ -12,7 +12,7 @@ import 'rule.dart';
 /// A lint rule that enforces alphabetical ordering of function arguments.
 /// {@endtemplate}
 @staticLoggerEnforcement
-class AlphabetizeArgumentsRule extends LintRule {
+class AlphabetizeArgumentsRule extends LintRule<AlphabetizeArgumentsRule> {
   /// {@macro alphabetize_arguments}
   AlphabetizeArgumentsRule() : super(.alphabetizeArguments, _logger);
 
@@ -26,31 +26,30 @@ class AlphabetizeArgumentsRule extends LintRule {
     RuleContext context,
   ) {
     logger.fine('Registering node processors for AlphabetizeArgumentsRule');
-    var visitor = _AlphabetizeArgumentsVisitor(this);
+    var visitor = _AlphabetizeArgumentsVisitor(this, context);
     registry.addArgumentList(this, visitor);
     logger.fine('Registered node processors for AlphabetizeArgumentsRule');
   }
 }
 
-class _AlphabetizeArgumentsVisitor extends SimpleAstVisitor<void> {
-  _AlphabetizeArgumentsVisitor(this.rule);
-
-  final AlphabetizeArgumentsRule rule;
+class _AlphabetizeArgumentsVisitor
+    extends BaseVisitor<AlphabetizeArgumentsRule> {
+  _AlphabetizeArgumentsVisitor(super.rule, super.context);
 
   @override
   void visitArgumentList(ArgumentList node) {
-    rule.logger.info(
+    logger.info(
       'AlphabetizeArgumentsRule.visitArgumentList() started at offset '
       '${node.offset}',
     );
 
     var arguments = node.arguments;
     var argumentNames = arguments.whereType<NamedExpression>().toList();
-    rule.logger.fine('Found ${argumentNames.length} named arguments');
+    logger.fine('Found ${argumentNames.length} named arguments');
 
     if (argumentNames.length < 2) {
-      rule.logger.finer('Less than two named arguments, nothing to check');
-      rule.logger.info(
+      logger..finer('Less than two named arguments, nothing to check')
+      ..info(
         'AlphabetizeArgumentsRule.visitArgumentList() completed',
       );
       return;
@@ -59,12 +58,12 @@ class _AlphabetizeArgumentsVisitor extends SimpleAstVisitor<void> {
     for (var i = 1; i < argumentNames.length; i++) {
       var previousName = argumentNames[i - 1].name.label.name;
       var currentName = argumentNames[i].name.label.name;
-      rule.logger.finer(
+      logger.finer(
         'Comparing previous="$previousName" with '
         'current="$currentName" at index ${i - 1} -> $i',
       );
       if (previousName.compareTo(currentName) > 0) {
-        rule.logger.fine(
+        logger.fine(
           'Alphabetical order violation: "$previousName" > "$currentName" — '
           'reporting at node',
         );
@@ -75,6 +74,6 @@ class _AlphabetizeArgumentsVisitor extends SimpleAstVisitor<void> {
       }
     }
 
-    rule.logger.info('AlphabetizeArgumentsRule.visitArgumentList() completed');
+    logger.info('AlphabetizeArgumentsRule.visitArgumentList() completed');
   }
 }

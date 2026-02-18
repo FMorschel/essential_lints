@@ -1,30 +1,30 @@
-import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:essential_lints/src/plugin.dart';
+import 'package:essential_lints/src/rules/analysis_rule.dart';
 import 'package:logging/logging.dart';
 
 import 'diagnostic.dart';
 import 'invalid_base_visitor.dart';
+import 'rule.dart';
 
-class InvalidModifiersRule extends AnalysisRule {
-  InvalidModifiersRule()
-    : super(
-        name: _diagnostic.lowerCaseUniqueName,
-        description: 'Modifiers that are invalid for a given modifier.',
-      );
+@staticLoggerEnforcement
+class InvalidModifiersRule extends LintRule<InvalidModifiersRule> {
+  InvalidModifiersRule() : super(_diagnostic, _logger);
 
   static final Logger _logger = EssentialLintsPlugin.newLogger(
     'InvalidModifiersRule',
   );
 
+  @override
   Logger get logger => _logger;
 
   static const _diagnostic = InternalDiagnosticCode(
     name: 'invalid_modifiers',
     problemMessage: 'This modifier is invalid for {0}.',
     correctionMessage: 'Remove the invalid modifier.',
+    description: 'Modifiers that are invalid for a given modifier.',
     severity: .ERROR,
   );
 
@@ -43,9 +43,9 @@ class InvalidModifiersRule extends AnalysisRule {
   }
 }
 
-class _InvalidModifiersVisitor extends InvalidBaseVisitor {
-  _InvalidModifiersVisitor(InvalidModifiersRule rule, RuleContext context)
-    : super(context, rule, rule.logger);
+class _InvalidModifiersVisitor
+    extends InvalidBaseVisitor<InvalidModifiersRule> {
+  _InvalidModifiersVisitor(super.rule, super.context);
 
   @override
   String get annotationName => 'InvalidModifiers';

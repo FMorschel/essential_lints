@@ -1,31 +1,35 @@
-import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart';
 import 'package:analyzer/src/dart/ast/ast.dart';
 import 'package:collection/collection.dart';
+import 'package:essential_lints/src/plugin.dart';
+import 'package:essential_lints/src/rules/analysis_rule.dart';
+import 'package:essential_lints/src/utils/base_visitor.dart';
+import 'package:logging/logging.dart';
 
 import 'diagnostic.dart';
+import 'rule.dart';
 
-class StaticEnforcementRule extends AnalysisRule {
-  StaticEnforcementRule()
-    : super(
-        name: _diagnostic.lowerCaseUniqueName,
-        description: 'Enforces that certain members are declared as static.',
-      );
+@staticLoggerEnforcement
+class StaticEnforcementRule extends LintRule<StaticEnforcementRule> {
+  StaticEnforcementRule() : super(_diagnostic, _logger);
 
   static const _diagnostic = InternalDiagnosticCode(
     name: 'static_enforcement',
     problemMessage: "A member named '{0}' should be declared and be static.",
     correctionMessage: "Declare '{0}' as static.",
+    description: 'Enforces that certain members are declared as static.',
+  );
+
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
+    'StaticEnforcementRule',
   );
 
   @override
-  DiagnosticCode get diagnosticCode => _diagnostic;
+  InternalDiagnosticCode get diagnosticCode => _diagnostic;
 
   @override
   void registerNodeProcessors(
@@ -42,11 +46,8 @@ class StaticEnforcementRule extends AnalysisRule {
   }
 }
 
-class _StaticEnforcementVisitor extends SimpleAstVisitor<void> {
-  _StaticEnforcementVisitor(this.rule, this.context);
-
-  StaticEnforcementRule rule;
-  RuleContext context;
+class _StaticEnforcementVisitor extends BaseVisitor<StaticEnforcementRule> {
+  _StaticEnforcementVisitor(super.rule, super.context);
 
   @override
   void visitClassDeclaration(ClassDeclaration node) {

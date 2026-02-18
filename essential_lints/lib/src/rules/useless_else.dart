@@ -1,10 +1,10 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:logging/logging.dart';
 
 import '../plugin.dart';
+import '../utils/base_visitor.dart';
 import '../utils/extensions/ast.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
@@ -13,7 +13,7 @@ import 'rule.dart';
 /// Checks for useless else statements.
 /// {@endtemplate}
 @staticLoggerEnforcement
-class UselessElseRule extends LintRule {
+class UselessElseRule extends LintRule<UselessElseRule> {
   /// {@macro useless_else}
   UselessElseRule() : super(.uselessElse, _logger);
 
@@ -31,28 +31,23 @@ class UselessElseRule extends LintRule {
   }
 }
 
-class _UselessElseVisitor extends SimpleAstVisitor<void> {
-  _UselessElseVisitor(this.rule, this.context) {
-    rule.logger.info('_UselessElseVisitor() created');
-  }
-
-  final UselessElseRule rule;
-  final RuleContext context;
+class _UselessElseVisitor extends BaseVisitor<UselessElseRule> {
+  _UselessElseVisitor(super.rule, super.context);
 
   @override
   void visitIfStatement(IfStatement node) {
-    rule.logger.info('visitIfStatement() started for: ${node.toSource()}');
+    logger.info('visitIfStatement() started for: ${node.toSource()}');
     var elseKeyword = node.elseKeyword;
     if (elseKeyword == null) {
-      rule.logger.finer('No else keyword present, skipping');
+      logger.finer('No else keyword present, skipping');
       return;
     }
     if (node.thenStatement.alwaysExits) {
-      rule.logger.fine(
+      logger.fine(
         'Then-statement always exits; reporting else at ${elseKeyword.lexeme}',
       );
       rule.reportAtToken(elseKeyword);
     }
-    rule.logger.info('visitIfStatement() completed for: ${node.toSource()}');
+    logger.info('visitIfStatement() completed for: ${node.toSource()}');
   }
 }

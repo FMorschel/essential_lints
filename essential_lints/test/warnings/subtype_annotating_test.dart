@@ -17,7 +17,7 @@ void main() {
 class SubtypeAnnotatingTest extends MultiWarningTestProcessor
     with AnnotationsDependencyMixin {
   @override
-  MultiWarningRule<SubWarnings> get rule => SubtypeAnnotatingRule();
+  MultiWarningRule<dynamic, SubWarnings> get rule => SubtypeAnnotatingRule();
 
   @override
   Future<void> setUp() async {

@@ -37,7 +37,7 @@ abstract class MultiLintTestProcessor<T extends SubLints>
   String get analysisRule => rule.rule.lowerCaseUniqueName;
 
   @override
-  MultiLintRule<T> get rule;
+  MultiLintRule<dynamic, T> get rule;
 
   @override
   void setUp() {

@@ -2,7 +2,6 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/scope.dart';
 import 'package:analyzer/src/generated/resolver.dart' // ignore: implementation_imports, not exposed api
@@ -10,6 +9,7 @@ import 'package:analyzer/src/generated/resolver.dart' // ignore: implementation_
 import 'package:logging/logging.dart';
 
 import '../plugin.dart';
+import '../utils/base_visitor.dart';
 import '../utils/diagnostic_message.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
@@ -19,7 +19,7 @@ import 'rule.dart';
 /// scope.
 /// {@endtemplate}
 @staticLoggerEnforcement
-class VariableShadowingRule extends LintRule {
+class VariableShadowingRule extends LintRule<VariableShadowingRule> {
   /// {@macro variable_shadowing}
   VariableShadowingRule() : super(.variableShadowing, _logger);
 
@@ -39,17 +39,12 @@ class VariableShadowingRule extends LintRule {
   }
 }
 
-class _VariableShadowingVisitor extends SimpleAstVisitor<void> {
-  _VariableShadowingVisitor(this.rule, this.context) {
-    rule.logger.info('_VariableShadowingVisitor() created');
-  }
-
-  final VariableShadowingRule rule;
-  final RuleContext context;
+class _VariableShadowingVisitor extends BaseVisitor<VariableShadowingRule> {
+  _VariableShadowingVisitor(super.rule, super.context);
 
   @override
   void visitDeclaredVariablePattern(DeclaredVariablePattern node) {
-    rule.logger.info(
+    logger.info(
       'visitDeclaredVariablePattern() started for: ${node.toSource()}',
     );
     var element = _resolveNameInPreviousScope(
@@ -57,10 +52,10 @@ class _VariableShadowingVisitor extends SimpleAstVisitor<void> {
       node,
     );
     if (element != null) {
-      rule.logger.fine('Found previous declaration: ${element.displayName}');
+      logger.fine('Found previous declaration: ${element.displayName}');
       reportForTokenIfValid(node.name, element);
     } else {
-      rule.logger.finer(
+      logger.finer(
         'No previous declaration found for: '
         '${node.declaredFragment!.element.displayName}',
       );
@@ -69,11 +64,11 @@ class _VariableShadowingVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitVariableDeclaration(VariableDeclaration node) {
-    rule.logger.info(
+    logger.info(
       'visitVariableDeclaration() started for: ${node.toSource()}',
     );
     if (node.thisOrAncestorOfType<FieldDeclaration>() != null) {
-      rule.logger.finer(
+      logger.finer(
         'Declaration is a field; skipping variable shadowing check',
       );
       return;
@@ -83,10 +78,10 @@ class _VariableShadowingVisitor extends SimpleAstVisitor<void> {
       node,
     );
     if (element != null) {
-      rule.logger.fine('Found previous declaration: ${element.displayName}');
+      logger.fine('Found previous declaration: ${element.displayName}');
       reportForTokenIfValid(node.name, element);
     } else {
-      rule.logger.finer(
+      logger.finer(
         'No previous declaration found for: '
         '${node.declaredFragment!.element.displayName}',
       );
@@ -97,13 +92,13 @@ class _VariableShadowingVisitor extends SimpleAstVisitor<void> {
     if (element is PropertyAccessorElement &&
             element.enclosingElement is InstanceElement ||
         element.enclosingElement is LibraryElement) {
-      rule.logger.finer(
+      logger.finer(
         'Previous declaration is a property accessor or top-level; skipping '
         'report for: ${element.displayName}',
       );
       return;
     }
-    rule.logger.fine(
+    logger.fine(
       'Reporting shadowed variable at token: ${token.lexeme} (previous: '
       '${element.displayName})',
     );

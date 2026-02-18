@@ -17,7 +17,7 @@ void main() {
 class PendingListenerTest extends MultiLintTestProcessor<PendingListener>
     with FlutterDependencyMixin {
   @override
-  MultiLintRule<PendingListener> get rule => PendingListenerRule();
+  MultiLintRule<dynamic, PendingListener> get rule => PendingListenerRule();
 
   @override
   void setUp() {

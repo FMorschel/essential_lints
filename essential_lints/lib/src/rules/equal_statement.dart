@@ -1,10 +1,10 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:logging/logging.dart';
 
 import '../plugin.dart';
+import '../utils/base_visitor.dart';
 import '../utils/extensions/list.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
@@ -13,7 +13,7 @@ import 'rule.dart';
 /// A lint rule for equal statements under switch cases.
 /// {@endtemplate}
 @staticLoggerEnforcement
-class EqualStatementRule extends LintRule {
+class EqualStatementRule extends LintRule<EqualStatementRule> {
   /// {@macro equal_statement}
   EqualStatementRule() : super(.equalStatement, _logger);
 
@@ -33,19 +33,16 @@ class EqualStatementRule extends LintRule {
   }
 }
 
-class _EqualStatementVisitor extends SimpleAstVisitor<void> {
-  _EqualStatementVisitor(this.rule, this.context);
-
-  final EqualStatementRule rule;
-  final RuleContext context;
+class _EqualStatementVisitor extends BaseVisitor<EqualStatementRule> {
+  _EqualStatementVisitor(super.rule, super.context);
 
   @override
   void visitSwitchExpression(SwitchExpression node) {
-    rule.logger.info(
+    logger.info(
       'visitSwitchExpression() started with ${node.cases.length} case(s)',
     );
     if (node.cases.length < 2) {
-      rule.logger.finer('Less than 2 cases — nothing to compare');
+      logger.finer('Less than 2 cases — nothing to compare');
       return;
     }
 
@@ -54,7 +51,7 @@ class _EqualStatementVisitor extends SimpleAstVisitor<void> {
       var comparingExpression = node.cases[i].expression;
       var key = comparingExpression.toSource();
       if (equals.containsKey(key)) {
-        rule.logger.finer('Already processed expression: $key');
+        logger.finer('Already processed expression: $key');
         continue;
       }
       for (var switchCase in node.cases) {
@@ -62,7 +59,7 @@ class _EqualStatementVisitor extends SimpleAstVisitor<void> {
           equals.putIfAbsent(key, () => []).add(switchCase);
         }
       }
-      rule.logger.finer(
+      logger.finer(
         'Collected ${equals[key]?.length ?? 0} entry(ies) for expression: $key',
       );
     }
@@ -71,7 +68,7 @@ class _EqualStatementVisitor extends SimpleAstVisitor<void> {
       if (entry.value.length < 2) {
         continue;
       }
-      rule.logger.fine(
+      logger.fine(
         'Reporting equal switch expression for ${entry.key} with '
         '${entry.value.length} occurrences',
       );
@@ -88,11 +85,11 @@ class _EqualStatementVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitSwitchStatement(SwitchStatement node) {
-    rule.logger.info(
+    logger.info(
       'visitSwitchStatement() started with ${node.members.length} member(s)',
     );
     if (node.members.length < 2) {
-      rule.logger.finer('Less than 2 members — nothing to compare');
+      logger.finer('Less than 2 members — nothing to compare');
       return;
     }
 
@@ -100,12 +97,12 @@ class _EqualStatementVisitor extends SimpleAstVisitor<void> {
     for (var i = 0; i < node.members.length; i++) {
       var member = node.members[i];
       if (member.statements.isEmpty) {
-        rule.logger.finer('Member $i has no statements — skipping');
+        logger.finer('Member $i has no statements — skipping');
         continue;
       }
       var statementsSource = member.statements.map((e) => e.toSource()).join();
       if (equals.containsKey(statementsSource)) {
-        rule.logger.finer('Statements source already processed for member $i');
+        logger.finer('Statements source already processed for member $i');
         continue;
       }
       for (var switchCase in node.members) {
@@ -116,7 +113,7 @@ class _EqualStatementVisitor extends SimpleAstVisitor<void> {
           equals.putIfAbsent(statementsSource, () => []).add(switchCase);
         }
       }
-      rule.logger.finer(
+      logger.finer(
         'Collected ${equals[statementsSource]?.length ?? 0} member(s) for '
         'statementsSource at member $i',
       );
@@ -126,7 +123,7 @@ class _EqualStatementVisitor extends SimpleAstVisitor<void> {
       if (entry.value.length < 2) {
         continue;
       }
-      rule.logger.fine(
+      logger.fine(
         'Reporting equal switch statement with ${entry.value.length} '
         'occurrences',
       );

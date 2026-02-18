@@ -369,10 +369,11 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
 }
 
 /// The list of all essential lint rules.
-enum EssentialMultiLints<T extends SubLints> with EnumDiagnostic, EnumLint {
+enum EssentialMultiLints<T extends SubLints>
+    with EnumDiagnostic, EnumLint, SuperDiagnostic<T> {
   /// A lint rule that detects pending listeners and reminds developers to
   /// remove them.
-  pendingListener<PendingListener>(
+  pendingListener(
     LintRuleCode(
       name: 'pending_listener',
       problemMessage: 'Pending listener detected.',
@@ -381,13 +382,17 @@ enum EssentialMultiLints<T extends SubLints> with EnumDiagnostic, EnumLint {
           'A lint rule that detects pending listeners and reminds developers '
           'to remove them.',
     ),
+    PendingListener.values,
   ),
   ;
 
-  const EssentialMultiLints(this.code);
+  const EssentialMultiLints(this.code, this.subDiagnostics);
 
   @override
   final LintRuleCode code;
+
+  @override
+  final List<T> subDiagnostics;
 }
 
 /// {@template lint_rule_code}

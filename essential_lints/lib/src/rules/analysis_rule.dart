@@ -7,12 +7,26 @@ import 'package:essential_lints_annotations/src/_internal/static_enforcement.dar
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 
+import '../utils/base_visitor.dart';
 import '../warnings/essential_lint_warnings.dart'
     hide SubtypeAnnotating, SubtypeNaming;
 
 /// Static enforcement to ensure a static logger is present in all analysis
 /// rules.
 const staticLoggerEnforcement = StaticEnforcement(#_logger, th<Logger>());
+
+/// Shared base class for all essential analysis rules.
+sealed class AbstractEssentialAnalysisRule<Diagnostic extends WarningCode> {
+  /// The logger for this analysis rule.
+  Logger get logger;
+
+  @mustBeOverridden
+  // ignore: public_member_api_docs, will be provided by the analyzer class.
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
+  );
+}
 
 /// {@template essentialAnalysisRule}
 /// The base class for all essential analysis rules.
@@ -22,29 +36,28 @@ const staticLoggerEnforcement = StaticEnforcement(#_logger, th<Logger>());
   option: .onlyConcrete,
 )
 @SubtypeNaming(suffix: 'Rule')
-abstract class EssentialAnalysisRule extends AnalysisRule {
+abstract class EssentialAnalysisRule<
+  Rule extends EssentialAnalysisRule<Rule, Visitor, Diagnostic>,
+  Visitor extends BaseVisitor<Rule>,
+  Diagnostic extends WarningCode
+>
+    extends AnalysisRule
+    implements AbstractEssentialAnalysisRule<Diagnostic> {
   /// {@macro essentialAnalysisRule}
   EssentialAnalysisRule(this.rule, this.logger)
     : super(
         name: rule.lowerCaseUniqueName,
-        description: rule.code.description,
+        description: rule.description,
       );
 
-  /// The logger for this analysis rule.
+  @override
   final Logger logger;
 
   /// The essential lint rule associated with this analysis rule.
-  final EnumDiagnostic rule;
+  final Diagnostic rule;
 
   @override
-  EnumDiagnostic get diagnosticCode => rule;
-
-  @override
-  @mustBeOverridden
-  void registerNodeProcessors(
-    RuleVisitorRegistry registry,
-    RuleContext context,
-  );
+  Diagnostic get diagnosticCode => rule;
 }
 
 /// {@template essentialMultiAnalysisRule}
@@ -55,8 +68,14 @@ abstract class EssentialAnalysisRule extends AnalysisRule {
   option: .onlyConcrete,
 )
 @SubtypeNaming(suffix: 'Rule')
-abstract class EssentialMultiAnalysisRule<T extends EnumDiagnostic>
-    extends MultiAnalysisRule {
+abstract class EssentialMultiAnalysisRule<
+  Rule extends EssentialMultiAnalysisRule<Rule, Visitor, Diagnostic, Sub>,
+  Visitor extends BaseVisitor<Rule>,
+  Diagnostic extends SuperDiagnostic<Sub>,
+  Sub extends SubDiagnostic
+>
+    extends MultiAnalysisRule
+    implements AbstractEssentialAnalysisRule<Diagnostic> {
   /// {@macro essentialMultiAnalysisRule}
   EssentialMultiAnalysisRule(this.rule, this.logger)
     : super(
@@ -64,25 +83,15 @@ abstract class EssentialMultiAnalysisRule<T extends EnumDiagnostic>
         description: rule.code.description,
       );
 
-  /// The logger for this analysis rule.
+  @override
   final Logger logger;
 
   /// The essential lint rule associated with this analysis rule.
-  final EnumDiagnostic rule;
+  final Diagnostic rule;
 
   /// The list of sub-diagnostics associated with this analysis rule.
-  List<T> get subDiagnostics;
+  List<Sub> get subDiagnostics => rule.subDiagnostics;
 
   @override
-  List<EnumDiagnostic> get diagnosticCodes => [
-    rule,
-    ...subDiagnostics,
-  ];
-
-  @override
-  @mustBeOverridden
-  void registerNodeProcessors(
-    RuleVisitorRegistry registry,
-    RuleContext context,
-  );
+  List<EnumDiagnostic> get diagnosticCodes => rule.all;
 }

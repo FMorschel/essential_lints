@@ -1,28 +1,32 @@
-import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:essential_lints/src/plugin.dart';
+import 'package:essential_lints/src/rules/analysis_rule.dart';
+import 'package:essential_lints/src/utils/base_visitor.dart';
 import 'package:essential_lints/src/utils/dart_object_to_string.dart';
+import 'package:logging/logging.dart';
 
 import 'diagnostic.dart';
+import 'rule.dart';
 
-class AnnotateMembersWithRule extends AnalysisRule {
-  AnnotateMembersWithRule()
-    : super(
-        name: _diagnostic.lowerCaseUniqueName,
-        description:
-            'Members that should be annotated with specific annotations.',
-      );
+@staticLoggerEnforcement
+class AnnotateMembersWithRule extends LintRule<AnnotateMembersWithRule> {
+  AnnotateMembersWithRule() : super(_diagnostic, _logger);
 
   static const _diagnostic = InternalDiagnosticCode(
     name: 'annotate_members_with',
     problemMessage: "This member should be annotated with '{0}'.",
     correctionMessage: 'Add the required annotation.',
+    description: 'Members that should be annotated with specific annotations.',
     severity: .ERROR,
+  );
+
+  static final Logger _logger = EssentialLintsPlugin.newLogger(
+    'AnnotateMembersWithRule',
   );
 
   @override
@@ -41,11 +45,9 @@ class AnnotateMembersWithRule extends AnalysisRule {
   }
 }
 
-class _AnnotateMembersWithVisitor extends GeneralizingAstVisitor<void> {
-  _AnnotateMembersWithVisitor(this.rule, this.context);
-
-  final AnnotateMembersWithRule rule;
-  final RuleContext context;
+class _AnnotateMembersWithVisitor
+    extends GeneralizingBaseVisitor<AnnotateMembersWithRule> {
+  _AnnotateMembersWithVisitor(super.rule, super.context);
 
   @override
   void visitClassMember(ClassMember node) {
@@ -98,7 +100,7 @@ class _AnnotateMembersWithVisitor extends GeneralizingAstVisitor<void> {
             annotationType.isDartCoreType &&
             type != null &&
             annotationAsType != null) {
-          if (context.typeSystem.isAssignableTo(type, annotationAsType)) {
+          if (typeSystem.isAssignableTo(type, annotationAsType)) {
             // Valid annotation type.
             return true;
           }
