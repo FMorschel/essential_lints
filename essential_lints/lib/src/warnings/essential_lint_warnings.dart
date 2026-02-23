@@ -14,13 +14,7 @@ const staticAllEnforcement = StaticEnforcement(
 /// {@template enum_diagnostic}
 /// A mixin for enums that provide a diagnostic code.
 /// {@endtemplate}
-mixin EnumDiagnostic
-    implements
-        DiagnosticCode,
-        WarningCode,
-        // TODO(FMorschel): Remove this once the new version of
-        //  `analysis_server_plugin` is released.
-        LintCode {
+mixin EnumDiagnostic implements DiagnosticCode, WarningCode {
   /// The diagnostic code associated with the enum value.
   WarningCode get code;
 

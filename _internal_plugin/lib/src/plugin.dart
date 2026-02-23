@@ -9,6 +9,7 @@ import 'package:essential_lints/src/warnings/subtype_naming.dart';
 import 'rules/annotate_members_with.dart';
 import 'rules/invalid_members.dart';
 import 'rules/invalid_modifiers.dart';
+import 'rules/report_shorter_lengths.dart';
 import 'rules/static_enforcement.dart';
 
 class InternalPlugin extends Plugin {
@@ -23,6 +24,7 @@ class InternalPlugin extends Plugin {
       ..registerWarningRule(SubtypeNamingRule())
       ..registerWarningRule(AnnotateMembersWithRule())
       ..registerWarningRule(InvalidMembersRule())
+      ..registerWarningRule(ReportShorterLengthsRule())
       ..registerWarningRule(StaticEnforcementRule())
       ..registerWarningRule(InvalidModifiersRule());
   }

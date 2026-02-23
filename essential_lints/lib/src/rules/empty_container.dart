@@ -71,6 +71,7 @@ class _EmptyContainerVisitor extends BaseVisitor<EmptyContainerRule> {
     }
 
     logger.fine('Reporting empty Container instance creation: $typeSrc');
+    // ignore: _internal_plugin/report_shorter_lengths helps with the fix
     rule.reportAtNode(name);
   }
 

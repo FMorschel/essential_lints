@@ -61,6 +61,8 @@ class _OptionalPositionalParametersVisitor
         rule.reportAtToken(name);
       } else {
         logger.fine('Reporting optional positional parameter at node');
+        // Should be only a type annotation at this point.
+        // ignore: _internal_plugin/report_shorter_lengths
         rule.reportAtNode(parameter);
       }
     } else {

@@ -22,7 +22,7 @@ void f(bool a) {
   if (a && a) {}
 }
 ''',
-      [lint(28, 1)],
+      [lint(25, 2)],
     );
   }
 
@@ -33,7 +33,7 @@ void f(bool a) {
   if (a || a) {}
 }
 ''',
-      [lint(28, 1)],
+      [lint(25, 2)],
     );
   }
 
@@ -44,7 +44,7 @@ void f(bool a) {
   if (a == a) {}
 }
 ''',
-      [lint(28, 1)],
+      [lint(25, 2)],
     );
   }
 
@@ -55,7 +55,7 @@ void f(bool a) {
   if (a != a) {}
 }
 ''',
-      [lint(28, 1)],
+      [lint(25, 2)],
     );
   }
 
@@ -66,7 +66,7 @@ void f(bool a) {
   if (a ^ a) {}
 }
 ''',
-      [lint(27, 1)],
+      [lint(25, 1)],
     );
   }
 
@@ -85,7 +85,7 @@ void f(int value) {
   if (value == 5 || value == 5) {}
 }
 ''',
-      [lint(40, 10)],
+      [lint(37, 2)],
     );
   }
 
@@ -99,7 +99,7 @@ int f(int value) {
   };
 }
 ''',
-      [lint(54, 1)],
+      [lint(51, 2)],
     );
   }
 
@@ -113,7 +113,7 @@ int f(int value) {
   };
 }
 ''',
-      [lint(54, 1)],
+      [lint(51, 2)],
     );
   }
 
@@ -129,7 +129,7 @@ int f(int value) {
   }
 }
 ''',
-      [lint(52, 1)],
+      [lint(49, 2)],
     );
   }
 
@@ -145,7 +145,7 @@ int f(int value) {
   }
 }
 ''',
-      [lint(52, 1)],
+      [lint(49, 2)],
     );
   }
 }

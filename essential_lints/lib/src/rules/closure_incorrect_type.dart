@@ -1,7 +1,9 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:analyzer/source/source_range.dart';
 import 'package:analyzer/src/dart/ast/ast.dart'; // ignore: implementation_imports, not exported
+import 'package:analyzer_plugin/utilities/range_factory.dart';
 import 'package:logging/logging.dart';
 
 import '../plugin.dart';
@@ -46,22 +48,24 @@ class _ClosureIncorrectTypeVisitor
 
     var parameters = node.parameters;
     if (parameters == null) {
-      logger..finer('FunctionExpression has no parameters, skipping')
-      ..info(
-        'ClosureIncorrectTypeRule.visitFunctionExpression() completed',
-      );
+      logger
+        ..finer('FunctionExpression has no parameters, skipping')
+        ..info(
+          'ClosureIncorrectTypeRule.visitFunctionExpression() completed',
+        );
       return;
     }
 
     var correspondingParameterType = node.correspondingParameter?.type;
     if (correspondingParameterType is! FunctionType) {
       // Skip if the closure is not overriding a parameter with a specific type.
-      logger..finer(
-        'correspondingParameter is not a FunctionType, skipping',
-      )
-      ..info(
-        'ClosureIncorrectTypeRule.visitFunctionExpression() completed',
-      );
+      logger
+        ..finer(
+          'correspondingParameter is not a FunctionType, skipping',
+        )
+        ..info(
+          'ClosureIncorrectTypeRule.visitFunctionExpression() completed',
+        );
       return;
     }
 
@@ -116,7 +120,15 @@ class _ClosureIncorrectTypeVisitor
           'actual=${actualParameterType.getDisplayString()} '
           'expected=${expectedType.getDisplayString()} — reporting at node',
         );
-        rule.reportAtNode(actualParameter);
+        var range = actualParameter.typeAnnotation;
+        if (range == null) {
+          logger.warning(
+            'No type annotation found for parameter, skipping reporting. How '
+            'did we get here?',
+          );
+          continue;
+        }
+        rule.reportAtOffset(range.offset, range.length);
       }
     }
 
@@ -128,4 +140,18 @@ class _ClosureIncorrectTypeVisitor
 
 extension on NormalFormalParameter {
   DartType? get type => declaredFragment?.element.type;
+
+  SourceRange? get typeAnnotation => switch (this) {
+    FieldFormalParameter(:var type) => type?.sourceRange,
+    FunctionTypedFormalParameter(
+      :var returnType,
+      :var parameters,
+    ) =>
+      range.startEnd(
+        returnType ?? parameters.beginToken.previous!,
+        parameters.parameters.last,
+      ),
+    SimpleFormalParameter(:var type) => type?.sourceRange,
+    SuperFormalParameter(:var type) => type?.sourceRange,
+  };
 }

@@ -88,7 +88,8 @@ class _SubtypeNamingVisitor extends BaseVisitor<SubtypeNamingRule> {
           'No naming constraints defined, reporting missing definition',
         );
         rule.reportAtNode(
-          node,
+          // ignore: _internal_plugin/report_shorter_lengths more meaningful
+          node.constructorName ?? node.name,
           diagnosticCode: SubtypeNaming.missingNameDefinition,
         );
       } else {
@@ -291,6 +292,7 @@ class _SubtypeNamingVisitor extends BaseVisitor<SubtypeNamingRule> {
             );
           case AstNode():
             rule.reportAtNode(
+              // ignore: _internal_plugin/report_shorter_lengths handled
               name,
               diagnosticCode: rule.rule,
             );

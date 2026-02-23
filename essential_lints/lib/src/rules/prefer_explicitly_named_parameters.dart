@@ -58,6 +58,8 @@ class _PreferExplicitlyNamedParametersVisitor
           'Reporting unnamed positional parameter in function type: '
           '${node.toSource()}',
         );
+        // This should be only a type annotation.
+        // ignore: _internal_plugin/report_shorter_lengths
         rule.reportAtNode(parameter);
       }
     }

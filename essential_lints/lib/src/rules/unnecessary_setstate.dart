@@ -141,17 +141,18 @@ class _SyncCallVisitor extends RecursiveAstVisitor<void> {
   final ExecutableElement? _invoked;
   final ClassDeclaration _classDeclaration;
 
-  final _callSites = <AstNode>[];
+  final _callSites = <SimpleIdentifier>[];
 
   @override
   void visitAssignmentExpression(AssignmentExpression node) {
     var containing = node.enclosingExecutableElementIfSync;
-    if (containing != null) {
+    if (_Assignment(node.leftHandSide).name case var name?
+        when containing != null) {
       _handleInvocation(
         node.writeElement,
         containing,
         null,
-        node.leftHandSide,
+        name,
       );
     }
     super.visitAssignmentExpression(node);
@@ -204,7 +205,7 @@ class _SyncCallVisitor extends RecursiveAstVisitor<void> {
     Element? invoked,
     ExecutableElement containing,
     AstNode? target,
-    AstNode reportingNode,
+    SimpleIdentifier reportingNode,
   ) {
     var isLifecycleMethod =
         _lifecycleMethods.contains(containing.displayName) &&
@@ -233,7 +234,7 @@ class _SyncCallVisitor extends RecursiveAstVisitor<void> {
     }
   }
 
-  static List<AstNode> findLifecycleCallSites(
+  static List<SimpleIdentifier> findLifecycleCallSites(
     ExecutableElement element,
     ExecutableElement? invoked,
     ClassDeclaration classDeclaration, {
@@ -261,4 +262,13 @@ class _SyncCallVisitor extends RecursiveAstVisitor<void> {
     );
     return visitor._callSites;
   }
+}
+
+extension type _Assignment(Expression expression) {
+  SimpleIdentifier? get name => switch (expression) {
+    PropertyAccess(:var propertyName) => propertyName,
+    PrefixedIdentifier(:var identifier) => identifier,
+    SimpleIdentifier identifier => identifier,
+    _ => null,
+  };
 }

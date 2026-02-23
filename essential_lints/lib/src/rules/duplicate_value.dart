@@ -61,7 +61,7 @@ class _DuplicateValueVisitor extends BaseVisitor<DuplicateValueRule> {
     logger.finer('Left: "$left", Right: "$right"');
     if (left == right) {
       logger.fine('Detected duplicate value in binary expression: $left');
-      rule.reportAtNode(node.rightOperand);
+      rule.reportAtToken(node.operator);
     }
   }
 
@@ -84,11 +84,21 @@ class _DuplicateValueVisitor extends BaseVisitor<DuplicateValueRule> {
 
     DartPattern leftPattern;
     DartPattern rightPattern;
+    Token token;
     if (pattern
-        case LogicalOrPattern(:var leftOperand, :var rightOperand) ||
-            LogicalAndPattern(:var leftOperand, :var rightOperand)) {
+        case LogicalOrPattern(
+              :var leftOperand,
+              :var rightOperand,
+              :var operator,
+            ) ||
+            LogicalAndPattern(
+              :var leftOperand,
+              :var rightOperand,
+              :var operator,
+            )) {
       leftPattern = leftOperand;
       rightPattern = rightOperand;
+      token = operator;
     } else {
       logger.finer('Pattern is not LogicalOr/LogicalAnd — skipping');
       return;
@@ -99,7 +109,7 @@ class _DuplicateValueVisitor extends BaseVisitor<DuplicateValueRule> {
     logger.finer('Left pattern: "$leftSrc", Right pattern: "$rightSrc"');
     if (leftSrc == rightSrc) {
       logger.fine('Detected duplicate value in pattern: $leftSrc');
-      rule.reportAtNode(rightPattern);
+      rule.reportAtToken(token);
     }
   }
 }

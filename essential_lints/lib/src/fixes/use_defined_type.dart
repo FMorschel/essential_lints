@@ -62,7 +62,7 @@ class UseDefinedTypeFix extends CorrectionProducerLogger with LintFix {
       return;
     }
     logger.fine('correspondingParameterType is FunctionType');
-    var parameter = node;
+    var parameter = node.thisOrAncestorOfType<NormalFormalParameter>();
     logger.finer('Node type: ${parameter.runtimeType}');
     if (parameter is! NormalFormalParameter) {
       logger.finer('Node is not NormalFormalParameter, returning');

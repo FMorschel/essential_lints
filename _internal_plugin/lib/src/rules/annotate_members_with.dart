@@ -129,13 +129,14 @@ class _AnnotateMembersWithVisitor
               name,
               arguments: [requiredAnnotationString],
             );
-          } else if (node case ConstructorDeclaration(:var typeName)) {
+          } else if (node case ConstructorDeclaration(:var typeName?)) {
             rule.reportAtNode(
               typeName,
               arguments: [requiredAnnotationString],
             );
           } else {
             rule.reportAtNode(
+              // ignore: _internal_plugin/report_shorter_lengths fallback case
               node,
               arguments: [requiredAnnotationString],
             );
@@ -173,7 +174,7 @@ extension on ClassMember {
       MethodDeclaration(:var name) => name,
       FieldDeclaration(:var fields) => fields.variables.first.name,
       ConstructorDeclaration(:var name) => name,
-      _ => null,
+      PrimaryConstructorBody(:var thisKeyword) => thisKeyword,
     };
   }
 }

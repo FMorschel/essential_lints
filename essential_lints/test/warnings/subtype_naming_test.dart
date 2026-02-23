@@ -134,7 +134,7 @@ import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 @SubtypeNaming()
 class MyClass {}
 ''',
-      [error(SubtypeNaming.missingNameDefinition, 80, 16)],
+      [error(SubtypeNaming.missingNameDefinition, 81, 13)],
     );
   }
 

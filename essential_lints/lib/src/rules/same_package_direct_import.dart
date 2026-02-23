@@ -172,6 +172,7 @@ mixin _SamePackageDirectImportUriCollector<
       if (element.library?.uri case var uri?
           when uri != libraryImport.importedLibrary?.uri) {
         rule?.logger.fine('Reporting indirect import for uri: $uri');
+        // ignore: _internal_plugin/report_shorter_lengths usually single node
         rule?.reportAtNode(node.uri);
         if (rule != null) {
           break;

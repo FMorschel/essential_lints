@@ -30,7 +30,7 @@ void f<T>(void Function(T) callback) {
   f<int>((num n) {});
 }
 ''',
-      [lint(49, 5)],
+      [lint(49, 3)],
     );
   }
 
@@ -73,7 +73,18 @@ void f(void Function(int Function()) callback) {
   f((num Function() f) {});
 }
 ''',
-      [lint(54, 16)],
+      [lint(54, 14)],
+    );
+  }
+
+  Future<void> test_functionType_dynamicReturn() async {
+    await assertDiagnostics(
+      '''
+void f(void Function(int Function()) callback) {
+  f((Function() f) {});
+}
+''',
+      [lint(54, 10)],
     );
   }
 
@@ -84,7 +95,7 @@ void f(void callback(int Function())) {
   f((num Function() f) {});
 }
 ''',
-      [lint(45, 16)],
+      [lint(45, 14)],
     );
   }
 
@@ -95,7 +106,7 @@ void f(void Function(int) callback) {
   f((num n) {});
 }
 ''',
-      [lint(43, 5)],
+      [lint(43, 3)],
     );
   }
 
@@ -106,7 +117,7 @@ void f(void callback(int v)) {
   f((num n) {});
 }
 ''',
-      [lint(36, 5)],
+      [lint(36, 3)],
     );
   }
 
@@ -123,7 +134,7 @@ class B extends A {
   }
 }
 ''',
-      [lint(94, 5)],
+      [lint(94, 3)],
     );
   }
 

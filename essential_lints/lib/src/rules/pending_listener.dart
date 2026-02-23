@@ -147,6 +147,7 @@ class PendingListenerRule
             'Reporting unmatched expression: ${control.toSource()} '
             'for ${code.lowerCaseName}',
           );
+          // ignore: _internal_plugin/report_shorter_lengths more meaningful
           reportAtNode(control, diagnosticCode: code);
         }
       }

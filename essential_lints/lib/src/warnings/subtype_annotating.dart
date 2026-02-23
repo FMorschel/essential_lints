@@ -90,6 +90,7 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule> {
               'Found ConstructorReference instead of type, reporting error',
             );
             rule.reportAtNode(
+              // ignore: _internal_plugin/report_shorter_lengths more meaningful
               element,
               diagnosticCode: SubtypeAnnotating.constructorNotType,
             );
@@ -99,6 +100,7 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule> {
       if (annotation.annotations.isEmpty) {
         logger.fine('Missing annotation list, reporting error');
         rule.reportAtNode(
+          // ignore: _internal_plugin/report_shorter_lengths more meaningful
           node.name,
           diagnosticCode: SubtypeAnnotating.missingAnnotation,
         );
@@ -291,6 +293,7 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule> {
             );
           case AstNode():
             rule.reportAtNode(
+              // ignore: _internal_plugin/report_shorter_lengths handled
               name,
               diagnosticCode: rule.rule,
               arguments: [annotationNames],

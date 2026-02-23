@@ -482,6 +482,9 @@ class _LintingMemberVisitor extends RecursiveBaseVisitor<SortingMembersRule>
         } else {
           rule.reportAtNode(node.typeName);
         }
+      case PrimaryConstructorBody(:var thisKeyword):
+        logger.finer('Reporting at primary constructor body');
+        rule.reportAtToken(thisKeyword);
       default:
         logger.severe(
           'Unexpected node type for member: ${node.runtimeType}',
@@ -490,6 +493,7 @@ class _LintingMemberVisitor extends RecursiveBaseVisitor<SortingMembersRule>
           'Unexpected node type for member: $node',
         );
         assert(false, 'Unexpected node type for member: $node');
+          // ignore: _internal_plugin/report_shorter_lengths fallback
         rule.reportAtNode(node);
     }
     reported = true;

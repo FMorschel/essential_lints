@@ -67,6 +67,7 @@ class _GettersInMemberListVisitor extends BaseVisitor<GettersInMemberListRule> {
       if (annotation.memberListName.isEmpty) {
         logger.finer('Member list name is empty, reporting error');
         rule.reportAtNode(
+          // ignore: _internal_plugin/report_shorter_lengths more meaningful
           node.arguments?.arguments
                   .firstWhereOrNull(_isMemberListName)
                   .whenTypeOrNull<NamedExpression>()
@@ -263,8 +264,8 @@ class _GettersInMemberListVisitor extends BaseVisitor<GettersInMemberListRule> {
     }
     if (expression == null) {
       logger.fine('Expression is null, reporting error');
-      rule.reportAtNode(
-        member,
+      rule.reportAtToken(
+        memberName,
         diagnosticCode: GettersInMemberList.invalidMemberList,
         arguments: [memberName.lexeme],
       );
@@ -331,6 +332,7 @@ class _GettersInMemberListVisitor extends BaseVisitor<GettersInMemberListRule> {
           'reporting error',
         );
         rule.reportAtNode(
+          // ignore: _internal_plugin/report_shorter_lengths more meaningful
           expression,
           diagnosticCode: GettersInMemberList.nonMemberIn,
         );
@@ -363,8 +365,8 @@ class _GettersInMemberListVisitor extends BaseVisitor<GettersInMemberListRule> {
           'List element ${element.displayName} is not in valid getters, '
           'reporting error',
         );
-        rule.reportAtNode(
-          expression,
+        rule.reportAtToken(
+          expression.beginToken,
           diagnosticCode: GettersInMemberList.nonMemberIn,
         );
       }

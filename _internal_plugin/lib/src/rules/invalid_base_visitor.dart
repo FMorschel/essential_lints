@@ -16,7 +16,7 @@ abstract class InvalidBaseVisitor<Rule extends LintRule<Rule>>
     extends BaseVisitor<Rule> {
   InvalidBaseVisitor(super.rule, super.context, {super.logger});
 
-  final _nodeToType = <AstNode, DartType>{};
+  final _nodeToType = <SimpleIdentifier, DartType>{};
 
   /// The name of the annotation to check for (e.g., 'InvalidModifiers' or
   /// 'InvalidMembers')
@@ -51,7 +51,7 @@ abstract class InvalidBaseVisitor<Rule extends LintRule<Rule>>
 
   void _process(
     DartType? type,
-    AstNode nodeForReporting,
+    SimpleIdentifier nodeForReporting,
     AstNode nodeForProcessing,
   ) {
     logger.fine('  _process called with type: $type');
@@ -157,7 +157,7 @@ abstract class InvalidBaseVisitor<Rule extends LintRule<Rule>>
   }
 
   /// Report an error at the given node
-  void reportError(AstNode node, String? name);
+  void reportError(SimpleIdentifier node, String? name);
 
   bool _isInvalidAnnotation(ElementAnnotation element) {
     if (element.computeConstantValue() case DartObject(:var type)) {

@@ -22,8 +22,8 @@ keywords:
   - linters
 
 dependencies:
-  analysis_server_plugin: ^0.3.8
-  analyzer: ^10.0.2
+  analysis_server_plugin: ^0.3.9
+  analyzer: ^10.1.0
   analyzer_plugin: ^0.14.0
   args: ^2.0.0
   collection: ^1.16.0

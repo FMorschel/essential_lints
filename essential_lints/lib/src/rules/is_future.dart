@@ -75,6 +75,7 @@ class _IsFutureVisitor extends BaseVisitor<IsFutureRule> {
         logger.fine(
           'Reporting `is Future` used on FutureOr that accepts Future',
         );
+        // ignore: _internal_plugin/report_shorter_lengths more meaningful
         rule.reportAtNode(node.type);
       } else {
         logger.finer('`is` target is not Future — no report');

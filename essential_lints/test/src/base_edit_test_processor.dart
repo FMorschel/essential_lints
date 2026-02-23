@@ -113,7 +113,7 @@ abstract class BaseEditTestProcessor extends AnalysisRuleTest
     multiWarnings.forEach(registry.Registry.ruleRegistry.registerLintRule);
     warnings.forEach(registry.Registry.ruleRegistry.registerLintRule);
     fix_generators.registeredFixGenerators.lintProducers.addAll(lintFixes);
-    fix_generators.registeredFixGenerators.nonLintProducers.addAll(
+    fix_generators.registeredFixGenerators.warningProducers.addAll(
       warningFixes,
     );
     assist_generators.registeredAssistGenerators.producerGenerators.addAll(

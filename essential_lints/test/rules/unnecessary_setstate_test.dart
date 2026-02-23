@@ -226,7 +226,7 @@ abstract class MyState extends State {
   }
 }
 ''',
-      [lint(134, 10)],
+      [lint(139, 5)],
     );
   }
 

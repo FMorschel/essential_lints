@@ -72,6 +72,7 @@ class _MutableTearoffsVisitor extends BaseVisitor<MutableTearoffRule> {
     ..fine(
       'Reporting instance creation constructor as mutable tear-off',
     );
+    // ignore: _internal_plugin/report_shorter_lengths more meaningful
     rule.reportAtNode(node.constructorName);
   }
 

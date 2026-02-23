@@ -85,6 +85,7 @@ class _BorderRadiusAllVisitor extends BaseVisitor<BorderRadiusAllRule> {
     logger.fine(
       'Detected BorderRadius.circular instance — reporting at constructor name',
     );
+    // ignore: _internal_plugin/report_shorter_lengths helps with the fix
     rule.reportAtNode(node.constructorName);
     logger.info(
       'BorderRadiusAllRule.visitInstanceCreationExpression() completed '

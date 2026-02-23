@@ -67,7 +67,7 @@ class _InvalidMembersVisitor extends InvalidBaseVisitor<InvalidMembersRule> {
   );
 
   @override
-  void reportError(AstNode node, String? name) {
+  void reportError(SimpleIdentifier node, String? name) {
     rule.reportAtNode(
       node,
       arguments: ['for $name'],

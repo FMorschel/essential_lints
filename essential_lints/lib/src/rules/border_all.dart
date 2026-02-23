@@ -87,6 +87,7 @@ class _BorderAllVisitor extends BaseVisitor<BorderAllRule> {
     logger.fine(
       'Detected Border.all instance — reporting at constructor name',
     );
+    // ignore: _internal_plugin/report_shorter_lengths helps with the fix
     rule.reportAtNode(node.constructorName);
     logger.info(
       'BorderAllRule.visitInstanceCreationExpression() completed (violation '
