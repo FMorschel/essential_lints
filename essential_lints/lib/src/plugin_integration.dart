@@ -29,6 +29,7 @@ import 'fixes/use_padding_property.dart';
 import 'plugin.dart';
 import 'rules/alphabetize_arguments.dart';
 import 'rules/alphabetize_enum_constants.dart';
+import 'rules/ambiguous_positional_boolean.dart';
 import 'rules/boolean_assignment.dart';
 import 'rules/border_all.dart';
 import 'rules/border_radius_all.dart';
@@ -286,6 +287,7 @@ mixin RulesPluginIntegration {
         .mutableTearoff => MutableTearoffRule(),
         .uselessElse => UselessElseRule(),
         .booleanAssignment => BooleanAssignmentRule(),
+        .ambiguousPositionalBoolean => AmbiguousPositionalBooleanRule(),
       });
     }
     logger

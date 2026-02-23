@@ -1,13 +1,12 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/source/source_range.dart';
 import 'package:analyzer/src/dart/ast/ast.dart'; // ignore: implementation_imports, not exported
-import 'package:analyzer_plugin/utilities/range_factory.dart';
 import 'package:logging/logging.dart';
 
 import '../plugin.dart';
 import '../utils/base_visitor.dart';
+import '../utils/extensions/ast.dart';
 import 'analysis_rule.dart';
 import 'rule.dart';
 
@@ -120,7 +119,7 @@ class _ClosureIncorrectTypeVisitor
           'actual=${actualParameterType.getDisplayString()} '
           'expected=${expectedType.getDisplayString()} — reporting at node',
         );
-        var range = actualParameter.typeAnnotation;
+        var range = actualParameter.typeAnnotationRange;
         if (range == null) {
           logger.warning(
             'No type annotation found for parameter, skipping reporting. How '
@@ -136,22 +135,4 @@ class _ClosureIncorrectTypeVisitor
       'ClosureIncorrectTypeRule.visitFunctionExpression() completed',
     );
   }
-}
-
-extension on NormalFormalParameter {
-  DartType? get type => declaredFragment?.element.type;
-
-  SourceRange? get typeAnnotation => switch (this) {
-    FieldFormalParameter(:var type) => type?.sourceRange,
-    FunctionTypedFormalParameter(
-      :var returnType,
-      :var parameters,
-    ) =>
-      range.startEnd(
-        returnType ?? parameters.beginToken.previous!,
-        parameters.parameters.last,
-      ),
-    SimpleFormalParameter(:var type) => type?.sourceRange,
-    SuperFormalParameter(:var type) => type?.sourceRange,
-  };
 }

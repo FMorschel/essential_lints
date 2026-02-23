@@ -359,6 +359,24 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
           'maintainability.',
     ),
   ),
+
+  /// A lint rule that detects ambiguous positional boolean parameters in
+  /// functions and methods, which can lead to confusion and errors in code.
+  ambiguousPositionalBoolean(
+    LintRuleCode(
+      name: 'ambiguous_positional_boolean',
+      problemMessage:
+          'Avoid using ambiguous positional boolean parameters in functions '
+          'and methods.',
+      correctionMessage:
+          'Use named parameters for boolean values to improve readability and '
+          'reduce confusion.',
+      description:
+          'A lint rule that detects ambiguous positional boolean parameters in '
+          'functions and methods, which can lead to confusion and errors in '
+          'code.',
+    ),
+  )
   ;
 
   const EssentialLintRules(this.code);

@@ -1,5 +1,8 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
+import 'package:analyzer/source/source_range.dart';
+import 'package:analyzer_plugin/utilities/range_factory.dart';
 
 import 'object.dart';
 
@@ -146,4 +149,28 @@ extension ExpressionExt on Expression {
       _ => canBeConst,
     };
   }
+}
+
+/// Extension to get the type and type annotation of a normal formal parameter.
+extension NormalFormalParameterExt on FormalParameter {
+  /// Gets the declared type of the parameter, or `null` if it cannot be
+  /// determined.
+  DartType? get type => declaredFragment?.element.type;
+
+  /// Gets the source range of the parameter's type annotation, or `null` if
+  /// it cannot be determined.
+  SourceRange? get typeAnnotationRange => switch (this) {
+    FieldFormalParameter(:var type) => type?.sourceRange,
+    FunctionTypedFormalParameter(
+      :var returnType,
+      :var parameters,
+    ) =>
+      range.startEnd(
+        returnType ?? parameters.beginToken.previous!,
+        parameters.parameters.last,
+      ),
+    SimpleFormalParameter(:var type) => type?.sourceRange,
+    SuperFormalParameter(:var type) => type?.sourceRange,
+    DefaultFormalParameter(:var parameter) => parameter.typeAnnotationRange,
+  };
 }
