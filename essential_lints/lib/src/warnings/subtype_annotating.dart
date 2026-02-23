@@ -180,16 +180,6 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule> {
       return .empty;
     }
 
-    var element = annotation.element;
-    logger.finer(
-      'Annotation element: ${element?.displayName ?? "null"}, type: '
-      '${element.runtimeType}',
-    );
-    if (element is! ConstructorElement) {
-      logger.finer('Element is not ConstructorElement, returning empty');
-      return .empty;
-    }
-
     var type = annotation.computeConstantValue();
     logger.finer(
       'Computed constant value: ${type != null ? "success" : "null"}',
