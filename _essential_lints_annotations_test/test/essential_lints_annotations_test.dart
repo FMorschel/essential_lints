@@ -1,12 +1,11 @@
 import 'dart:io';
 
+import 'package:_essential_lints_annotations_test/current_package_path.dart';
 import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:test/test.dart';
-
-import 'src/current_package_path.dart';
 
 void main() {
   test('all public declarations in src are exported', () async {

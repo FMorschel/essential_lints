@@ -14,6 +14,8 @@ environment:
   sdk: ^3.10.0
 
 dependencies:
+  _essential_lints_annotations_test:
+    path: ../_essential_lints_annotations_test
   analyzer: any
   analyzer_testing: any
 

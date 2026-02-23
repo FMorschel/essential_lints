@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:_essential_lints_annotations_test/current_package_path.dart';
 import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
@@ -7,8 +8,6 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
-
-import '../src/current_package_path.dart';
 
 /// Represents a static member (field, getter, or method) of a class.
 class StaticMember {
@@ -181,7 +180,8 @@ void main() {
     var testDirPath = path.normalize(
       path.join(
         (await packageDir(
-          'package:_essential_lints_annotations_test/placehoder.dart',
+          '_essential_lints_annotations_test',
+          'current_package_path.dart',
         )).path,
         'test',
         'sorting_declarations',
