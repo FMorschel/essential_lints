@@ -465,6 +465,18 @@ enum PendingListener with EnumDiagnostic, SubDiagnostic, SubLints {
           'were never added.',
     ),
   ),
+
+  /// Listener handling at unused instantiation detected.
+  listenerInstantiation(
+    LintRuleCode(
+      name: 'listener_instantiation',
+      problemMessage: 'Listener handling at unused instantiation detected.',
+      correctionMessage:
+          'Make use of this instance or remove it if it is not needed.',
+      description:
+          'A sub-lint that detects instantiations with listener handling.',
+    ),
+  ),
   ;
 
   const PendingListener(this.code);

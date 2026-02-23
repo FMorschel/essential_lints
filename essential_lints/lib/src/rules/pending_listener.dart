@@ -68,6 +68,16 @@ class PendingListenerRule
           context,
           PendingListener.unnecessaryRemove,
         );
+        for (var expression in visitor.instantiationListeners) {
+          logger.fine(
+            'Reporting listener instantiation: ${expression.toSource()}',
+          );
+          reportAtNode(
+            // ignore: _internal_plugin/report_shorter_lengths more meaningful
+            expression,
+            diagnosticCode: PendingListener.listenerInstantiation,
+          );
+        }
       });
   }
 
@@ -185,7 +195,15 @@ class PendingListenerRule
 
   /// Extracts a chain of elements from an expression.
   /// For `a.b.c`, returns a list with [c element, b element, a element].
-  _ElementChain _extractElementChain(Expression expression) {
+  _ElementChain _extractElementChain(
+    Expression expression, [
+    List<Expression>? instantiation,
+    Expression? report,
+  ]) {
+    assert(
+      (instantiation != null) == (report != null),
+      'Both instatiation and report should be provided together.',
+    );
     _logger.info(
       '_extractElementChain() started for: ${expression.toSource()}',
     );
@@ -247,6 +265,56 @@ class PendingListenerRule
           }
         }
         current = null; // End of chain
+      } else if (current is PostfixExpression) {
+        current = current.operand; // Continue with operand
+      } else if (current
+          case InstanceCreationExpression(
+                parent: CascadeExpression(
+                  parent: AssignmentExpression(
+                        writeElement: var element?,
+                        :var leftHandSideOrNull,
+                      ) ||
+                      VariableDeclaration(
+                        declaredFragment: Fragment(:var element),
+                        :var leftHandSideOrNull,
+                      ),
+                ),
+              ) ||
+              DotShorthandConstructorInvocation(
+                parent: CascadeExpression(
+                  parent: AssignmentExpression(
+                        writeElement: var element?,
+                        :var leftHandSideOrNull,
+                      ) ||
+                      VariableDeclaration(
+                        declaredFragment: Fragment(:var element),
+                        :var leftHandSideOrNull,
+                      ),
+                ),
+              )) {
+        if (chain == null) {
+          chain = _ElementChain(element);
+        } else {
+          chain.add(element);
+        }
+        // Check if we need to add enclosing type
+        if (!_isTopLevelOrLocal(element)) {
+          if (element.enclosingElement case var enclosing?) {
+            chain.add(enclosing);
+          }
+        }
+        if (leftHandSideOrNull?.parent case Expression exp) {
+          current = exp; // Continue with left-hand side
+        }
+      } else if (current
+          case InstanceCreationExpression() ||
+              DotShorthandConstructorInvocation()) {
+        // Always warn.
+        if (report != null) {
+          instantiation?.add(report);
+        }
+        current = null;
+        continue;
       } else {
         current = null; // Unknown type, end chain
       }
@@ -308,7 +376,8 @@ class PendingListenerRule
 }
 
 class _ElementChain {
-  _ElementChain(this.element);
+  _ElementChain(Element? element)
+    : element = element is PropertyAccessorElement ? element.variable : element;
 
   static final nullElement = _ElementChain(null);
 
@@ -343,6 +412,11 @@ class _ElementChain {
     }
     return true;
   }
+
+  @override
+  String toString() => parent == null
+      ? '${element?.displayName}'
+      : '$parent.${element?.displayName}';
 }
 
 class _PendingListenerVisitor extends BaseVisitor<PendingListenerRule> {
@@ -358,11 +432,15 @@ class _PendingListenerVisitor extends BaseVisitor<PendingListenerRule> {
     'package:flutter/src/foundation/change_notifier.dart',
   );
 
+  final _instantiationListeners = <Expression>[];
   final _addedListeners = <_ElementChain, List<Expression>>{};
   final _removedListeners = <_ElementChain, List<Expression>>{};
   final _disposedElements = <_ElementChain>{};
   final _addedClosures = <_ElementChain, List<({int offset, int length})>>{};
   final _removedClosures = <({int offset, int length})>[];
+
+  List<Expression> get instantiationListeners =>
+      List.unmodifiable(_instantiationListeners);
 
   /// All added listeners, including those on disposed elements.
   Map<_ElementChain, List<Expression>> get addedListeners =>
@@ -555,7 +633,12 @@ class _PendingListenerVisitor extends BaseVisitor<PendingListenerRule> {
     // Extract the full element chain from the target expression
     // This ensures widget.controller and oldWidget.controller are tracked
     // as different elements
-    var chain = rule._extractElementChain(target);
+    var firstArgument = node.argumentList.arguments.firstOrNull;
+    var chain = rule._extractElementChain(
+      target,
+      firstArgument == null ? null : _instantiationListeners,
+      firstArgument,
+    );
 
     if (chain.isEmpty) {
       logger.warning(
@@ -583,5 +666,14 @@ extension<K extends _ElementChain, V> on Map<K, V> {
     var existingKey = keys.firstWhereOrNull(key.matches) ?? key;
     var list = this[existingKey] ?? create();
     return this[existingKey] = list;
+  }
+}
+
+extension on AstNode {
+  Expression? get leftHandSideOrNull {
+    if (this case AssignmentExpression(:var leftHandSide)) {
+      return leftHandSide;
+    }
+    return null;
   }
 }

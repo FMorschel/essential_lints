@@ -615,4 +615,51 @@ abstract class _GenericState<T> extends State<Generic<T>> {
       ],
     );
   }
+
+  Future<void> test_postfix() async {
+    await assertNoDiagnostics('''
+import 'package:flutter/foundation.dart';
+
+abstract class ValueListenable<T> extends Listenable {}
+
+abstract class C extends ValueListenable<int> {}
+
+class D {
+  C? c;
+
+  void m() {
+    c?.removeListener(m);
+    c!.addListener(m);
+  }
+}
+''');
+  }
+
+  Future<void> test_instantiation() async {
+    await assertDiagnostics(
+      '''
+import 'package:flutter/foundation.dart';
+
+void f() {
+  ChangeNotifier().addListener(f);
+}
+''',
+      [error(PendingListener.listenerInstantiation, 85, 1)],
+    );
+  }
+
+  Future<void> test_instantiation_cascaded() async {
+    await assertNoDiagnostics('''
+import 'package:flutter/foundation.dart';
+
+class D {
+  late Listenable c;
+
+  void m() {
+    c = ChangeNotifier()..addListener(m);
+    c.removeListener(m);
+  }
+}
+''');
+  }
 }
