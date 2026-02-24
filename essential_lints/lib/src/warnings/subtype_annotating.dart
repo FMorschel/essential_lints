@@ -188,6 +188,7 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule> {
     }
     var annotations = [...?type.getField('annotations')?.toListValue()];
     var onlyConcrete = type.getField('option');
+    var packageOption = type.getField('packageOption');
 
     logger.fine(
       '_mapKnownArguments() returning ${annotations.length} annotations',
@@ -195,6 +196,7 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule> {
     return _SubtypeNamingAnnotation(
       annotations: annotations,
       option: onlyConcrete,
+      packageOption: packageOption,
     );
   }
 
@@ -212,7 +214,7 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule> {
     logger.fine(
       'Verifying supertypes for: ${element.name}, abstract=$abstract',
     );
-    var annotations = <_SubtypeNamingAnnotation>[];
+    var annotations = <MapEntry<_SubtypeNamingAnnotation, InterfaceElement>>[];
     var visitedElements = <InterfaceElement>{element};
     logger.finer('Processing ${element.allSupertypes.length} supertypes');
     for (var interface in element.allSupertypes) {
@@ -229,7 +231,7 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule> {
         'Supertype ${current.name} has ${currentAnnotations.length} '
         'SubtypeAnnotating annotations',
       );
-      annotations.addAll(currentAnnotations);
+      annotations.addAll(currentAnnotations.map((a) => MapEntry(a, current)));
     }
 
     logger.fine('Total annotations to check: ${annotations.length}');
@@ -245,7 +247,16 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule> {
     }
 
     var missingCount = 0;
-    for (var annotation in annotations) {
+    for (var entry in annotations) {
+      var annotation = entry.key;
+      var origin = entry.value;
+      if (annotation.packageOption?.variable?.name == 'private' &&
+          !_isSamePackage(element, origin)) {
+        logger.finer(
+          '  Skipping due to packageOption.private from other package',
+        );
+        continue;
+      }
       logger.finer(
         'Checking annotation with ${annotation.annotations.length} required '
         'annotations',
@@ -294,19 +305,35 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule> {
       'annotations',
     );
   }
+
+  bool _isSamePackage(InterfaceElement a, InterfaceElement b) {
+    var au = a.firstFragment.enclosingFragment?.source.uri;
+    var bu = b.firstFragment.enclosingFragment?.source.uri;
+    if (au == null || bu == null) return false;
+    if (au.scheme == 'package' && bu.scheme == 'package') {
+      if (au.pathSegments.isNotEmpty && bu.pathSegments.isNotEmpty) {
+        return au.pathSegments.first == bu.pathSegments.first;
+      }
+      return au == bu;
+    }
+    return au == bu;
+  }
 }
 
 class _SubtypeNamingAnnotation {
   const _SubtypeNamingAnnotation({
     required this.annotations,
     required this.option,
+    required this.packageOption,
   });
 
   static _SubtypeNamingAnnotation empty = const .new(
     annotations: [],
     option: null,
+    packageOption: null,
   );
 
   final List<DartObject> annotations;
   final DartObject? option;
+  final DartObject? packageOption;
 }

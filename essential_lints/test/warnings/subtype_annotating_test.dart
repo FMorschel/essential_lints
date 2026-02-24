@@ -1,4 +1,5 @@
 import 'package:_internal_testing/dependencies.dart';
+import 'package:_internal_testing/other_package.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:essential_lints/src/warnings/essential_lint_warnings.dart';
 import 'package:essential_lints/src/warnings/subtype_annotating.dart';
@@ -15,13 +16,14 @@ void main() {
 
 @reflectiveTest
 class SubtypeAnnotatingTest extends MultiWarningTestProcessor
-    with AnnotationsDependencyMixin {
+    with AnnotationsDependencyMixin, OtherPackageMixin {
   @override
   MultiWarningRule<dynamic, SubWarnings> get rule => SubtypeAnnotatingRule();
 
   @override
   Future<void> setUp() async {
     await addAnnotationsDependency();
+    createOtherPackage();
     super.setUp();
   }
 
@@ -295,6 +297,53 @@ class OtherClass extends MyClass {}
 mixin class MixinClass implements MyClass {}
 ''',
       [lint(184, 10), lint(226, 10)],
+    );
+  }
+
+  Future<void> test_packageOption_private_samePackage() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeAnnotating(annotations: [Deprecated], packageOption: .private)
+class BaseClass {}
+
+class MySubclass extends BaseClass {}
+''',
+      [error(rule.rule, 177, 10)],
+    );
+  }
+
+  Future<void> test_packageOption_private_differentPackage() async {
+    // Create an external package with the annotated base class.
+    otherPackage.addFile('lib/base.dart', '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeAnnotating(annotations: [Deprecated], packageOption: .private)
+class BaseClass {}
+''');
+    await assertNoDiagnostics('''
+import 'package:other/base.dart';
+
+class MySubclass extends BaseClass {}
+''');
+  }
+
+  Future<void> test_packageOption_differentPackage() async {
+    // Create an external package with the annotated base class.
+    otherPackage.addFile('lib/base.dart', '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeAnnotating(annotations: [Deprecated])
+class BaseClass {}
+''');
+    await assertDiagnostics(
+      '''
+import 'package:other/base.dart';
+
+class MySubclass extends BaseClass {}
+''',
+      [error(rule.rule, 41, 10)],
     );
   }
 }

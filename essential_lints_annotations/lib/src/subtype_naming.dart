@@ -1,5 +1,6 @@
 import 'package:meta/meta_meta.dart';
 
+import 'utils/package_option.dart';
 import 'utils/subtype_option.dart';
 
 /// {@template subtype_naming}
@@ -18,6 +19,7 @@ class SubtypeNaming {
     this.suffix,
     this.containing,
     this.option = SubtypeOption.all,
+    this.packageOption = PackageOption.inherit,
   });
 
   /// The required prefix for the subtype name.
@@ -31,4 +33,7 @@ class SubtypeNaming {
 
   /// {@macro subtype_option}
   final SubtypeOption option;
+
+  /// {@macro package_option}
+  final PackageOption packageOption;
 }

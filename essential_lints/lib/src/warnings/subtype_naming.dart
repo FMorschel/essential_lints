@@ -47,6 +47,7 @@ class _SubtypeNamingAnnotation {
     required this.suffix,
     required this.containing,
     required this.option,
+    required this.packageOption,
   });
 
   static _SubtypeNamingAnnotation empty = const .new(
@@ -54,12 +55,14 @@ class _SubtypeNamingAnnotation {
     suffix: null,
     containing: null,
     option: null,
+    packageOption: null,
   );
 
   final String? prefix;
   final String? suffix;
   final String? containing;
   final DartObject? option;
+  final DartObject? packageOption;
 }
 
 class _SubtypeNamingVisitor extends BaseVisitor<SubtypeNamingRule> {
@@ -184,6 +187,7 @@ class _SubtypeNamingVisitor extends BaseVisitor<SubtypeNamingRule> {
     var suffix = type.getField('suffix')?.toStringValue();
     var containing = type.getField('containing')?.toStringValue();
     var option = type.getField('option');
+    var packageOption = type.getField('packageOption');
 
     logger.fine(
       '_mapKnownArguments() returning annotation: prefix=$prefix, '
@@ -194,6 +198,7 @@ class _SubtypeNamingVisitor extends BaseVisitor<SubtypeNamingRule> {
       suffix: suffix,
       containing: containing,
       option: option,
+      packageOption: packageOption,
     );
   }
 
@@ -210,7 +215,7 @@ class _SubtypeNamingVisitor extends BaseVisitor<SubtypeNamingRule> {
     logger.fine(
       'Verifying supertypes for: ${element.name}, abstract=$abstract',
     );
-    var annotations = <_SubtypeNamingAnnotation>[];
+    var annotations = <MapEntry<_SubtypeNamingAnnotation, InterfaceElement>>[];
     var visitedElements = <InterfaceElement>{element};
     logger.finer('Processing ${element.allSupertypes.length} supertypes');
     for (var interface in element.allSupertypes) {
@@ -227,11 +232,20 @@ class _SubtypeNamingVisitor extends BaseVisitor<SubtypeNamingRule> {
         'Supertype ${current.name} has ${currentAnnotations.length} '
         'SubtypeNaming annotations',
       );
-      annotations.addAll(currentAnnotations);
+      annotations.addAll(currentAnnotations.map((a) => MapEntry(a, current)));
     }
 
     logger.fine('Total annotations to check: ${annotations.length}');
-    for (var annotation in annotations) {
+    for (var entry in annotations) {
+      var annotation = entry.key;
+      var origin = entry.value;
+      if (annotation.packageOption?.variable?.name == 'private' &&
+          !_isSamePackage(element, origin)) {
+        logger.finer(
+          '  Skipping due to packageOption.private from other package',
+        );
+        continue;
+      }
       logger.finer(
         'Checking annotation: prefix=${annotation.prefix}, '
         'suffix=${annotation.suffix}, containing=${annotation.containing}',
@@ -293,5 +307,18 @@ class _SubtypeNamingVisitor extends BaseVisitor<SubtypeNamingRule> {
       }
     }
     logger.info('_verifySuperTypes() completed');
+  }
+
+  bool _isSamePackage(InterfaceElement a, InterfaceElement b) {
+    var au = a.firstFragment.enclosingFragment?.source.uri;
+    var bu = b.firstFragment.enclosingFragment?.source.uri;
+    if (au == null || bu == null) return false;
+    if (au.scheme == 'package' && bu.scheme == 'package') {
+      if (au.pathSegments.isNotEmpty && bu.pathSegments.isNotEmpty) {
+        return au.pathSegments.first == bu.pathSegments.first;
+      }
+      return au == bu;
+    }
+    return au == bu;
   }
 }
