@@ -161,26 +161,17 @@ mixin FixesPluginIntegration {
           SamePackageDirectImportFix.new,
           [.samePackageDirectImport],
         ),
-        .useDefinedType => addFixTo(
-          UseDefinedTypeFix.new,
-          [.closureIncorrectType],
-        ),
-        .addCurrentStack => addFixTo(
-          AddCurrentStackFix.new,
-          [.completerErrorNoStack],
-        ),
-        .removeUselessElse => addFixTo(
-          RemoveUselessElseAssistFix.new,
-          [.uselessElse],
-        ),
-        .replaceWithFirst => addFixTo(
-          ReplaceWithFirstFix.new,
-          [.firstGetter],
-        ),
-        .replaceWithLast => addFixTo(
-          ReplaceWithLastFix.new,
-          [.lastGetter],
-        ),
+        .useDefinedType => addFixTo(UseDefinedTypeFix.new, [
+          .closureIncorrectType,
+        ]),
+        .addCurrentStack => addFixTo(AddCurrentStackFix.new, [
+          .completerErrorNoStack,
+        ]),
+        .removeUselessElse => addFixTo(RemoveUselessElseAssistFix.new, [
+          .uselessElse,
+        ]),
+        .replaceWithFirst => addFixTo(ReplaceWithFirstFix.new, [.firstGetter]),
+        .replaceWithLast => addFixTo(ReplaceWithLastFix.new, [.lastGetter]),
       };
     }
     logger.info('Mapped lint fixes');

@@ -19,9 +19,7 @@ class BorderAllRule extends LintRule<BorderAllRule> {
   /// {@macro border_all_rule}
   BorderAllRule() : super(.borderAll, _logger);
 
-  static final Logger _logger = EssentialLintsPlugin.newLogger(
-    'BorderAllRule',
-  );
+  static final Logger _logger = EssentialLintsPlugin.newLogger('BorderAllRule');
 
   @override
   void registerNodeProcessors(
@@ -84,9 +82,7 @@ class _BorderAllVisitor extends BaseVisitor<BorderAllRule> {
       return;
     }
 
-    logger.fine(
-      'Detected Border.all instance — reporting at constructor name',
-    );
+    logger.fine('Detected Border.all instance — reporting at constructor name');
     // ignore: _internal_plugin/report_shorter_lengths helps with the fix
     rule.reportAtNode(node.constructorName);
     logger.info(

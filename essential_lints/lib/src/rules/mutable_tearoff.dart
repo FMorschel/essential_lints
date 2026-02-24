@@ -65,23 +65,21 @@ class _MutableTearoffsVisitor extends BaseVisitor<MutableTearoffRule> {
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    logger..info(
-      'visitInstanceCreationExpression() started for: '
-      '${node.constructorName.toSource()}',
-    )
-    ..fine(
-      'Reporting instance creation constructor as mutable tear-off',
-    );
+    logger
+      ..info(
+        'visitInstanceCreationExpression() started for: '
+        '${node.constructorName.toSource()}',
+      )
+      ..fine('Reporting instance creation constructor as mutable tear-off');
     // ignore: _internal_plugin/report_shorter_lengths more meaningful
     rule.reportAtNode(node.constructorName);
   }
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    logger..info(
-      'visitMethodInvocation() started: ${node.methodName.name}',
-    )
-    ..fine('Reporting method invocation as mutable tear-off');
+    logger
+      ..info('visitMethodInvocation() started: ${node.methodName.name}')
+      ..fine('Reporting method invocation as mutable tear-off');
     rule.reportAtNode(node.methodName);
   }
 
@@ -146,9 +144,7 @@ class _MutableTearoffsVisitor extends BaseVisitor<MutableTearoffRule> {
       var element = node.element;
       if (element is! PropertyAccessorElement ||
           !element.variable.type.isFunction) {
-        logger.finer(
-          'Not a property accessor returning a function — skipping',
-        );
+        logger.finer('Not a property accessor returning a function — skipping');
         return;
       }
     }

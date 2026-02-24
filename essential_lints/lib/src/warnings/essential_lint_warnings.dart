@@ -82,8 +82,7 @@ enum EssentialLintWarnings with EnumDiagnostic {
           'A rule that ensures the members of a class are sorted in a '
           'specific order.',
     ),
-  ),
-  ;
+  );
 
   const EssentialLintWarnings(this.code);
 
@@ -137,8 +136,7 @@ enum EssentialMultiWarnings<T extends SubWarnings>
           'annotations as defined by the @SubtypeAnnotating annotation.',
     ),
     SubtypeAnnotating.values,
-  ),
-  ;
+  );
 
   const EssentialMultiWarnings(this.code, this.subDiagnostics);
 
@@ -162,10 +160,7 @@ mixin SuperDiagnostic<Base extends SubDiagnostic> implements EnumDiagnostic {
 
 /// The list of sub-warnings for the GettersInMemberList warning.
 @staticAllEnforcement
-@StaticEnforcement(
-  #base,
-  annotation.th<EssentialMultiWarnings>(),
-)
+@StaticEnforcement(#base, annotation.th<EssentialMultiWarnings>())
 enum GettersInMemberList with EnumDiagnostic, SubDiagnostic, SubWarnings {
   /// An instance member list is missing to include getters/fields.
   missingList(
@@ -231,8 +226,7 @@ enum GettersInMemberList with EnumDiagnostic, SubDiagnostic, SubWarnings {
           'valid expected instance member of the class.',
       uniqueName: 'non_member_in_getters_in_member_list',
     ),
-  )
-  ;
+  );
 
   const GettersInMemberList(this.code);
 
@@ -248,10 +242,7 @@ enum GettersInMemberList with EnumDiagnostic, SubDiagnostic, SubWarnings {
 
 /// The list of sub-warnings for the SubtypeAnnotating warning.
 @staticAllEnforcement
-@StaticEnforcement(
-  #base,
-  annotation.th<EssentialMultiWarnings>(),
-)
+@StaticEnforcement(#base, annotation.th<EssentialMultiWarnings>())
 enum SubtypeAnnotating with EnumDiagnostic, SubDiagnostic, SubWarnings {
   /// The annotation does not specify any required annotations.
   missingAnnotation(
@@ -283,8 +274,7 @@ enum SubtypeAnnotating with EnumDiagnostic, SubDiagnostic, SubWarnings {
           'A lint rule that ensures the @SubtypeAnnotating annotation '
           'specifies type names and not constructor invocations or tear-offs.',
     ),
-  ),
-  ;
+  );
 
   const SubtypeAnnotating(this.code);
 
@@ -300,10 +290,7 @@ enum SubtypeAnnotating with EnumDiagnostic, SubDiagnostic, SubWarnings {
 
 /// The list of sub-warnings for the SubtypeNaming warning.
 @staticAllEnforcement
-@StaticEnforcement(
-  #base,
-  annotation.th<EssentialMultiWarnings>(),
-)
+@StaticEnforcement(#base, annotation.th<EssentialMultiWarnings>())
 enum SubtypeNaming with EnumDiagnostic, SubDiagnostic, SubWarnings {
   /// The annotation does not specify any naming conventions.
   missingNameDefinition(
@@ -320,8 +307,7 @@ enum SubtypeNaming with EnumDiagnostic, SubDiagnostic, SubWarnings {
           'at least one naming convention (prefix, suffix, or containing '
           'name).',
     ),
-  ),
-  ;
+  );
 
   const SubtypeNaming(this.code);
 
@@ -340,10 +326,7 @@ enum SubtypeNaming with EnumDiagnostic, SubDiagnostic, SubWarnings {
 /// {@endtemplate}
 @annotation.SubtypeAnnotating(
   annotations: [
-    StaticEnforcement(
-      #base,
-      annotation.th<EssentialMultiWarnings>(),
-    ),
+    StaticEnforcement(#base, annotation.th<EssentialMultiWarnings>()),
   ],
   option: .onlyInstantiable,
 )
@@ -378,10 +361,7 @@ class WarningCode extends DiagnosticCode {
     this.severity = .WARNING,
     String? uniqueName,
     this.type = .STATIC_WARNING,
-  }) : super(
-         uniqueName: uniqueName ?? name,
-         isUnresolvedIdentifier: false,
-       );
+  }) : super(uniqueName: uniqueName ?? name, isUnresolvedIdentifier: false);
 
   /// A detailed description of the lint rule.
   final String description;

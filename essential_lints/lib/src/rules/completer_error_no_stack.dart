@@ -67,9 +67,7 @@ class _CompleterErrorNoStackVisitor
     }
 
     var argCount = node.argumentList.arguments.length;
-    logger.fine(
-      'Found completeError invocation with $argCount argument(s)',
-    );
+    logger.fine('Found completeError invocation with $argCount argument(s)');
     if (argCount == 1) {
       logger.fine('Reporting completeError call without stackTrace');
       rule.reportAtNode(node.methodName);
@@ -88,23 +86,17 @@ class _CompleterErrorNoStackVisitor
       '_isCompleteErrorFromCompleter() started for: ${methodName.name}',
     );
     if (methodName.name != _methodName) {
-      logger.finer(
-        'Method name mismatch: ${methodName.name} != $_methodName',
-      );
+      logger.finer('Method name mismatch: ${methodName.name} != $_methodName');
       return false;
     }
     if (target is! InterfaceType) {
-      logger.finer(
-        'Target is not an InterfaceType: ${target.runtimeType}',
-      );
+      logger.finer('Target is not an InterfaceType: ${target.runtimeType}');
       return false;
     }
 
     var direct = _isCompleter(target);
     if (direct) {
-      logger.finer(
-        'Target type ${target.element.displayName} is a Completer',
-      );
+      logger.finer('Target type ${target.element.displayName} is a Completer');
       return true;
     }
 

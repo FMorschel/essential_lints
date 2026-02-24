@@ -69,9 +69,7 @@ class _StandardCommentStyleVisitor
         token = commentToken = commentToken.next ?? current;
       }
       if (list.isNotEmpty) {
-        logger.finer(
-          'Found ${list.length} comment token(s), handling group',
-        );
+        logger.finer('Found ${list.length} comment token(s), handling group');
         _handleCommentList(list);
         list.clear();
       }
@@ -84,17 +82,13 @@ class _StandardCommentStyleVisitor
   }
 
   void _handleCommentList(List<CommentToken> list) {
-    logger.info(
-      '_handleCommentList() started with ${list.length} comment(s)',
-    );
+    logger.info('_handleCommentList() started with ${list.length} comment(s)');
     var textComment = <(String, CommentToken)>[];
     for (var comment in list) {
       var commentText = comment.lexeme
           .replaceFirst(_startingComment, '')
           .trimRight();
-      logger.finer(
-        'Processing comment token: ${commentText.length} chars',
-      );
+      logger.finer('Processing comment token: ${commentText.length} chars');
       if (_ignore.hasMatch(commentText.trim()) ||
           _ignoreForFile.hasMatch(commentText.trim())) {
         logger.finer(
@@ -128,9 +122,7 @@ class _StandardCommentStyleVisitor
       logger.finer('Processing paragraph: ${paragraph.length} chars');
       if (paragraph.startsWith(_dartdocCompatible)) {
         paragraph = paragraph
-            .substring(
-              _dartdocCompatible.firstMatch(paragraph)!.end,
-            )
+            .substring(_dartdocCompatible.firstMatch(paragraph)!.end)
             .trim();
       }
       if (paragraph.isEmpty) {
@@ -144,9 +136,7 @@ class _StandardCommentStyleVisitor
         continue;
       }
       if (paragraph.startsWith(_noUppercaseLetter)) {
-        logger.fine(
-          'Reporting paragraph starting without uppercase letter',
-        );
+        logger.fine('Reporting paragraph starting without uppercase letter');
         rule.reportAtToken(firstComment);
         continue;
       }
@@ -177,10 +167,7 @@ extension on List<(String, CommentToken)> {
 
     void flushParagraph() {
       if (buffer.isNotEmpty && firstComment != null) {
-        result.add((
-          paragraph: buffer.toString(),
-          firstComment: firstComment!,
-        ));
+        result.add((paragraph: buffer.toString(), firstComment: firstComment!));
       }
       buffer.clear();
       firstComment = null;

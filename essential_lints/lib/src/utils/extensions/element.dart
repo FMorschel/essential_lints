@@ -13,9 +13,7 @@ extension ElementExt on Element? {
   static final Uri _uriContainer = .parse(
     'package:flutter/src/widgets/container.dart',
   );
-  static final Uri _uriBasic = .parse(
-    'package:flutter/src/widgets/basic.dart',
-  );
+  static final Uri _uriBasic = .parse('package:flutter/src/widgets/basic.dart');
 
   /// Whether this element is a Flutter Container.
   bool get isContainer {

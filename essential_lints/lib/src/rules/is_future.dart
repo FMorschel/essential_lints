@@ -18,9 +18,7 @@ class IsFutureRule extends LintRule<IsFutureRule> {
   /// {@macro is_future}
   IsFutureRule() : super(.isFuture, _logger);
 
-  static final Logger _logger = EssentialLintsPlugin.newLogger(
-    'IsFutureRule',
-  );
+  static final Logger _logger = EssentialLintsPlugin.newLogger('IsFutureRule');
 
   @override
   void registerNodeProcessors(

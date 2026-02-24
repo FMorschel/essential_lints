@@ -27,10 +27,7 @@ class NewInstanceCascadeRule extends LintRule<NewInstanceCascadeRule> {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _NewInstanceCascadeVisitor(
-      this,
-      context,
-    );
+    var visitor = _NewInstanceCascadeVisitor(this, context);
     registry.addCascadeExpression(this, visitor);
   }
 }
@@ -99,10 +96,7 @@ class _NewInstanceCascadeVisitor extends BaseVisitor<NewInstanceCascadeRule> {
             rule.reportAtNode(section.propertyName);
           }
         } else if (element is PropertyInducingElement) {
-          var isSubtype = typeSystem.isSubtypeOf(
-            element.type,
-            targetType,
-          );
+          var isSubtype = typeSystem.isSubtypeOf(element.type, targetType);
           logger.finer(
             'Property type: ${element.type.getDisplayString()} — isSubtypeOf '
             'target: $isSubtype',

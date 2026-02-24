@@ -8,8 +8,7 @@ enum EssentialLintAssists implements AssistKind {
   removeUselessElse.fromFix(
     'dart.assist.remove_useless_else',
     .removeUselessElse,
-  ),
-  ;
+  );
 
   const EssentialLintAssists(this.id, this._message)
     : associatedFix = null,

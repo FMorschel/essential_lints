@@ -48,10 +48,9 @@ class _AlphabetizeArgumentsVisitor
     logger.fine('Found ${argumentNames.length} named arguments');
 
     if (argumentNames.length < 2) {
-      logger..finer('Less than two named arguments, nothing to check')
-      ..info(
-        'AlphabetizeArgumentsRule.visitArgumentList() completed',
-      );
+      logger
+        ..finer('Less than two named arguments, nothing to check')
+        ..info('AlphabetizeArgumentsRule.visitArgumentList() completed');
       return;
     }
 

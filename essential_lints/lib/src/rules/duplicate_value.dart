@@ -78,9 +78,7 @@ class _DuplicateValueVisitor extends BaseVisitor<DuplicateValueRule> {
   }
 
   void _handlePattern(DartPattern pattern) {
-    logger.info(
-      '_handlePattern() started for pattern: ${pattern.runtimeType}',
-    );
+    logger.info('_handlePattern() started for pattern: ${pattern.runtimeType}');
 
     DartPattern leftPattern;
     DartPattern rightPattern;

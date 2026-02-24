@@ -51,10 +51,7 @@ String dartObjectToString(DartObject? dartObject) {
     var named = recordValue.named.entries
         .map((entry) => '${entry.key}: ${dartObjectToString(entry.value)}')
         .commaSeparated;
-    return '(${[
-      if (positional.isNotEmpty) positional,
-      if (named.isNotEmpty) named,
-    ].commaSeparated})';
+    return '(${[if (positional.isNotEmpty) positional, if (named.isNotEmpty) named].commaSeparated})';
   }
   return dartObject.toString();
 }

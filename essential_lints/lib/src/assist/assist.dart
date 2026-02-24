@@ -14,9 +14,7 @@ import 'essential_lint_assists.dart';
 @SubtypeNaming(containing: 'Assist')
 @staticLoggerEnforcement
 mixin Assist on CorrectionProducerLogger {
-  static final Logger _logger = EssentialLintsPlugin.newLogger(
-    'Assist',
-  );
+  static final Logger _logger = EssentialLintsPlugin.newLogger('Assist');
 
   @override
   CorrectionApplicability get applicability => .singleLocation;

@@ -62,13 +62,9 @@ class _ReturningWidgetsVisitor extends BaseVisitor<ReturningWidgetsRule> {
 
   @override
   void visitFunctionDeclaration(FunctionDeclaration node) {
-    logger.info(
-      'visitFunctionDeclaration() started for: ${node.name.lexeme}',
-    );
+    logger.info('visitFunctionDeclaration() started for: ${node.name.lexeme}');
     if (isWidgetType(node.returnType)) {
-      logger.fine(
-        'Reporting function returning widget: ${node.name.lexeme}',
-      );
+      logger.fine('Reporting function returning widget: ${node.name.lexeme}');
       rule.reportAtToken(node.name);
     }
     logger.info(
@@ -78,9 +74,7 @@ class _ReturningWidgetsVisitor extends BaseVisitor<ReturningWidgetsRule> {
 
   @override
   void visitMethodDeclaration(MethodDeclaration node) {
-    logger.info(
-      'visitMethodDeclaration() started for: ${node.name.lexeme}',
-    );
+    logger.info('visitMethodDeclaration() started for: ${node.name.lexeme}');
     var element = node.enclosingTypeElement;
     var shouldReport =
         isWidgetType(node.returnType) &&
@@ -89,17 +83,11 @@ class _ReturningWidgetsVisitor extends BaseVisitor<ReturningWidgetsRule> {
                   entry.key.name == node.declaredFragment?.element.lookupName,
             ) ??
             true);
-    logger.finer(
-      'Method shouldReport=$shouldReport for ${node.name.lexeme}',
-    );
+    logger.finer('Method shouldReport=$shouldReport for ${node.name.lexeme}');
     if (shouldReport) {
-      logger.fine(
-        'Reporting method returning widget: ${node.name.lexeme}',
-      );
+      logger.fine('Reporting method returning widget: ${node.name.lexeme}');
       rule.reportAtToken(node.name);
     }
-    logger.info(
-      'visitMethodDeclaration() completed for: ${node.name.lexeme}',
-    );
+    logger.info('visitMethodDeclaration() completed for: ${node.name.lexeme}');
   }
 }

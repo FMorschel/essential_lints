@@ -79,28 +79,17 @@ class RemoveUselessElseAssistFix extends CorrectionProducerLogger
         logger.fine('Else statement is a block, adjusting indentation');
         var offset = elseStatement.leftBracket.next!.offset;
         var end = elseStatement.rightBracket.previous!.end;
-        var source = utils.getText(
-          offset,
-          end - offset,
-        );
+        var source = utils.getText(offset, end - offset);
         source = utils.indentSourceLeftRight(source);
         builder.addSimpleReplacement(
-          range.startEnd(
-            elseStatement.leftBracket,
-            elseStatement.rightBracket,
-          ),
+          range.startEnd(elseStatement.leftBracket, elseStatement.rightBracket),
           source,
         );
         if (elseStatement.rightBracket.next case var next?) {
           logger.fine('Adjusting indentation for code after else block');
-          var finalPrefix = utils.getLinePrefix(
-            next.offset,
-          );
+          var finalPrefix = utils.getLinePrefix(next.offset);
           builder.addSimpleReplacement(
-            range.endStart(
-              elseStatement.rightBracket,
-              next,
-            ),
+            range.endStart(elseStatement.rightBracket, next),
             finalPrefix,
           );
         }

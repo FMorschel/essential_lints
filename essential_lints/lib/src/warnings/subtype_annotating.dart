@@ -131,9 +131,7 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule> {
 
   @override
   void visitEnumDeclaration(EnumDeclaration node) {
-    logger.fine(
-      'visitEnumDeclaration() for: ${node.namePart.typeName.lexeme}',
-    );
+    logger.fine('visitEnumDeclaration() for: ${node.namePart.typeName.lexeme}');
     _verifySuperTypes(
       node.namePart.typeName,
       node.declaredFragment?.element,

@@ -45,9 +45,7 @@ class _PreferFirstVisitor extends BaseVisitor<FirstGetterRule> {
     logger.info('visitIndexExpression() started');
     var target = node.target;
     var type = target?.staticType;
-    logger.finer(
-      'Resolved target type: ${type?.getDisplayString() ?? 'null'}',
-    );
+    logger.finer('Resolved target type: ${type?.getDisplayString() ?? 'null'}');
     var element = type?.element;
     if (element == null) {
       logger.finer('Target element is null — skipping');
@@ -63,9 +61,7 @@ class _PreferFirstVisitor extends BaseVisitor<FirstGetterRule> {
     if (expression case IntegerLiteral(:var value) when value == 0) {
       var offset = node.leftBracket.offset;
       var endOffset = node.rightBracket.end;
-      logger.fine(
-        'Suggest using `.first` instead of [0] at offset $offset',
-      );
+      logger.fine('Suggest using `.first` instead of [0] at offset $offset');
       rule.reportAtOffset(offset, endOffset - offset);
     }
     super.visitIndexExpression(node);
@@ -73,9 +69,7 @@ class _PreferFirstVisitor extends BaseVisitor<FirstGetterRule> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    logger.info(
-      'visitMethodInvocation() started: ${node.methodName.name}',
-    );
+    logger.info('visitMethodInvocation() started: ${node.methodName.name}');
     var target = node.target;
     if (target is! SimpleIdentifier) {
       logger.finer('Target is not SimpleIdentifier — skipping');
@@ -120,9 +114,7 @@ class _PreferFirstVisitor extends BaseVisitor<FirstGetterRule> {
         element.interfaceMembers.entries
             .map((entry) => entry.key.name)
             .contains('first');
-    logger.finer(
-      '_elementDoesntContainFirst(${element.name}) -> ${!contains}',
-    );
+    logger.finer('_elementDoesntContainFirst(${element.name}) -> ${!contains}');
     return !contains;
   }
 

@@ -128,8 +128,7 @@ enum EssentialLintFixes implements EnumFix {
       DartFixKindPriority.standard,
       "Replace with '.last'",
     ),
-  ),
-  ;
+  );
 
   const EssentialLintFixes(this.fixKind);
 
@@ -175,8 +174,7 @@ enum EssentialLintWarningFixes implements EnumFix {
       DartFixKindPriority.standard,
       'Sort members',
     ),
-  ),
-  ;
+  );
 
   const EssentialLintWarningFixes(this.fixKind);
 

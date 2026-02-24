@@ -53,9 +53,7 @@ class _EmptyContainerVisitor extends BaseVisitor<EmptyContainerRule> {
       return;
     }
     if (node.argumentList.arguments.isNotEmpty) {
-      logger.finer(
-        'Container has constructor arguments — not empty, skipping',
-      );
+      logger.finer('Container has constructor arguments — not empty, skipping');
       return;
     }
 
@@ -64,9 +62,7 @@ class _EmptyContainerVisitor extends BaseVisitor<EmptyContainerRule> {
       'supertype',
     );
     if (!_isStandalone(node) && !_isAssignedToSupertype(node)) {
-      logger.finer(
-        'Not standalone and not assigned to a supertype — skipping',
-      );
+      logger.finer('Not standalone and not assigned to a supertype — skipping');
       return;
     }
 
@@ -97,9 +93,7 @@ class _EmptyContainerVisitor extends BaseVisitor<EmptyContainerRule> {
     }
 
     if (!typeSystem.isAssignableTo(actualType, expectedType)) {
-      logger.finer(
-        'Actual type is not assignable to expected type -> false',
-      );
+      logger.finer('Actual type is not assignable to expected type -> false');
       return false;
     }
 

@@ -376,8 +376,7 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
           'functions and methods, which can lead to confusion and errors in '
           'code.',
     ),
-  )
-  ;
+  );
 
   const EssentialLintRules(this.code);
 
@@ -401,8 +400,7 @@ enum EssentialMultiLints<T extends SubLints>
           'to remove them.',
     ),
     PendingListener.values,
-  ),
-  ;
+  );
 
   const EssentialMultiLints(this.code, this.subDiagnostics);
 
@@ -433,10 +431,7 @@ class LintRuleCode extends WarningCode implements LintCode {
 /// Sub-lints for the PendingListener lint rule.
 /// {@endtemplate}
 @staticAllEnforcement
-@StaticEnforcement(
-  #base,
-  annotation.th<EssentialMultiLints>(),
-)
+@StaticEnforcement(#base, annotation.th<EssentialMultiLints>())
 enum PendingListener with EnumDiagnostic, SubDiagnostic, SubLints {
   /// Closures used as listeners cannot be matched for removal.
   closuresCannotBeMatched(
@@ -476,8 +471,7 @@ enum PendingListener with EnumDiagnostic, SubDiagnostic, SubLints {
       description:
           'A sub-lint that detects instantiations with listener handling.',
     ),
-  ),
-  ;
+  );
 
   const PendingListener(this.code);
 
@@ -496,12 +490,7 @@ enum PendingListener with EnumDiagnostic, SubDiagnostic, SubLints {
 /// {@endtemplate}
 
 @annotation.SubtypeAnnotating(
-  annotations: [
-    StaticEnforcement(
-      #base,
-      annotation.th<EssentialMultiLints>(),
-    ),
-  ],
+  annotations: [StaticEnforcement(#base, annotation.th<EssentialMultiLints>())],
   option: .onlyInstantiable,
 )
 mixin SubLints on SubDiagnostic implements LintCode {

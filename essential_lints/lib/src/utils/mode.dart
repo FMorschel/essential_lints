@@ -7,8 +7,7 @@ enum Mode {
   profile,
 
   /// Debug mode.
-  debug,
-  ;
+  debug;
 
   /// The current mode of operation.
   static const Mode current = bool.fromEnvironment('dart.vm.product')

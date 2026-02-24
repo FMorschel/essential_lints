@@ -64,13 +64,9 @@ class _VariableShadowingVisitor extends BaseVisitor<VariableShadowingRule> {
 
   @override
   void visitVariableDeclaration(VariableDeclaration node) {
-    logger.info(
-      'visitVariableDeclaration() started for: ${node.toSource()}',
-    );
+    logger.info('visitVariableDeclaration() started for: ${node.toSource()}');
     if (node.thisOrAncestorOfType<FieldDeclaration>() != null) {
-      logger.finer(
-        'Declaration is a field; skipping variable shadowing check',
-      );
+      logger.finer('Declaration is a field; skipping variable shadowing check');
       return;
     }
     var element = _resolveNameInPreviousScope(

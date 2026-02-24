@@ -45,10 +45,7 @@ abstract class EssentialAnalysisRule<
     implements AbstractEssentialAnalysisRule<Diagnostic> {
   /// {@macro essentialAnalysisRule}
   EssentialAnalysisRule(this.rule, this.logger)
-    : super(
-        name: rule.lowerCaseUniqueName,
-        description: rule.description,
-      );
+    : super(name: rule.lowerCaseUniqueName, description: rule.description);
 
   @override
   final Logger logger;
@@ -78,10 +75,7 @@ abstract class EssentialMultiAnalysisRule<
     implements AbstractEssentialAnalysisRule<Diagnostic> {
   /// {@macro essentialMultiAnalysisRule}
   EssentialMultiAnalysisRule(this.rule, this.logger)
-    : super(
-        name: rule.lowerCaseUniqueName,
-        description: rule.code.description,
-      );
+    : super(name: rule.lowerCaseUniqueName, description: rule.code.description);
 
   @override
   final Logger logger;

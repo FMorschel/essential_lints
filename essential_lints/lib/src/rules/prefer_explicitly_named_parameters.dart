@@ -42,9 +42,7 @@ class _PreferExplicitlyNamedParametersVisitor
 
   @override
   void visitGenericFunctionType(GenericFunctionType node) {
-    logger.info(
-      'visitGenericFunctionType() started for: ${node.toSource()}',
-    );
+    logger.info('visitGenericFunctionType() started for: ${node.toSource()}');
     for (var parameter in node.parameters.parameters) {
       if (parameter.isNamed) {
         logger.finer(
@@ -63,9 +61,7 @@ class _PreferExplicitlyNamedParametersVisitor
         rule.reportAtNode(parameter);
       }
     }
-    logger.info(
-      'visitGenericFunctionType() completed for: ${node.toSource()}',
-    );
+    logger.info('visitGenericFunctionType() completed for: ${node.toSource()}');
     super.visitGenericFunctionType(node);
   }
 }

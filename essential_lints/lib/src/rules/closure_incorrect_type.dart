@@ -49,9 +49,7 @@ class _ClosureIncorrectTypeVisitor
     if (parameters == null) {
       logger
         ..finer('FunctionExpression has no parameters, skipping')
-        ..info(
-          'ClosureIncorrectTypeRule.visitFunctionExpression() completed',
-        );
+        ..info('ClosureIncorrectTypeRule.visitFunctionExpression() completed');
       return;
     }
 
@@ -59,12 +57,8 @@ class _ClosureIncorrectTypeVisitor
     if (correspondingParameterType is! FunctionType) {
       // Skip if the closure is not overriding a parameter with a specific type.
       logger
-        ..finer(
-          'correspondingParameter is not a FunctionType, skipping',
-        )
-        ..info(
-          'ClosureIncorrectTypeRule.visitFunctionExpression() completed',
-        );
+        ..finer('correspondingParameter is not a FunctionType, skipping')
+        ..info('ClosureIncorrectTypeRule.visitFunctionExpression() completed');
       return;
     }
 
@@ -131,8 +125,6 @@ class _ClosureIncorrectTypeVisitor
       }
     }
 
-    logger.info(
-      'ClosureIncorrectTypeRule.visitFunctionExpression() completed',
-    );
+    logger.info('ClosureIncorrectTypeRule.visitFunctionExpression() completed');
   }
 }

@@ -80,9 +80,7 @@ class _UnnecessarySetstateVisitor extends BaseVisitor<UnnecessarySetstateRule> {
       );
       return;
     }
-    logger.fine(
-      'Detected setState invocation; searching lifecycle call sites',
-    );
+    logger.fine('Detected setState invocation; searching lifecycle call sites');
     foundOneSetState = true;
     var nodes = _SyncCallVisitor.findLifecycleCallSites(
       element,
@@ -148,12 +146,7 @@ class _SyncCallVisitor extends RecursiveAstVisitor<void> {
     var containing = node.enclosingExecutableElementIfSync;
     if (_Assignment(node.leftHandSide).name case var name?
         when containing != null) {
-      _handleInvocation(
-        node.writeElement,
-        containing,
-        null,
-        name,
-      );
+      _handleInvocation(node.writeElement, containing, null, name);
     }
     super.visitAssignmentExpression(node);
   }
@@ -191,12 +184,7 @@ class _SyncCallVisitor extends RecursiveAstVisitor<void> {
   void visitSimpleIdentifier(SimpleIdentifier node) {
     var containing = node.enclosingExecutableElementIfSync;
     if (containing != null && node.element is! MethodElement) {
-      _handleInvocation(
-        node.element,
-        containing,
-        null,
-        node,
-      );
+      _handleInvocation(node.element, containing, null, node);
     }
     super.visitSimpleIdentifier(node);
   }

@@ -82,9 +82,7 @@ extension AstExtension on AstNode {
             EnumDeclaration(
               declaredFragment: InterfaceFragment(:var element),
             ) ||
-            MixinDeclaration(
-              declaredFragment: InterfaceFragment(:var element),
-            ):
+            MixinDeclaration(declaredFragment: InterfaceFragment(:var element)):
           return element;
       }
     }
@@ -161,10 +159,7 @@ extension NormalFormalParameterExt on FormalParameter {
   /// it cannot be determined.
   SourceRange? get typeAnnotationRange => switch (this) {
     FieldFormalParameter(:var type) => type?.sourceRange,
-    FunctionTypedFormalParameter(
-      :var returnType,
-      :var parameters,
-    ) =>
+    FunctionTypedFormalParameter(:var returnType, :var parameters) =>
       range.startEnd(
         returnType ?? parameters.beginToken.previous!,
         parameters.parameters.last,

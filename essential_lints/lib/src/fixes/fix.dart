@@ -28,9 +28,7 @@ abstract class CorrectionProducerLogger extends ResolvedCorrectionProducer {
 @SubtypeNaming(suffix: 'Fix')
 @staticLoggerEnforcement
 mixin LintFix on CorrectionProducerLogger {
-  static final Logger _logger = EssentialLintsPlugin.newLogger(
-    'LintFix',
-  );
+  static final Logger _logger = EssentialLintsPlugin.newLogger('LintFix');
 
   /// The essential lint fix associated with this correction producer.
   EssentialLintFixes get fix;
@@ -48,9 +46,7 @@ mixin LintFix on CorrectionProducerLogger {
 @SubtypeNaming(suffix: 'Fix')
 @staticLoggerEnforcement
 mixin WarningFix on CorrectionProducerLogger {
-  static final Logger _logger = EssentialLintsPlugin.newLogger(
-    'WarningFix',
-  );
+  static final Logger _logger = EssentialLintsPlugin.newLogger('WarningFix');
 
   /// The essential warning fix associated with this correction producer.
   EssentialLintWarningFixes get fix;

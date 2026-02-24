@@ -146,9 +146,7 @@ class PendingListenerRule
         for (var compare in compareListeners) {
           if (_expressionsMatch(control, compare)) {
             hasMatch = true;
-            logger.finer(
-              'Expression matched: ${control.toSource()}',
-            );
+            logger.finer('Expression matched: ${control.toSource()}');
             break;
           }
         }
@@ -540,10 +538,7 @@ class _PendingListenerVisitor extends BaseVisitor<PendingListenerRule> {
       );
       return;
     }
-    if (firstArgument case FunctionExpression(
-      :var body,
-      :var offset,
-    )) {
+    if (firstArgument case FunctionExpression(:var body, :var offset)) {
       // Track closures, report later based on disposal status
       var length = body.offset - offset;
       logger.fine(

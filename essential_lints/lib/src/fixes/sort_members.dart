@@ -347,11 +347,7 @@ class SortMembersFix extends CorrectionProducerLogger with WarningFix {
         }
       }
 
-      edits.add((
-        start: offset,
-        end: offset,
-        replacement: buffer.toString(),
-      ));
+      edits.add((start: offset, end: offset, replacement: buffer.toString()));
     }
 
     // Fix spacing for members that weren't moved but need spacing adjustments

@@ -82,9 +82,7 @@ class _GettersInMemberListVisitor extends BaseVisitor<GettersInMemberListRule> {
 
   @override
   void visitClassDeclaration(ClassDeclaration node) {
-    logger.info(
-      'GettersInMemberListVisitor.visitClassDeclaration() started',
-    );
+    logger.info('GettersInMemberListVisitor.visitClassDeclaration() started');
     var element = node.declaredFragment?.element;
     if (element == null) {
       logger.finer('Class element is null, returning');
@@ -100,9 +98,7 @@ class _GettersInMemberListVisitor extends BaseVisitor<GettersInMemberListRule> {
     );
     for (var annotation in relevant) {
       var memberListName = annotation.memberListName;
-      logger.finer(
-        'Processing annotation for member list: $memberListName',
-      );
+      logger.finer('Processing annotation for member list: $memberListName');
       if (annotation.memberListName.isEmpty) {
         logger.finer('Member list name is empty, skipping');
         continue;
@@ -140,9 +136,7 @@ class _GettersInMemberListVisitor extends BaseVisitor<GettersInMemberListRule> {
         memberElement = element;
         memberName = name;
       } else if (member case FieldDeclaration(
-        fields: VariableDeclarationList(
-          :var variables,
-        ),
+        fields: VariableDeclarationList(:var variables),
       )) {
         logger.finer(
           'Found field declaration with ${variables.length} variables',
@@ -172,9 +166,7 @@ class _GettersInMemberListVisitor extends BaseVisitor<GettersInMemberListRule> {
         if (element case GetterElement(:var enclosingElement)
             when enclosingElement != typeProvider.objectElement &&
                 !getters.keys.contains(element.displayName)) {
-          getters.addAll({
-            element.displayName: element,
-          });
+          getters.addAll({element.displayName: element});
         }
       }
       logger.fine('Total getters to check: ${getters.length}');
@@ -196,15 +188,11 @@ class _GettersInMemberListVisitor extends BaseVisitor<GettersInMemberListRule> {
         );
       }
     }
-    logger.info(
-      'GettersInMemberListVisitor.visitClassDeclaration() completed',
-    );
+    logger.info('GettersInMemberListVisitor.visitClassDeclaration() completed');
   }
 
   ListLiteral? _calculateList(ClassMember? member, Token memberName) {
-    logger.fine(
-      '_calculateList() started for member: ${memberName.lexeme}',
-    );
+    logger.fine('_calculateList() started for member: ${memberName.lexeme}');
     Expression? expression;
     if (member case MethodDeclaration(:var body, isGetter: true)) {
       logger.finer('Member is getter method, checking body type');
@@ -245,9 +233,7 @@ class _GettersInMemberListVisitor extends BaseVisitor<GettersInMemberListRule> {
           return null;
       }
     } else if (member case FieldDeclaration(
-      fields: VariableDeclarationList(
-        :var variables,
-      ),
+      fields: VariableDeclarationList(:var variables),
     )) {
       logger.finer(
         'Member is field declaration with ${variables.length} variables',
@@ -485,9 +471,7 @@ extension on (MultiWarningRule, GetterElement) {
     ) when element == $2.variable || element == $2) {
       return true;
     } else if (member case FieldDeclaration(
-      fields: VariableDeclarationList(
-        :var variables,
-      ),
+      fields: VariableDeclarationList(:var variables),
     )) {
       for (var variable in variables) {
         if (variable.declaredFragment?.element == $2.variable) {

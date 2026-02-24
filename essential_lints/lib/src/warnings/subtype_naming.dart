@@ -120,9 +120,7 @@ class _SubtypeNamingVisitor extends BaseVisitor<SubtypeNamingRule> {
 
   @override
   void visitEnumDeclaration(EnumDeclaration node) {
-    logger.fine(
-      'visitEnumDeclaration() for: ${node.namePart.typeName.lexeme}',
-    );
+    logger.fine('visitEnumDeclaration() for: ${node.namePart.typeName.lexeme}');
     _verifySuperTypes(node.namePart.typeName, node.declaredFragment?.element);
     super.visitEnumDeclaration(node);
   }
@@ -281,15 +279,10 @@ class _SubtypeNamingVisitor extends BaseVisitor<SubtypeNamingRule> {
         violations.add('containing');
       }
       if (violations.isNotEmpty) {
-        logger.fine(
-          'Reporting naming violation for ${violations.join(", ")}',
-        );
+        logger.fine('Reporting naming violation for ${violations.join(", ")}');
         switch (name) {
           case Token():
-            rule.reportAtToken(
-              name,
-              diagnosticCode: rule.rule,
-            );
+            rule.reportAtToken(name, diagnosticCode: rule.rule);
           case AstNode():
             rule.reportAtNode(
               // ignore: _internal_plugin/report_shorter_lengths handled

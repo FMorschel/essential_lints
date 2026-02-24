@@ -52,20 +52,20 @@ class AddCurrentStackFix extends CorrectionProducerLogger with LintFix {
       '${enclosingCatchClause != null ? 'found' : 'not found'}',
     );
     await builder.addDartFileEdit(file, (builder) {
-      builder.addInsertion(
-        invocation.argumentList.rightParenthesis.offset,
-        (builder) {
-          builder.write(', ');
-          if (enclosingCatchClause?.stackTraceParameter
-              case CatchClauseParameter(:var name)) {
-            logger.finer('Using stack trace parameter: ${name.lexeme}');
-            builder.write(name.lexeme);
-          } else {
-            logger.finer('Using StackTrace.current');
-            builder.write('StackTrace.current');
-          }
-        },
-      );
+      builder.addInsertion(invocation.argumentList.rightParenthesis.offset, (
+        builder,
+      ) {
+        builder.write(', ');
+        if (enclosingCatchClause?.stackTraceParameter case CatchClauseParameter(
+          :var name,
+        )) {
+          logger.finer('Using stack trace parameter: ${name.lexeme}');
+          builder.write(name.lexeme);
+        } else {
+          logger.finer('Using StackTrace.current');
+          builder.write('StackTrace.current');
+        }
+      });
     });
     logger.info('AddCurrentStackFix.compute() completed successfully');
   }

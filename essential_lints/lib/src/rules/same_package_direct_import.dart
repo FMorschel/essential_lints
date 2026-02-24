@@ -30,10 +30,7 @@ class SamePackageDirectImportRule
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _SamePackageDirectImportVisitor(
-      this,
-      context,
-    );
+    var visitor = _SamePackageDirectImportVisitor(this, context);
     registry.addImportDirective(this, visitor);
   }
 }

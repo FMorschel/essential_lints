@@ -60,9 +60,7 @@ class _BooleanAssignmentVisitor extends BaseVisitor<BooleanAssignmentRule> {
       );
       _reportIfAssignment(node.expression);
     } else {
-      logger.finer(
-        'IfStatement has a caseClause, skipping condition check',
-      );
+      logger.finer('IfStatement has a caseClause, skipping condition check');
     }
   }
 
@@ -88,33 +86,34 @@ class _BooleanAssignmentVisitor extends BaseVisitor<BooleanAssignmentRule> {
 
   @override
   void visitWhileStatement(WhileStatement node) {
-    logger..info(
-      'BooleanAssignmentRule.visitWhileStatement() started at offset '
-      '${node.offset}',
-    )
-    ..fine('Checking while condition for assignment');
+    logger
+      ..info(
+        'BooleanAssignmentRule.visitWhileStatement() started at offset '
+        '${node.offset}',
+      )
+      ..fine('Checking while condition for assignment');
     _reportIfAssignment(node.condition);
   }
 
   @override
   void visitConditionalExpression(ConditionalExpression node) {
-    logger..info(
-      'BooleanAssignmentRule.visitConditionalExpression() started at offset '
-      '${node.offset}',
-    )
-    ..fine(
-      'Checking conditional expression condition for assignment',
-    );
+    logger
+      ..info(
+        'BooleanAssignmentRule.visitConditionalExpression() started at offset '
+        '${node.offset}',
+      )
+      ..fine('Checking conditional expression condition for assignment');
     _reportIfAssignment(node.condition);
   }
 
   @override
   void visitWhenClause(WhenClause node) {
-    logger..info(
-      'BooleanAssignmentRule.visitWhenClause() started at offset '
-      '${node.offset}',
-    )
-    ..fine('Checking when-clause expression for assignment');
+    logger
+      ..info(
+        'BooleanAssignmentRule.visitWhenClause() started at offset '
+        '${node.offset}',
+      )
+      ..fine('Checking when-clause expression for assignment');
     _reportIfAssignment(node.expression);
   }
 
@@ -162,21 +161,23 @@ class _BooleanAssignmentVisitor extends BaseVisitor<BooleanAssignmentRule> {
 
   @override
   void visitAssertInitializer(AssertInitializer node) {
-    logger..info(
-      'BooleanAssignmentRule.visitAssertInitializer() started at offset '
-      '${node.offset}',
-    )
-    ..fine('Checking assert initializer condition for assignment');
+    logger
+      ..info(
+        'BooleanAssignmentRule.visitAssertInitializer() started at offset '
+        '${node.offset}',
+      )
+      ..fine('Checking assert initializer condition for assignment');
     _reportIfAssignment(node.condition);
   }
 
   @override
   void visitAssertStatement(AssertStatement node) {
-    logger..info(
-      'BooleanAssignmentRule.visitAssertStatement() started at offset '
-      '${node.offset}',
-    )
-    ..fine('Checking assert statement condition for assignment');
+    logger
+      ..info(
+        'BooleanAssignmentRule.visitAssertStatement() started at offset '
+        '${node.offset}',
+      )
+      ..fine('Checking assert statement condition for assignment');
     _reportIfAssignment(node.condition);
   }
 
@@ -193,9 +194,7 @@ class _BooleanAssignmentVisitor extends BaseVisitor<BooleanAssignmentRule> {
       );
       _reportIfAssignment(expression);
     } else {
-      logger.finer(
-        'Return statement expression is not a bool or is absent',
-      );
+      logger.finer('Return statement expression is not a bool or is absent');
     }
   }
 

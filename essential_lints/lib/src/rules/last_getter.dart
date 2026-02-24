@@ -91,9 +91,7 @@ class _PreferLastVisitor extends BaseVisitor<LastGetterRule> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    logger.info(
-      'visitMethodInvocation() started: ${node.methodName.name}',
-    );
+    logger.info('visitMethodInvocation() started: ${node.methodName.name}');
     var target = node.target;
     if (target is! SimpleIdentifier) {
       logger.finer('Target is not SimpleIdentifier — skipping');
@@ -124,9 +122,7 @@ class _PreferLastVisitor extends BaseVisitor<LastGetterRule> {
     var expression = node.argumentList.arguments.first;
     var offset = node.methodName.offset;
     var endOffset = node.methodName.end;
-    logger.finer(
-      'Checking method invocation arguments for length - 1 pattern',
-    );
+    logger.finer('Checking method invocation arguments for length - 1 pattern');
     _reportWhenLengthMinusOne(
       expression,
       targetElement,
@@ -143,9 +139,7 @@ class _PreferLastVisitor extends BaseVisitor<LastGetterRule> {
         element.interfaceMembers.entries
             .map((entry) => entry.key.name)
             .contains('last');
-    logger.finer(
-      '_elementDoesntContainLast(${element.name}) -> ${!contains}',
-    );
+    logger.finer('_elementDoesntContainLast(${element.name}) -> ${!contains}');
     return !contains;
   }
 
