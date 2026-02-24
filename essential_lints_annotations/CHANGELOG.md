@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.3+1
+
+Released on: 2026-02-24
+
+- Updated README.md to reflect the new `packageOption` member in the `SubtypeAnnotating` and `SubtypeNaming` annotations.
+
 ## 0.1.3
 
 Released on: 2026-02-24
