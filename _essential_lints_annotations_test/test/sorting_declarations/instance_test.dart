@@ -103,9 +103,7 @@ void main() {
           expectSortDeclaration(const .instance(.typed(.fields)));
         });
         test('fieldsGettersSetters', () {
-          expectSortDeclaration(
-            const .instance(.typed(.fieldsGettersSetters)),
-          );
+          expectSortDeclaration(const .instance(.typed(.fieldsGettersSetters)));
         });
         test('getters', () {
           expectSortDeclaration(const .instance(.typed(.getters)));
@@ -170,9 +168,7 @@ void main() {
       });
       group('Initialized', () {
         test('fields', () {
-          expectSortDeclaration(
-            const .instance(.typed(.initialized(.fields))),
-          );
+          expectSortDeclaration(const .instance(.typed(.initialized(.fields))));
         });
         group('Public', () {
           test('fields', () {
@@ -435,9 +431,7 @@ void main() {
       group('Typed', () {
         group('members', () {
           test('fields', () {
-            expectSortDeclaration(
-              const .instance(.abstract(.typed(.fields))),
-            );
+            expectSortDeclaration(const .instance(.abstract(.typed(.fields))));
           });
           test('fieldsGettersSetters', () {
             expectSortDeclaration(
@@ -445,9 +439,7 @@ void main() {
             );
           });
           test('getters', () {
-            expectSortDeclaration(
-              const .instance(.abstract(.typed(.getters))),
-            );
+            expectSortDeclaration(const .instance(.abstract(.typed(.getters))));
           });
           test('gettersSetters', () {
             expectSortDeclaration(
@@ -455,14 +447,10 @@ void main() {
             );
           });
           test('methods', () {
-            expectSortDeclaration(
-              const .instance(.abstract(.typed(.methods))),
-            );
+            expectSortDeclaration(const .instance(.abstract(.typed(.methods))));
           });
           test('setters', () {
-            expectSortDeclaration(
-              const .instance(.abstract(.typed(.setters))),
-            );
+            expectSortDeclaration(const .instance(.abstract(.typed(.setters))));
           });
         });
         group('Public', () {
@@ -569,17 +557,13 @@ void main() {
           group('Public', () {
             test('fields', () {
               expectSortDeclaration(
-                const .instance(
-                  .abstract(.typed(.nullable(.public(.fields)))),
-                ),
+                const .instance(.abstract(.typed(.nullable(.public(.fields))))),
               );
             });
             test('fieldsGettersSetters', () {
               expectSortDeclaration(
                 const .instance(
-                  .abstract(
-                    .typed(.nullable(.public(.fieldsGettersSetters))),
-                  ),
+                  .abstract(.typed(.nullable(.public(.fieldsGettersSetters)))),
                 ),
               );
             });
@@ -623,9 +607,7 @@ void main() {
             test('fieldsGettersSetters', () {
               expectSortDeclaration(
                 const .instance(
-                  .abstract(
-                    .typed(.nullable(.private(.fieldsGettersSetters))),
-                  ),
+                  .abstract(.typed(.nullable(.private(.fieldsGettersSetters)))),
                 ),
               );
             });
@@ -662,9 +644,7 @@ void main() {
       });
       group('Nullable', () {
         test('fields', () {
-          expectSortDeclaration(
-            const .instance(.abstract(.nullable(.fields))),
-          );
+          expectSortDeclaration(const .instance(.abstract(.nullable(.fields))));
         });
         test('fieldsGettersSetters', () {
           expectSortDeclaration(
@@ -877,9 +857,7 @@ void main() {
           group('Public', () {
             test('fields', () {
               expectSortDeclaration(
-                const .instance(
-                  .abstract(.final_(.dynamic(.public(.fields)))),
-                ),
+                const .instance(.abstract(.final_(.dynamic(.public(.fields))))),
               );
             });
           });
@@ -909,18 +887,14 @@ void main() {
           group('Private', () {
             test('fields', () {
               expectSortDeclaration(
-                const .instance(
-                  .abstract(.final_(.typed(.private(.fields)))),
-                ),
+                const .instance(.abstract(.final_(.typed(.private(.fields))))),
               );
             });
           });
           group('Nullable', () {
             test('fields', () {
               expectSortDeclaration(
-                const .instance(
-                  .abstract(.final_(.typed(.nullable(.fields)))),
-                ),
+                const .instance(.abstract(.final_(.typed(.nullable(.fields))))),
               );
             });
             group('Public', () {
@@ -1037,9 +1011,7 @@ void main() {
         expectSortDeclaration(const .instance(.fields));
       });
       test('fieldsGettersSetters', () {
-        expectSortDeclaration(
-          const .instance(.fieldsGettersSetters),
-        );
+        expectSortDeclaration(const .instance(.fieldsGettersSetters));
       });
       test('methods', () {
         expectSortDeclaration(const .instance(.methods));
@@ -1268,9 +1240,7 @@ void main() {
               test('fields', () {
                 expectSortDeclaration(
                   const .instance(
-                    .final_(
-                      .typed(.nullable(.initialized(.private(.fields)))),
-                    ),
+                    .final_(.typed(.nullable(.initialized(.private(.fields))))),
                   ),
                 );
               });
@@ -1453,9 +1423,7 @@ void main() {
           group('Private', () {
             test('fields', () {
               expectSortDeclaration(
-                const .instance(
-                  .late(.typed(.initialized(.private(.fields)))),
-                ),
+                const .instance(.late(.typed(.initialized(.private(.fields))))),
               );
             });
           });
@@ -1867,9 +1835,7 @@ void main() {
               test('fields', () {
                 expectSortDeclaration(
                   const .instance(
-                    .late(
-                      .final_(.nullable(.initialized(.private(.fields)))),
-                    ),
+                    .late(.final_(.nullable(.initialized(.private(.fields))))),
                   ),
                 );
               });
@@ -1919,16 +1885,12 @@ void main() {
       });
       group('Dynamic', () {
         test('methods', () {
-          expectSortDeclaration(
-            const .instance(.operator(.dynamic(.methods))),
-          );
+          expectSortDeclaration(const .instance(.operator(.dynamic(.methods))));
         });
       });
       group('Typed', () {
         test('methods', () {
-          expectSortDeclaration(
-            const .instance(.operator(.typed(.methods))),
-          );
+          expectSortDeclaration(const .instance(.operator(.typed(.methods))));
         });
         group('Nullable', () {
           test('methods', () {
@@ -3266,9 +3228,7 @@ void main() {
           });
           test('fieldsGettersSetters', () {
             expectSortDeclaration(
-              const .instance(
-                .overridden(.abstract(.fieldsGettersSetters)),
-              ),
+              const .instance(.overridden(.abstract(.fieldsGettersSetters))),
             );
           });
           test('getters', () {

@@ -55,17 +55,7 @@ void f() {
 }
 ''',
       [
-        lint(
-          36,
-          1,
-          contextMessages: [
-            contextMessage(
-              testFile,
-              17,
-              1,
-            ),
-          ],
-        ),
+        lint(36, 1, contextMessages: [contextMessage(testFile, 17, 1)]),
       ],
     );
   }

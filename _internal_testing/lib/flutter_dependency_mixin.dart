@@ -64,13 +64,7 @@ abstract class State<T extends StatefulWidget> {
 ''',
     );
     newFile(
-      join(
-        flutterRootPath,
-        'lib',
-        'src',
-        'foundation',
-        'change_notifier.dart',
-      ),
+      join(flutterRootPath, 'lib', 'src', 'foundation', 'change_notifier.dart'),
       '''
 typedef VoidCallback = void Function();
 

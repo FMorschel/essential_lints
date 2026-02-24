@@ -9,9 +9,7 @@ Future<Directory> packageDir(String packageName, String fileUnderLib) async {
   var uri = await Isolate.resolvePackageUri(packageUri);
 
   if (uri == null) {
-    throw StateError(
-      'Could not resolve package URI for $packageName.',
-    );
+    throw StateError('Could not resolve package URI for $packageName.');
   }
   var dir = Directory(uri.toFilePath());
   for (var _ in _regExp.allMatches(fileUnderLib)) {
@@ -41,16 +39,10 @@ Future<Directory> essentialLintsAnnotationsTestPackage() async {
 
 /// Utility functions to get the file system paths of the analyzer package.
 Future<Directory> analyzerPackage() async {
-  return await packageDir(
-    'analyzer',
-    'file_system/file_system.dart.dart',
-  );
+  return await packageDir('analyzer', 'file_system/file_system.dart.dart');
 }
 
 /// Utility functions to get the file system paths of the meta package.
 Future<Directory> metaPackage() async {
-  return await packageDir(
-    'meta',
-    'meta.dart',
-  );
+  return await packageDir('meta', 'meta.dart');
 }

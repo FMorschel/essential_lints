@@ -44,10 +44,7 @@ class ReportShorterLengthsRule extends LintRule<ReportShorterLengthsRule> {
 
 class _ReportShorterLengthsVisitor
     extends BaseVisitor<ReportShorterLengthsRule> {
-  _ReportShorterLengthsVisitor(
-    super.rule,
-    super.context,
-  );
+  _ReportShorterLengthsVisitor(super.rule, super.context);
 
   static const classes = ['AnalysisRule', 'MultiAnalysisRule'];
   static const method = 'reportAtNode';

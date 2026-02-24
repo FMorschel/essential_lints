@@ -122,14 +122,11 @@ workspace:
 ''');
     var anotherPackageRootPath = join(testPackageRootPath, 'another');
     var anotherPackageLibPath = join(anotherPackageRootPath, 'lib');
-    newFile(
-      join(anotherPackageRootPath, 'pubspec.yaml'),
-      '''
+    newFile(join(anotherPackageRootPath, 'pubspec.yaml'), '''
 ${pubspecYamlContent(name: 'another')}
 
 resolution: workspace
-''',
-    );
+''');
     newPackageConfigJsonFileFromBuilder(
       testPackageRootPath,
       PackageConfigFileBuilder()
@@ -139,10 +136,7 @@ resolution: workspace
     newFile(join(anotherPackageLibPath, 'a.dart'), 'class A {}');
     newFile(join(anotherPackageLibPath, 'export.dart'), "export 'a.dart';");
     // Change it so the test file is in the `another` package.
-    testFile = newFile(
-      join(anotherPackageLibPath, 'test.dart'),
-      '',
-    );
+    testFile = newFile(join(anotherPackageLibPath, 'test.dart'), '');
     await resolveTestCode('''
 import 'package:another/export.dart';
 
@@ -163,14 +157,11 @@ workspace:
   - another
 ''');
     var anotherPackageRootPath = join(testPackageRootPath, 'another');
-    newFile(
-      join(anotherPackageRootPath, 'pubspec.yaml'),
-      '''
+    newFile(join(anotherPackageRootPath, 'pubspec.yaml'), '''
 ${pubspecYamlContent(name: 'another')}
 
 resolution: workspace
-''',
-    );
+''');
     newPackageConfigJsonFileFromBuilder(
       testPackageRootPath,
       PackageConfigFileBuilder()

@@ -46,9 +46,7 @@ enum Colors {
   green,
 }
 ''',
-      [
-        lint(31, 5),
-      ],
+      [lint(31, 5)],
     );
   }
 
@@ -63,9 +61,7 @@ enum Colors {
   const Colors(double value);
 }
 ''',
-      [
-        lint(37, 5),
-      ],
+      [lint(37, 5)],
     );
   }
 
@@ -80,9 +76,7 @@ enum Colors {
   c
 }
 ''',
-      [
-        lint(31, 1),
-      ],
+      [lint(31, 1)],
     );
   }
 }

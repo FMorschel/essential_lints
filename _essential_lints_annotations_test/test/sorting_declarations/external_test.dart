@@ -2958,9 +2958,7 @@ void main() {
       });
       group('Dynamic', () {
         test('methods', () {
-          expectSortDeclaration(
-            const .external(.operator(.dynamic(.methods))),
-          );
+          expectSortDeclaration(const .external(.operator(.dynamic(.methods))));
           expectSortDeclaration(const .external(.operator(.dynamic())));
         });
       });
@@ -3068,9 +3066,7 @@ void main() {
           );
         });
         test('getters', () {
-          expectSortDeclaration(
-            const .external(.nullable(.private(.getters))),
-          );
+          expectSortDeclaration(const .external(.nullable(.private(.getters))));
         });
         test('gettersSetters', () {
           expectSortDeclaration(
@@ -3078,14 +3074,10 @@ void main() {
           );
         });
         test('methods', () {
-          expectSortDeclaration(
-            const .external(.nullable(.private(.methods))),
-          );
+          expectSortDeclaration(const .external(.nullable(.private(.methods))));
         });
         test('setters', () {
-          expectSortDeclaration(
-            const .external(.nullable(.private(.setters))),
-          );
+          expectSortDeclaration(const .external(.nullable(.private(.setters))));
         });
       });
     });
@@ -3204,9 +3196,7 @@ void main() {
           group('Private', () {
             test('fields', () {
               expectSortDeclaration(
-                const .external(
-                  .final_(.typed(.nullable(.private(.fields)))),
-                ),
+                const .external(.final_(.typed(.nullable(.private(.fields))))),
               );
             });
           });
@@ -3248,9 +3238,7 @@ void main() {
         expectSortDeclaration(const .external(.private(.fields)));
       });
       test('fieldsGettersSetters', () {
-        expectSortDeclaration(
-          const .external(.private(.fieldsGettersSetters)),
-        );
+        expectSortDeclaration(const .external(.private(.fieldsGettersSetters)));
       });
       test('getters', () {
         expectSortDeclaration(const .external(.private(.getters)));

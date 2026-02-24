@@ -132,22 +132,16 @@ void main() {
                   .toSet();
 
               // Get required members (all non-optional members)
-              var requiredMembers = allGroupMembers.difference(
-                optionalInGroup,
-              );
+              var requiredMembers = allGroupMembers.difference(optionalInGroup);
               var requiredNames = requiredMembers.map((e) => e.name).toSet();
 
               // Check if any optional member is present
-              var hasOptional = redirectedMembers.any(
-                optionalInGroup.contains,
-              );
+              var hasOptional = redirectedMembers.any(optionalInGroup.contains);
 
               if (hasOptional) {
                 // If optional member(s) are present, all required members
                 // must also be present
-                var missingRequired = requiredNames.difference(
-                  redirectedNames,
-                );
+                var missingRequired = requiredNames.difference(redirectedNames);
 
                 if (missingRequired.isNotEmpty) {
                   var optionalNames = optionalInGroup
@@ -168,9 +162,7 @@ void main() {
               } else {
                 // No optional members present
                 // Check if all present members are required
-                var missingRequired = requiredNames.difference(
-                  redirectedNames,
-                );
+                var missingRequired = requiredNames.difference(redirectedNames);
 
                 if (missingRequired.isNotEmpty) {
                   // Some required members are missing

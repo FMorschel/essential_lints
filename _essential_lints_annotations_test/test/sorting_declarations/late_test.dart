@@ -332,23 +332,17 @@ void main() {
       });
       group('Private', () {
         test('fields', () {
-          expectSortDeclaration(
-            const .late(.dynamic(.private(.fields))),
-          );
+          expectSortDeclaration(const .late(.dynamic(.private(.fields))));
         });
       });
       group('Public', () {
         test('fields', () {
-          expectSortDeclaration(
-            const .late(.dynamic(.public(.fields))),
-          );
+          expectSortDeclaration(const .late(.dynamic(.public(.fields))));
         });
       });
       group('Initialized', () {
         test('fields', () {
-          expectSortDeclaration(
-            const .late(.dynamic(.initialized(.fields))),
-          );
+          expectSortDeclaration(const .late(.dynamic(.initialized(.fields))));
         });
         group('Private', () {
           test('fields', () {
@@ -372,23 +366,17 @@ void main() {
       });
       group('Private', () {
         test('fields', () {
-          expectSortDeclaration(
-            const .late(.typed(.private(.fields))),
-          );
+          expectSortDeclaration(const .late(.typed(.private(.fields))));
         });
       });
       group('Public', () {
         test('fields', () {
-          expectSortDeclaration(
-            const .late(.typed(.public(.fields))),
-          );
+          expectSortDeclaration(const .late(.typed(.public(.fields))));
         });
       });
       group('Nullable', () {
         test('fields', () {
-          expectSortDeclaration(
-            const .late(.typed(.nullable(.fields))),
-          );
+          expectSortDeclaration(const .late(.typed(.nullable(.fields))));
         });
         group('Private', () {
           test('fields', () {
@@ -413,18 +401,14 @@ void main() {
           group('Private', () {
             test('fields', () {
               expectSortDeclaration(
-                const .late(
-                  .typed(.nullable(.initialized(.private(.fields)))),
-                ),
+                const .late(.typed(.nullable(.initialized(.private(.fields))))),
               );
             });
           });
           group('Public', () {
             test('fields', () {
               expectSortDeclaration(
-                const .late(
-                  .typed(.nullable(.initialized(.public(.fields)))),
-                ),
+                const .late(.typed(.nullable(.initialized(.public(.fields))))),
               );
             });
           });
@@ -432,9 +416,7 @@ void main() {
       });
       group('Initialized', () {
         test('fields', () {
-          expectSortDeclaration(
-            const .late(.typed(.initialized(.fields))),
-          );
+          expectSortDeclaration(const .late(.typed(.initialized(.fields))));
         });
         group('Private', () {
           test('fields', () {

@@ -55,10 +55,8 @@ class A {
   }
 
   Future<void> test_first_param_bool_allowed() async {
-    await assertNoDiagnostics(
-      '''
+    await assertNoDiagnostics('''
 void f(bool a, int b) {}
-''',
-    );
+''');
   }
 }

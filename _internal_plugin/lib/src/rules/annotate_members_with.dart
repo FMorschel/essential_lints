@@ -125,15 +125,9 @@ class _AnnotateMembersWithVisitor
             annotation.annotation,
           );
           if (node.name case var name?) {
-            rule.reportAtToken(
-              name,
-              arguments: [requiredAnnotationString],
-            );
+            rule.reportAtToken(name, arguments: [requiredAnnotationString]);
           } else if (node case ConstructorDeclaration(:var typeName?)) {
-            rule.reportAtNode(
-              typeName,
-              arguments: [requiredAnnotationString],
-            );
+            rule.reportAtNode(typeName, arguments: [requiredAnnotationString]);
           } else {
             rule.reportAtNode(
               // ignore: _internal_plugin/report_shorter_lengths fallback case

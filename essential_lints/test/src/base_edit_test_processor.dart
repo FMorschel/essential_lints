@@ -58,9 +58,8 @@ abstract class BaseEditTestProcessor extends AnalysisRuleTest
 
   Folder get sdkRoot => getFolder('/sdk');
 
-  dart_change_workspace.DartChangeWorkspace get workspace => .new([
-    sessionFor(testUnit.path),
-  ]);
+  dart_change_workspace.DartChangeWorkspace get workspace =>
+      .new([sessionFor(testUnit.path)]);
 
   void matchesExpected(
     String expected, {

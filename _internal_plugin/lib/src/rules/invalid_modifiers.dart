@@ -70,9 +70,6 @@ class _InvalidModifiersVisitor
 
   @override
   void reportError(SimpleIdentifier node, String? name) {
-    rule.reportAtNode(
-      node,
-      arguments: [name ?? ''],
-    );
+    rule.reportAtNode(node, arguments: [name ?? '']);
   }
 }

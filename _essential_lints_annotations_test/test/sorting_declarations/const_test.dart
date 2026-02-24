@@ -62,9 +62,7 @@ void main() {
       });
       group('Private', () {
         test('constructors', () {
-          expectSortDeclaration(
-            const .const_(.named(.private(.constructors))),
-          );
+          expectSortDeclaration(const .const_(.named(.private(.constructors))));
         });
       });
     });

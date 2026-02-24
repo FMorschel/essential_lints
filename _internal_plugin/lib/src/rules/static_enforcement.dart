@@ -59,10 +59,7 @@ class _StaticEnforcementVisitor extends BaseVisitor<StaticEnforcementRule> {
 
   @override
   void visitMixinDeclaration(MixinDeclaration node) {
-    _handleInstanceElement(
-      node.declaredFragment?.element,
-      node.name,
-    );
+    _handleInstanceElement(node.declaredFragment?.element, node.name);
   }
 
   @override

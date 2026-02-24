@@ -117,9 +117,7 @@ void main() {
         var hasPublicConstructor = classElement.constructors.any(
           (constructor) => constructor.isPublic,
         );
-        var hasPublicField = classElement.fields.any(
-          (field) => field.isPublic,
-        );
+        var hasPublicField = classElement.fields.any((field) => field.isPublic);
         var hasPublicMethod = classElement.methods.any(
           (method) => method.isPublic,
         );
@@ -138,69 +136,62 @@ void main() {
       );
     });
 
-    test(
-      'All public classes (except Group and SortDeclaration) should be used '
-      'as factory constructor parameters',
-      () {
-        var classElements = sortDeclarationsResult.element.classes;
+    test('All public classes (except Group and SortDeclaration) should be used '
+        'as factory constructor parameters', () {
+      var classElements = sortDeclarationsResult.element.classes;
 
-        expect(
-          classElements,
-          isNotEmpty,
-          reason: 'No classes found in library',
-        );
+      expect(classElements, isNotEmpty, reason: 'No classes found in library');
 
-        // Collect all public classes except Group and SortDeclaration
-        var publicClasses = classElements.where((c) => c.isPublic).toSet();
+      // Collect all public classes except Group and SortDeclaration
+      var publicClasses = classElements.where((c) => c.isPublic).toSet();
 
-        // Collect all types used as factory constructor parameters
-        var typesUsedInFactories = <String>{};
+      // Collect all types used as factory constructor parameters
+      var typesUsedInFactories = <String>{};
 
-        for (var classElement in classElements) {
-          for (var constructor in classElement.constructors) {
-            if (constructor.isFactory) {
-              for (var parameter in constructor.formalParameters) {
-                var paramType = parameter.type;
-                var paramTypeName = paramType.element?.name;
-                if (paramTypeName != null) {
-                  typesUsedInFactories.add(paramTypeName);
-                }
+      for (var classElement in classElements) {
+        for (var constructor in classElement.constructors) {
+          if (constructor.isFactory) {
+            for (var parameter in constructor.formalParameters) {
+              var paramType = parameter.type;
+              var paramTypeName = paramType.element?.name;
+              if (paramTypeName != null) {
+                typesUsedInFactories.add(paramTypeName);
               }
             }
           }
         }
+      }
 
-        // Find classes not used in factory constructors
-        var unusedClasses = <String>[];
+      // Find classes not used in factory constructors
+      var unusedClasses = <String>[];
 
-        for (var classElement in publicClasses) {
-          var className = classElement.name;
-          if (className == null) continue;
+      for (var classElement in publicClasses) {
+        var className = classElement.name;
+        if (className == null) continue;
 
-          // Skip Group classes and SortDeclaration
-          if (className == 'SortDeclaration') continue;
+        // Skip Group classes and SortDeclaration
+        if (className == 'SortDeclaration') continue;
 
-          // Skip classes that extend Group
-          var extendsGroup = classElement.allSupertypes.any(
-            (type) => type.element.name == 'Group',
-          );
-          if (extendsGroup || className == 'Group') continue;
-
-          if (className == 'Modifier') continue;
-
-          if (!typesUsedInFactories.contains(className)) {
-            unusedClasses.add(className);
-          }
-        }
-
-        expect(
-          unusedClasses,
-          isEmpty,
-          reason:
-              'The following public classes are not used as factory '
-              'constructor parameters:\n  - ${unusedClasses.join('\n  - ')}',
+        // Skip classes that extend Group
+        var extendsGroup = classElement.allSupertypes.any(
+          (type) => type.element.name == 'Group',
         );
-      },
-    );
+        if (extendsGroup || className == 'Group') continue;
+
+        if (className == 'Modifier') continue;
+
+        if (!typesUsedInFactories.contains(className)) {
+          unusedClasses.add(className);
+        }
+      }
+
+      expect(
+        unusedClasses,
+        isEmpty,
+        reason:
+            'The following public classes are not used as factory '
+            'constructor parameters:\n  - ${unusedClasses.join('\n  - ')}',
+      );
+    });
   });
 }

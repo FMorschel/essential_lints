@@ -25,9 +25,7 @@ void main() {
       });
       group('Private', () {
         test('fields', () {
-          expectSortDeclaration(
-            const .final_(.initialized(.private(.fields))),
-          );
+          expectSortDeclaration(const .final_(.initialized(.private(.fields))));
         });
       });
     });
@@ -147,9 +145,7 @@ void main() {
         });
         group('members', () {
           test('fields', () {
-            expectSortDeclaration(
-              const .final_(.typed(.initialized(.fields))),
-            );
+            expectSortDeclaration(const .final_(.typed(.initialized(.fields))));
           });
         });
         group('Private', () {

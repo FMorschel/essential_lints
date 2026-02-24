@@ -34,13 +34,7 @@ import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 @GettersInMemberList(memberListName: Symbol.empty)
 class A {}
 ''',
-      [
-        error(
-          GettersInMemberList.invalidMemberListName,
-          117,
-          1,
-        ),
-      ],
+      [error(GettersInMemberList.invalidMemberListName, 117, 1)],
     );
   }
 
@@ -94,9 +88,7 @@ abstract class A {
         lint(
           193,
           7,
-          correctionContains: RegExp(
-            r"^(?=.*'value')(?=.*'otherValue').+$",
-          ),
+          correctionContains: RegExp(r"^(?=.*'value')(?=.*'otherValue').+$"),
         ),
       ],
     );
@@ -135,9 +127,7 @@ abstract class A {
         lint(
           219,
           7,
-          correctionContains: RegExp(
-            r"^(?=.*'value')(?!.*'otherValue').+$",
-          ),
+          correctionContains: RegExp(r"^(?=.*'value')(?!.*'otherValue').+$"),
         ),
       ],
     );
@@ -160,9 +150,7 @@ abstract class A {
         lint(
           218,
           7,
-          correctionContains: RegExp(
-            r"^(?!.*'value')(?=.*'otherValue').+$",
-          ),
+          correctionContains: RegExp(r"^(?!.*'value')(?=.*'otherValue').+$"),
         ),
       ],
     );
@@ -185,9 +173,7 @@ abstract class A {
         lint(
           228,
           7,
-          correctionContains: RegExp(
-            r"^(?!.*'value')(?=.*'otherValue').+$",
-          ),
+          correctionContains: RegExp(r"^(?!.*'value')(?=.*'otherValue').+$"),
         ),
       ],
     );
@@ -210,9 +196,7 @@ abstract class A {
         lint(
           229,
           7,
-          correctionContains: RegExp(
-            r"^(?=.*'value')(?=.*'otherValue').+$",
-          ),
+          correctionContains: RegExp(r"^(?=.*'value')(?=.*'otherValue').+$"),
         ),
       ],
     );
@@ -235,9 +219,7 @@ abstract class A {
         lint(
           223,
           7,
-          correctionContains: RegExp(
-            r"^(?!.*'value')(?=.*'otherValue').+$",
-          ),
+          correctionContains: RegExp(r"^(?!.*'value')(?=.*'otherValue').+$"),
         ),
       ],
     );
@@ -260,9 +242,7 @@ abstract class A {
         lint(
           224,
           7,
-          correctionContains: RegExp(
-            r"^(?=.*'value')(?!.*'otherValue').+$",
-          ),
+          correctionContains: RegExp(r"^(?=.*'value')(?!.*'otherValue').+$"),
         ),
       ],
     );
@@ -302,13 +282,7 @@ class A {
   List<Object?> get members => [value, 0];
 }
 ''',
-      [
-        error(
-          GettersInMemberList.nonMemberIn,
-          213,
-          1,
-        ),
-      ],
+      [error(GettersInMemberList.nonMemberIn, 213, 1)],
     );
   }
 
@@ -328,13 +302,7 @@ class A {
   List<Object?> get members => [value, ?nullableInt, value2];
 }
 ''',
-      [
-        error(
-          GettersInMemberList.nonMemberIn,
-          278,
-          11,
-        ),
-      ],
+      [error(GettersInMemberList.nonMemberIn, 278, 11)],
     );
   }
 
@@ -383,13 +351,7 @@ class A {
   List<Object?> get members => [value, staticValue];
 }
 ''',
-      [
-        error(
-          GettersInMemberList.nonMemberIn,
-          250,
-          11,
-        ),
-      ],
+      [error(GettersInMemberList.nonMemberIn, 250, 11)],
     );
   }
 
@@ -532,9 +494,7 @@ class A {
         lint(
           230,
           7,
-          correctionContains: RegExp(
-            r"^(?=.*'staticValue')(?=.*'value').+$",
-          ),
+          correctionContains: RegExp(r"^(?=.*'staticValue')(?=.*'value').+$"),
         ),
       ],
     );

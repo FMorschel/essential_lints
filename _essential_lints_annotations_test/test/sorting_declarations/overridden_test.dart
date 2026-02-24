@@ -425,9 +425,7 @@ void main() {
       });
       group('Public', () {
         test('fields', () {
-          expectSortDeclaration(
-            const .overridden(.nullable(.public(.fields))),
-          );
+          expectSortDeclaration(const .overridden(.nullable(.public(.fields))));
         });
         test('fieldsGettersSetters', () {
           expectSortDeclaration(
@@ -581,9 +579,7 @@ void main() {
           });
           test('gettersSetters', () {
             expectSortDeclaration(
-              const .overridden(
-                .abstract(.dynamic(.private(.gettersSetters))),
-              ),
+              const .overridden(.abstract(.dynamic(.private(.gettersSetters)))),
             );
           });
           test('methods', () {
@@ -685,9 +681,7 @@ void main() {
           });
           test('gettersSetters', () {
             expectSortDeclaration(
-              const .overridden(
-                .abstract(.typed(.private(.gettersSetters))),
-              ),
+              const .overridden(.abstract(.typed(.private(.gettersSetters)))),
             );
           });
           test('methods', () {
@@ -721,9 +715,7 @@ void main() {
           });
           test('gettersSetters', () {
             expectSortDeclaration(
-              const .overridden(
-                .abstract(.typed(.nullable(.gettersSetters))),
-              ),
+              const .overridden(.abstract(.typed(.nullable(.gettersSetters)))),
             );
           });
           test('methods', () {
@@ -852,9 +844,7 @@ void main() {
       });
       group('Public', () {
         test('fields', () {
-          expectSortDeclaration(
-            const .overridden(.abstract(.public(.fields))),
-          );
+          expectSortDeclaration(const .overridden(.abstract(.public(.fields))));
         });
         test('getters', () {
           expectSortDeclaration(
@@ -1001,9 +991,7 @@ void main() {
           expectSortDeclaration(
             const .overridden(.abstract(.operator(.methods))),
           );
-          expectSortDeclaration(
-            const .overridden(.abstract(.operator())),
-          );
+          expectSortDeclaration(const .overridden(.abstract(.operator())));
         });
         group('Dynamic', () {
           test('methods', () {
@@ -1082,9 +1070,7 @@ void main() {
       });
       group('final', () {
         test('fields', () {
-          expectSortDeclaration(
-            const .overridden(.abstract(.final_(.fields))),
-          );
+          expectSortDeclaration(const .overridden(.abstract(.final_(.fields))));
         });
         group('Dynamic', () {
           test('fields', () {
@@ -1147,9 +1133,7 @@ void main() {
           group('Public', () {
             test('fields', () {
               expectSortDeclaration(
-                const .overridden(
-                  .abstract(.final_(.typed(.public(.fields)))),
-                ),
+                const .overridden(.abstract(.final_(.typed(.public(.fields))))),
               );
             });
           });
@@ -1218,9 +1202,7 @@ void main() {
       });
       group('Typed', () {
         test('methods', () {
-          expectSortDeclaration(
-            const .overridden(.operator(.typed(.methods))),
-          );
+          expectSortDeclaration(const .overridden(.operator(.typed(.methods))));
         });
         group('Nullable', () {
           test('methods', () {
@@ -1334,9 +1316,7 @@ void main() {
           group('Private', () {
             test('fields', () {
               expectSortDeclaration(
-                const .overridden(
-                  .late(.typed(.nullable(.private(.fields)))),
-                ),
+                const .overridden(.late(.typed(.nullable(.private(.fields))))),
               );
             });
           });
@@ -1543,18 +1523,14 @@ void main() {
           group('Public', () {
             test('fields', () {
               expectSortDeclaration(
-                const .overridden(
-                  .late(.final_(.dynamic(.public(.fields)))),
-                ),
+                const .overridden(.late(.final_(.dynamic(.public(.fields))))),
               );
             });
           });
           group('Private', () {
             test('fields', () {
               expectSortDeclaration(
-                const .overridden(
-                  .late(.final_(.dynamic(.private(.fields)))),
-                ),
+                const .overridden(.late(.final_(.dynamic(.private(.fields))))),
               );
             });
           });
@@ -1568,9 +1544,7 @@ void main() {
           group('Nullable', () {
             test('fields', () {
               expectSortDeclaration(
-                const .overridden(
-                  .late(.final_(.typed(.nullable(.fields)))),
-                ),
+                const .overridden(.late(.final_(.typed(.nullable(.fields))))),
               );
             });
             group('Initialized', () {
@@ -1657,18 +1631,14 @@ void main() {
           group('Public', () {
             test('fields', () {
               expectSortDeclaration(
-                const .overridden(
-                  .late(.final_(.typed(.public(.fields)))),
-                ),
+                const .overridden(.late(.final_(.typed(.public(.fields))))),
               );
             });
           });
           group('Private', () {
             test('fields', () {
               expectSortDeclaration(
-                const .overridden(
-                  .late(.final_(.typed(.private(.fields)))),
-                ),
+                const .overridden(.late(.final_(.typed(.private(.fields))))),
               );
             });
           });
@@ -1816,9 +1786,7 @@ void main() {
       });
       group('Dynamic', () {
         test('fields', () {
-          expectSortDeclaration(
-            const .overridden(.final_(.dynamic(.fields))),
-          );
+          expectSortDeclaration(const .overridden(.final_(.dynamic(.fields))));
         });
         group('Initialized', () {
           test('fields', () {
@@ -1900,9 +1868,7 @@ void main() {
           group('Public', () {
             test('fields', () {
               expectSortDeclaration(
-                const .overridden(
-                  .final_(.typed(.nullable(.public(.fields)))),
-                ),
+                const .overridden(.final_(.typed(.nullable(.public(.fields))))),
               );
             });
           });

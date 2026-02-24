@@ -227,11 +227,7 @@ Future<void> main() async {
     ),
   );
   var testDirPath = path.normalize(
-    path.join(
-      currentPackageDir.path,
-      'test',
-      'sorting_declarations',
-    ),
+    path.join(currentPackageDir.path, 'test', 'sorting_declarations'),
   );
 
   // Analyze sort_declarations.dart
@@ -269,18 +265,14 @@ Future<void> main() async {
   var testFiles = [
     ...await testDir
         .list()
-        .where(
-          (entity) => entity is File && entity.path.endsWith('_test.dart'),
-        )
+        .where((entity) => entity is File && entity.path.endsWith('_test.dart'))
         .map((entity) => path.normalize(entity.path))
         .toList(),
   ];
 
   for (var testFile in testFiles) {
     var testPath = path.join(testDirPath, testFile);
-    var testResult = await context.currentSession.getResolvedLibrary(
-      testPath,
-    );
+    var testResult = await context.currentSession.getResolvedLibrary(testPath);
     if (testResult is ResolvedLibraryResult) {
       testResults.add(testResult);
     }

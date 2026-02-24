@@ -3,9 +3,7 @@ import 'package:analyzer/error/error.dart';
 
 mixin BuiltInRules {
   List<AnalysisRule> get builtInRules {
-    return [
-      _BuiltInRule('prefer_relative_imports'),
-    ];
+    return [_BuiltInRule('prefer_relative_imports')];
   }
 }
 

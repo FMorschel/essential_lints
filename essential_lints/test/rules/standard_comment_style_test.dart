@@ -50,10 +50,7 @@ void f() {}
 /// a new paragraph.
 void f() {}
 ''',
-      [
-        lint(0, 25),
-        lint(70, 20),
-      ],
+      [lint(0, 25), lint(70, 20)],
     );
   }
 

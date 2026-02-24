@@ -15,20 +15,17 @@ Future<void> main() async {
     var packageRootPath = packageRoot.path;
 
     // Parse dartdoc options with the package root as input directory
-    var config = parseOptions(
-      pubPackageMetaProvider,
-      ['--input', packageRootPath],
-    );
+    var config = parseOptions(pubPackageMetaProvider, [
+      '--input',
+      packageRootPath,
+    ]);
 
     if (config == null) {
       fail('Failed to parse dartdoc options');
     }
 
     // Create package builder
-    var packageBuilder = PubPackageBuilder(
-      config,
-      pubPackageMetaProvider,
-    );
+    var packageBuilder = PubPackageBuilder(config, pubPackageMetaProvider);
 
     // Build package graph without generating documentation
     var packageGraph = await packageBuilder.buildPackageGraph();
@@ -63,9 +60,7 @@ Future<void> main() async {
         for (var constructor in class_.constructors) {
           if (!constructor.isPublic) continue;
           if (constructor.documentation.trim().isEmpty) {
-            missingDocs.add(
-              'Constructor ${constructor.name}',
-            );
+            missingDocs.add('Constructor ${constructor.name}');
           }
         }
 

@@ -1212,9 +1212,7 @@ class A extends Base {
   int? field = 1;
 }
 ''',
-      [
-        error(rule.diagnosticCode, 241, 5),
-      ],
+      [error(rule.diagnosticCode, 241, 5)],
     );
   }
 
@@ -1260,9 +1258,7 @@ class A extends Base {
   int newField = 0;
 }
 ''',
-      [
-        error(rule.diagnosticCode, 228, 8),
-      ],
+      [error(rule.diagnosticCode, 228, 8)],
     );
   }
 

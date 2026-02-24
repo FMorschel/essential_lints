@@ -183,10 +183,7 @@ class C {
   }
 }
 ''',
-      [
-        lint(200, 1),
-        error(PendingListener.unnecessaryRemove, 235, 1),
-      ],
+      [lint(200, 1), error(PendingListener.unnecessaryRemove, 235, 1)],
     );
   }
 
@@ -365,10 +362,7 @@ class C {
   }
 }
 ''',
-      [
-        lint(301, 8),
-        error(PendingListener.unnecessaryRemove, 354, 8),
-      ],
+      [lint(301, 8), error(PendingListener.unnecessaryRemove, 354, 8)],
     );
   }
 
@@ -424,10 +418,7 @@ class C {
   }
 }
 ''',
-      [
-        lint(362, 8),
-        error(PendingListener.unnecessaryRemove, 420, 8),
-      ],
+      [lint(362, 8), error(PendingListener.unnecessaryRemove, 420, 8)],
     );
   }
 
@@ -487,10 +478,7 @@ class C {
   }
 }
 ''',
-      [
-        lint(173, 8),
-        error(PendingListener.unnecessaryRemove, 247, 8),
-      ],
+      [lint(173, 8), error(PendingListener.unnecessaryRemove, 247, 8)],
     );
   }
 
