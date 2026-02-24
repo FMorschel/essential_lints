@@ -105,12 +105,13 @@ const experimental = 'experimental';
 abstract class ExperimentalApi {}
 ```
 
-Use the `onlyConcrete` parameter to only enforce the rule on concrete (non-abstract) subtypes:
+Use the `option` parameter to only enforce the rule on concrete (non-abstract) subtypes. You can also control package scope with `packageOption`:
 
 ```dart
 @SubtypeAnnotating(
   annotations: [Deprecated],
-  onlyConcrete: true,
+  option: SubtypeOption.concrete,
+  packageOption: PackageOption.inherit,
 )
 abstract class BaseClass {}
 
@@ -158,15 +159,43 @@ class MyCustom extends Base {}                // ✗ Missing 'Class' suffix
 class CustomClass extends Base {}             // ✗ Missing 'My' prefix
 ```
 
-Use the `onlyConcrete` parameter to only enforce naming on concrete (non-abstract) subtypes:
+Use the `option` parameter to only enforce naming on concrete (non-abstract) subtypes. You can also control package scope with `packageOption`:
 
 ```dart
-@SubtypeNaming(prefix: 'I', onlyConcrete: true)
+@SubtypeNaming(prefix: 'I', option: SubtypeOption.concrete)
 abstract class Interface {}
 
 abstract class BaseImplementation extends Interface {} // ✓ Allowed
 class IUserRepository extends Interface {}             // ✓ Correct
 class UserRepository extends Interface {}              // ✗ Missing 'I' prefix
+```
+
+### Package Option
+
+Use the `packageOption` parameter to control whether a rule applies only to subtypes inside the same package (`PackageOption.private`) or to subtypes across packages (`PackageOption.inherit`).
+
+```dart
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+// Only enforce annotations for subtypes in the same package
+@SubtypeAnnotating(
+  annotations: [Deprecated],
+  option: SubtypeOption.concrete,
+  packageOption: PackageOption.private,
+)
+abstract class BaseInternal {}
+
+class InternalConcrete extends BaseInternal {} // ✓ must have @Deprecated (same package)
+
+// To enforce across packages, use `PackageOption.inherit` instead
+@SubtypeAnnotating(
+  annotations: [Deprecated],
+  option: SubtypeOption.concrete,
+  packageOption: PackageOption.inherit,
+)
+abstract class BasePublic {}
+
+// Subtypes in other packages will also be required to have the annotation
 ```
 
 ## Additional information
