@@ -3,7 +3,6 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/syntactic_entity.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:logging/logging.dart';
 
@@ -11,6 +10,7 @@ import '../plugin.dart';
 import '../rules/analysis_rule.dart';
 import '../utils/base_visitor.dart';
 import 'essential_lint_warnings.dart';
+import 'subtype_rule_mixin.dart';
 import 'warning.dart';
 
 /// {@template subtype_naming_rule}
@@ -18,7 +18,8 @@ import 'warning.dart';
 /// {@endtemplate}
 @staticLoggerEnforcement
 class SubtypeNamingRule
-    extends MultiWarningRule<SubtypeNamingRule, SubtypeNaming> {
+    extends MultiWarningRule<SubtypeNamingRule, SubtypeNaming>
+    with SubtypeRuleMixin {
   /// {@macro subtype_naming_rule}
   SubtypeNamingRule() : super(.subtypeNaming, _logger);
 
@@ -41,16 +42,16 @@ class SubtypeNamingRule
   }
 }
 
-class _SubtypeNamingAnnotation {
+class _SubtypeNamingAnnotation extends SubtypeAnnotation {
   const _SubtypeNamingAnnotation({
     required this.prefix,
     required this.suffix,
     required this.containing,
-    required this.option,
-    required this.packageOption,
+    required super.option,
+    required super.packageOption,
   });
 
-  static _SubtypeNamingAnnotation empty = const .new(
+  static const _SubtypeNamingAnnotation empty = .new(
     prefix: null,
     suffix: null,
     containing: null,
@@ -61,11 +62,10 @@ class _SubtypeNamingAnnotation {
   final String? prefix;
   final String? suffix;
   final String? containing;
-  final DartObject? option;
-  final DartObject? packageOption;
 }
 
-class _SubtypeNamingVisitor extends BaseVisitor<SubtypeNamingRule> {
+class _SubtypeNamingVisitor extends BaseVisitor<SubtypeNamingRule>
+    with SubtypeRuleMixin {
   _SubtypeNamingVisitor(super.rule, super.context);
 
   static const _annotationName = 'SubtypeNaming';
@@ -215,55 +215,28 @@ class _SubtypeNamingVisitor extends BaseVisitor<SubtypeNamingRule> {
     logger.fine(
       'Verifying supertypes for: ${element.name}, abstract=$abstract',
     );
-    var annotations = <MapEntry<_SubtypeNamingAnnotation, InterfaceElement>>[];
-    var visitedElements = <InterfaceElement>{element};
-    logger.finer('Processing ${element.allSupertypes.length} supertypes');
-    for (var interface in element.allSupertypes) {
-      var current = interface.element;
-      if (!visitedElements.add(current)) {
-        logger.finer('Already visited ${current.name}, skipping');
-        continue;
-      }
-      var currentAnnotations = current.metadata.annotations
-          .where(_isSubtypeNamingAnnotation)
-          .map(_mapKnownArguments)
-          .toList();
-      logger.finer(
-        'Supertype ${current.name} has ${currentAnnotations.length} '
-        'SubtypeNaming annotations',
-      );
-      annotations.addAll(currentAnnotations.map((a) => MapEntry(a, current)));
-    }
+    var annotations = collectSuperTypeAnnotations<_SubtypeNamingAnnotation>(
+      element,
+      _isSubtypeNamingAnnotation,
+      _mapKnownArguments,
+    );
 
     logger.fine('Total annotations to check: ${annotations.length}');
-    for (var entry in annotations) {
-      var annotation = entry.key;
-      var origin = entry.value;
-      if (annotation.packageOption?.variable?.name == 'private' &&
-          !_isSamePackage(element, origin)) {
-        logger.finer(
-          '  Skipping due to packageOption.private from other package',
-        );
+    for (var MapEntry(key: annotation, value: origin) in annotations) {
+      if (shouldSkipAnnotation(
+        annotation,
+        element,
+        origin,
+        abstract: abstract,
+        isMixin: element is MixinElement,
+      )) {
+        logger.finer('  Skipping due to subtype annotation options');
         continue;
       }
       logger.finer(
         'Checking annotation: prefix=${annotation.prefix}, '
         'suffix=${annotation.suffix}, containing=${annotation.containing}',
       );
-      if (annotation.option?.variable?.name == 'onlyConcrete' && abstract) {
-        logger.finer('  Skipping due to onlyConcrete with abstract type');
-        continue;
-      } else if (annotation.option?.variable?.name == 'onlyAbstract' &&
-          !abstract) {
-        logger.finer('  Skipping due to onlyAbstract with concrete type');
-        continue;
-      } else if (annotation.option?.variable?.name == 'onlyInstantiable' &&
-          (abstract || element is MixinElement)) {
-        logger.finer(
-          '  Skipping due to onlyInstantiable with non-instantiable type',
-        );
-        continue;
-      }
       var typeName = switch (name) {
         Token() => name.lexeme,
         Identifier() => name.name,
@@ -307,18 +280,5 @@ class _SubtypeNamingVisitor extends BaseVisitor<SubtypeNamingRule> {
       }
     }
     logger.info('_verifySuperTypes() completed');
-  }
-
-  bool _isSamePackage(InterfaceElement a, InterfaceElement b) {
-    var au = a.firstFragment.enclosingFragment?.source.uri;
-    var bu = b.firstFragment.enclosingFragment?.source.uri;
-    if (au == null || bu == null) return false;
-    if (au.scheme == 'package' && bu.scheme == 'package') {
-      if (au.pathSegments.isNotEmpty && bu.pathSegments.isNotEmpty) {
-        return au.pathSegments.first == bu.pathSegments.first;
-      }
-      return au == bu;
-    }
-    return au == bu;
   }
 }

@@ -14,6 +14,7 @@ import '../utils/base_visitor.dart';
 import '../utils/dart_object_to_string.dart';
 import '../utils/extensions/list.dart';
 import 'essential_lint_warnings.dart';
+import 'subtype_rule_mixin.dart';
 import 'warning.dart';
 
 /// {@template subtype_annotating_rule}
@@ -21,7 +22,8 @@ import 'warning.dart';
 /// {@endtemplate}
 @staticLoggerEnforcement
 class SubtypeAnnotatingRule
-    extends MultiWarningRule<SubtypeAnnotatingRule, SubtypeAnnotating> {
+    extends MultiWarningRule<SubtypeAnnotatingRule, SubtypeAnnotating>
+    with SubtypeRuleMixin {
   /// {@macro subtype_annotating_rule}
   SubtypeAnnotatingRule() : super(.subtypeAnnotating, _logger);
 
@@ -44,7 +46,8 @@ class SubtypeAnnotatingRule
   }
 }
 
-class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule> {
+class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule>
+    with SubtypeRuleMixin {
   _SubtypeAnnotatingVisitor(super.rule, super.context);
 
   static const _annotationName = 'SubtypeAnnotating';
@@ -56,7 +59,7 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule> {
   @override
   void visitAnnotation(Annotation node) {
     logger.info('_SubtypeAnnotatingVisitor.visitAnnotation() started');
-    if (_isSubtypeNamingAnnotation(node.elementAnnotation)) {
+    if (_isSubtypeAnnotation(node.elementAnnotation)) {
       logger.fine('Found SubtypeAnnotating annotation');
       var annotation = _mapKnownArguments(node.elementAnnotation);
       logger.finer(
@@ -161,7 +164,7 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule> {
     super.visitMixinDeclaration(node);
   }
 
-  bool _isSubtypeNamingAnnotation(ElementAnnotation? annotation) {
+  bool _isSubtypeAnnotation(ElementAnnotation? annotation) {
     if (annotation == null) {
       return false;
     }
@@ -171,7 +174,7 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule> {
     return annotation.element?.library?.uri == _annotationUri;
   }
 
-  _SubtypeNamingAnnotation _mapKnownArguments(ElementAnnotation? annotation) {
+  _SubtypeAnnotatingAnnotation _mapKnownArguments(ElementAnnotation? annotation) {
     logger.fine('_mapKnownArguments() started');
     if (annotation == null) {
       logger.finer('Annotation is null, returning empty');
@@ -193,7 +196,7 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule> {
     logger.fine(
       '_mapKnownArguments() returning ${annotations.length} annotations',
     );
-    return _SubtypeNamingAnnotation(
+    return _SubtypeAnnotatingAnnotation(
       annotations: annotations,
       option: onlyConcrete,
       packageOption: packageOption,
@@ -214,25 +217,11 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule> {
     logger.fine(
       'Verifying supertypes for: ${element.name}, abstract=$abstract',
     );
-    var annotations = <MapEntry<_SubtypeNamingAnnotation, InterfaceElement>>[];
-    var visitedElements = <InterfaceElement>{element};
-    logger.finer('Processing ${element.allSupertypes.length} supertypes');
-    for (var interface in element.allSupertypes) {
-      var current = interface.element;
-      if (!visitedElements.add(current)) {
-        logger.finer('Already visited ${current.name}, skipping');
-        continue;
-      }
-      var currentAnnotations = current.metadata.annotations
-          .where(_isSubtypeNamingAnnotation)
-          .map(_mapKnownArguments)
-          .toList();
-      logger.finer(
-        'Supertype ${current.name} has ${currentAnnotations.length} '
-        'SubtypeAnnotating annotations',
-      );
-      annotations.addAll(currentAnnotations.map((a) => MapEntry(a, current)));
-    }
+    var annotations = collectSuperTypeAnnotations<_SubtypeAnnotatingAnnotation>(
+      element,
+      _isSubtypeAnnotation,
+      _mapKnownArguments,
+    );
 
     logger.fine('Total annotations to check: ${annotations.length}');
     bool existing(DartObject annotation) {
@@ -247,34 +236,21 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule> {
     }
 
     var missingCount = 0;
-    for (var entry in annotations) {
-      var annotation = entry.key;
-      var origin = entry.value;
-      if (annotation.packageOption?.variable?.name == 'private' &&
-          !_isSamePackage(element, origin)) {
-        logger.finer(
-          '  Skipping due to packageOption.private from other package',
-        );
+    for (var MapEntry(key: annotation, value: origin) in annotations) {
+      if (shouldSkipAnnotation(
+        annotation,
+        element,
+        origin,
+        abstract: abstract,
+        isMixin: element is MixinElement,
+      )) {
+        logger.finer('  Skipping due to subtype annotation options');
         continue;
       }
       logger.finer(
         'Checking annotation with ${annotation.annotations.length} required '
         'annotations',
       );
-      if (annotation.option?.variable?.name == 'onlyConcrete' && abstract) {
-        logger.finer('  Skipping due to onlyConcrete with abstract type');
-        continue;
-      } else if (annotation.option?.variable?.name == 'onlyAbstract' &&
-          !abstract) {
-        logger.finer('  Skipping due to onlyAbstract with concrete type');
-        continue;
-      } else if (annotation.option?.variable?.name == 'onlyInstantiable' &&
-          (abstract || element is MixinElement)) {
-        logger.finer(
-          '  Skipping due to onlyInstantiable with non-instantiable type',
-        );
-        continue;
-      }
       var missingAnnotations = annotation.annotations.whereNot(existing);
       logger.finer('  Missing ${missingAnnotations.length} annotations');
       if (missingAnnotations.isNotEmpty) {
@@ -305,35 +281,20 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule> {
       'annotations',
     );
   }
-
-  bool _isSamePackage(InterfaceElement a, InterfaceElement b) {
-    var au = a.firstFragment.enclosingFragment?.source.uri;
-    var bu = b.firstFragment.enclosingFragment?.source.uri;
-    if (au == null || bu == null) return false;
-    if (au.scheme == 'package' && bu.scheme == 'package') {
-      if (au.pathSegments.isNotEmpty && bu.pathSegments.isNotEmpty) {
-        return au.pathSegments.first == bu.pathSegments.first;
-      }
-      return au == bu;
-    }
-    return au == bu;
-  }
 }
 
-class _SubtypeNamingAnnotation {
-  const _SubtypeNamingAnnotation({
+class _SubtypeAnnotatingAnnotation extends SubtypeAnnotation {
+  const _SubtypeAnnotatingAnnotation({
     required this.annotations,
-    required this.option,
-    required this.packageOption,
+    required super.option,
+    required super.packageOption,
   });
 
-  static _SubtypeNamingAnnotation empty = const .new(
+  static const _SubtypeAnnotatingAnnotation empty = .new(
     annotations: [],
     option: null,
     packageOption: null,
   );
 
   final List<DartObject> annotations;
-  final DartObject? option;
-  final DartObject? packageOption;
 }
