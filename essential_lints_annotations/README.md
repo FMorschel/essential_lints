@@ -16,7 +16,7 @@ Add `essential_lints_annotations` to your `analysis_options.yaml` plugins:
 
 ```yaml
 dependencies:
-  essential_lints_annotations: ^0.1.9
+  essential_lints_annotations: ^0.1.10
 ```
 
 Ensure you have the [`essential_lints`](https://pub.dev/packages/essential_lints) package configured in your `analysis_options.yaml` to enable these lint rules.

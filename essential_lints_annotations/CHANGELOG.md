@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.4
+
+Released on: 2026-02-24
+
+- Adds **`SubtypeDeannotating`**: An annotation that stops propagation of annotation rules to subtypes. This is useful for cases where you want to enforce certain rules on a class and its subtypes, but allow specific subtypes to opt-out of those rules.
+- Adds **`SubtypeUnnaming`**: An annotation that stops propagation of naming rules to subtypes. This is useful for cases where you want to enforce certain naming conventions on a class and its subtypes, but allow specific subtypes to opt-out of those naming conventions.
+
 ## 0.1.3+1
 
 Released on: 2026-02-24
