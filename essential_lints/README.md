@@ -101,7 +101,7 @@ If you plan to use the configurable warning rules (`getters_in_member_list`, `su
 
 ```yaml
 dependencies:
-  essential_lints_annotations: ^0.1.1
+  essential_lints_annotations: ^0.1.3
 ```
 
 ## Usage

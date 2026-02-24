@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.9
+
+Released on: 2026-02-24
+
+- **Subtype annotations**: Adds package-option support
+- **ambiguous_positional_boolean**: Adds new rule to detect ambiguous boolean positional parameters.
+- **pending_listeners**:
+  - Fixes two more cases of disposed listeners and multiple removals.
+  - Improves detection and reporting for additional listener scenarios (instantiation and assignments).
+
 ## 0.1.8
 
 Released on: 2026-02-17
