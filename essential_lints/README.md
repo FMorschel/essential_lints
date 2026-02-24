@@ -70,8 +70,8 @@ plugins:
     diagnostics:
       - alphabetize_arguments
       - alphabetize_enum_constants
-      - boolean_assignment
       - ambiguous_positional_boolean
+      - boolean_assignment
       - border_all
       - border_radius_all
       - closure_incorrect_type

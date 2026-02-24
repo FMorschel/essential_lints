@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.9+1
+
+Released on: 2026-02-24
+
+- Fixes README rule sorting.
+
 ## 0.1.9
 
 Released on: 2026-02-24
