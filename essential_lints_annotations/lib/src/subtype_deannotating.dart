@@ -4,8 +4,8 @@ import 'utils/package_option.dart';
 import 'utils/subtype_annotation.dart';
 import 'utils/subtype_option.dart';
 
-/// {@template subtype_annotating}
-/// Annotations for the `subtype_annotating` rule.
+/// {@template subtype_deannotating}
+/// Annotation that stops propagation of annotation rules to subtypes.
 /// {@endtemplate}
 @Target({
   TargetKind.classType,
@@ -13,9 +13,9 @@ import 'utils/subtype_option.dart';
   TargetKind.mixinType,
   TargetKind.enumType,
 })
-class SubtypeAnnotating implements SubtypeAnnotation {
-  /// {@macro subtype_annotating}
-  const SubtypeAnnotating({
+class SubtypeDeannotating implements SubtypeAnnotation {
+  /// {@macro subtype_deannotating}
+  const SubtypeDeannotating({
     required this.annotations,
     this.option = SubtypeOption.all,
     this.packageOption = PackageOption.inherit,

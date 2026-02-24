@@ -274,7 +274,26 @@ enum SubtypeAnnotating with EnumDiagnostic, SubDiagnostic, SubWarnings {
           'A lint rule that ensures the @SubtypeAnnotating annotation '
           'specifies type names and not constructor invocations or tear-offs.',
     ),
+  ),
+
+  /// Unnecessary @SubtypeDeannotating annotation when there are no matching
+  /// @SubtypeAnnotating annotations in the supertypes.
+  unnecessaryDeannotatingAnnotation(
+    WarningCode(
+      name: 'unnecessary_deannotating_annotation',
+      problemMessage:
+          'The @SubtypeDeannotating annotation is unnecessary because there '
+          'are no matching @SubtypeAnnotating annotations in the supertypes.',
+      correctionMessage:
+          'Remove the unnecessary @SubtypeDeannotating annotation.',
+      description:
+          'A lint rule that identifies unnecessary @SubtypeDeannotating '
+          'annotations when there are no matching @SubtypeAnnotating '
+          'annotations in the supertypes.',
+    ),
   );
+
+  /// Checks if two elements are from the same package, used for package-level
 
   const SubtypeAnnotating(this.code);
 
@@ -317,8 +336,7 @@ enum SubtypeNaming with EnumDiagnostic, SubDiagnostic, SubWarnings {
       problemMessage:
           'The @SubtypeUnnaming annotation is unnecessary because there are no '
           'matching @SubtypeNaming annotations in the supertypes.',
-      correctionMessage:
-          'Remove the unnecessary @SubtypeUnnaming annotation.',
+      correctionMessage: 'Remove the unnecessary @SubtypeUnnaming annotation.',
       description:
           'A lint rule that identifies unnecessary @SubtypeUnnaming '
           'annotations when there are no matching @SubtypeNaming annotations '

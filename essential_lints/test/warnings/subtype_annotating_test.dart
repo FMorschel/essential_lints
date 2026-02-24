@@ -346,4 +346,45 @@ class MySubclass extends BaseClass {}
       [error(rule.rule, 41, 10)],
     );
   }
+
+  Future<void> test_unnaming_stops_propagation() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeAnnotating(annotations: [Deprecated])
+class A {}
+
+@Deprecated('Use C instead')
+class B extends A {}
+
+@SubtypeDeannotating(annotations: [Deprecated])
+class C extends A {}
+
+class C1 extends C {}
+''');
+  }
+
+  Future<void> test_unnaming_doesntStop_propagation_unmatched() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeAnnotating(annotations: [Deprecated])
+class A {}
+
+@Deprecated('Use C instead')
+class B extends A {}
+
+@SubtypeDeannotating(annotations: [Deprecated], option: .onlyInstantiable)
+class C extends A {}
+
+class C1 extends C {}
+''',
+      [
+        error(SubtypeAnnotating.unnecessaryDeannotatingAnnotation, 190, 19),
+        error(rule.rule, 270, 1),
+        error(rule.rule, 292, 2),
+      ],
+    );
+  }
 }

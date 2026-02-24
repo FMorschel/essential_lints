@@ -12,6 +12,7 @@ import '../plugin.dart';
 import '../rules/analysis_rule.dart';
 import '../utils/base_visitor.dart';
 import '../utils/dart_object_to_string.dart';
+import '../utils/extensions/ast.dart';
 import '../utils/extensions/list.dart';
 import 'essential_lint_warnings.dart';
 import 'subtype_rule_mixin.dart';
@@ -51,15 +52,19 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule>
   _SubtypeAnnotatingVisitor(super.rule, super.context);
 
   static const _annotationName = 'SubtypeAnnotating';
+  static const _deannotatingName = 'SubtypeDeannotating';
 
   static final Uri _annotationUri = .parse(
     'package:essential_lints_annotations/src/subtype_annotating.dart',
+  );
+  static final Uri _dennotationUri = .parse(
+    'package:essential_lints_annotations/src/subtype_deannotating.dart',
   );
 
   @override
   void visitAnnotation(Annotation node) {
     logger.info('_SubtypeAnnotatingVisitor.visitAnnotation() started');
-    if (_isSubtypeAnnotation(node.elementAnnotation)) {
+    if (_isSubtypeAnnotatingAnnotation(node.elementAnnotation)) {
       logger.fine('Found SubtypeAnnotating annotation');
       var annotation = _mapKnownArguments(node.elementAnnotation);
       logger.finer(
@@ -107,6 +112,66 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule>
           node.name,
           diagnosticCode: SubtypeAnnotating.missingAnnotation,
         );
+      }
+    } else if (_isSubtypeDeannotatingAnnotation(node.elementAnnotation)) {
+      logger.fine('Found SubtypeDeannotating annotation, skipping supertypes');
+      var annotation = _mapKnownDeannotatingArguments(node.elementAnnotation);
+      logger.finer(
+        'Deannotating with ${annotation.annotations.length} annotations',
+      );
+      for (var parameter in [...?node.arguments?.arguments]) {
+        if (parameter case NamedExpression(
+          :var name,
+        ) when name.label.token.lexeme != 'annotations') {
+          logger.finer(
+            'Skipping non-annotations parameter: ${name.label.token.lexeme}',
+          );
+          continue;
+        }
+        if (parameter is! NamedExpression) {
+          logger.finer('Parameter is not NamedExpression, skipping');
+          continue;
+        }
+        var list = parameter.expression;
+        logger.finer('Parameter expression type: ${list.runtimeType}');
+        if (list is! ListLiteral) {
+          logger.finer('Expression is not ListLiteral, skipping');
+          continue;
+        }
+        logger.fine(
+          'Found annotations list with ${list.elements.length} elements',
+        );
+        for (var element in list.elements) {
+          if (element is ConstructorReference) {
+            logger.fine(
+              'Found ConstructorReference instead of type, reporting error',
+            );
+            rule.reportAtNode(
+              // ignore: _internal_plugin/report_shorter_lengths more meaningful
+              element,
+              diagnosticCode: SubtypeAnnotating.constructorNotType,
+            );
+          }
+        }
+      }
+      if (node.enclosingTypeElement case var element?) {
+        var result = collectSuperTypeAnnotations(
+          element,
+          _isSubtypeAnnotatingAnnotation,
+          _mapKnownArguments,
+          isOppositeAnnotation: _isSubtypeDeannotatingAnnotation,
+          mapperOpposite: _mapKnownDeannotatingArguments,
+        );
+        if (result.unmatchedOpposites.firstWhereOrNull(
+              (match) => match.value == element,
+            ) !=
+            null) {
+          rule.reportAtNode(
+            // ignore: _internal_plugin/report_shorter_lengths more meaningful
+            node.name,
+            diagnosticCode: SubtypeAnnotating.unnecessaryDeannotatingAnnotation,
+          );
+        }
       }
     }
     logger.info('_SubtypeAnnotatingVisitor.visitAnnotation() completed');
@@ -164,7 +229,7 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule>
     super.visitMixinDeclaration(node);
   }
 
-  bool _isSubtypeAnnotation(ElementAnnotation? annotation) {
+  bool _isSubtypeAnnotatingAnnotation(ElementAnnotation? annotation) {
     if (annotation == null) {
       return false;
     }
@@ -221,8 +286,10 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule>
     );
     var annotationsResult = collectSuperTypeAnnotations(
       element,
-      _isSubtypeAnnotation,
+      _isSubtypeAnnotatingAnnotation,
       _mapKnownArguments,
+      isOppositeAnnotation: _isSubtypeDeannotatingAnnotation,
+      mapperOpposite: _mapKnownDeannotatingArguments,
     );
 
     logger.fine(
@@ -286,10 +353,42 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule>
       'annotations',
     );
   }
+
+  bool _isSubtypeDeannotatingAnnotation(ElementAnnotation? p1) {
+    if (p1 == null) {
+      return false;
+    }
+    if (p1.element?.displayName != _deannotatingName) {
+      return false;
+    }
+    return p1.element?.library?.uri == _dennotationUri;
+  }
+
+  _SubtypeDeannotatingAnnotation _mapKnownDeannotatingArguments(
+    ElementAnnotation? p1,
+  ) {
+    if (p1 == null) {
+      return .empty;
+    }
+
+    var type = p1.computeConstantValue();
+    if (type == null) {
+      return .empty;
+    }
+    var annotations = [...?type.getField('annotations')?.toListValue()];
+    var onlyConcrete = type.getField('option');
+    var packageOption = type.getField('packageOption');
+
+    return _SubtypeDeannotatingAnnotation(
+      annotations: annotations,
+      option: onlyConcrete,
+      packageOption: packageOption,
+    );
+  }
 }
 
 class _SubtypeAnnotatingAnnotation
-    extends SubtypeAnnotation<Matching<_SubtypeAnnotatingAnnotation>> {
+    extends SubtypeAnnotation<_SubtypeDeannotatingAnnotation> {
   const _SubtypeAnnotatingAnnotation({
     required this.annotations,
     required super.option,
@@ -305,5 +404,37 @@ class _SubtypeAnnotatingAnnotation
   final List<DartObject> annotations;
 
   @override
-  bool matches(Matching<dynamic> other) => false;
+  bool matches(_SubtypeDeannotatingAnnotation other) =>
+      const DeepCollectionEquality.unordered().equals(
+        annotations,
+        other.annotations,
+      ) &&
+      option == other.option &&
+      packageOption == other.packageOption;
+}
+
+class _SubtypeDeannotatingAnnotation
+    extends SubtypeAnnotation<_SubtypeAnnotatingAnnotation> {
+  const _SubtypeDeannotatingAnnotation({
+    required this.annotations,
+    required super.option,
+    required super.packageOption,
+  });
+
+  static const _SubtypeDeannotatingAnnotation empty = .new(
+    annotations: [],
+    option: null,
+    packageOption: null,
+  );
+
+  final List<DartObject> annotations;
+
+  @override
+  bool matches(_SubtypeAnnotatingAnnotation other) =>
+      const DeepCollectionEquality.unordered().equals(
+        annotations,
+        other.annotations,
+      ) &&
+      option == other.option &&
+      packageOption == other.packageOption;
 }
