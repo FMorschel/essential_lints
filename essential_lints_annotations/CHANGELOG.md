@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.3
+
+Released on: 2026-02-24
+
+- Adds a new `packageOption` member to both `SubtypeAnnotating` and `SubtypeNaming` annotations, allowing users to specify if the defined annotations should only apply to members of the same package. This is useful for libraries that want to enforce certain rules only within their own codebase, without affecting external users of the library.
+
 ## 0.1.2
 
 Released on: 2026-02-16
