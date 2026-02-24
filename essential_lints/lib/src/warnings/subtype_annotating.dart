@@ -174,7 +174,9 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule>
     return annotation.element?.library?.uri == _annotationUri;
   }
 
-  _SubtypeAnnotatingAnnotation _mapKnownArguments(ElementAnnotation? annotation) {
+  _SubtypeAnnotatingAnnotation _mapKnownArguments(
+    ElementAnnotation? annotation,
+  ) {
     logger.fine('_mapKnownArguments() started');
     if (annotation == null) {
       logger.finer('Annotation is null, returning empty');

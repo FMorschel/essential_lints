@@ -110,7 +110,11 @@ class UsePaddingPropertyFix extends CorrectionProducerLogger with LintFix {
       var offset = arguments.arguments.first.offset;
       var end = arguments.arguments.last.end;
       source =
-          '$indent${utils.oneIndent}${utils.indentSourceLeftRight(utils.getText(offset, end - offset)).trimRight()},';
+          '$indent${utils.oneIndent}'
+          '${utils.indentSourceLeftRight(
+            // Formatting trick.
+            utils.getText(offset, end - offset),
+          ).trimRight()},';
       logger.finer('Built source: ${source.replaceAll('\n', ' ')}');
     } else {
       logger.finer('Container has no arguments, source will be null');
