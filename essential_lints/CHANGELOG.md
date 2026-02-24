@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.10
+
+Released on: 2026-02-24
+
+- Adds support for `essential_lints_annotations`' `0.1.4` version with **`SubtypeDeannotating`** and **`SubtypeUnnaming`** annotations, allowing users to stop propagation of annotation and naming rules to subtypes. This enhances the flexibility of lint rules for library authors and users.
+
 ## 0.1.9+1
 
 Released on: 2026-02-24
