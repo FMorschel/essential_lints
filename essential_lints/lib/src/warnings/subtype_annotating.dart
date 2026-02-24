@@ -219,13 +219,15 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule>
     logger.fine(
       'Verifying supertypes for: ${element.name}, abstract=$abstract',
     );
-    var annotations = collectSuperTypeAnnotations<_SubtypeAnnotatingAnnotation>(
+    var annotationsResult = collectSuperTypeAnnotations(
       element,
       _isSubtypeAnnotation,
       _mapKnownArguments,
     );
 
-    logger.fine('Total annotations to check: ${annotations.length}');
+    logger.fine(
+      'Total annotations to check: ${annotationsResult.annotations.length}',
+    );
     bool existing(DartObject annotation) {
       for (var meta in metadata) {
         var value = meta.elementAnnotation?.computeConstantValue();
@@ -238,7 +240,8 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule>
     }
 
     var missingCount = 0;
-    for (var MapEntry(key: annotation, value: origin) in annotations) {
+    for (var MapEntry(key: annotation, value: origin)
+        in annotationsResult.annotations) {
       if (shouldSkipAnnotation(
         annotation,
         element,
@@ -285,7 +288,8 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule>
   }
 }
 
-class _SubtypeAnnotatingAnnotation extends SubtypeAnnotation {
+class _SubtypeAnnotatingAnnotation
+    extends SubtypeAnnotation<Matching<_SubtypeAnnotatingAnnotation>> {
   const _SubtypeAnnotatingAnnotation({
     required this.annotations,
     required super.option,
@@ -299,4 +303,7 @@ class _SubtypeAnnotatingAnnotation extends SubtypeAnnotation {
   );
 
   final List<DartObject> annotations;
+
+  @override
+  bool matches(Matching<dynamic> other) => false;
 }

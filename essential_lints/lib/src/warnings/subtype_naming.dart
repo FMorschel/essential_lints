@@ -4,11 +4,13 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/syntactic_entity.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
 
 import '../plugin.dart';
 import '../rules/analysis_rule.dart';
 import '../utils/base_visitor.dart';
+import '../utils/extensions/ast.dart';
 import 'essential_lint_warnings.dart';
 import 'subtype_rule_mixin.dart';
 import 'warning.dart';
@@ -42,7 +44,8 @@ class SubtypeNamingRule
   }
 }
 
-class _SubtypeNamingAnnotation extends SubtypeAnnotation {
+class _SubtypeNamingAnnotation
+    extends SubtypeAnnotation<_SubtypeUnnamingAnnotation> {
   const _SubtypeNamingAnnotation({
     required this.prefix,
     required this.suffix,
@@ -62,6 +65,45 @@ class _SubtypeNamingAnnotation extends SubtypeAnnotation {
   final String? prefix;
   final String? suffix;
   final String? containing;
+
+  @override
+  bool matches(_SubtypeUnnamingAnnotation namingAnnotation) =>
+      prefix == namingAnnotation.prefix &&
+      suffix == namingAnnotation.suffix &&
+      containing == namingAnnotation.containing &&
+      option == namingAnnotation.option &&
+      packageOption == namingAnnotation.packageOption;
+}
+
+class _SubtypeUnnamingAnnotation
+    extends SubtypeAnnotation<_SubtypeNamingAnnotation> {
+  const _SubtypeUnnamingAnnotation({
+    required this.prefix,
+    required this.suffix,
+    required this.containing,
+    required super.option,
+    required super.packageOption,
+  });
+
+  static const _SubtypeUnnamingAnnotation empty = .new(
+    prefix: null,
+    suffix: null,
+    containing: null,
+    option: null,
+    packageOption: null,
+  );
+
+  final String? prefix;
+  final String? suffix;
+  final String? containing;
+
+  @override
+  bool matches(_SubtypeNamingAnnotation namingAnnotation) =>
+      prefix == namingAnnotation.prefix &&
+      suffix == namingAnnotation.suffix &&
+      containing == namingAnnotation.containing &&
+      option == namingAnnotation.option &&
+      packageOption == namingAnnotation.packageOption;
 }
 
 class _SubtypeNamingVisitor extends BaseVisitor<SubtypeNamingRule>
@@ -69,9 +111,14 @@ class _SubtypeNamingVisitor extends BaseVisitor<SubtypeNamingRule>
   _SubtypeNamingVisitor(super.rule, super.context);
 
   static const _annotationName = 'SubtypeNaming';
+  static const _unnamingAnnotationName = 'SubtypeUnnaming';
 
   static final Uri _annotationUri = .parse(
     'package:essential_lints_annotations/src/subtype_naming.dart',
+  );
+
+  static final Uri _unnamingAnnotationUri = .parse(
+    'package:essential_lints_annotations/src/subtype_unnaming.dart',
   );
 
   @override
@@ -97,6 +144,46 @@ class _SubtypeNamingVisitor extends BaseVisitor<SubtypeNamingRule>
         );
       } else {
         logger.fine('Naming definition present');
+      }
+    } else if (_isSubtypeUnnamingAnnotation(node.elementAnnotation)) {
+      logger.fine('Found SubtypeUnnaming annotation');
+      var annotation = _mapKnownUnnamingArguments(node.elementAnnotation);
+      logger.finer(
+        'Annotation mapped: prefix=${annotation.prefix}, '
+        'suffix=${annotation.suffix}, containing=${annotation.containing}',
+      );
+      if (annotation.prefix == null &&
+          annotation.suffix == null &&
+          annotation.containing == null) {
+        logger.fine(
+          'No naming constraints defined, reporting missing definition',
+        );
+        rule.reportAtNode(
+          // ignore: _internal_plugin/report_shorter_lengths more meaningful
+          node.constructorName ?? node.name,
+          diagnosticCode: SubtypeNaming.missingNameDefinition,
+        );
+      } else {
+        logger.fine('Naming definition present');
+      }
+      if (node.enclosingTypeElement case var element?) {
+        var result = collectSuperTypeAnnotations(
+          element,
+          _isSubtypeNamingAnnotation,
+          _mapKnownArguments,
+          isOppositeAnnotation: _isSubtypeUnnamingAnnotation,
+          mapperOpposite: _mapKnownUnnamingArguments,
+        );
+        if (result.unmatchedOpposites.firstWhereOrNull(
+              (match) => match.value == element,
+            ) !=
+            null) {
+          rule.reportAtNode(
+            // ignore: _internal_plugin/report_shorter_lengths more meaningful
+            node.name,
+            diagnosticCode: SubtypeNaming.unnecessaryUnnamingAnnotation,
+          );
+        }
       }
     }
     logger.info('_SubtypeNamingVisitor.visitAnnotation() completed');
@@ -165,16 +252,6 @@ class _SubtypeNamingVisitor extends BaseVisitor<SubtypeNamingRule>
       return .empty;
     }
 
-    var element = annotation.element;
-    logger.finer(
-      'Annotation element: ${element?.displayName ?? "null"}, type: '
-      '${element.runtimeType}',
-    );
-    if (element is! ConstructorElement) {
-      logger.finer('Element is not ConstructorElement, returning empty');
-      return .empty;
-    }
-
     var type = annotation.computeConstantValue();
     logger.finer(
       'Computed constant value: ${type != null ? "success" : "null"}',
@@ -215,14 +292,19 @@ class _SubtypeNamingVisitor extends BaseVisitor<SubtypeNamingRule>
     logger.fine(
       'Verifying supertypes for: ${element.name}, abstract=$abstract',
     );
-    var annotations = collectSuperTypeAnnotations<_SubtypeNamingAnnotation>(
+    var annotationsResult = collectSuperTypeAnnotations(
       element,
       _isSubtypeNamingAnnotation,
       _mapKnownArguments,
+      isOppositeAnnotation: _isSubtypeUnnamingAnnotation,
+      mapperOpposite: _mapKnownUnnamingArguments,
     );
 
-    logger.fine('Total annotations to check: ${annotations.length}');
-    for (var MapEntry(key: annotation, value: origin) in annotations) {
+    logger.fine(
+      'Total annotations to check: ${annotationsResult.annotations.length}',
+    );
+    for (var MapEntry(key: annotation, value: origin)
+        in annotationsResult.annotations) {
       if (shouldSkipAnnotation(
         annotation,
         element,
@@ -280,5 +362,49 @@ class _SubtypeNamingVisitor extends BaseVisitor<SubtypeNamingRule>
       }
     }
     logger.info('_verifySuperTypes() completed');
+  }
+
+  bool _isSubtypeUnnamingAnnotation(ElementAnnotation? p1) {
+    if (p1 == null) {
+      return false;
+    }
+    if (p1.element?.displayName != _unnamingAnnotationName) {
+      return false;
+    }
+    return p1.element?.library?.uri == _unnamingAnnotationUri;
+  }
+
+  _SubtypeUnnamingAnnotation _mapKnownUnnamingArguments(ElementAnnotation? p1) {
+    logger.fine('_mapKnownUnnamingArguments() started');
+    if (p1 == null) {
+      logger.finer('Annotation is null, returning empty');
+      return .empty;
+    }
+
+    var type = p1.computeConstantValue();
+    logger.finer(
+      'Computed constant value: ${type != null ? "success" : "null"}',
+    );
+    if (type == null) {
+      logger.finer('Type is null, returning empty');
+      return .empty;
+    }
+    var prefix = type.getField('prefix')?.toStringValue();
+    var suffix = type.getField('suffix')?.toStringValue();
+    var containing = type.getField('containing')?.toStringValue();
+    var option = type.getField('option');
+    var packageOption = type.getField('packageOption');
+
+    logger.fine(
+      '_mapKnownUnnamingArguments() returning annotation: prefix=$prefix, '
+      'suffix=$suffix, containing=$containing',
+    );
+    return _SubtypeUnnamingAnnotation(
+      prefix: prefix,
+      suffix: suffix,
+      containing: containing,
+      option: option,
+      packageOption: packageOption,
+    );
   }
 }

@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:analysis_server_plugin/plugin.dart';
 import 'package:analysis_server_plugin/registry.dart';
+import 'package:essential_lints/src/fixes/same_package_direct_import.dart';
+import 'package:essential_lints/src/rules/essential_lint_rules.dart';
+import 'package:essential_lints/src/rules/same_package_direct_import.dart';
 import 'package:essential_lints/src/warnings/getters_in_member_list.dart';
 import 'package:essential_lints/src/warnings/subtype_annotating.dart';
 import 'package:essential_lints/src/warnings/subtype_naming.dart';
@@ -26,6 +29,11 @@ class InternalPlugin extends Plugin {
       ..registerWarningRule(InvalidMembersRule())
       ..registerWarningRule(ReportShorterLengthsRule())
       ..registerWarningRule(StaticEnforcementRule())
-      ..registerWarningRule(InvalidModifiersRule());
+      ..registerWarningRule(InvalidModifiersRule())
+      ..registerWarningRule(SamePackageDirectImportRule())
+      ..registerFixForRule(
+        EssentialLintRules.samePackageDirectImport,
+        SamePackageDirectImportFix.new,
+      );
   }
 }

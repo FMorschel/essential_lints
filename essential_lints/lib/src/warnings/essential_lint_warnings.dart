@@ -307,6 +307,23 @@ enum SubtypeNaming with EnumDiagnostic, SubDiagnostic, SubWarnings {
           'at least one naming convention (prefix, suffix, or containing '
           'name).',
     ),
+  ),
+
+  /// Unnecessary @SubtypeUnnaming annotation when there are no matching
+  /// @SubtypeNaming annotations in the supertypes.
+  unnecessaryUnnamingAnnotation(
+    WarningCode(
+      name: 'unnecessary_unnaming_annotation',
+      problemMessage:
+          'The @SubtypeUnnaming annotation is unnecessary because there are no '
+          'matching @SubtypeNaming annotations in the supertypes.',
+      correctionMessage:
+          'Remove the unnecessary @SubtypeUnnaming annotation.',
+      description:
+          'A lint rule that identifies unnecessary @SubtypeUnnaming '
+          'annotations when there are no matching @SubtypeNaming annotations '
+          'in the supertypes.',
+    ),
   );
 
   const SubtypeNaming(this.code);

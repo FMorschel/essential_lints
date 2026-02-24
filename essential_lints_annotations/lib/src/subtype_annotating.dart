@@ -1,6 +1,7 @@
 import 'package:meta/meta_meta.dart';
 
 import 'utils/package_option.dart';
+import 'utils/subtype_annotation.dart';
 import 'utils/subtype_option.dart';
 
 /// {@template subtype_annotating}
@@ -12,7 +13,7 @@ import 'utils/subtype_option.dart';
   TargetKind.mixinType,
   TargetKind.enumType,
 })
-class SubtypeAnnotating {
+class SubtypeAnnotating implements SubtypeAnnotation {
   /// {@macro subtype_naming}
   const SubtypeAnnotating({
     required this.annotations,
@@ -24,8 +25,10 @@ class SubtypeAnnotating {
   final List<Object> annotations;
 
   /// {@macro subtype_option}
+  @override
   final SubtypeOption option;
 
   /// {@macro package_option}
+  @override
   final PackageOption packageOption;
 }

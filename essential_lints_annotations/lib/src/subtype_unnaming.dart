@@ -4,8 +4,8 @@ import 'utils/package_option.dart';
 import 'utils/subtype_annotation.dart';
 import 'utils/subtype_option.dart';
 
-/// {@template subtype_naming}
-/// Annotations for the `subtype_naming` rule.
+/// {@template subtype_unnaming}
+/// Annotation that stops propagation of naming rules to subtypes.
 /// {@endtemplate}
 @Target({
   TargetKind.classType,
@@ -13,9 +13,9 @@ import 'utils/subtype_option.dart';
   TargetKind.mixinType,
   TargetKind.enumType,
 })
-class SubtypeNaming implements SubtypeAnnotation {
-  /// {@macro subtype_naming}
-  const SubtypeNaming({
+class SubtypeUnnaming implements SubtypeAnnotation {
+  /// {@macro subtype_unnaming}
+  const SubtypeUnnaming({
     this.prefix,
     this.containing,
     this.suffix,

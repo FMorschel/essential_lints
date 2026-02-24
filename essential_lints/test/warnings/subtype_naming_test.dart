@@ -325,4 +325,43 @@ class MySubclass extends BaseClass {}
       [error(rule.rule, 41, 10)],
     );
   }
+
+  Future<void> test_unnaming_stops_propagation() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeNaming(prefix: 'My')
+class A {}
+
+class MyB extends A {}
+
+@SubtypeUnnaming(prefix: 'My')
+class C extends A {}
+
+class C1 extends C {}
+''');
+  }
+
+  Future<void> test_unnaming_doesntStop_propagation_unmatched() async {
+    await assertDiagnostics(
+      '''
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@SubtypeNaming(prefix: 'My')
+class A {}
+
+class MyB extends A {}
+
+@SubtypeUnnaming(prefix: 'My', suffix: 'Class')
+class C extends A {}
+
+class C1 extends C {}
+''',
+      [
+        error(SubtypeNaming.unnecessaryUnnamingAnnotation, 146, 15),
+        error(rule.rule, 199, 1),
+        error(rule.rule, 221, 2),
+      ],
+    );
+  }
 }
