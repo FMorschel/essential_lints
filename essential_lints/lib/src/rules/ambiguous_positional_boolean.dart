@@ -2,6 +2,7 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/source_range.dart';
 import 'package:logging/logging.dart';
 
@@ -38,7 +39,8 @@ class AmbiguousPositionalBooleanRule
     registry
       ..addFunctionExpression(this, visitor)
       ..addMethodDeclaration(this, visitor)
-      ..addConstructorDeclaration(this, visitor);
+      ..addConstructorDeclaration(this, visitor)
+      ..addGenericFunctionType(this, visitor);
     logger.fine(
       'Registered node processors for AmbiguousPositionalBooleanRule',
     );
@@ -68,6 +70,11 @@ class _AmbiguousPositionalBooleanVisitor
   }
 
   @override
+  void visitGenericFunctionType(GenericFunctionType node) {
+    _checkForAmbiguousBooleans(node.parameters);
+  }
+
+  @override
   void visitConstructorDeclaration(ConstructorDeclaration node) {
     _checkForAmbiguousBooleans(node.parameters);
   }
@@ -79,6 +86,39 @@ class _AmbiguousPositionalBooleanVisitor
           when parameter.isPositional &&
               (parameter.type?.isDartCoreBool ?? false)) {
         rule.reportAtOffset(offset, length);
+      } else if (parameter case FieldFormalParameter(
+        :var thisKeyword,
+        isPositional: true,
+        declaredFragment: FieldFormalParameterFragment(
+          element: FieldFormalParameterElement(
+            type: DartType(isDartCoreBool: true),
+          ),
+        ),
+      )) {
+        rule.reportAtToken(thisKeyword);
+      } else if (parameter case SuperFormalParameter(
+        :var superKeyword,
+        isPositional: true,
+        declaredFragment: SuperFormalParameterFragment(
+          element: SuperFormalParameterElement(
+            type: DartType(isDartCoreBool: true),
+          ),
+        ),
+      )) {
+        rule.reportAtToken(superKeyword);
+      } else if (parameter.declaredFragment?.element
+          case FormalParameterElement(
+            isPositional: true,
+            type: DartType(isDartCoreBool: true),
+          )) {
+        if (parameter.name case var name?) {
+          rule.reportAtToken(name);
+        } else {
+          logger.finer(
+            'How did we get here? A positional parameter without a name that '
+            'has a specific type?',
+          );
+        }
       }
     }
   }

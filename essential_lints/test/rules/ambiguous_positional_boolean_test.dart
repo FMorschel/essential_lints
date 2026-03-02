@@ -24,6 +24,76 @@ void f(int a, bool b) {}
     );
   }
 
+  Future<void> test_function_nullable_positional() async {
+    await assertDiagnostics(
+      '''
+void f(int a, bool? b) {}
+''',
+      [lint(14, 5)],
+    );
+  }
+
+  Future<void> test_function_literal() async {
+    await assertDiagnostics(
+      '''
+typedef F = void Function(int a, bool b);
+''',
+      [lint(33, 4)],
+    );
+  }
+
+  Future<void> test_function_literal_parameter() async {
+    await assertDiagnostics(
+      '''
+void foo(void Function(int a, bool b) f) {}
+''',
+      [lint(30, 4)],
+    );
+  }
+
+  Future<void> test_super_parameter() async {
+    await assertDiagnostics(
+      '''
+class C {
+  C(this.a);
+  bool a;
+}
+
+class D extends C {
+  D(int _, super.a);
+}
+''',
+      [lint(67, 5)],
+    );
+  }
+
+  Future<void> test_this_parameter() async {
+    await assertDiagnostics(
+      '''
+class C {
+  C(int _, this.a);
+  bool a;
+}
+''',
+      [lint(21, 4)],
+    );
+  }
+
+  Future<void> test_overriden_parameter() async {
+    await assertDiagnostics(
+      '''
+class D extends C {
+  @override
+  void m(int a, b) {}
+}
+class C {
+  void m(int a, bool b) {}
+}
+''',
+      [lint(48, 1), lint(82, 4)],
+    );
+  }
+
   Future<void> test_method_positional() async {
     await assertDiagnostics(
       '''
