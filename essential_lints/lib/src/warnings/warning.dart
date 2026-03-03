@@ -1,5 +1,4 @@
 import '../rules/analysis_rule.dart';
-import '../utils/base_visitor.dart';
 import 'essential_lint_warnings.dart'
     show EssentialLintWarningCode, EssentialMultiWarningCode, SubWarnings;
 
@@ -73,7 +72,6 @@ abstract class WarningRule<Rule extends WarningRule<Rule>>
     extends
         EssentialAnalysisRule<
           Rule,
-          BaseVisitor<Rule>,
           EssentialLintWarningCode
         > {
   /// {@macro rule}
@@ -90,7 +88,6 @@ abstract class MultiWarningRule<
     extends
         EssentialMultiAnalysisRule<
           R,
-          BaseVisitor<R>,
           EssentialMultiWarningCode<Sub>,
           Sub
         > {

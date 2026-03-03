@@ -21,11 +21,15 @@ class IsFutureRule extends LintRule<IsFutureRule> {
   static final Logger _logger = EssentialLintsPlugin.newLogger('IsFutureRule');
 
   @override
+  Visitor<IsFutureRule, void> visitorFor(RuleContext context) =>
+      _IsFutureVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _IsFutureVisitor(this, context);
+    var visitor = visitorFor(context);
     registry.addIsExpression(this, visitor);
   }
 }

@@ -33,11 +33,15 @@ class SubtypeAnnotatingRule
   );
 
   @override
+  Visitor<SubtypeAnnotatingRule, void> visitorFor(RuleContext context) =>
+      _SubtypeAnnotatingVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _SubtypeAnnotatingVisitor(this, context);
+    var visitor = visitorFor(context);
     registry
       ..addAnnotation(this, visitor)
       ..addClassDeclaration(this, visitor)

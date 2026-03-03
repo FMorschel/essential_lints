@@ -22,11 +22,15 @@ class EqualStatementRule extends LintRule<EqualStatementRule> {
   );
 
   @override
+  Visitor<EqualStatementRule, void> visitorFor(RuleContext context) =>
+      _EqualStatementVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _EqualStatementVisitor(this, context);
+    var visitor = visitorFor(context);
     registry
       ..addSwitchStatement(this, visitor)
       ..addSwitchExpression(this, visitor);

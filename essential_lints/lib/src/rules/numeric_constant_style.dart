@@ -26,11 +26,15 @@ class NumericConstantStyleRule extends LintRule<NumericConstantStyleRule> {
   );
 
   @override
+  Visitor<NumericConstantStyleRule, void> visitorFor(RuleContext context) =>
+      _NumericConstantStyleVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _NumericConstantStyleVisitor(this, context);
+    var visitor = visitorFor(context);
     registry.addDoubleLiteral(this, visitor);
   }
 }

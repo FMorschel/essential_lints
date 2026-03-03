@@ -22,12 +22,16 @@ class BorderAllRule extends LintRule<BorderAllRule> {
   static final Logger _logger = EssentialLintsPlugin.newLogger('BorderAllRule');
 
   @override
+  Visitor<BorderAllRule, void> visitorFor(RuleContext context) =>
+      _BorderAllVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
     logger.fine('Registering node processors for BorderAllRule');
-    var visitor = _BorderAllVisitor(this, context);
+    var visitor = visitorFor(context);
     registry.addInstanceCreationExpression(this, visitor);
     logger.fine('Registered node processors for BorderAllRule');
   }

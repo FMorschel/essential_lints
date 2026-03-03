@@ -22,11 +22,15 @@ class AlphabetizeEnumConstantsRule
   );
 
   @override
+  Visitor<AlphabetizeEnumConstantsRule, void> visitorFor(RuleContext context) =>
+      _AlphabetizeEnumConstantsVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _AlphabetizeEnumConstantsVisitor(this, context);
+    var visitor = visitorFor(context);
     registry.addEnumDeclaration(this, visitor);
   }
 }

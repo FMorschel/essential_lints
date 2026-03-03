@@ -38,6 +38,11 @@ class PendingListenerRule
   String? _logFilePath;
   @override
   String? get logFilePath => _logFilePath;
+  
+  @override
+  // ignore: library_private_types_in_public_api, not really public.
+  _PendingListenerVisitor visitorFor(RuleContext context) =>
+      _PendingListenerVisitor(this, context);
 
   @override
   void registerNodeProcessors(
@@ -48,7 +53,7 @@ class PendingListenerRule
       _logFilePath = r'D:\dev\logs\pending_listener.log';
       setLogListener(level: .ALL, logger: logger);
     }
-    var visitor = _PendingListenerVisitor(this, context);
+    var visitor = visitorFor(context);
     registry
       ..addMethodInvocation(this, visitor)
       ..afterLibrary(this, () {

@@ -26,11 +26,15 @@ class SamePackageDirectImportRule
   );
 
   @override
+  Visitor<SamePackageDirectImportRule, void> visitorFor(RuleContext context) =>
+      _SamePackageDirectImportVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _SamePackageDirectImportVisitor(this, context);
+    var visitor = visitorFor(context);
     registry.addImportDirective(this, visitor);
   }
 }

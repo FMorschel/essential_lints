@@ -29,11 +29,15 @@ class LastGetterRule extends LintRule<LastGetterRule> {
   );
 
   @override
+  Visitor<LastGetterRule, void> visitorFor(RuleContext context) =>
+      _PreferLastVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _PreferLastVisitor(this, context);
+    var visitor = visitorFor(context);
     registry
       ..addIndexExpression(this, visitor)
       ..addMethodInvocation(this, visitor);

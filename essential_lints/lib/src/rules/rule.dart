@@ -1,4 +1,3 @@
-import '../utils/base_visitor.dart';
 import '../warnings/warning.dart';
 import 'analysis_rule.dart';
 import 'essential_lint_rules.dart';
@@ -246,9 +245,8 @@ enum EssentialLintRule implements Rule {
 /// {@template rule}
 /// The base class for all essential lint rules.
 /// {@endtemplate}
-// ignore: avoid_types_as_parameter_names
-abstract class LintRule<Rule extends LintRule<Rule>>
-    extends EssentialAnalysisRule<Rule, BaseVisitor<Rule>, EssentialLintCode> {
+abstract class LintRule<Self extends LintRule<Self>>
+    extends EssentialAnalysisRule<Self, EssentialLintCode> {
   /// {@macro rule}
   LintRule(super.rule, super.logger);
 }
@@ -257,16 +255,10 @@ abstract class LintRule<Rule extends LintRule<Rule>>
 /// The base class for all essential multi-lints rules.
 /// {@endtemplate}
 abstract class MultiLintRule<
-  R extends MultiLintRule<R, Sub>,
+  Self extends MultiLintRule<Self, Sub>,
   Sub extends SubLints
 >
-    extends
-        EssentialMultiAnalysisRule<
-          R,
-          BaseVisitor<R>,
-          EssentialMultiLints<Sub>,
-          Sub
-        > {
+    extends EssentialMultiAnalysisRule<Self, EssentialMultiLints<Sub>, Sub> {
   /// {@macro rule}
   MultiLintRule(super.rule, super.logger);
 }

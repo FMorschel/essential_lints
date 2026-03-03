@@ -31,11 +31,15 @@ class SortingMembersRule extends WarningRule<SortingMembersRule> {
   );
 
   @override
+  Visitor<SortingMembersRule, void> visitorFor(RuleContext context) =>
+      _SortingMembersVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _SortingMembersVisitor(this, context);
+    var visitor = visitorFor(context);
     registry
       ..addClassDeclaration(this, visitor)
       ..addMixinDeclaration(this, visitor)

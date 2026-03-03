@@ -29,11 +29,15 @@ class UnnecessarySetstateRule extends LintRule<UnnecessarySetstateRule> {
   );
 
   @override
+  Visitor<UnnecessarySetstateRule, void> visitorFor(RuleContext context) =>
+      _UnnecessarySetstateVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _UnnecessarySetstateVisitor(this, context);
+    var visitor = visitorFor(context);
     registry.addMethodInvocation(this, visitor);
   }
 }

@@ -28,11 +28,15 @@ class VariableShadowingRule extends LintRule<VariableShadowingRule> {
   );
 
   @override
+  Visitor<VariableShadowingRule, void> visitorFor(RuleContext context) =>
+      _VariableShadowingVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _VariableShadowingVisitor(this, context);
+    var visitor = visitorFor(context);
     registry
       ..addVariableDeclaration(this, visitor)
       ..addDeclaredVariablePattern(this, visitor);

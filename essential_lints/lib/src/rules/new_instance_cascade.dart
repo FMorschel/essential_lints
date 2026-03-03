@@ -23,11 +23,15 @@ class NewInstanceCascadeRule extends LintRule<NewInstanceCascadeRule> {
   );
 
   @override
+  Visitor<NewInstanceCascadeRule, void> visitorFor(RuleContext context) =>
+      _NewInstanceCascadeVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _NewInstanceCascadeVisitor(this, context);
+    var visitor = visitorFor(context);
     registry.addCascadeExpression(this, visitor);
   }
 }

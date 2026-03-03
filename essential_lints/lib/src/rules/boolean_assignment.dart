@@ -21,12 +21,16 @@ class BooleanAssignmentRule extends LintRule<BooleanAssignmentRule> {
   );
 
   @override
+  Visitor<BooleanAssignmentRule, void> visitorFor(RuleContext context) =>
+      _BooleanAssignmentVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
     logger.fine('Registering node processors for BooleanAssignmentRule');
-    var visitor = _BooleanAssignmentVisitor(this, context);
+    var visitor = visitorFor(context);
     registry
       ..addIfStatement(this, visitor)
       ..addVariableDeclaration(this, visitor)

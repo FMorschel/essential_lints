@@ -31,11 +31,15 @@ class StaticEnforcementRule extends LintRule<StaticEnforcementRule> {
   InternalDiagnosticCode get diagnosticCode => _diagnostic;
 
   @override
+  Visitor<StaticEnforcementRule, void> visitorFor(RuleContext context) =>
+      _StaticEnforcementVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _StaticEnforcementVisitor(this, context);
+    var visitor = visitorFor(context);
     registry
       ..addClassDeclaration(this, visitor)
       ..addMixinDeclaration(this, visitor)

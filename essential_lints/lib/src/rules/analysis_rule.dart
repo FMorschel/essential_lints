@@ -37,8 +37,7 @@ sealed class AbstractEssentialAnalysisRule<Diagnostic extends WarningCode> {
 )
 @SubtypeNaming(suffix: 'Rule')
 abstract class EssentialAnalysisRule<
-  R extends EssentialAnalysisRule<R, Visitor, Diagnostic>,
-  Visitor extends BaseVisitor<R>,
+  Self extends EssentialAnalysisRule<Self, Diagnostic>,
   Diagnostic extends WarningCode
 >
     extends AnalysisRule
@@ -53,6 +52,10 @@ abstract class EssentialAnalysisRule<
   /// The essential lint rule associated with this analysis rule.
   final Diagnostic rule;
 
+  /// The visitor for this analysis rule, which will be registered with the
+  /// analyzer.
+  Visitor<Self, void> visitorFor(RuleContext context);
+
   @override
   Diagnostic get diagnosticCode => rule;
 }
@@ -66,8 +69,7 @@ abstract class EssentialAnalysisRule<
 )
 @SubtypeNaming(suffix: 'Rule')
 abstract class EssentialMultiAnalysisRule<
-  R extends EssentialMultiAnalysisRule<R, Visitor, Diagnostic, Sub>,
-  Visitor extends BaseVisitor<R>,
+  Self extends EssentialMultiAnalysisRule<Self, Diagnostic, Sub>,
   Diagnostic extends SuperDiagnostic<Sub>,
   Sub extends SubDiagnostic
 >
@@ -83,8 +85,9 @@ abstract class EssentialMultiAnalysisRule<
   /// The essential lint rule associated with this analysis rule.
   final Diagnostic rule;
 
-  /// The list of sub-diagnostics associated with this analysis rule.
-  List<Sub> get subDiagnostics => rule.subDiagnostics;
+  /// The visitor for this analysis rule, which will be registered with the
+  /// analyzer.
+  Visitor<Self, void> visitorFor(RuleContext context);
 
   @override
   List<EnumDiagnostic> get diagnosticCodes => rule.all;

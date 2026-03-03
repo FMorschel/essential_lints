@@ -32,11 +32,15 @@ class ReportShorterLengthsRule extends LintRule<ReportShorterLengthsRule> {
   final InternalDiagnosticCode diagnosticCode = _diagnostic;
 
   @override
+  Visitor<ReportShorterLengthsRule, void> visitorFor(RuleContext context) =>
+      _ReportShorterLengthsVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _ReportShorterLengthsVisitor(this, context);
+    var visitor = visitorFor(context);
     registry.addMethodInvocation(this, visitor);
   }
 }

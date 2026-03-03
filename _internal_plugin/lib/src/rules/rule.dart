@@ -1,5 +1,4 @@
 import 'package:essential_lints/src/rules/analysis_rule.dart';
-import 'package:essential_lints/src/utils/base_visitor.dart';
 import 'package:essential_lints/src/warnings/essential_lint_warnings.dart';
 import 'package:essential_lints/src/warnings/warning.dart' as diagnostic;
 
@@ -40,23 +39,17 @@ enum InternalLintRule implements diagnostic.Rule {
   final String description;
 }
 
-abstract class LintRule<R extends LintRule<R>>
-    extends EssentialAnalysisRule<R, BaseVisitor<R>, InternalDiagnosticCode> {
+abstract class LintRule<Self extends LintRule<Self>>
+    extends EssentialAnalysisRule<Self, InternalDiagnosticCode> {
   /// {@macro rule}
   LintRule(super.rule, super.logger);
 }
 
 abstract class MultiLintRule<
-  R extends MultiLintRule<R, Sub>,
+  Self extends MultiLintRule<Self, Sub>,
   Sub extends InternalMultiLints
 >
-    extends
-        EssentialMultiAnalysisRule<
-          R,
-          BaseVisitor<R>,
-          SuperDiagnostic<Sub>,
-          Sub
-        > {
+    extends EssentialMultiAnalysisRule<Self, SuperDiagnostic<Sub>, Sub> {
   /// {@macro rule}
   MultiLintRule(super.rule, super.logger);
 }

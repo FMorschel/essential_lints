@@ -3,6 +3,7 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:essential_lints/src/plugin.dart';
 import 'package:essential_lints/src/rules/analysis_rule.dart';
+import 'package:essential_lints/src/utils/base_visitor.dart';
 import 'package:logging/logging.dart';
 
 import 'diagnostic.dart';
@@ -31,11 +32,15 @@ class InvalidModifiersRule extends LintRule<InvalidModifiersRule> {
   final InternalDiagnosticCode diagnosticCode = _diagnostic;
 
   @override
+  Visitor<InvalidModifiersRule, void> visitorFor(RuleContext context) =>
+      _InvalidModifiersVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _InvalidModifiersVisitor(this, context);
+    var visitor = visitorFor(context);
     registry
       ..addDotShorthandPropertyAccess(this, visitor)
       ..addDotShorthandConstructorInvocation(this, visitor);

@@ -28,6 +28,11 @@ class AmbiguousPositionalBooleanRule
   );
 
   @override
+  Visitor<AmbiguousPositionalBooleanRule, void> visitorFor(
+    RuleContext context,
+  ) => _AmbiguousPositionalBooleanVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
@@ -35,7 +40,7 @@ class AmbiguousPositionalBooleanRule
     logger.fine(
       'Registering node processors for AmbiguousPositionalBooleanRule',
     );
-    var visitor = _AmbiguousPositionalBooleanVisitor(this, context);
+    var visitor = visitorFor(context);
     registry
       ..addFunctionExpression(this, visitor)
       ..addMethodDeclaration(this, visitor)

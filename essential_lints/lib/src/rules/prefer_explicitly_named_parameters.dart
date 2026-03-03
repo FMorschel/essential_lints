@@ -27,11 +27,16 @@ class PreferExplicitlyNamedParameterRule
   );
 
   @override
+  Visitor<PreferExplicitlyNamedParameterRule, void> visitorFor(
+    RuleContext context,
+  ) => _PreferExplicitlyNamedParametersVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _PreferExplicitlyNamedParametersVisitor(this, context);
+    var visitor = visitorFor(context);
     registry.addGenericFunctionType(this, visitor);
   }
 }

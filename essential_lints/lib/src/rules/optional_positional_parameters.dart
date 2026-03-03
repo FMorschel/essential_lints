@@ -24,11 +24,16 @@ class OptionalPositionalParametersRule
   );
 
   @override
+  Visitor<OptionalPositionalParametersRule, void> visitorFor(
+    RuleContext context,
+  ) => _OptionalPositionalParametersVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _OptionalPositionalParametersVisitor(this, context);
+    var visitor = visitorFor(context);
     registry.addFormalParameterList(this, visitor);
   }
 }

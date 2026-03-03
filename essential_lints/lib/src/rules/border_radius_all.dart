@@ -25,12 +25,16 @@ class BorderRadiusAllRule extends LintRule<BorderRadiusAllRule> {
   );
 
   @override
+  Visitor<BorderRadiusAllRule, void> visitorFor(RuleContext context) =>
+      _BorderRadiusAllVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
     logger.fine('Registering node processors for BorderRadiusAllRule');
-    var visitor = _BorderRadiusAllVisitor(this, context);
+    var visitor = visitorFor(context);
     registry.addInstanceCreationExpression(this, visitor);
     logger.fine('Registered node processors for BorderRadiusAllRule');
   }

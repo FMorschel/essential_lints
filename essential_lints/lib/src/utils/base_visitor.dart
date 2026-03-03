@@ -6,6 +6,7 @@ import 'package:analyzer/dart/element/type_system.dart';
 import 'package:logging/logging.dart';
 
 import '../rules/analysis_rule.dart';
+import '../warnings/essential_lint_warnings.dart';
 
 /// A base visitor that provides access to the rule and context for all
 /// visitors.
@@ -59,7 +60,7 @@ abstract class BaseVisitor<Rule extends AbstractEssentialAnalysisRule?>
 /// for all visitors.
 /// {@endtemplate}
 abstract class GeneralizingBaseVisitor<
-  Rule extends AbstractEssentialAnalysisRule?
+  Rule extends AbstractEssentialAnalysisRule<WarningCode>?
 >
     extends GeneralizingAstVisitor<void>
     with Visitor<Rule, void> {

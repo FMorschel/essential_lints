@@ -32,11 +32,15 @@ class AnnotateMembersWithRule extends LintRule<AnnotateMembersWithRule> {
   final InternalDiagnosticCode diagnosticCode = _diagnostic;
 
   @override
+  Visitor<AnnotateMembersWithRule, void> visitorFor(RuleContext context) =>
+      _AnnotateMembersWithVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _AnnotateMembersWithVisitor(this, context);
+    var visitor = visitorFor(context);
     registry
       ..addMethodDeclaration(this, visitor)
       ..addFieldDeclaration(this, visitor)

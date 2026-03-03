@@ -30,11 +30,15 @@ class GettersInMemberListRule
   );
 
   @override
+  Visitor<GettersInMemberListRule, void> visitorFor(RuleContext context) =>
+      _GettersInMemberListVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _GettersInMemberListVisitor(this, context);
+    var visitor = visitorFor(context);
     registry
       ..addClassDeclaration(this, visitor)
       ..addAnnotation(this, visitor);

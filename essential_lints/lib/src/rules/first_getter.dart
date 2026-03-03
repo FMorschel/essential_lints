@@ -26,11 +26,15 @@ class FirstGetterRule extends LintRule<FirstGetterRule> {
   );
 
   @override
+  Visitor<FirstGetterRule, void> visitorFor(RuleContext context) =>
+      _PreferFirstVisitor(this, context);
+
+  @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    var visitor = _PreferFirstVisitor(this, context);
+    var visitor = visitorFor(context);
     registry
       ..addIndexExpression(this, visitor)
       ..addMethodInvocation(this, visitor);
