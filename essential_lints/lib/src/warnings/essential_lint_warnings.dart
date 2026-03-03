@@ -18,13 +18,12 @@ const staticAllEnforcement = StaticEnforcement(
 /// {@template enum_diagnostic}
 /// A mixin for enums that provide a diagnostic code.
 /// {@endtemplate}
-mixin EnumDiagnostic<Code extends WarningCode<R>, R extends Rule>
-    implements DiagnosticCode, WarningCode<R> {
+mixin EnumDiagnostic implements DiagnosticCode, WarningCode {
   /// The diagnostic code associated with the enum value.
-  Code get code;
+  WarningCode get code;
 
   @override
-  R get rule => code.rule;
+  Rule get rule => code.rule;
 
   @override
   String? get correctionMessage => code.correctionMessage;
@@ -79,15 +78,10 @@ mixin EnumDiagnostic<Code extends WarningCode<R>, R extends Rule>
 }
 
 /// The list of all essential lint warnings.
-enum EssentialLintWarningCode
-    with
-        EnumDiagnostic<
-          WarningCode<EssentialLintWarningRule>,
-          EssentialLintWarningRule
-        > {
+enum EssentialLintWarningCode with EnumDiagnostic {
   /// Members of a class should be sorted in a specific order.
   sortingMembers(
-    WarningCode(
+    WarningRuleCode(
       rule: .sortingMembers,
       problemMessage:
           'The members of this class are not sorted according to the '
@@ -100,28 +94,15 @@ enum EssentialLintWarningCode
   const EssentialLintWarningCode(this.code);
 
   @override
-  final WarningCode<EssentialLintWarningRule> code;
+  final WarningRuleCode code;
 }
 
 /// The list of all essential lint rules.
-enum EssentialMultiWarningCode<
-  T extends SubWarnings<Code, R>,
-  Code extends SubWarningCode<R>,
-  R extends EssentialLintWarningRule
->
-    with
-        EnumDiagnostic<
-          WarningCode<EssentialLintWarningRule>,
-          EssentialLintWarningRule
-        >,
-        SuperDiagnostic<
-          T,
-          WarningCode<EssentialLintWarningRule>,
-          EssentialLintWarningRule
-        > {
+enum EssentialMultiWarningCode<T extends SubWarnings>
+    with EnumDiagnostic, SuperDiagnostic<T> {
   /// Getters should be included in member lists.
   gettersInMemberList(
-    WarningCode(
+    WarningRuleCode(
       rule: .gettersInMemberList,
       problemMessage: 'All {0} should be included in member lists.',
       correctionMessage: 'Include the missing member(s) {1}',
@@ -131,7 +112,7 @@ enum EssentialMultiWarningCode<
 
   /// Subtypes should follow specific naming conventions.
   subtypeNaming(
-    WarningCode(
+    WarningRuleCode(
       rule: .subtypeNaming,
       problemMessage:
           'The name of this subtype does not follow the required naming '
@@ -144,7 +125,7 @@ enum EssentialMultiWarningCode<
 
   /// Subtypes should be annotated with specific annotations.
   subtypeAnnotating(
-    WarningCode(
+    WarningRuleCode(
       rule: .subtypeAnnotating,
       problemMessage:
           'The subtype is missing required annotations as specified by the '
@@ -157,7 +138,7 @@ enum EssentialMultiWarningCode<
   const EssentialMultiWarningCode(this.code, this.subDiagnostics);
 
   @override
-  final WarningCode<EssentialLintWarningRule> code;
+  final WarningRuleCode code;
 
   @override
   final List<T> subDiagnostics;
@@ -165,31 +146,19 @@ enum EssentialMultiWarningCode<
 
 /// Represents a base diagnostic for mutlti diagnostic rules that have
 /// sub-diagnostics.
-mixin SuperDiagnostic<
-  Base extends SubDiagnostic<Code, R>,
-  Code extends WarningCode<R>,
-  R extends Rule
->
-    implements EnumDiagnostic<Code, R> {
+mixin SuperDiagnostic<Base extends SubDiagnostic> implements EnumDiagnostic {
   /// Sub diagnostics associated with this diagnostic.
   List<Base> get subDiagnostics;
 
   /// All diagnostics associated with this diagnostic, including
   /// sub-diagnostics.
-  List<EnumDiagnostic<Code, R>> get all => [...subDiagnostics, this];
+  List<EnumDiagnostic> get all => [...subDiagnostics, this];
 }
 
 /// The list of sub-warnings for the GettersInMemberList warning.
 @staticAllEnforcement
 @StaticEnforcement(#base, annotation.th<EssentialMultiWarningCode>())
-enum GettersInMemberList
-    with
-        EnumDiagnostic<
-          SubWarningCode<EssentialLintWarningRule>,
-          EssentialLintWarningRule
-        >,
-        SubDiagnostic,
-        SubWarnings {
+enum GettersInMemberList with EnumDiagnostic, SubDiagnostic, SubWarnings {
   /// An instance member list is missing to include getters/fields.
   missingList(
     SubWarningCode(
@@ -259,14 +228,7 @@ enum GettersInMemberList
 /// The list of sub-warnings for the SubtypeAnnotating warning.
 @staticAllEnforcement
 @StaticEnforcement(#base, annotation.th<EssentialMultiWarningCode>())
-enum SubtypeAnnotating
-    with
-        EnumDiagnostic<
-          SubWarningCode<EssentialLintWarningRule>,
-          EssentialLintWarningRule
-        >,
-        SubDiagnostic,
-        SubWarnings {
+enum SubtypeAnnotating with EnumDiagnostic, SubDiagnostic, SubWarnings {
   /// The annotation does not specify any required annotations.
   missingAnnotation(
     SubWarningCode(
@@ -326,14 +288,7 @@ enum SubtypeAnnotating
 /// The list of sub-warnings for the SubtypeNaming warning.
 @staticAllEnforcement
 @StaticEnforcement(#base, annotation.th<EssentialMultiWarningCode>())
-enum SubtypeNaming
-    with
-        EnumDiagnostic<
-          SubWarningCode<EssentialLintWarningRule>,
-          EssentialLintWarningRule
-        >,
-        SubDiagnostic,
-        SubWarnings {
+enum SubtypeNaming with EnumDiagnostic, SubDiagnostic, SubWarnings {
   /// The annotation does not specify any naming conventions.
   missingNameDefinition(
     SubWarningCode(
@@ -376,8 +331,7 @@ enum SubtypeNaming
 /// {@template sub_warning_code}
 /// A sub diagnostic code for a warning rule.
 /// {@endtemplate}
-class SubWarningCode<R extends EssentialLintWarningRule>
-    extends WarningCode<R> {
+class SubWarningCode extends WarningRuleCode {
   /// {@macro sub_warning_code}
   const SubWarningCode({
     required super.rule,
@@ -397,11 +351,7 @@ class SubWarningCode<R extends EssentialLintWarningRule>
   ],
   option: .onlyInstantiable,
 )
-mixin SubWarnings<
-  Code extends SubWarningCode<R>,
-  R extends EssentialLintWarningRule
->
-    on SubDiagnostic<Code, R> {}
+mixin SubWarnings on SubDiagnostic {}
 
 /// {@template sub_warnings}
 /// A grouping of sub-warnings under a base warning.
@@ -410,13 +360,27 @@ mixin SubWarnings<
   annotations: [staticAllEnforcement],
   option: .onlyInstantiable,
 )
-mixin SubDiagnostic<Code extends WarningCode<R>, R extends Rule>
-    on EnumDiagnostic<Code, R> {}
+mixin SubDiagnostic on EnumDiagnostic {}
+
+/// {@template warning_rule_code}
+/// A diagnostic code for warning rules, with a typed
+/// [EssentialLintWarningRule] rule.
+/// {@endtemplate}
+class WarningRuleCode extends WarningCode {
+  /// {@macro warning_rule_code}
+  const WarningRuleCode({
+    required EssentialLintWarningRule super.rule,
+    required super.problemMessage,
+    super.correctionMessage,
+    super.severity,
+    super.uniqueName,
+  });
+}
 
 /// {@template rule_code}
 /// A diagnostic code for warnings.
 /// {@endtemplate}
-class WarningCode<R extends Rule> implements DiagnosticCode {
+class WarningCode implements DiagnosticCode {
   /// {@macro rule_code}
   const WarningCode({
     required this.rule,
@@ -474,7 +438,7 @@ class WarningCode<R extends Rule> implements DiagnosticCode {
   }
 
   /// The human-readable rule information.
-  final R rule;
+  final Rule rule;
 
   @override
   final DiagnosticSeverity severity;

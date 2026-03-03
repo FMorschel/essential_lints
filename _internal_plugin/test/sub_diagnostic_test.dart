@@ -34,9 +34,9 @@ class TestRule extends Rule {
   );
 }
 
-class InternalDiagnosticCode extends WarningCode<TestRule> {
+class InternalDiagnosticCode extends WarningCode {
   const InternalDiagnosticCode({
-    required super.rule,
+    required TestRule super.rule,
     required super.problemMessage,
     super.uniqueName,
     super.severity = .WARNING,
@@ -45,15 +45,15 @@ class InternalDiagnosticCode extends WarningCode<TestRule> {
   });
 }
 
-mixin SubDiagnostic<T extends WarningCode<R>, R extends TestRule>
-    on d.SubDiagnostic<T, R> {}
+mixin SubDiagnostic
+    on d.SubDiagnostic {}
 
 enum BaseLints
     with
-        EnumDiagnostic<InternalDiagnosticCode, TestRule>,
-        SuperDiagnostic<SubLints, InternalDiagnosticCode, TestRule> {
+        EnumDiagnostic,
+        SuperDiagnostic<SubLints> {
   subDiagnostic(
-    InternalDiagnosticCode(rule: .instance, problemMessage: ''),
+    InternalDiagnosticCode(rule: TestRule.instance, problemMessage: ''),
     SubLints.values,
   );
 
@@ -82,9 +82,9 @@ part 'other.dart';
 @staticAllEnforcement
 enum SubLints
     with
-        EnumDiagnostic<InternalDiagnosticCode, TestRule>,
-        d.SubDiagnostic<InternalDiagnosticCode, TestRule>,
-        SubDiagnostic<InternalDiagnosticCode, TestRule> {
+        EnumDiagnostic,
+        d.SubDiagnostic,
+        SubDiagnostic {
   subLint(
     InternalDiagnosticCode(
       rule: .instance,
@@ -120,9 +120,9 @@ part 'other.dart';
 @staticAllEnforcement
 enum SubLints
     with
-        EnumDiagnostic<InternalDiagnosticCode, TestRule>,
-        d.SubDiagnostic<InternalDiagnosticCode, TestRule>,
-        SubDiagnostic<InternalDiagnosticCode, TestRule> {
+        EnumDiagnostic,
+        d.SubDiagnostic,
+        SubDiagnostic {
   subLint(
     InternalDiagnosticCode(
       rule: .instance2,
@@ -141,7 +141,7 @@ enum SubLints
   final InternalDiagnosticCode code;
 }
 ''',
-      [lint(510, 7)],
+      [lint(408, 7)],
     );
   }
 
@@ -160,9 +160,9 @@ part 'other.dart';
 @staticAllEnforcement
 enum SubLints
     with
-        EnumDiagnostic<InternalDiagnosticCode, TestRule>,
-        d.SubDiagnostic<InternalDiagnosticCode, TestRule>,
-        SubDiagnostic<InternalDiagnosticCode, TestRule> {
+        EnumDiagnostic,
+        d.SubDiagnostic,
+        SubDiagnostic {
   subLint(
     InternalDiagnosticCode(
       rule: .instance,
@@ -188,7 +188,7 @@ enum SubLints
   final InternalDiagnosticCode code;
 }
 ''',
-      [error(InternalMultiLints.nonUniqueName, 640, 5)],
+      [error(InternalMultiLints.nonUniqueName, 538, 5)],
     );
   }
 
@@ -206,9 +206,9 @@ part 'other.dart';
 @staticAllEnforcement
 enum SubLints
     with
-        EnumDiagnostic<InternalDiagnosticCode, TestRule>,
-        d.SubDiagnostic<InternalDiagnosticCode, TestRule>,
-        SubDiagnostic<InternalDiagnosticCode, TestRule> {
+        EnumDiagnostic,
+        d.SubDiagnostic,
+        SubDiagnostic {
   subLint(
     InternalDiagnosticCode(
       rule: .instance,

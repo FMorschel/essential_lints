@@ -54,10 +54,8 @@ abstract class MultiLintRule<
         EssentialMultiAnalysisRule<
           R,
           BaseVisitor<R>,
-          SuperDiagnostic<Sub, InternalDiagnosticCode, InternalLintRule>,
-          Sub,
-          InternalDiagnosticCode,
-          InternalLintRule
+          SuperDiagnostic<Sub>,
+          Sub
         > {
   /// {@macro rule}
   MultiLintRule(super.rule, super.logger);

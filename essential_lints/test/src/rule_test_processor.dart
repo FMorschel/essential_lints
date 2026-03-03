@@ -31,11 +31,7 @@ optional-checks:
 
 @SubtypeNaming(suffix: 'Test')
 @SubtypeAnnotating(annotations: [reflectiveTest], option: .onlyConcrete)
-abstract class MultiLintTestProcessor<
-  T extends SubLints<Code, R>,
-  Code extends SubLintRuleCode<R>,
-  R extends EssentialLintRule
->
+abstract class MultiLintTestProcessor<T extends SubLints>
     extends AnalysisRuleTest {
   @override
   String get analysisRule => rule.rule.lowerCaseUniqueName;

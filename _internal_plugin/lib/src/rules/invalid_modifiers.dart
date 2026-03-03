@@ -20,7 +20,7 @@ class InvalidModifiersRule extends LintRule<InvalidModifiersRule> {
   @override
   Logger get logger => _logger;
 
-  static const _diagnostic = InternalDiagnosticCode<InternalLintRule>(
+  static const _diagnostic = InternalDiagnosticCode(
     rule: .invalidModifiers,
     problemMessage: 'This modifier is invalid for {0}.',
     correctionMessage: 'Remove the invalid modifier.',

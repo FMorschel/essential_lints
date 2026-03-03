@@ -20,7 +20,7 @@ class InvalidMembersRule extends LintRule<InvalidMembersRule> {
   @override
   Logger get logger => _logger;
 
-  static const _diagnostic = InternalDiagnosticCode<InternalLintRule>(
+  static const _diagnostic = InternalDiagnosticCode(
     rule: .invalidMembers,
     problemMessage: 'This member is invalid {0}.',
     correctionMessage: 'Remove the invalid member.',

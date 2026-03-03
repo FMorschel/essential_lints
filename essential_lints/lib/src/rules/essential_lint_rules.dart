@@ -10,18 +10,13 @@ import 'rule.dart';
 /// {@template enum_lint}
 /// A mixin for enums that provide a lint rule code.
 /// {@endtemplate}
-mixin EnumLint<Code extends LintRuleCode<R>, R extends EssentialLintRule>
-    on EnumDiagnostic<Code, R>
-    implements LintCode {
+mixin EnumLint on EnumDiagnostic implements LintCode {
   @override
-  Code get code;
+  LintRuleCode get code;
 }
 
 /// The list of all essential lint rules.
-enum EssentialLintCode
-    with
-        EnumDiagnostic<LintRuleCode<EssentialLintRule>, EssentialLintRule>,
-        EnumLint {
+enum EssentialLintCode with EnumDiagnostic, EnumLint {
   /// Arguments should be in alphabetical order.
   alphabetizeArguments(
     LintRuleCode(
@@ -311,17 +306,12 @@ enum EssentialLintCode
 
   /// The diagnostic code associated with the lint rule.
   @override
-  final LintRuleCode<EssentialLintRule> code;
+  final LintRuleCode code;
 }
 
 /// The list of all essential lint rules.
-enum EssentialMultiLints<
-  T extends SubLints<LintRuleCode<EssentialLintRule>, EssentialLintRule>
->
-    with
-        EnumDiagnostic<LintRuleCode<EssentialLintRule>, EssentialLintRule>,
-        EnumLint,
-        SuperDiagnostic<T, LintRuleCode<EssentialLintRule>, EssentialLintRule> {
+enum EssentialMultiLints<T extends SubLints>
+    with EnumDiagnostic, EnumLint, SuperDiagnostic<T> {
   /// A lint rule that detects pending listeners and reminds developers to
   /// remove them.
   pendingListener(
@@ -336,7 +326,7 @@ enum EssentialMultiLints<
   const EssentialMultiLints(this.code, this.subDiagnostics);
 
   @override
-  final LintRuleCode<EssentialLintRule> code;
+  final LintRuleCode code;
 
   @override
   final List<T> subDiagnostics;
@@ -345,11 +335,10 @@ enum EssentialMultiLints<
 /// {@template lint_rule_code}
 /// A diagnostic code for a lint rule.
 /// {@endtemplate}
-class LintRuleCode<R extends EssentialLintRule> extends WarningCode<R>
-    implements LintCode {
+class LintRuleCode extends WarningCode implements LintCode {
   /// {@macro lint_rule_code}
   const LintRuleCode({
-    required super.rule,
+    required EssentialLintRule super.rule,
     required super.problemMessage,
     super.correctionMessage,
     super.severity = .INFO,
@@ -360,7 +349,7 @@ class LintRuleCode<R extends EssentialLintRule> extends WarningCode<R>
 /// {@template sub_lint_rule_code}
 /// A sub diagnostic code for a lint rule.
 /// {@endtemplate}
-class SubLintRuleCode<R extends EssentialLintRule> extends LintRuleCode<R> {
+class SubLintRuleCode extends LintRuleCode {
   /// {@macro sub_lint_rule_code}
   const SubLintRuleCode({
     required super.rule,
@@ -376,11 +365,7 @@ class SubLintRuleCode<R extends EssentialLintRule> extends LintRuleCode<R> {
 /// {@endtemplate}
 @staticAllEnforcement
 @StaticEnforcement(#base, annotation.th<EssentialMultiLints>())
-enum PendingListener
-    with
-        EnumDiagnostic<SubLintRuleCode<EssentialLintRule>, EssentialLintRule>,
-        SubDiagnostic,
-        SubLints {
+enum PendingListener with EnumDiagnostic, SubDiagnostic, SubLints {
   /// Closures used as listeners cannot be matched for removal.
   closuresCannotBeMatched(
     SubLintRuleCode(
@@ -425,7 +410,7 @@ enum PendingListener
   static const EssentialMultiLints base = .pendingListener;
 
   @override
-  final SubLintRuleCode<EssentialLintRule> code;
+  final SubLintRuleCode code;
 }
 
 /// {@template sub_warnings}
@@ -436,6 +421,4 @@ enum PendingListener
   annotations: [StaticEnforcement(#base, annotation.th<EssentialMultiLints>())],
   option: .onlyInstantiable,
 )
-mixin SubLints<Code extends LintRuleCode<R>, R extends EssentialLintRule>
-    on SubDiagnostic<Code, R>
-    implements LintRuleCode<R> {}
+mixin SubLints on SubDiagnostic implements LintRuleCode {}

@@ -17,7 +17,7 @@ import 'rule.dart';
 class StaticEnforcementRule extends LintRule<StaticEnforcementRule> {
   StaticEnforcementRule() : super(_diagnostic, _logger);
 
-  static const _diagnostic = InternalDiagnosticCode<InternalLintRule>(
+  static const _diagnostic = InternalDiagnosticCode(
     rule: .staticEnforcement,
     problemMessage: "A member named '{0}' should be declared and be static.",
     correctionMessage: "Declare '{0}' as static.",

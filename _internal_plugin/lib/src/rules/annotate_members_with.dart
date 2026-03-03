@@ -17,7 +17,7 @@ import 'rule.dart';
 class AnnotateMembersWithRule extends LintRule<AnnotateMembersWithRule> {
   AnnotateMembersWithRule() : super(_diagnostic, _logger);
 
-  static const _diagnostic = InternalDiagnosticCode<InternalLintRule>(
+  static const _diagnostic = InternalDiagnosticCode(
     rule: .annotateMembersWith,
     problemMessage: "This member should be annotated with '{0}'.",
     correctionMessage: 'Add the required annotation.',

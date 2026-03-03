@@ -258,16 +258,14 @@ abstract class LintRule<Rule extends LintRule<Rule>>
 /// {@endtemplate}
 abstract class MultiLintRule<
   R extends MultiLintRule<R, Sub>,
-  Sub extends SubLints<SubLintRuleCode<EssentialLintRule>, EssentialLintRule>
+  Sub extends SubLints
 >
     extends
         EssentialMultiAnalysisRule<
           R,
           BaseVisitor<R>,
           EssentialMultiLints<Sub>,
-          Sub,
-          LintRuleCode,
-          EssentialLintRule
+          Sub
         > {
   /// {@macro rule}
   MultiLintRule(super.rule, super.logger);

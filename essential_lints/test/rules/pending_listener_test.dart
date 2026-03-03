@@ -14,13 +14,7 @@ void main() {
 }
 
 @reflectiveTest
-class PendingListenerTest
-    extends
-        MultiLintTestProcessor<
-          PendingListener,
-          SubLintRuleCode<EssentialLintRule>,
-          EssentialLintRule
-        >
+class PendingListenerTest extends MultiLintTestProcessor<PendingListener>
     with FlutterDependencyMixin {
   @override
   MultiLintRule<dynamic, PendingListener> get rule => PendingListenerRule();

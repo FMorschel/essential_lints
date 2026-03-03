@@ -1,12 +1,7 @@
 import '../rules/analysis_rule.dart';
 import '../utils/base_visitor.dart';
 import 'essential_lint_warnings.dart'
-    show
-        EssentialLintWarningCode,
-        EssentialMultiWarningCode,
-        SubWarningCode,
-        SubWarnings,
-        WarningCode;
+    show EssentialLintWarningCode, EssentialMultiWarningCode, SubWarnings;
 
 /// The enum for all the essential warning rules, containing their names and
 /// descriptions.
@@ -90,23 +85,14 @@ abstract class WarningRule<Rule extends WarningRule<Rule>>
 /// {@endtemplate}
 abstract class MultiWarningRule<
   R extends MultiWarningRule<R, Sub>,
-  Sub extends SubWarnings<
-    SubWarningCode<EssentialLintWarningRule>,
-    EssentialLintWarningRule
-  >
+  Sub extends SubWarnings
 >
     extends
         EssentialMultiAnalysisRule<
           R,
           BaseVisitor<R>,
-          EssentialMultiWarningCode<
-            Sub,
-            SubWarningCode<EssentialLintWarningRule>,
-            EssentialLintWarningRule
-          >,
-          Sub,
-          WarningCode,
-          Rule
+          EssentialMultiWarningCode<Sub>,
+          Sub
         > {
   /// {@macro rule}
   MultiWarningRule(super.rule, super.logger);

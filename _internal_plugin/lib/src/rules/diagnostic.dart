@@ -3,10 +3,9 @@ import 'package:essential_lints/src/warnings/essential_lint_warnings.dart'
 
 import 'rule.dart';
 
-class InternalDiagnosticCode<R extends InternalLintRule>
-    extends diagnostic.WarningCode<R> {
+class InternalDiagnosticCode extends diagnostic.WarningCode {
   const InternalDiagnosticCode({
-    required super.rule,
+    required InternalLintRule super.rule,
     required super.problemMessage,
     super.uniqueName,
     super.severity = .WARNING,
@@ -15,17 +14,12 @@ class InternalDiagnosticCode<R extends InternalLintRule>
   });
 }
 
-mixin SubDiagnostic<R extends InternalLintRule>
-    on diagnostic.SubDiagnostic<InternalDiagnosticCode<R>, R> {}
+mixin SubDiagnostic on diagnostic.SubDiagnostic {}
 
 enum InternalDiagnostics
     with
-        diagnostic.EnumDiagnostic<InternalDiagnosticCode, InternalLintRule>,
-        diagnostic.SuperDiagnostic<
-          InternalMultiLints,
-          InternalDiagnosticCode,
-          InternalLintRule
-        > {
+        diagnostic.EnumDiagnostic,
+        diagnostic.SuperDiagnostic<InternalMultiLints> {
   subDiagnostic(
     InternalDiagnosticCode(
       rule: .subDiagnostic,
@@ -38,7 +32,7 @@ enum InternalDiagnostics
   const InternalDiagnostics(this.code, this.subDiagnostics);
 
   @override
-  final InternalDiagnosticCode<InternalLintRule> code;
+  final InternalDiagnosticCode code;
 
   @override
   final List<InternalMultiLints> subDiagnostics;
@@ -46,13 +40,7 @@ enum InternalDiagnostics
 
 @diagnostic.staticAllEnforcement
 enum InternalMultiLints
-    with
-        diagnostic.EnumDiagnostic<
-          InternalDiagnosticCode<InternalLintRule>,
-          InternalLintRule
-        >,
-        diagnostic.SubDiagnostic,
-        SubDiagnostic {
+    with diagnostic.EnumDiagnostic, diagnostic.SubDiagnostic, SubDiagnostic {
   nonUniqueName(
     InternalDiagnosticCode(
       rule: .subDiagnostic,
@@ -69,5 +57,5 @@ enum InternalMultiLints
   static const InternalDiagnostics base = .subDiagnostic;
 
   @override
-  final InternalDiagnosticCode<InternalLintRule> code;
+  final InternalDiagnosticCode code;
 }
