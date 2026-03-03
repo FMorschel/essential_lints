@@ -18,8 +18,8 @@ This package provides **20+ lint rules** organized into several categories:
 
 ### Type Safety & Correctness
 
+- **`ambiguous_positional_boolean`** - Detects APIs that accept positional `bool` parameters which can make call-sites ambiguous
 - **`boolean_assignment`** - Detects assignments where a condition was likely intended
-- **`ambiguous_positional_boolean`** - Detects APIs that accept positional `bool` parameters which can make call-sites ambiguous; suggests using named parameters or explicit parameter names
 - **`closure_incorrect_type`** - Catches closures with incorrect type annotations
 - **`is_future`** - Warns about problematic `is Future` type checks in FutureOr contexts
 - **`variable_shadowing`** - Prevents variable declarations that shadow outer scope variables
