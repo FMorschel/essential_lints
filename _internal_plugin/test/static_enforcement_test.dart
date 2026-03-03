@@ -77,6 +77,19 @@ class C {
 ''');
   }
 
+  Future<void> test_ok_subtype() async {
+    await assertNoDiagnostics('''
+import 'package:essential_lints_annotations/src/_internal/static_enforcement.dart';
+import 'package:essential_lints_annotations/essential_lints_annotations.dart';
+
+@StaticEnforcement(#staticMethod, th<num>())
+class C {
+  void instanceMethod() {}
+  static int staticMethod() => 0;
+}
+''');
+  }
+
   Future<void> test_ok() async {
     await assertNoDiagnostics('''
 import 'package:essential_lints_annotations/src/_internal/static_enforcement.dart';

@@ -48,6 +48,10 @@ class StaticEnforcementRule extends LintRule<StaticEnforcementRule> {
 class _StaticEnforcementVisitor extends BaseVisitor<StaticEnforcementRule> {
   _StaticEnforcementVisitor(super.rule, super.context);
 
+  static final Uri _staticEnforcementUri = .parse(
+    'package:essential_lints_annotations/src/_internal/static_enforcement.dart',
+  );
+
   @override
   void visitClassDeclaration(ClassDeclaration node) {
     _handleInstanceElement(
@@ -132,7 +136,7 @@ class _StaticEnforcementVisitor extends BaseVisitor<StaticEnforcementRule> {
                       first: FormalParameterElement(:var type),
                     ),
                   ),
-                ) when type != argument) {
+                ) when !typeSystem.isAssignableTo(type, argument)) {
           rule.reportAtToken(node, arguments: [memberName]);
         }
       }
@@ -145,9 +149,6 @@ class _StaticEnforcementVisitor extends BaseVisitor<StaticEnforcementRule> {
     var type = value.type;
     if (type == null) return false;
     return type.element?.lookupName == 'StaticEnforcement' &&
-        type.element?.library?.uri ==
-            .parse(
-              'package:essential_lints_annotations/src/_internal/static_enforcement.dart',
-            );
+        type.element?.library?.uri == _staticEnforcementUri;
   }
 }

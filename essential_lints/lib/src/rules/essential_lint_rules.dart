@@ -419,10 +419,7 @@ enum PendingListener
   const PendingListener(this.code);
 
   /// All the diagnostics associated with this multi-lint.
-  static final List<
-    EnumDiagnostic<LintRuleCode<EssentialLintRule>, EssentialLintRule>
-  >
-  all = [...values, base];
+  static final List<EnumDiagnostic> all = [...values, base];
 
   /// The base lint rule.
   static const EssentialMultiLints base = .pendingListener;
