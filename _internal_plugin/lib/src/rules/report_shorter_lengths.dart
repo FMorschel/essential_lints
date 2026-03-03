@@ -47,6 +47,9 @@ class _ReportShorterLengthsVisitor
 
   static const classes = ['AnalysisRule', 'MultiAnalysisRule'];
   static const method = 'reportAtNode';
+  static final Uri _astNodeLibraryUri = .parse(
+    'package:analyzer/src/dart/ast/ast.dart',
+  );
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
@@ -86,8 +89,7 @@ class _ReportShorterLengthsVisitor
       if (element is! ClassElement) return false;
       bool isAstNode(InterfaceType interface) =>
           interface.element.name == 'AstNode' &&
-              interface.element.library.uri ==
-                  .parse('package:analyzer/src/dart/ast/ast.dart') ||
+              interface.element.library.uri == _astNodeLibraryUri ||
           interface.element.allSupertypes.reversed.any(isAstNode);
 
       return element.allSupertypes.reversed.any(isAstNode);
@@ -106,11 +108,6 @@ class _ReportShorterLengthsVisitor
           typeSystem.isSubtypeOf(c.thisType, element.thisType) &&
           c.thisType != element.thisType,
     );
-    for (var subtype in subtypes) {
-      if (subtype.isAbstract) {
-        return true;
-      }
-    }
-    return false;
+    return subtypes.any((subtype) => subtype.isAbstract);
   }
 }
