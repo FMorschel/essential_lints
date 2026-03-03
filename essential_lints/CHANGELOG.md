@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.11
+
+Released on: 2026-03-03
+
+- **ambiguous_positional_boolean**: Adds support for function types.
+
+Internal refactoring for better code reuse and maintainability.
+
 ## 0.1.10
 
 Released on: 2026-02-24
