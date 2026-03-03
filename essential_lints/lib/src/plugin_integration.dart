@@ -120,11 +120,11 @@ mixin FixesPluginIntegration {
   );
 
   /// Returns the list of registered lint fixes.
-  Map<EssentialLintRules, List<FixGenerator>> get lintFixes {
+  Map<EssentialLintCode, List<FixGenerator>> get lintFixes {
     logger.info('Mapping lint fixes');
-    var fixes = <EssentialLintRules, List<FixGenerator>>{};
+    var fixes = <EssentialLintCode, List<FixGenerator>>{};
 
-    void addFixTo(FixGenerator generator, List<EssentialLintRules> rules) {
+    void addFixTo(FixGenerator generator, List<EssentialLintCode> rules) {
       for (var rule in rules) {
         fixes.putIfAbsent(rule, () => []).add(generator);
       }
@@ -192,7 +192,7 @@ mixin FixesPluginIntegration {
     for (var fix in EssentialLintWarningFixes.values) {
       var _ = switch (fix) {
         .addMissingMembers => addFixTo(AddMissingMembersFix.new, [
-          EssentialMultiWarnings.gettersInMemberList,
+          EssentialMultiWarningCode.gettersInMemberList,
         ]),
         .removeExpression => addFixTo(RemoveExpressionFix.new, [
           GettersInMemberList.nonMemberIn,
@@ -201,7 +201,7 @@ mixin FixesPluginIntegration {
           GettersInMemberList.missingList,
         ]),
         .sortMembers => addFixTo(SortMembersFix.new, [
-          EssentialLintWarnings.sortingMembers,
+          EssentialLintWarningCode.sortingMembers,
         ]),
       };
     }
@@ -251,7 +251,7 @@ mixin RulesPluginIntegration {
   Set<AbstractAnalysisRule> get rules {
     logger.info('Mapping lint rules');
     var rules = <AbstractAnalysisRule>{};
-    for (var rule in EssentialLintRules.values) {
+    for (var rule in EssentialLintCode.values) {
       rules.add(switch (rule) {
         .alphabetizeEnumConstants => AlphabetizeEnumConstantsRule(),
         .alphabetizeArguments => AlphabetizeArgumentsRule(),
@@ -327,7 +327,7 @@ mixin WarningsPluginIntegration {
     logger.info('Mapping multi warning rules');
     var rules = <MultiWarningRule>{};
     // Single instance to satisfy exhaustive switch requirement.
-    for (var rule in EssentialMultiWarnings.values) {
+    for (var rule in EssentialMultiWarningCode.values) {
       rules.add(switch (rule) {
         .gettersInMemberList => GettersInMemberListRule(),
         .subtypeNaming => SubtypeNamingRule(),
@@ -343,7 +343,7 @@ mixin WarningsPluginIntegration {
     logger.info('Mapping warning rules');
     var rules = <WarningRule>{};
     // Single instance to satisfy exhaustive switch requirement.
-    for (var rule in EssentialLintWarnings.values) {
+    for (var rule in EssentialLintWarningCode.values) {
       rules.add(switch (rule) {
         .sortingMembers => SortingMembersRule(),
       });

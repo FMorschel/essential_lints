@@ -22,11 +22,10 @@ class ReportShorterLengthsRule extends LintRule<ReportShorterLengthsRule> {
   @override
   Logger get logger => _logger;
 
-  static const _diagnostic = InternalDiagnosticCode(
-    name: 'report_shorter_lengths',
+  static const _diagnostic = InternalDiagnosticCode<InternalLintRule>(
+    rule: .reportShorterLengths,
     problemMessage: 'Report shorter lengths to avoid unnecessary overlaps.',
     correctionMessage: 'Chose a more specific node or token.',
-    description: 'Report for long nodes.',
   );
 
   @override

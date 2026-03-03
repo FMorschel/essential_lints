@@ -21,15 +21,16 @@ mixin class DebugLogMixin {
   /// logger.
   StreamSubscription<LogRecord> setLogListener({
     Level level = .OFF,
+    Logger? logger,
     bool root = false,
   }) {
     _sink = logFilePath != null
         ? File(logFilePath!).openWrite(mode: FileMode.append)
         : null;
-    hierarchicalLoggingEnabled = !root;
-    var logger = root ? Logger.root : EssentialLintsPlugin.logger
-      // Set the logging level.
-      ..level = level;
+    hierarchicalLoggingEnabled = logger != null || !root;
+    logger ??= root ? Logger.root : EssentialLintsPlugin.logger;
+    // Set the logging level.
+    logger.level = level;
     return logger.onRecord.listen(_listener);
   }
 

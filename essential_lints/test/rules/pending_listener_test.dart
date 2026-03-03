@@ -14,7 +14,13 @@ void main() {
 }
 
 @reflectiveTest
-class PendingListenerTest extends MultiLintTestProcessor<PendingListener>
+class PendingListenerTest
+    extends
+        MultiLintTestProcessor<
+          PendingListener,
+          SubLintRuleCode<EssentialLintRule>,
+          EssentialLintRule
+        >
     with FlutterDependencyMixin {
   @override
   MultiLintRule<dynamic, PendingListener> get rule => PendingListenerRule();
@@ -646,6 +652,48 @@ class D {
   void m() {
     c = ChangeNotifier()..addListener(m);
     c.removeListener(m);
+  }
+}
+''');
+  }
+
+  Future<void> test_localMethodsIgnored() async {
+    await assertDiagnostics(
+      '''
+import 'package:flutter/foundation.dart';
+
+abstract class D extends Listenable {
+  void m() {
+    addListener(m);
+    {
+      void addListener(void Function() f) {}
+      addListener(m);
+    }
+  }
+}
+''',
+      [lint(110, 1)],
+    );
+  }
+
+  Future<void> test_otherClass() async {
+    await assertNoDiagnostics('''
+class Listenable {
+  void addListener(void Function() f) {}
+  void removeListener(void Function() f) {}
+}
+
+class Disposable extends Listenable {
+  void dispose() {}
+}
+
+class D {
+  late Disposable c;
+
+  void m() {
+    c = Disposable()..addListener(m);
+    c.removeListener(() {});
+    c.dispose();
   }
 }
 ''');

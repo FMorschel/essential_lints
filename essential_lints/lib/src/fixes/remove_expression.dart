@@ -35,7 +35,7 @@ class RemoveExpressionFix extends CorrectionProducerLogger with WarningFix {
     logger.info('RemoveExpressionFix.compute() started');
     var node = this.node;
     logger.finer('Initial node type: ${node.runtimeType}');
-    if (diagnostic?.diagnosticCode == EssentialLintRules.emptyContainer) {
+    if (diagnostic?.diagnosticCode == EssentialLintCode.emptyContainer) {
       logger.finer(
         'Diagnostic is emptyContainer, trying to find Expression ancestor',
       );

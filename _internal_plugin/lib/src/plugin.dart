@@ -14,6 +14,7 @@ import 'rules/invalid_members.dart';
 import 'rules/invalid_modifiers.dart';
 import 'rules/report_shorter_lengths.dart';
 import 'rules/static_enforcement.dart';
+import 'rules/sub_diagnostic.dart';
 
 class InternalPlugin extends Plugin {
   @override
@@ -30,9 +31,10 @@ class InternalPlugin extends Plugin {
       ..registerWarningRule(ReportShorterLengthsRule())
       ..registerWarningRule(StaticEnforcementRule())
       ..registerWarningRule(InvalidModifiersRule())
+      ..registerLintRule(SubDiagnosticRule())
       ..registerWarningRule(SamePackageDirectImportRule())
       ..registerFixForRule(
-        EssentialLintRules.samePackageDirectImport,
+        EssentialLintCode.samePackageDirectImport,
         SamePackageDirectImportFix.new,
       );
   }

@@ -28,6 +28,11 @@ Future<Directory> essentialLintsAnnotationsPackage() async {
   );
 }
 
+/// Utility functions to get the file system paths of the essential_lints.
+Future<Directory> essentialLintsPackage() async {
+  return await packageDir('essential_lints', 'main.dart');
+}
+
 /// Utility functions to get the file system paths of the
 /// _essential_lints_annotations_test package.
 Future<Directory> essentialLintsAnnotationsTestPackage() async {

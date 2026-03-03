@@ -180,7 +180,7 @@ class _GettersInMemberListVisitor extends BaseVisitor<GettersInMemberListRule> {
         logger.finer('Reporting missing members: ${missing.join(", ")}');
         rule.reportAtToken(
           memberName,
-          diagnosticCode: EssentialMultiWarnings.gettersInMemberList,
+          diagnosticCode: EssentialMultiWarningCode.gettersInMemberList,
           arguments: [
             annotation.gettersAndFieldsDescription,
             missing.quotedAndCommaSeparatedWithAnd,

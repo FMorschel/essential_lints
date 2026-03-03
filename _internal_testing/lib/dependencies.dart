@@ -20,4 +20,19 @@ mixin AnnotationsDependencyMixin on AnalysisRuleTest {
 
     return newPackage('essential_lints_annotations');
   }
+
+  Future<PackageBuilder> addLintDependency() async {
+    var directory = await essentialLintsPackage();
+    var resourceProvider = PhysicalResourceProvider.INSTANCE;
+    annotationLibSource = resourceProvider.getFolder(
+      resourceProvider.pathContext.normalize(
+        join(directory.uri.toFilePath(), 'lib'),
+      ),
+    );
+
+    var annotationFolder = newFolder('/package/essential_lints');
+    annotationLibSource.copyTo(annotationFolder);
+
+    return newPackage('essential_lints');
+  }
 }

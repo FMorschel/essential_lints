@@ -12,8 +12,7 @@ import '../rules/analysis_rule.dart';
 ///
 /// It ensures that the rule and context are available to all visitors and
 /// provides easier access to the logger.
-mixin Visitor<Rule extends AbstractEssentialAnalysisRule?>
-    on AstVisitor<dynamic> {
+mixin Visitor<Rule extends AbstractEssentialAnalysisRule?, T> on AstVisitor<T> {
   /// The context of the rule, used to report diagnostics.
   RuleContext get context;
 
@@ -36,7 +35,7 @@ mixin Visitor<Rule extends AbstractEssentialAnalysisRule?>
 /// {@endtemplate}
 abstract class BaseVisitor<Rule extends AbstractEssentialAnalysisRule?>
     extends SimpleAstVisitor<void>
-    with Visitor<Rule> {
+    with Visitor<Rule, void> {
   /// {@macro base_visitor}
   BaseVisitor(this.rule, this.context, {Logger? logger})
     : assert(
@@ -63,7 +62,7 @@ abstract class GeneralizingBaseVisitor<
   Rule extends AbstractEssentialAnalysisRule?
 >
     extends GeneralizingAstVisitor<void>
-    with Visitor<Rule> {
+    with Visitor<Rule, void> {
   /// {@macro generalizing_base_visitor}
   GeneralizingBaseVisitor(this.rule, this.context, {Logger? logger})
     : assert(
@@ -92,7 +91,7 @@ abstract class GeneralizingBaseVisitor<
 /// {@endtemplate}
 abstract class RecursiveBaseVisitor<Rule extends AbstractEssentialAnalysisRule?>
     extends RecursiveAstVisitor<void>
-    with Visitor<Rule> {
+    with Visitor<Rule, void> {
   /// {@macro recursive_base_visitor}
   RecursiveBaseVisitor(this.rule, this.context, {Logger? logger})
     : assert(

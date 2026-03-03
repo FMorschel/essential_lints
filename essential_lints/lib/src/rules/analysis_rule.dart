@@ -10,6 +10,7 @@ import 'package:meta/meta.dart';
 import '../utils/base_visitor.dart';
 import '../warnings/essential_lint_warnings.dart'
     hide SubtypeAnnotating, SubtypeNaming;
+import '../warnings/warning.dart';
 
 /// Static enforcement to ensure a static logger is present in all analysis
 /// rules.
@@ -37,8 +38,8 @@ sealed class AbstractEssentialAnalysisRule<Diagnostic extends WarningCode> {
 )
 @SubtypeNaming(suffix: 'Rule')
 abstract class EssentialAnalysisRule<
-  Rule extends EssentialAnalysisRule<Rule, Visitor, Diagnostic>,
-  Visitor extends BaseVisitor<Rule>,
+  R extends EssentialAnalysisRule<R, Visitor, Diagnostic>,
+  Visitor extends BaseVisitor<R>,
   Diagnostic extends WarningCode
 >
     extends AnalysisRule
@@ -66,10 +67,12 @@ abstract class EssentialAnalysisRule<
 )
 @SubtypeNaming(suffix: 'Rule')
 abstract class EssentialMultiAnalysisRule<
-  Rule extends EssentialMultiAnalysisRule<Rule, Visitor, Diagnostic, Sub>,
-  Visitor extends BaseVisitor<Rule>,
-  Diagnostic extends SuperDiagnostic<Sub>,
-  Sub extends SubDiagnostic
+  R extends EssentialMultiAnalysisRule<R, Visitor, Diagnostic, Sub, Code, R2>,
+  Visitor extends BaseVisitor<R>,
+  Diagnostic extends SuperDiagnostic<Sub, Code, R2>,
+  Sub extends SubDiagnostic<Code, R2>,
+  Code extends WarningCode<R2>,
+  R2 extends Rule
 >
     extends MultiAnalysisRule
     implements AbstractEssentialAnalysisRule<Diagnostic> {

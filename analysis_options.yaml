@@ -1,5 +1,11 @@
 include: essential_lints_annotations\lib\src\_internal\analysis_options.yaml
 
+analyzer:
+  errors:
+    use_function_type_syntax_for_parameters: error
+
 plugins:
   _internal_plugin:
     path: _internal_plugin/
+    diagnostics:
+      sub_diagnostic: true

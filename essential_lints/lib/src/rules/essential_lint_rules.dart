@@ -5,54 +5,50 @@ import 'package:essential_lints_annotations/essential_lints_annotations.dart'
 import 'package:essential_lints_annotations/src/_internal/static_enforcement.dart';
 
 import '../warnings/essential_lint_warnings.dart';
+import 'rule.dart';
 
 /// {@template enum_lint}
 /// A mixin for enums that provide a lint rule code.
 /// {@endtemplate}
-mixin EnumLint on EnumDiagnostic implements LintCode {
+mixin EnumLint<Code extends LintRuleCode<R>, R extends EssentialLintRule>
+    on EnumDiagnostic<Code, R>
+    implements LintCode {
   @override
-  LintRuleCode get code;
+  Code get code;
 }
 
 /// The list of all essential lint rules.
-enum EssentialLintRules with EnumDiagnostic, EnumLint {
+enum EssentialLintCode
+    with
+        EnumDiagnostic<LintRuleCode<EssentialLintRule>, EssentialLintRule>,
+        EnumLint {
   /// Arguments should be in alphabetical order.
   alphabetizeArguments(
     LintRuleCode(
-      name: 'alphabetize_arguments',
+      rule: .alphabetizeArguments,
       problemMessage: 'Arguments should be in alphabetical order.',
       correctionMessage: 'Reorder the arguments alphabetically.',
-      description:
-          'A lint rule that enforces alphabetical ordering of function '
-          'arguments.',
     ),
   ),
 
   /// Prefer explicitly named parameters for better readability.
   preferExplicitlyNamedParameter(
     LintRuleCode(
-      name: 'prefer_explicitly_named_parameter',
+      rule: .preferExplicitlyNamedParameter,
       problemMessage: 'Use explicitly named parameters for better readability.',
       correctionMessage:
           'Change to use explicitly named parameters in function type '
           'declarations.',
-      description:
-          'A lint rule that encourages the use of explicitly named parameters '
-          'in function type declarations for improved code clarity and '
-          'completion.',
     ),
   ),
 
   /// Double literals should follow the preferred format.
   numericConstantStyle(
     LintRuleCode(
-      name: 'numeric_constant_style',
+      rule: .numericConstantStyle,
       problemMessage: 'Double literals should follow the preferred format.',
       correctionMessage:
           'Reformat the double literal to match the preferred style.',
-      description:
-          'A lint rule that enforces a consistent format for double literals '
-          'in the codebase.',
     ),
   ),
 
@@ -60,15 +56,11 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
   /// list-like object.
   lastGetter(
     LintRuleCode(
-      name: 'last_getter',
+      rule: .lastGetter,
       problemMessage:
           'Prefer using the `last` getter to access the last element of a '
           'list-like object.',
       correctionMessage: 'Replace the index access with the `last` getter.',
-      description:
-          'A lint rule that suggests using the `last` getter instead of '
-          'accessing the last element of a list-like object using length - 1 '
-          'index.',
     ),
   ),
 
@@ -76,27 +68,20 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
   /// list-like object.
   firstGetter(
     LintRuleCode(
-      name: 'first_getter',
+      rule: .firstGetter,
       problemMessage:
           'Prefer using the `first` getter to access the first element of a '
           'list-like object.',
       correctionMessage: 'Replace the index access with the `first` getter.',
-      description:
-          'A lint rule that suggests using the `first` getter instead of '
-          'accessing the first element of a list-like object using 0 index.',
     ),
   ),
 
   /// Avoid returning Widgets from functions.
   returningWidgets(
     LintRuleCode(
-      name: 'returning_widgets',
+      rule: .returningWidgets,
       problemMessage: 'Avoid returning Widgets from functions.',
       correctionMessage: 'Prefer extracting the widget into a separate class.',
-      description:
-          'A lint rule that discourages returning Widgets from functions and '
-          'encourages extracting them into separate classes for better code '
-          'organization and reusability.',
     ),
   ),
 
@@ -104,62 +89,49 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
   /// a Padding widget.
   paddingOverContainer(
     LintRuleCode(
-      name: 'padding_over_container',
+      rule: .paddingOverContainer,
       problemMessage:
           'Prefer using the inner padding property from Container over '
           'wrapping with padding.',
       correctionMessage:
           'Use the padding property of Container instead of wrapping it with '
           'a Padding widget.',
-      description:
-          'A lint rule that suggests using the padding property of Container '
-          'instead of wrapping it with a Padding widget.',
     ),
   ),
 
   /// Detects unnecessary calls to setState in Flutter widgets.
   unnecessarySetstate(
     LintRuleCode(
-      name: 'unnecessary_setstate',
+      rule: .unnecessarySetstate,
       problemMessage: 'Unnecessary calls to setState detected.',
       correctionMessage: 'Remove the unnecessary call to setState.',
-      description:
-          'A lint rule that detects and flags unnecessary calls to setState '
-          'in State classes.',
     ),
   ),
 
   /// A rule that detects empty container widgets in Flutter code.
   emptyContainer(
     LintRuleCode(
-      name: 'empty_container',
+      rule: .emptyContainer,
       problemMessage: 'Empty Container widget detected.',
       correctionMessage: 'Remove the empty Container widget.',
-      description:
-          'A lint rule that detects empty Container widgets in Flutter code.',
     ),
   ),
 
   /// A rule that enforces alphabetical ordering of enum constants.
   alphabetizeEnumConstants(
     LintRuleCode(
-      name: 'alphabetize_enum_constants',
+      rule: .alphabetizeEnumConstants,
       problemMessage: 'Enum constants should be in alphabetical order.',
       correctionMessage: 'Reorder the enum constants alphabetically.',
-      description:
-          'A lint rule that enforces alphabetical ordering of enum constants.',
     ),
   ),
 
   /// A lint rule that checks for the use of `Border.all` in Flutter widgets.
   borderAll(
     LintRuleCode(
-      name: 'border_all',
+      rule: .borderAll,
       problemMessage: 'Avoid using Border.all in Flutter widgets.',
       correctionMessage: 'Use Border.fromBorderSide instead of Border.all.',
-      description:
-          'A lint rule that checks for the use of Border.all in Flutter '
-          'widgets.',
     ),
   ),
 
@@ -167,36 +139,30 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
   /// Flutter widgets.
   borderRadiusAll(
     LintRuleCode(
-      name: 'border_radius_all',
+      rule: .borderRadiusAll,
       problemMessage: 'Avoid using BorderRadius.circular in Flutter widgets.',
       correctionMessage:
           'Use BorderRadius.all instead of BorderRadius.circular.',
-      description:
-          'A lint rule that checks for the use of BorderRadius.circular in '
-          'Flutter widgets.',
     ),
   ),
 
   /// A rule that checks for proper phrasing of comments.
   standardCommentStyle(
     LintRuleCode(
-      name: 'standard_comment_style',
+      rule: .standardCommentStyle,
       problemMessage: 'Comments should be phrased.',
       correctionMessage:
           'Format comments to end with proper punctuation and capitalization.',
-      description: 'A lint rule that checks for proper phrasing of comments.',
     ),
   ),
 
   /// A lint rule that enforces direct imports within the same package.
   samePackageDirectImport(
     LintRuleCode(
-      name: 'same_package_direct_import',
+      rule: .samePackageDirectImport,
       problemMessage:
           'Imports within the same package should be direct imports.',
       correctionMessage: 'Change to a direct import.',
-      description:
-          'A lint rule that enforces direct imports within the same package.',
     ),
   ),
 
@@ -204,14 +170,11 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
   /// instances.
   newInstanceCascade(
     LintRuleCode(
-      name: 'new_instance_cascade',
+      rule: .newInstanceCascade,
       problemMessage:
           'Avoid using cascades on members that return new instances.',
       correctionMessage:
           'Do not use cascades on members that return new instances.',
-      description:
-          'A lint rule that detects cascades being used on members that return '
-          'new instances.',
     ),
   ),
 
@@ -219,16 +182,13 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
   /// `FutureOr` instances that accept `Future` values.
   isFuture(
     LintRuleCode(
-      name: 'is_future',
+      rule: .isFuture,
       problemMessage:
           'Avoid using `is Future` type checks in `FutureOr` instances that '
           'accept `Future` values.',
       correctionMessage:
           'Remove the `is Future` type check when working with `FutureOr` '
           'instances.',
-      description:
-          'A lint rule that checks for usages of `is Future` type checks in '
-          '`FutureOr` instances that accept `Future` values.',
     ),
   ),
 
@@ -236,16 +196,13 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
   /// variables in the same scope.
   variableShadowing(
     LintRuleCode(
-      name: 'variable_shadowing',
+      rule: .variableShadowing,
       problemMessage:
           'Variable declarations should not shadow other variables in the '
           'same scope.',
       correctionMessage:
           'Rename the variable to avoid shadowing another variable in the '
           'same scope.',
-      description:
-          'A lint rule that checks for variable declarations that shadow other '
-          'variables in the same scope.',
     ),
   ),
 
@@ -253,15 +210,12 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
   /// in function declarations.
   optionalPositionalParameters(
     LintRuleCode(
-      name: 'optional_positional_parameters',
+      rule: .optionalPositionalParameters,
       problemMessage:
           'Avoid using optional positional parameters in function '
           'declarations.',
       correctionMessage:
           'Use named parameters instead of optional positional parameters.',
-      description:
-          'A lint rule that discourages the use of optional positional '
-          'parameters in function declarations.',
     ),
   ),
 
@@ -269,13 +223,10 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
   /// annotation.
   closureIncorrectType(
     LintRuleCode(
-      name: 'closure_incorrect_type',
+      rule: .closureIncorrectType,
       problemMessage: 'Closure parameter has an incorrect type annotation.',
       correctionMessage:
           'Adjust the type annotation to match the expected type.',
-      description:
-          'A lint rule that checks for closures that have an incorrect type '
-          'annotation.',
     ),
   ),
 
@@ -283,24 +234,20 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
   /// providing a stack trace.
   completerErrorNoStack(
     LintRuleCode(
-      name: 'completer_error_no_stack',
+      rule: .completerErrorNoStack,
       problemMessage:
           'Avoid using Completer.completeError without a stack trace.',
       correctionMessage:
           'Provide a stack trace when calling Completer.completeError.',
-      description:
-          'A lint rule that checks for the use of Completer.completeError '
-          'without providing a stack trace.',
     ),
   ),
 
   /// A lint rule that detects equal statements in switch cases.
   equalStatement(
     LintRuleCode(
-      name: 'equal_statement',
+      rule: .equalStatement,
       problemMessage: 'Avoid using equal statements in switch cases.',
       correctionMessage: 'Agregate {0} cases.',
-      description: 'A lint rule for equal statements under switch cases.',
     ),
   ),
 
@@ -308,55 +255,41 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
   /// `||`.
   duplicateValue(
     LintRuleCode(
-      name: 'duplicate_value',
+      rule: .duplicateValue,
       problemMessage: 'Duplicate value detected.',
       correctionMessage: 'Remove the duplicate value.',
-      description:
-          'A lint rule that detects duplicate values in comparisons like `&&` '
-          'and `||`.',
     ),
   ),
 
   /// A lint rule that detects tearing off mutable methods or getters.
   mutableTearoff(
     LintRuleCode(
-      name: 'mutable_tearoff',
+      rule: .mutableTearoff,
       problemMessage:
           'Avoid tearing off mutable methods or getters to prevent '
           'unintended side effects.',
       correctionMessage:
           'Do not tear off mutable methods or getters; consider using a '
           'different approach.',
-      description:
-          'A lint rule that detects tearing off mutable methods or getters, '
-          'which can lead to unintended side effects if the underlying state '
-          'changes.',
     ),
   ),
 
   /// A lint rule that detects useless else statements.
   uselessElse(
     LintRuleCode(
-      name: 'useless_else',
+      rule: .uselessElse,
       problemMessage: 'Useless else statement detected.',
       correctionMessage: 'Remove the useless else statement.',
-      description:
-          'A lint rule that detects and suggests to remove useless else '
-          'statements that are not necessary for control flow.',
     ),
   ),
 
   /// A lint rule that discourages assignment of boolean values in conditions.
   booleanAssignment(
     LintRuleCode(
-      name: 'boolean_assignment',
+      rule: .booleanAssignment,
       problemMessage: 'Avoid assigning boolean in conditions.',
       correctionMessage:
           'Refactor the code to use a condition instead of boolean assignment.',
-      description:
-          'A lint rule that discourages assignment of boolean values, '
-          'encouraging the use of conditions for better code clarity and '
-          'maintainability.',
     ),
   ),
 
@@ -364,40 +297,38 @@ enum EssentialLintRules with EnumDiagnostic, EnumLint {
   /// functions and methods, which can lead to confusion and errors in code.
   ambiguousPositionalBoolean(
     LintRuleCode(
-      name: 'ambiguous_positional_boolean',
+      rule: .ambiguousPositionalBoolean,
       problemMessage:
           'Avoid using ambiguous positional boolean parameters in functions '
           'and methods.',
       correctionMessage:
           'Use named parameters for boolean values to improve readability and '
           'reduce confusion.',
-      description:
-          'A lint rule that detects ambiguous positional boolean parameters in '
-          'functions and methods, which can lead to confusion and errors in '
-          'code.',
     ),
   );
 
-  const EssentialLintRules(this.code);
+  const EssentialLintCode(this.code);
 
   /// The diagnostic code associated with the lint rule.
   @override
-  final LintRuleCode code;
+  final LintRuleCode<EssentialLintRule> code;
 }
 
 /// The list of all essential lint rules.
-enum EssentialMultiLints<T extends SubLints>
-    with EnumDiagnostic, EnumLint, SuperDiagnostic<T> {
+enum EssentialMultiLints<
+  T extends SubLints<LintRuleCode<EssentialLintRule>, EssentialLintRule>
+>
+    with
+        EnumDiagnostic<LintRuleCode<EssentialLintRule>, EssentialLintRule>,
+        EnumLint,
+        SuperDiagnostic<T, LintRuleCode<EssentialLintRule>, EssentialLintRule> {
   /// A lint rule that detects pending listeners and reminds developers to
   /// remove them.
   pendingListener(
     LintRuleCode(
-      name: 'pending_listener',
+      rule: .pendingListener,
       problemMessage: 'Pending listener detected.',
       correctionMessage: 'Remove the pending listener.',
-      description:
-          'A lint rule that detects pending listeners and reminds developers '
-          'to remove them.',
     ),
     PendingListener.values,
   );
@@ -405,7 +336,7 @@ enum EssentialMultiLints<T extends SubLints>
   const EssentialMultiLints(this.code, this.subDiagnostics);
 
   @override
-  final LintRuleCode code;
+  final LintRuleCode<EssentialLintRule> code;
 
   @override
   final List<T> subDiagnostics;
@@ -414,17 +345,30 @@ enum EssentialMultiLints<T extends SubLints>
 /// {@template lint_rule_code}
 /// A diagnostic code for a lint rule.
 /// {@endtemplate}
-class LintRuleCode extends WarningCode implements LintCode {
+class LintRuleCode<R extends EssentialLintRule> extends WarningCode<R>
+    implements LintCode {
   /// {@macro lint_rule_code}
   const LintRuleCode({
-    required super.name,
+    required super.rule,
     required super.problemMessage,
-    required super.correctionMessage,
-    required super.description,
+    super.correctionMessage,
     super.severity = .INFO,
-    super.hasPublishedDocs,
     super.uniqueName,
   }) : super(type: DiagnosticType.LINT);
+}
+
+/// {@template sub_lint_rule_code}
+/// A sub diagnostic code for a lint rule.
+/// {@endtemplate}
+class SubLintRuleCode<R extends EssentialLintRule> extends LintRuleCode<R> {
+  /// {@macro sub_lint_rule_code}
+  const SubLintRuleCode({
+    required super.rule,
+    required super.uniqueName,
+    required super.problemMessage,
+    super.correctionMessage,
+    super.severity = .INFO,
+  });
 }
 
 /// {@template pending_listener}
@@ -432,57 +376,59 @@ class LintRuleCode extends WarningCode implements LintCode {
 /// {@endtemplate}
 @staticAllEnforcement
 @StaticEnforcement(#base, annotation.th<EssentialMultiLints>())
-enum PendingListener with EnumDiagnostic, SubDiagnostic, SubLints {
+enum PendingListener
+    with
+        EnumDiagnostic<SubLintRuleCode<EssentialLintRule>, EssentialLintRule>,
+        SubDiagnostic,
+        SubLints {
   /// Closures used as listeners cannot be matched for removal.
   closuresCannotBeMatched(
-    LintRuleCode(
-      name: 'closures_cannot_be_matched',
+    SubLintRuleCode(
+      rule: .pendingListener,
+      uniqueName: 'closures_cannot_be_matched',
       problemMessage:
           'Closures used as listeners cannot be matched for '
           'removal.',
       correctionMessage:
           'Avoid using closures as listeners to ensure they can be properly '
           'removed.',
-      description:
-          'A sub-lint that highlights the use of closures as listeners, which '
-          'cannot be matched for removal later.',
     ),
   ),
 
   /// Unnecessary calls to remove listeners that were never added.
   unnecessaryRemove(
-    LintRuleCode(
-      name: 'unnecessary_remove',
+    SubLintRuleCode(
+      rule: .pendingListener,
+      uniqueName: 'unnecessary_remove',
       problemMessage: 'Unnecessary listener removal detected.',
       correctionMessage: 'Remove the unnecessary listener removal call.',
-      description:
-          'A sub-lint that detects unnecessary calls to remove listeners that '
-          'were never added.',
     ),
   ),
 
   /// Listener handling at unused instantiation detected.
   listenerInstantiation(
-    LintRuleCode(
-      name: 'listener_instantiation',
+    SubLintRuleCode(
+      rule: .pendingListener,
+      uniqueName: 'listener_instantiation',
       problemMessage: 'Listener handling at unused instantiation detected.',
       correctionMessage:
           'Make use of this instance or remove it if it is not needed.',
-      description:
-          'A sub-lint that detects instantiations with listener handling.',
     ),
   );
 
   const PendingListener(this.code);
 
   /// All the diagnostics associated with this multi-lint.
-  static final List<EnumDiagnostic> all = [...values, base];
+  static final List<
+    EnumDiagnostic<LintRuleCode<EssentialLintRule>, EssentialLintRule>
+  >
+  all = [...values, base];
 
   /// The base lint rule.
   static const EssentialMultiLints base = .pendingListener;
 
   @override
-  final LintRuleCode code;
+  final SubLintRuleCode<EssentialLintRule> code;
 }
 
 /// {@template sub_warnings}
@@ -493,7 +439,6 @@ enum PendingListener with EnumDiagnostic, SubDiagnostic, SubLints {
   annotations: [StaticEnforcement(#base, annotation.th<EssentialMultiLints>())],
   option: .onlyInstantiable,
 )
-mixin SubLints on SubDiagnostic implements LintCode {
-  @override
-  LintRuleCode get code;
-}
+mixin SubLints<Code extends LintRuleCode<R>, R extends EssentialLintRule>
+    on SubDiagnostic<Code, R>
+    implements LintRuleCode<R> {}

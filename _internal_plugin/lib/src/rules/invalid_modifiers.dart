@@ -20,11 +20,10 @@ class InvalidModifiersRule extends LintRule<InvalidModifiersRule> {
   @override
   Logger get logger => _logger;
 
-  static const _diagnostic = InternalDiagnosticCode(
-    name: 'invalid_modifiers',
+  static const _diagnostic = InternalDiagnosticCode<InternalLintRule>(
+    rule: .invalidModifiers,
     problemMessage: 'This modifier is invalid for {0}.',
     correctionMessage: 'Remove the invalid modifier.',
-    description: 'Modifiers that are invalid for a given modifier.',
     severity: .ERROR,
   );
 

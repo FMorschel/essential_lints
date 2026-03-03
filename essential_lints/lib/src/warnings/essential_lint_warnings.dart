@@ -1,8 +1,12 @@
+import 'dart:math';
+
 import 'package:analyzer/error/error.dart';
 import 'package:essential_lints_annotations/essential_lints_annotations.dart'
     as annotation;
 // ignore: implementation_imports internal
 import 'package:essential_lints_annotations/src/_internal/static_enforcement.dart';
+
+import 'warning.dart';
 
 /// Enforcement to ensure a static list of all diagnostics is present in all
 /// multi-lint rules.
@@ -14,15 +18,19 @@ const staticAllEnforcement = StaticEnforcement(
 /// {@template enum_diagnostic}
 /// A mixin for enums that provide a diagnostic code.
 /// {@endtemplate}
-mixin EnumDiagnostic implements DiagnosticCode, WarningCode {
+mixin EnumDiagnostic<Code extends WarningCode<R>, R extends Rule>
+    implements DiagnosticCode, WarningCode<R> {
   /// The diagnostic code associated with the enum value.
-  WarningCode get code;
+  Code get code;
+
+  @override
+  R get rule => code.rule;
 
   @override
   String? get correctionMessage => code.correctionMessage;
 
   @override
-  // ignore: deprecated_member_use, overriding all members
+  @Deprecated("Use 'diagnosticSeverity' instead")
   DiagnosticSeverity get errorSeverity => code.errorSeverity;
 
   @override
@@ -61,6 +69,9 @@ mixin EnumDiagnostic implements DiagnosticCode, WarningCode {
   String get uniqueName => code.uniqueName;
 
   @override
+  String? get _uniqueName => code._uniqueName;
+
+  @override
   String get lowerCaseUniqueName => code.lowerCaseUniqueName;
 
   @override
@@ -68,40 +79,52 @@ mixin EnumDiagnostic implements DiagnosticCode, WarningCode {
 }
 
 /// The list of all essential lint warnings.
-enum EssentialLintWarnings with EnumDiagnostic {
+enum EssentialLintWarningCode
+    with
+        EnumDiagnostic<
+          WarningCode<EssentialLintWarningRule>,
+          EssentialLintWarningRule
+        > {
   /// Members of a class should be sorted in a specific order.
   sortingMembers(
     WarningCode(
-      name: 'sorting_members',
+      rule: .sortingMembers,
       problemMessage:
           'The members of this class are not sorted according to the '
           'required order.',
       correctionMessage:
           'Sort the members of the class to follow the required order.',
-      description:
-          'A rule that ensures the members of a class are sorted in a '
-          'specific order.',
     ),
   );
 
-  const EssentialLintWarnings(this.code);
+  const EssentialLintWarningCode(this.code);
 
   @override
-  final WarningCode code;
+  final WarningCode<EssentialLintWarningRule> code;
 }
 
 /// The list of all essential lint rules.
-enum EssentialMultiWarnings<T extends SubWarnings>
-    with EnumDiagnostic, SuperDiagnostic<T> {
+enum EssentialMultiWarningCode<
+  T extends SubWarnings<Code, R>,
+  Code extends SubWarningCode<R>,
+  R extends EssentialLintWarningRule
+>
+    with
+        EnumDiagnostic<
+          WarningCode<EssentialLintWarningRule>,
+          EssentialLintWarningRule
+        >,
+        SuperDiagnostic<
+          T,
+          WarningCode<EssentialLintWarningRule>,
+          EssentialLintWarningRule
+        > {
   /// Getters should be included in member lists.
   gettersInMemberList(
     WarningCode(
-      name: 'getters_in_member_list',
+      rule: .gettersInMemberList,
       problemMessage: 'All {0} should be included in member lists.',
       correctionMessage: 'Include the missing member(s) {1}',
-      description:
-          'A lint rule that ensures getters/fields are included in the member '
-          'list.',
     ),
     GettersInMemberList.values,
   ),
@@ -109,16 +132,12 @@ enum EssentialMultiWarnings<T extends SubWarnings>
   /// Subtypes should follow specific naming conventions.
   subtypeNaming(
     WarningCode(
-      name: 'subtype_naming',
+      rule: .subtypeNaming,
       problemMessage:
           'The name of this subtype does not follow the required naming '
           'conventions.',
       correctionMessage:
           'Rename the subtype to follow the required naming conventions.',
-      description:
-          'A lint rule that ensures subtypes follow specific naming '
-          'conventions such as required prefixes, suffixes, or containing '
-          'names.',
     ),
     SubtypeNaming.values,
   ),
@@ -126,22 +145,19 @@ enum EssentialMultiWarnings<T extends SubWarnings>
   /// Subtypes should be annotated with specific annotations.
   subtypeAnnotating(
     WarningCode(
-      name: 'subtype_annotating',
+      rule: .subtypeAnnotating,
       problemMessage:
           'The subtype is missing required annotations as specified by the '
           '@SubtypeAnnotating annotation.',
       correctionMessage: 'Add the required annotation(s): {0}',
-      description:
-          'A rule that ensures subtypes are annotated with specific '
-          'annotations as defined by the @SubtypeAnnotating annotation.',
     ),
     SubtypeAnnotating.values,
   );
 
-  const EssentialMultiWarnings(this.code, this.subDiagnostics);
+  const EssentialMultiWarningCode(this.code, this.subDiagnostics);
 
   @override
-  final WarningCode code;
+  final WarningCode<EssentialLintWarningRule> code;
 
   @override
   final List<T> subDiagnostics;
@@ -149,82 +165,82 @@ enum EssentialMultiWarnings<T extends SubWarnings>
 
 /// Represents a base diagnostic for mutlti diagnostic rules that have
 /// sub-diagnostics.
-mixin SuperDiagnostic<Base extends SubDiagnostic> implements EnumDiagnostic {
+mixin SuperDiagnostic<
+  Base extends SubDiagnostic<Code, R>,
+  Code extends WarningCode<R>,
+  R extends Rule
+>
+    implements EnumDiagnostic<Code, R> {
   /// Sub diagnostics associated with this diagnostic.
   List<Base> get subDiagnostics;
 
   /// All diagnostics associated with this diagnostic, including
   /// sub-diagnostics.
-  List<EnumDiagnostic> get all => [...subDiagnostics, this];
+  List<EnumDiagnostic<Code, R>> get all => [...subDiagnostics, this];
 }
 
 /// The list of sub-warnings for the GettersInMemberList warning.
 @staticAllEnforcement
-@StaticEnforcement(#base, annotation.th<EssentialMultiWarnings>())
-enum GettersInMemberList with EnumDiagnostic, SubDiagnostic, SubWarnings {
+@StaticEnforcement(#base, annotation.th<EssentialMultiWarningCode>())
+enum GettersInMemberList
+    with
+        EnumDiagnostic<
+          SubWarningCode<EssentialLintWarningRule>,
+          EssentialLintWarningRule
+        >,
+        SubDiagnostic,
+        SubWarnings {
   /// An instance member list is missing to include getters/fields.
   missingList(
-    WarningCode(
-      name: 'getters_in_member_list',
+    SubWarningCode(
+      rule: .gettersInMemberList,
+      uniqueName: 'missing_instance_getters_in_member_list',
       problemMessage:
           "The class needs a{1} member called '{0}' to list the "
           'members.',
       correctionMessage:
           "Include the missing member '{0}' or turn the static member into "
           'a{1} member.',
-      description:
-          'A lint rule that ensures getters/fields list instance member is '
-          'declared.',
-      uniqueName: 'missing_instance_getters_in_member_list',
     ),
   ),
 
   /// Invalid member list name in GettersInMemberList annotation.
   invalidMemberListName(
-    WarningCode(
-      name: 'getters_in_member_list',
+    SubWarningCode(
+      rule: .gettersInMemberList,
+      uniqueName: 'invalid_member_list_name_getters_in_member_list',
       problemMessage:
           'Invalid member list name: The name of the member list in the '
           '@GettersInMemberList annotation must be a valid identifier.',
       correctionMessage:
           'Provide a valid member list name in the '
           '@GettersInMemberList annotation.',
-      description:
-          'A lint rule that ensures the name of the member list in the '
-          '@GettersInMemberList annotation is a valid identifier.',
-      uniqueName: 'invalid_member_list_name_getters_in_member_list',
     ),
   ),
 
   /// Invalid member list for GettersInMemberList annotation.
   invalidMemberList(
-    WarningCode(
-      name: 'getters_in_member_list',
+    SubWarningCode(
+      rule: .gettersInMemberList,
+      uniqueName: 'invalid_member_list_getters_in_member_list',
       problemMessage:
           'The declaration of {0} must be a getter or a single field that '
           'returns a literal list containing the members.',
       correctionMessage:
           'Modify the declaration of {0} to be a getter or a single field '
           'that returns a literal list of the members.',
-      description:
-          'A lint rule that ensures the declaration of the member list is '
-          'valid.',
-      uniqueName: 'invalid_member_list_getters_in_member_list',
     ),
   ),
 
   /// Something listed in the member list is not a member of the class.
   nonMemberIn(
-    WarningCode(
-      name: 'getters_in_member_list',
+    SubWarningCode(
+      rule: .gettersInMemberList,
+      uniqueName: 'non_member_in_getters_in_member_list',
       problemMessage:
           'This is not a member of the class that should be included in the '
           'member list.',
       correctionMessage: 'Remove this from the member list.',
-      description:
-          'A lint rule that ensures everything listed in the member list is a '
-          'valid expected instance member of the class.',
-      uniqueName: 'non_member_in_getters_in_member_list',
     ),
   );
 
@@ -234,62 +250,62 @@ enum GettersInMemberList with EnumDiagnostic, SubDiagnostic, SubWarnings {
   static const List<EnumDiagnostic> all = [...values, base];
 
   /// The base warning.
-  static const EssentialMultiWarnings base = .gettersInMemberList;
+  static const EssentialMultiWarningCode base = .gettersInMemberList;
 
   @override
-  final WarningCode code;
+  final SubWarningCode code;
 }
 
 /// The list of sub-warnings for the SubtypeAnnotating warning.
 @staticAllEnforcement
-@StaticEnforcement(#base, annotation.th<EssentialMultiWarnings>())
-enum SubtypeAnnotating with EnumDiagnostic, SubDiagnostic, SubWarnings {
+@StaticEnforcement(#base, annotation.th<EssentialMultiWarningCode>())
+enum SubtypeAnnotating
+    with
+        EnumDiagnostic<
+          SubWarningCode<EssentialLintWarningRule>,
+          EssentialLintWarningRule
+        >,
+        SubDiagnostic,
+        SubWarnings {
   /// The annotation does not specify any required annotations.
   missingAnnotation(
-    WarningCode(
-      name: 'missing_annotation',
+    SubWarningCode(
+      rule: .subtypeAnnotating,
+      uniqueName: 'missing_annotation',
       problemMessage:
           'The @SubtypeAnnotating annotation must specify at least one '
           'required annotation.',
       correctionMessage:
           'Add at least one required annotation to the '
           '@SubtypeAnnotating annotation.',
-      description:
-          'A lint rule that ensures the @SubtypeAnnotating annotation '
-          'specifies at least one required annotation.',
     ),
   ),
 
   /// The added object a constructor (invocation/tear off) and not just a type
   /// name.
   constructorNotType(
-    WarningCode(
-      name: 'constructor_not_type',
+    SubWarningCode(
+      rule: .subtypeAnnotating,
+      uniqueName: 'constructor_not_type',
       problemMessage:
           'The @SubtypeAnnotating annotation should specify type names, not '
           'constructor invocations or tear-offs.',
       correctionMessage:
           'Replace the constructor invocation or tear-off with the type name.',
-      description:
-          'A lint rule that ensures the @SubtypeAnnotating annotation '
-          'specifies type names and not constructor invocations or tear-offs.',
     ),
   ),
 
   /// Unnecessary @SubtypeDeannotating annotation when there are no matching
   /// @SubtypeAnnotating annotations in the supertypes.
   unnecessaryDeannotatingAnnotation(
-    WarningCode(
-      name: 'unnecessary_deannotating_annotation',
+    SubWarningCode(
+      rule: .subtypeAnnotating,
+      uniqueName: 'unnecessary_deannotating_annotation',
       problemMessage:
           'The @SubtypeDeannotating annotation is unnecessary because there '
           'are no matching @SubtypeAnnotating annotations in the supertypes.',
       correctionMessage:
           'Remove the unnecessary @SubtypeDeannotating annotation.',
-      description:
-          'A lint rule that identifies unnecessary @SubtypeDeannotating '
-          'annotations when there are no matching @SubtypeAnnotating '
-          'annotations in the supertypes.',
     ),
   );
 
@@ -301,46 +317,47 @@ enum SubtypeAnnotating with EnumDiagnostic, SubDiagnostic, SubWarnings {
   static const List<EnumDiagnostic> all = [...values, base];
 
   /// The base warning.
-  static const EssentialMultiWarnings base = .subtypeAnnotating;
+  static const EssentialMultiWarningCode base = .subtypeAnnotating;
 
   @override
-  final WarningCode code;
+  final SubWarningCode code;
 }
 
 /// The list of sub-warnings for the SubtypeNaming warning.
 @staticAllEnforcement
-@StaticEnforcement(#base, annotation.th<EssentialMultiWarnings>())
-enum SubtypeNaming with EnumDiagnostic, SubDiagnostic, SubWarnings {
+@StaticEnforcement(#base, annotation.th<EssentialMultiWarningCode>())
+enum SubtypeNaming
+    with
+        EnumDiagnostic<
+          SubWarningCode<EssentialLintWarningRule>,
+          EssentialLintWarningRule
+        >,
+        SubDiagnostic,
+        SubWarnings {
   /// The annotation does not specify any naming conventions.
   missingNameDefinition(
-    WarningCode(
-      name: 'missing_subtype_naming_definition',
+    SubWarningCode(
+      rule: .subtypeNaming,
+      uniqueName: 'missing_subtype_naming_definition',
       problemMessage:
           'The @SubtypeNaming annotation must specify at least one naming '
           'convention (prefix, suffix, or containing name).',
       correctionMessage:
           'Add at least one naming convention to the @SubtypeNaming '
           'annotation.',
-      description:
-          'A lint rule that ensures the @SubtypeNaming annotation specifies '
-          'at least one naming convention (prefix, suffix, or containing '
-          'name).',
     ),
   ),
 
   /// Unnecessary @SubtypeUnnaming annotation when there are no matching
   /// @SubtypeNaming annotations in the supertypes.
   unnecessaryUnnamingAnnotation(
-    WarningCode(
-      name: 'unnecessary_unnaming_annotation',
+    SubWarningCode(
+      rule: .subtypeNaming,
+      uniqueName: 'unnecessary_unnaming_annotation',
       problemMessage:
           'The @SubtypeUnnaming annotation is unnecessary because there are no '
           'matching @SubtypeNaming annotations in the supertypes.',
       correctionMessage: 'Remove the unnecessary @SubtypeUnnaming annotation.',
-      description:
-          'A lint rule that identifies unnecessary @SubtypeUnnaming '
-          'annotations when there are no matching @SubtypeNaming annotations '
-          'in the supertypes.',
     ),
   );
 
@@ -350,10 +367,25 @@ enum SubtypeNaming with EnumDiagnostic, SubDiagnostic, SubWarnings {
   static const List<EnumDiagnostic> all = [...values, base];
 
   /// The base warning.
-  static const EssentialMultiWarnings base = .subtypeNaming;
+  static const EssentialMultiWarningCode base = .subtypeNaming;
 
   @override
-  final WarningCode code;
+  final SubWarningCode code;
+}
+
+/// {@template sub_warning_code}
+/// A sub diagnostic code for a warning rule.
+/// {@endtemplate}
+class SubWarningCode<R extends EssentialLintWarningRule>
+    extends WarningCode<R> {
+  /// {@macro sub_warning_code}
+  const SubWarningCode({
+    required super.rule,
+    required super.uniqueName,
+    required super.problemMessage,
+    required super.correctionMessage,
+    super.severity = .INFO,
+  });
 }
 
 /// {@template sub_warnings}
@@ -361,14 +393,15 @@ enum SubtypeNaming with EnumDiagnostic, SubDiagnostic, SubWarnings {
 /// {@endtemplate}
 @annotation.SubtypeAnnotating(
   annotations: [
-    StaticEnforcement(#base, annotation.th<EssentialMultiWarnings>()),
+    StaticEnforcement(#base, annotation.th<EssentialMultiWarningCode>()),
   ],
   option: .onlyInstantiable,
 )
-mixin SubWarnings on SubDiagnostic {
-  @override
-  WarningCode get code;
-}
+mixin SubWarnings<
+  Code extends SubWarningCode<R>,
+  R extends EssentialLintWarningRule
+>
+    on SubDiagnostic<Code, R> {}
 
 /// {@template sub_warnings}
 /// A grouping of sub-warnings under a base warning.
@@ -377,33 +410,90 @@ mixin SubWarnings on SubDiagnostic {
   annotations: [staticAllEnforcement],
   option: .onlyInstantiable,
 )
-mixin SubDiagnostic on EnumDiagnostic {
-  @override
-  WarningCode get code;
-}
+mixin SubDiagnostic<Code extends WarningCode<R>, R extends Rule>
+    on EnumDiagnostic<Code, R> {}
 
 /// {@template rule_code}
 /// A diagnostic code for warnings.
 /// {@endtemplate}
-class WarningCode extends DiagnosticCode {
+class WarningCode<R extends Rule> implements DiagnosticCode {
   /// {@macro rule_code}
   const WarningCode({
-    required super.name,
-    required super.problemMessage,
-    required super.correctionMessage,
-    required this.description,
-    super.hasPublishedDocs,
+    required this.rule,
+    required this.problemMessage,
+    this.correctionMessage,
     this.severity = .WARNING,
     String? uniqueName,
     this.type = .STATIC_WARNING,
-  }) : super(uniqueName: uniqueName ?? name, isUnresolvedIdentifier: false);
+  }) : _uniqueName = uniqueName;
 
-  /// A detailed description of the lint rule.
-  final String description;
+  /// Regular expression for identifying positional arguments in error messages.
+  static final RegExp _positionalArgumentRegExp = RegExp(r'\{(\d+)\}');
+
+  @override
+  @Deprecated("Use 'diagnosticSeverity' instead")
+  DiagnosticSeverity get errorSeverity => severity;
+
+  /// Whether a finding of this diagnostic is ignorable via comments such as
+  /// `// ignore:` or `// ignore_for_file:`.
+  @override
+  bool get isIgnorable => severity != DiagnosticSeverity.ERROR;
+
+  /// The name of the error code, converted to all lower case.
+  @override
+  // ignore: deprecated_member_use_from_same_package necessary
+  String get lowerCaseName => name.toLowerCase();
+
+  /// The unique name of this error code, converted to all lower case.
+  @override
+  // ignore: deprecated_member_use_from_same_package necessary
+  String get lowerCaseUniqueName => uniqueName.toLowerCase();
+
+  @override
+  @Deprecated('Please use lowerCaseName')
+  String get name => rule.name;
+
+  /// The human-readable rule information.
+  String get description => rule.name;
+
+  @override
+  @Deprecated('Please use lowerCaseUniqueName')
+  String get uniqueName => _uniqueName ?? rule.name;
+
+  final String? _uniqueName;
+
+  @override
+  int get numParameters {
+    var result = 0;
+    for (var s in [problemMessage, ?correctionMessage]) {
+      for (var match in _positionalArgumentRegExp.allMatches(s)) {
+        result = max(result, int.parse(match.group(1)!) + 1);
+      }
+    }
+    return result;
+  }
+
+  /// The human-readable rule information.
+  final R rule;
 
   @override
   final DiagnosticSeverity severity;
 
   @override
   final DiagnosticType type;
+
+  @override
+  final String? correctionMessage;
+
+  @override
+  final String problemMessage;
+
+  @override
+  bool get hasPublishedDocs => false;
+
+  @override
+  bool get isUnresolvedIdentifier => false;
+
+  @override
+  String? get url => null;
 }

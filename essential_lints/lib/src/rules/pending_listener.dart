@@ -13,6 +13,7 @@ import 'package:logging/logging.dart';
 
 import '../plugin.dart';
 import '../utils/base_visitor.dart';
+import '../utils/debug_log_mixin.dart';
 import '../utils/extensions/ast.dart';
 import '../utils/extensions/object.dart';
 import 'analysis_rule.dart';
@@ -25,7 +26,8 @@ import 'rule.dart';
 /// {@endtemplate}
 @staticLoggerEnforcement
 class PendingListenerRule
-    extends MultiLintRule<PendingListenerRule, PendingListener> {
+    extends MultiLintRule<PendingListenerRule, PendingListener>
+    with DebugLogMixin {
   /// {@macro pending_listener_rule}
   PendingListenerRule() : super(.pendingListener, _logger);
 
@@ -33,11 +35,19 @@ class PendingListenerRule
     'PendingListenerRule',
   );
 
+  String? _logFilePath;
+  @override
+  String? get logFilePath => _logFilePath;
+
   @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
+    if (logFilePath == null) {
+      _logFilePath = r'D:\dev\logs\pending_listener.log';
+      setLogListener(level: .ALL, logger: logger);
+    }
     var visitor = _PendingListenerVisitor(this, context);
     registry
       ..addMethodInvocation(this, visitor)
@@ -390,7 +400,12 @@ class _ElementChain {
 
   void add(Element? element) {
     if (element == null) return;
-    if (parent case var parent?) {
+    if (parent case var parent? when parent.element != null) {
+      PendingListenerRule._logger.warning(
+        'Adding element to chain with existing parent: '
+        '${parent.element?.displayName}, '
+        'new element: ${element.displayName}',
+      );
       parent.add(element);
     } else {
       parent = _ElementChain(element);
@@ -500,8 +515,19 @@ class _PendingListenerVisitor extends BaseVisitor<PendingListenerRule> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     logger.info('visitMethodInvocation() started for: ${node.toSource()}');
-    var targetType = node.realTarget?.staticType
-        .whenTypeOrNull<InterfaceType>();
+    var targetType =
+        node.realTarget?.staticType.whenTypeOrNull<InterfaceType>() ??
+        node.methodName.element?.enclosingElement
+            .whenTypeOrNull<InterfaceElement>()
+            ?.thisType;
+    if (!_isDisposeFromChangeNotifier(node.methodName, targetType) &&
+        !_isAddOrRemoveListenerFromListenable(node, targetType)) {
+      logger.finer(
+        'Method ${node.methodName.name} from $targetType is not relevant, '
+        'skipping.',
+      );
+      return;
+    }
     var targetElement = _targetElement(node);
     if (targetElement == null) {
       logger.finer(
@@ -519,10 +545,13 @@ class _PendingListenerVisitor extends BaseVisitor<PendingListenerRule> {
       logger.fine(
         'Marked element as disposed: ${targetElement.element?.displayName}',
       );
-    } else if (!_methodNames.contains(node.methodName.name) ||
-        targetType == null ||
-        !_isListenableType(targetType) &&
-            !targetType.allSupertypes.any(_isListenableType)) {
+      return;
+    }
+    if (!_methodNames.contains(node.methodName.name)) {
+      logger.finer(
+        'Method ${node.methodName.name} is not addListener or removeListener, '
+        'skipping.',
+      );
       return;
     }
     logger.fine(
@@ -570,6 +599,16 @@ class _PendingListenerVisitor extends BaseVisitor<PendingListenerRule> {
       );
       _removeFor(targetElement, firstArgument);
     }
+  }
+
+  bool _isAddOrRemoveListenerFromListenable(
+    MethodInvocation node,
+    InterfaceType? targetType,
+  ) {
+    return _methodNames.contains(node.methodName.name) &&
+        (targetType != null &&
+            (_isListenableType(targetType) ||
+                targetType.allSupertypes.any(_isListenableType)));
   }
 
   void _addFor(_ElementChain element, Expression expression) {

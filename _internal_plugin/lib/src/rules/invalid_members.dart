@@ -20,11 +20,10 @@ class InvalidMembersRule extends LintRule<InvalidMembersRule> {
   @override
   Logger get logger => _logger;
 
-  static const _diagnostic = InternalDiagnosticCode(
-    name: 'invalid_members',
+  static const _diagnostic = InternalDiagnosticCode<InternalLintRule>(
+    rule: .invalidMembers,
     problemMessage: 'This member is invalid {0}.',
     correctionMessage: 'Remove the invalid member.',
-    description: 'Members that are invalid for a given modifier.',
     severity: .ERROR,
   );
 
