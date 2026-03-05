@@ -174,6 +174,48 @@ void f(x) {
 """);
   }
 
+  Future<void> test_trippleQuotes_escape() async {
+    await resolveTestCode('''
+void f(x) {
+  var s = "''\'" r'hello^';
+}
+''');
+    await assertHasAssist(r"""
+void f(x) {
+  var s = '''
+''\'hello''';
+}
+""");
+  }
+
+  Future<void> test_trailingQuote_escape() async {
+    await resolveTestCode('''
+void f(x) {
+  var s = r'hello' "'^";
+}
+''');
+    await assertHasAssist(r"""
+void f(x) {
+  var s = '''
+hello\'''';
+}
+""");
+  }
+
+  Future<void> test_trailingQuote_interpolated_escape() async {
+    await resolveTestCode('''
+void f(x) {
+  var s = r'hello' "\${4}''\''^";
+}
+''');
+    await assertHasAssist(r"""
+void f(x) {
+  var s = '''
+hello${4}''\'\'''';
+}
+""");
+  }
+
   Future<void> test_threeStrings_allSameLine() async {
     await resolveTestCode('''
 void f() {

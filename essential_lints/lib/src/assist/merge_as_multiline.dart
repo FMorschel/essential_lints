@@ -45,10 +45,20 @@ class MergeAsMultilineAssist extends CorrectionProducerLogger with Assist {
       return;
     }
     await builder.addDartFileEdit(file, (builder) {
-      var couldBeRaw = true;
+      var lastEndsInQuote = switch (adjacentStrings.strings.last) {
+        SimpleStringLiteral(:var value) => value.endsWith("'"),
+        StringInterpolation(:var lastString) => lastString.value.endsWith("'"),
+        _ => throw ArgumentError(
+          'Unexpected StringLiteral type: ${adjacentStrings.runtimeType}',
+        ),
+      };
+      var couldBeRaw = !lastEndsInQuote;
       var anyIsRaw = false;
       var mergeWith = <(StringLiteral, StringLiteral, String)>[];
       for (var (string, next) in adjacentStrings.stringPairs) {
+        if (couldBeRaw && string.contains("'''")) {
+          couldBeRaw = false;
+        }
         if (couldBeRaw &&
             (string is StringInterpolation || next is StringInterpolation)) {
           couldBeRaw = false;
@@ -84,11 +94,14 @@ class MergeAsMultilineAssist extends CorrectionProducerLogger with Assist {
         );
       }
       if (!couldBeRaw) {
-        for (var string in adjacentStrings.strings) {
-          if (string is SimpleStringLiteral && string.isRaw) {
-            var escaped = string.value
-                .replaceAll(r'\', r'\\')
-                .replaceAll(r'$', r'\$');
+        for (var string in adjacentStrings.strings.take(
+          adjacentStrings.strings.length - 1,
+        )) {
+          if (string is SimpleStringLiteral) {
+            var escaped = string.value.replaceAll("'''", r"''\'");
+            if (string.isRaw) {
+              escaped = escaped.replaceAll(r'\', r'\\').replaceAll(r'$', r'\$');
+            }
             builder.addSimpleReplacement(
               range.startOffsetEndOffset(
                 string.contentsOffset,
@@ -96,6 +109,19 @@ class MergeAsMultilineAssist extends CorrectionProducerLogger with Assist {
               ),
               escaped,
             );
+          } else if (string is StringInterpolation) {
+            for (var part in string.elements) {
+              if (part is InterpolationString) {
+                var escaped = part.value.replaceAll("'''", r"''\'");
+                builder.addSimpleReplacement(
+                  range.startOffsetEndOffset(
+                    part.contentsOffset,
+                    part.contentsEnd,
+                  ),
+                  escaped,
+                );
+              }
+            }
           }
         }
       }
@@ -105,6 +131,65 @@ class MergeAsMultilineAssist extends CorrectionProducerLogger with Assist {
         builder.addSimpleReplacement(
           range.startOffsetEndOffset(offset, end),
           separator,
+        );
+      }
+      switch (adjacentStrings.strings.last) {
+        case SimpleStringLiteral(:var value, :var isRaw):
+          if (value.isEmpty) {
+            break;
+          }
+          var escaped = value
+              .substring(0, value.length - 1)
+              .replaceAll("'''", r"''\'");
+          if (isRaw) {
+            escaped = escaped.replaceAll(r'\', r'\\').replaceAll(r'$', r'\$');
+          }
+          builder.addSimpleReplacement(
+            range.startOffsetEndOffset(
+              adjacentStrings.strings.last.contentsOffset,
+              adjacentStrings.strings.last.contentsEnd - 1,
+            ),
+            escaped,
+          );
+        case StringInterpolation(:var elements):
+          var texts = elements.whereType<InterpolationString>().toList();
+          for (var part in texts.take(texts.length - 1)) {
+            if (part.value.isEmpty) {
+              break;
+            }
+            var escaped = part.value.replaceAll("'''", r"''\'");
+            builder.addSimpleReplacement(
+              range.startOffsetEndOffset(part.contentsOffset, part.contentsEnd),
+              escaped,
+            );
+          }
+          if (texts.last.value.isEmpty) {
+            break;
+          }
+          var lastUntilLast = texts.last.value.substring(
+            0,
+            texts.last.value.length - 1,
+          );
+          if (lastUntilLast.contains("'''")) {
+            var escaped = lastUntilLast.replaceAll("'''", r"''\'");
+            builder.addSimpleReplacement(
+              range.startOffsetEndOffset(
+                texts.last.contentsOffset,
+                texts.last.contentsEnd - 1,
+              ),
+              escaped,
+            );
+          }
+        default:
+          break;
+      }
+      if (lastEndsInQuote) {
+        builder.addSimpleReplacement(
+          range.startOffsetEndOffset(
+            adjacentStrings.strings.last.contentsEnd - 1,
+            adjacentStrings.strings.last.contentsEnd,
+          ),
+          r"\'",
         );
       }
       var lastContentEnd = adjacentStrings.strings.last.contentsEnd;
@@ -128,6 +213,13 @@ extension on StringLiteral {
     SimpleStringLiteral(:var contentsEnd) => contentsEnd,
     _ => throw ArgumentError('Unexpected StringLiteral type: $runtimeType'),
   };
+
+  bool contains(String string) {
+    if (this case SimpleStringLiteral(:var value) when value.contains(string)) {
+      return true;
+    }
+    return false;
+  }
 }
 
 extension on AdjacentStrings {
