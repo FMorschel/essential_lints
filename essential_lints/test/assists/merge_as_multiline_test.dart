@@ -160,6 +160,20 @@ hello${24}x''';
 """);
   }
 
+  Future<void> test_preventsRaw_escape() async {
+    await resolveTestCode(r'''
+void f(x) {
+  var s = r'\$hello' '${24}x^';
+}
+''');
+    await assertHasAssist(r"""
+void f(x) {
+  var s = '''
+\\\$hello${24}x''';
+}
+""");
+  }
+
   Future<void> test_threeStrings_allSameLine() async {
     await resolveTestCode('''
 void f() {

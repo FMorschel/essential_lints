@@ -83,6 +83,22 @@ class MergeAsMultilineAssist extends CorrectionProducerLogger with Assist {
           "'''${builder.eol}",
         );
       }
+      if (!couldBeRaw) {
+        for (var string in adjacentStrings.strings) {
+          if (string is SimpleStringLiteral && string.isRaw) {
+            var escaped = string.value
+                .replaceAll(r'\', r'\\')
+                .replaceAll(r'$', r'\$');
+            builder.addSimpleReplacement(
+              range.startOffsetEndOffset(
+                string.contentsOffset,
+                string.contentsEnd,
+              ),
+              escaped,
+            );
+          }
+        }
+      }
       for (var (string, next, separator) in mergeWith) {
         var offset = string.contentsEnd;
         var end = next.contentsOffset;
