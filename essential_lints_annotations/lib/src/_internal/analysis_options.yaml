@@ -12,6 +12,8 @@ linter:
     prefer_final_locals: false
     prefer_final_in_for_each: false
     unnecessary_final: true
+    unnecessary_string_escapes: true
+    unnecessary_raw_strings: true
 
 analyzer:
   language:

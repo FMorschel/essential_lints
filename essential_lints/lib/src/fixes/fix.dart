@@ -1,4 +1,5 @@
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
+import 'package:analyzer/source/line_info.dart';
 import 'package:analyzer_plugin/utilities/fixes/fixes.dart';
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 import 'package:logging/logging.dart';
@@ -38,6 +39,9 @@ mixin LintFix on CorrectionProducerLogger {
     _logger.log(.INFO, 'Setting fix kind for ${fix.name}');
     return fix.fixKind;
   }
+
+  /// The line info for the current compilation unit.
+  LineInfo get lineInfo => unit.lineInfo;
 }
 
 /// {@template warning_fix}

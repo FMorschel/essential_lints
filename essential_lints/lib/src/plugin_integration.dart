@@ -8,6 +8,7 @@ import 'package:analyzer/error/error.dart';
 import 'package:logging/logging.dart';
 
 import 'assist/essential_lint_assists.dart';
+import 'assist/merge_as_multiline.dart';
 import 'assist/remove_useless_else.dart';
 import 'fixes/add_current_stack.dart';
 import 'fixes/add_missing_members.dart';
@@ -84,6 +85,8 @@ mixin AssistsPluginIntegration {
       switch (assist) {
         case EssentialLintAssists.removeUselessElse:
           assists.add(RemoveUselessElseAssistFix.new);
+        case EssentialLintAssists.mergeAsMultiline:
+          assists.add(MergeAsMultilineAssist.new);
       }
     }
     logger.info('Mapped assists');

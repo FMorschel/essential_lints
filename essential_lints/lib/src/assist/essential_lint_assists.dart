@@ -8,7 +8,9 @@ enum EssentialLintAssists implements AssistKind {
   removeUselessElse.fromFix(
     'dart.assist.remove_useless_else',
     .removeUselessElse,
-  );
+  ),
+  /// Assist to merge adjacent string literals into a single multiline string.
+  mergeAsMultiline('dart.assist.merge_as_multiline', 'Merge into multiline');
 
   const EssentialLintAssists(this.id, this._message)
     : associatedFix = null,
