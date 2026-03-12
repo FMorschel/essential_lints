@@ -66,7 +66,7 @@ Add `essential_lints` in your `analysis_options.yaml` plugins:
 ```yaml
 plugins:
   essential_lints:
-    version: ^0.1.11
+    version: ^0.1.12
     diagnostics:
       - alphabetize_arguments
       - alphabetize_enum_constants

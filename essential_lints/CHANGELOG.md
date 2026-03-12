@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.12
+
+Released on: 2026-03-12
+
+- **standard_comment_style**: Considers dartdoc references as valid phrase starts.
+
+- **Merge as multiline**: Adds a new assist to merge sequencial strings as a multiline string.
+
 ## 0.1.11
 
 Released on: 2026-03-03
