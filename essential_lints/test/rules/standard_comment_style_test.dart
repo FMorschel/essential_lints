@@ -253,4 +253,18 @@ class C {
 }
 ''');
   }
+
+  Future<void> test_considersCommentReferencesAsUpperCase() async {
+    await assertNoDiagnostics('''
+/// Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+///
+/// [one] - The position 1
+/// [two] - The position 2
+///
+/// [f] does something.
+///
+/// Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+void f(int one, int two) {}
+''');
+  }
 }

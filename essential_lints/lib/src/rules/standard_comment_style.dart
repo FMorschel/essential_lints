@@ -49,7 +49,7 @@ class _StandardCommentStyleVisitor
   static final _noLetter = RegExp('^[^A-Za-z]');
   static final _noUppercaseLetter = RegExp('^[^A-Z]');
   static final _mdCompatible = RegExp(r'(#|>|-|\*|>\s)');
-  static final _dartdocCompatible = RegExp(r'\{@.*\}');
+  static final _dartdocCompatible = RegExp(r'(\{@.*\}|\[[^ ]*\])');
   static final _codeBlockDelimitor = RegExp('^```');
   static final _ignoreForFile = RegExp('^ignore_for_file:');
   static final _ignore = RegExp('^ignore:');
