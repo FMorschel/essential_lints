@@ -69,11 +69,7 @@ abstract class Rule {
 /// {@endtemplate}
 // ignore: avoid_types_as_parameter_names
 abstract class WarningRule<Rule extends WarningRule<Rule>>
-    extends
-        EssentialAnalysisRule<
-          Rule,
-          EssentialLintWarningCode
-        > {
+    extends EssentialAnalysisRule<Rule, EssentialLintWarningCode> {
   /// {@macro rule}
   WarningRule(super.rule, super.logger);
 }
@@ -85,12 +81,7 @@ abstract class MultiWarningRule<
   R extends MultiWarningRule<R, Sub>,
   Sub extends SubWarnings
 >
-    extends
-        EssentialMultiAnalysisRule<
-          R,
-          EssentialMultiWarningCode<Sub>,
-          Sub
-        > {
+    extends EssentialMultiAnalysisRule<R, EssentialMultiWarningCode<Sub>, Sub> {
   /// {@macro rule}
   MultiWarningRule(super.rule, super.logger);
 }

@@ -23,7 +23,7 @@ class PaddingOverContainerRule extends LintRule<PaddingOverContainerRule> {
   static final Logger _logger = EssentialLintsPlugin.newLogger(
     'PaddingOverContainerRule',
   );
-  
+
   @override
   Visitor<PaddingOverContainerRule, void> visitorFor(RuleContext context) =>
       _PaddingOverContainerVisitor(this, context);
