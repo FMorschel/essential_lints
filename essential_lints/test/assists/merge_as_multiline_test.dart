@@ -292,4 +292,65 @@ raw${24}xplain''';
 """);
   }
 
+  Future<void> test_stopsAtCommentsWithContent() async {
+    await resolveTestCode('''
+void f() {
+  var s = 'foo' // comment
+  'bar^';
+}
+''');
+    await assertNoAssist();
+  }
+
+  Future<void> test_stopsAtCommentsWithContent_2() async {
+    await resolveTestCode('''
+void f() {
+  var s = 'foo' // comment
+  'bar^'
+  'baz';
+}
+''');
+    await assertHasAssist("""
+void f() {
+  var s = 'foo' // comment
+  '''
+bar
+baz''';
+}
+""");
+  }
+
+  Future<void> test_stopsAtCommentsWithContent_3() async {
+    await resolveTestCode('''
+void f() {
+  var s = 'foo'
+  'bar^' // comment
+  'baz';
+}
+''');
+    await assertHasAssist("""
+void f() {
+  var s = '''
+foo
+bar''' // comment
+  'baz';
+}
+""");
+  }
+
+  Future<void> test_emptyCommentsAreIgnored() async {
+    await resolveTestCode('''
+void f() {
+  var s = 'foo' //
+  'bar^';
+}
+''');
+    await assertHasAssist("""
+void f() {
+  var s = '''
+foo
+bar''';
+}
+""");
+  }
 }

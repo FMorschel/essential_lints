@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
 import 'package:logging/logging.dart';
@@ -44,8 +45,19 @@ class MergeAsMultilineAssist extends CorrectionProducerLogger with Assist {
       logger.finer('Node is not part of AdjacentStrings, returning');
       return;
     }
+    var (string: _, :index) = adjacentStrings.stringFor(selectionOffset);
+    var (last, lastIndex) =
+        adjacentStrings.fromIndexStopAtComment(index, forward: true) ??
+        (adjacentStrings.strings.last, adjacentStrings.strings.length - 1);
+    var (first, firstIndex) =
+        adjacentStrings.fromIndexStopAtComment(index, forward: false) ??
+        (adjacentStrings.strings.first, 0);
+    if (firstIndex == lastIndex) {
+      logger.finer('Only one string in the adjacent strings, returning');
+      return;
+    }
     await builder.addDartFileEdit(file, (builder) {
-      var lastEndsInQuote = switch (adjacentStrings.strings.last) {
+      var lastEndsInQuote = switch (last) {
         SimpleStringLiteral(:var value) => value.endsWith("'"),
         StringInterpolation(:var lastString) => lastString.value.endsWith("'"),
         _ => throw ArgumentError(
@@ -55,7 +67,10 @@ class MergeAsMultilineAssist extends CorrectionProducerLogger with Assist {
       var couldBeRaw = !lastEndsInQuote;
       var anyIsRaw = false;
       var mergeWith = <(StringLiteral, StringLiteral, String)>[];
-      for (var (string, next) in adjacentStrings.stringPairs) {
+      for (var (string, next) in adjacentStrings.stringPairs(
+        firstIndex,
+        lastIndex,
+      )) {
         if (couldBeRaw && string.contains("'''")) {
           couldBeRaw = false;
         }
@@ -75,11 +90,11 @@ class MergeAsMultilineAssist extends CorrectionProducerLogger with Assist {
           mergeWith.add((string, next, builder.eol));
         }
       }
-      var contentsOffset = adjacentStrings.strings.first.contentsOffset;
+      var contentsOffset = adjacentStrings.strings[firstIndex].contentsOffset;
       if (couldBeRaw && anyIsRaw) {
         builder.addSimpleReplacement(
           range.startOffsetEndOffset(
-            adjacentStrings.strings.first.offset,
+            adjacentStrings.strings[firstIndex].offset,
             contentsOffset,
           ),
           "r'''${builder.eol}",
@@ -87,7 +102,7 @@ class MergeAsMultilineAssist extends CorrectionProducerLogger with Assist {
       } else {
         builder.addSimpleReplacement(
           range.startOffsetEndOffset(
-            adjacentStrings.strings.first.offset,
+            adjacentStrings.strings[firstIndex].offset,
             contentsOffset,
           ),
           "'''${builder.eol}",
@@ -133,7 +148,7 @@ class MergeAsMultilineAssist extends CorrectionProducerLogger with Assist {
           separator,
         );
       }
-      switch (adjacentStrings.strings.last) {
+      switch (last) {
         case SimpleStringLiteral(:var value, :var isRaw):
           if (value.isEmpty) {
             break;
@@ -146,8 +161,8 @@ class MergeAsMultilineAssist extends CorrectionProducerLogger with Assist {
           }
           builder.addSimpleReplacement(
             range.startOffsetEndOffset(
-              adjacentStrings.strings.last.contentsOffset,
-              adjacentStrings.strings.last.contentsEnd - 1,
+              last.contentsOffset,
+              last.contentsEnd - 1,
             ),
             escaped,
           );
@@ -185,16 +200,13 @@ class MergeAsMultilineAssist extends CorrectionProducerLogger with Assist {
       }
       if (lastEndsInQuote) {
         builder.addSimpleReplacement(
-          range.startOffsetEndOffset(
-            adjacentStrings.strings.last.contentsEnd - 1,
-            adjacentStrings.strings.last.contentsEnd,
-          ),
+          range.startOffsetEndOffset(last.contentsEnd - 1, last.contentsEnd),
           r"\'",
         );
       }
-      var lastContentEnd = adjacentStrings.strings.last.contentsEnd;
+      var lastContentEnd = last.contentsEnd;
       builder.addSimpleReplacement(
-        range.startOffsetEndOffset(lastContentEnd, adjacentStrings.end),
+        range.startOffsetEndOffset(lastContentEnd, last.end),
         "'''",
       );
     });
@@ -223,9 +235,70 @@ extension on StringLiteral {
 }
 
 extension on AdjacentStrings {
-  List<(StringLiteral, StringLiteral)> get stringPairs {
-    return [
-      for (var i = 0; i < strings.length - 1; i++) (strings[i], strings[i + 1]),
-    ];
+  List<(StringLiteral, StringLiteral)> stringPairs(int first, int last) {
+    return [for (var i = first; i < last; i++) (strings[i], strings[i + 1])];
+  }
+
+  ({StringLiteral string, int index}) stringFor(int selectionOffset) {
+    if (selectionOffset < strings.first.offset) {
+      return (string: strings.first, index: 0);
+    }
+    for (var i = 0; i < strings.length - 1; i++) {
+      var string = strings[i];
+      if (string.offset <= selectionOffset && selectionOffset <= string.end) {
+        return (string: string, index: i);
+      }
+      var next = strings[i + 1];
+      if ((selectionOffset > string.end) && (selectionOffset < next.offset)) {
+        // See if it is closer to one or the other
+        if (selectionOffset - string.end < next.offset - selectionOffset) {
+          return (string: string, index: i);
+        } else {
+          return (string: next, index: i + 1);
+        }
+      }
+    }
+    return (string: strings.last, index: strings.length - 1);
+  }
+
+  /// Iteratively we look at the next string (if any) for
+  /// [Token.precedingComments] and if we find any with content, we return the
+  /// string before the comment (considering the direction).
+  ///
+  /// If we don't find any comment in that direction, we return null.
+  (StringLiteral, int)? fromIndexStopAtComment(
+    int index, {
+    required bool forward,
+  }) {
+    for (
+      var i = index;
+      forward ? i < strings.length - 1 : i > 0;
+      forward ? i++ : i--
+    ) {
+      var string = strings[i];
+      var next = strings[forward ? i + 1 : i - 1];
+      var comment = forward
+          ? next.beginToken.precedingComments
+          : string.beginToken.precedingComments;
+      if (comment != null && comment.content.isNotEmpty) {
+        return (string, i);
+      }
+    }
+    return null;
+  }
+}
+
+extension on CommentToken {
+  String get content {
+    if (lexeme.startsWith('///')) {
+      return lexeme.substring(3).trim();
+    }
+    if (lexeme.startsWith('//')) {
+      return lexeme.substring(2).trim();
+    }
+    if (lexeme.startsWith('/*')) {
+      return lexeme.substring(2, lexeme.length - 2).trim();
+    }
+    return lexeme; // How?
   }
 }
