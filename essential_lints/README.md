@@ -25,6 +25,7 @@ This package provides **20+ lint rules** organized into several categories:
 - **`variable_shadowing`** - Prevents variable declarations that shadow outer scope variables
 - **`duplicate_value`** - Detects duplicate values in boolean expressions (`&&`, `||`)
 - **`equal_statement`** - Identifies identical statements in switch cases that should be combined
+- **`explicit_casts`** - Warns against explicit `as` casts and cast patterns (except to type parameters)
 - **`mutable_tearoff`** - Warns against tearing off mutable methods/getters
 
 ### Function Design
@@ -79,6 +80,7 @@ plugins:
       - duplicate_value
       - empty_container
       - equal_statement
+      - explicit_casts
       - first_getter
       - is_future
       - last_getter

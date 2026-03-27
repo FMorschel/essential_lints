@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.13+1
+
+Released on: 2026-03-27
+
+Updated readme to include the new `explicit_casts` rule and its description.
+
 ## 0.1.13
 
 Released on: 2026-03-27
