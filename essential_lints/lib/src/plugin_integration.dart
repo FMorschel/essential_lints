@@ -40,6 +40,7 @@ import 'rules/duplicate_value.dart';
 import 'rules/empty_container.dart';
 import 'rules/equal_statement.dart';
 import 'rules/essential_lint_rules.dart';
+import 'rules/explicit_casts.dart';
 import 'rules/first_getter.dart';
 import 'rules/is_future.dart';
 import 'rules/last_getter.dart';
@@ -282,6 +283,7 @@ mixin RulesPluginIntegration {
         .uselessElse => UselessElseRule(),
         .booleanAssignment => BooleanAssignmentRule(),
         .ambiguousPositionalBoolean => AmbiguousPositionalBooleanRule(),
+        .explicitCasts => ExplicitCastsRule(),
       });
     }
     logger

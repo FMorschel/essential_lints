@@ -300,6 +300,18 @@ enum EssentialLintCode with EnumDiagnostic, EnumLint {
           'Use named parameters for boolean values to improve readability and '
           'reduce confusion.',
     ),
+  ),
+
+  /// A lint rule that warns against explicit `as` casts. Encouraging the use
+  /// of type inference or other type-safe approaches instead.
+  explicitCasts(
+    LintRuleCode(
+      rule: .explicitCasts,
+      problemMessage: 'Avoid using explicit casts.',
+      correctionMessage:
+          'Use type inference or other type-safe approaches instead of '
+          'explicit casts.',
+    ),
   );
 
   const EssentialLintCode(this.code);

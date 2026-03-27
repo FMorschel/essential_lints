@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.13
+
+Released on: 2026-03-27
+
+- **explicit_casts**: New rule to detect explicit casts and suggest using type safety features instead.
+
 ## 0.1.12
 
 Released on: 2026-03-12

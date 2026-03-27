@@ -231,6 +231,15 @@ enum EssentialLintRule implements Rule {
     description:
         'A lint rule that detects pending listeners and reminds developers '
         'to remove them.',
+  ),
+
+  /// A lint rule that discourages the use of explicit casts, encouraging the
+  /// use of type inference or other type-safe approaches instead.
+  explicitCasts(
+    name: 'explicit_casts',
+    description:
+        'A lint rule that discourages the use of explicit casts, encouraging '
+        'the use of type inference or other type-safe approaches instead.',
   );
 
   const EssentialLintRule({required this.name, required this.description});
