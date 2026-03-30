@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.14
+
+Released on: 2026-03-30
+
+- **pending_listener**: Fixes intermittent crashes because of logging that should be on debug mode only.
+
 ## 0.1.13+1
 
 Released on: 2026-03-27

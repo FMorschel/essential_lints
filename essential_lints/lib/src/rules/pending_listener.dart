@@ -13,7 +13,6 @@ import 'package:logging/logging.dart';
 
 import '../plugin.dart';
 import '../utils/base_visitor.dart';
-import '../utils/debug_log_mixin.dart';
 import '../utils/extensions/ast.dart';
 import '../utils/extensions/object.dart';
 import 'analysis_rule.dart';
@@ -26,18 +25,13 @@ import 'rule.dart';
 /// {@endtemplate}
 @staticLoggerEnforcement
 class PendingListenerRule
-    extends MultiLintRule<PendingListenerRule, PendingListener>
-    with DebugLogMixin {
+    extends MultiLintRule<PendingListenerRule, PendingListener> {
   /// {@macro pending_listener_rule}
   PendingListenerRule() : super(.pendingListener, _logger);
 
   static final Logger _logger = EssentialLintsPlugin.newLogger(
     'PendingListenerRule',
   );
-
-  String? _logFilePath;
-  @override
-  String? get logFilePath => _logFilePath;
 
   @override
   // ignore: library_private_types_in_public_api, not really public.
@@ -49,10 +43,6 @@ class PendingListenerRule
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    if (logFilePath == null) {
-      _logFilePath = r'D:\dev\logs\pending_listener.log';
-      setLogListener(level: .ALL, logger: logger);
-    }
     var visitor = visitorFor(context);
     registry
       ..addMethodInvocation(this, visitor)
