@@ -1,4 +1,4 @@
-import 'package:analyzer/utilities/package_config_file_builder.dart';
+import 'package:analyzer_testing/package_config_file_builder.dart';
 import 'package:analyzer_testing/utilities/utilities.dart';
 import 'package:essential_lints/src/fixes/essential_lint_fixes.dart';
 import 'package:essential_lints/src/rules/rule.dart';
@@ -130,8 +130,8 @@ resolution: workspace
     newPackageConfigJsonFileFromBuilder(
       testPackageRootPath,
       PackageConfigFileBuilder()
-        ..add(name: 'test', rootPath: testPackageRootPath)
-        ..add(name: 'another', rootPath: anotherPackageRootPath),
+        ..add(name: 'test', rootFolder: getFolder(testPackageRootPath))
+        ..add(name: 'another', rootFolder: getFolder(anotherPackageRootPath)),
     );
     newFile(join(anotherPackageLibPath, 'a.dart'), 'class A {}');
     newFile(join(anotherPackageLibPath, 'export.dart'), "export 'a.dart';");
@@ -165,8 +165,8 @@ resolution: workspace
     newPackageConfigJsonFileFromBuilder(
       testPackageRootPath,
       PackageConfigFileBuilder()
-        ..add(name: 'test', rootPath: testPackageRootPath)
-        ..add(name: 'another', rootPath: anotherPackageRootPath),
+        ..add(name: 'test', rootFolder: getFolder(testPackageRootPath))
+        ..add(name: 'another', rootFolder: getFolder(anotherPackageRootPath)),
     );
     newFile(join(testPackageLibPath, 'a.dart'), 'class A {}');
     newFile(join(testPackageLibPath, 'export.dart'), "export 'a.dart';");

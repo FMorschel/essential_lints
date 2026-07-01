@@ -56,8 +56,6 @@ abstract class BaseEditTestProcessor extends AnalysisRuleTest
   // ignore: library_private_types_in_public_api, only used internally.
   _TestInstrumentationService get instrumentationService => .new();
 
-  Folder get sdkRoot => getFolder('/sdk');
-
   dart_change_workspace.DartChangeWorkspace get workspace =>
       .new([sessionFor(testUnit.path)]);
 

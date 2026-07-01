@@ -124,7 +124,9 @@ class _StandardCommentStyleVisitor
     for (var (:String paragraph, :CommentToken firstComment)
         in textComment.paragraphs) {
       logger.finer('Processing paragraph: ${paragraph.length} chars');
+      var startedWithDartdoc = false;
       if (paragraph.startsWith(_dartdocCompatible)) {
+        startedWithDartdoc = true;
         paragraph = paragraph
             .substring(_dartdocCompatible.firstMatch(paragraph)!.end)
             .trim();
@@ -139,7 +141,7 @@ class _StandardCommentStyleVisitor
         );
         continue;
       }
-      if (paragraph.startsWith(_noUppercaseLetter)) {
+      if (!startedWithDartdoc && paragraph.startsWith(_noUppercaseLetter)) {
         logger.fine('Reporting paragraph starting without uppercase letter');
         rule.reportAtToken(firstComment);
         continue;

@@ -1,5 +1,5 @@
-import 'package:analyzer/utilities/package_config_file_builder.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
+import 'package:analyzer_testing/package_config_file_builder.dart';
 
 mixin OtherPackageMixin on AnalysisRuleTest {
   late PackageBuilder otherPackage;
@@ -9,8 +9,8 @@ mixin OtherPackageMixin on AnalysisRuleTest {
     var path = '/package/other/.dart_tool/package_config.json';
     var builder = PackageConfigFileBuilder();
     for (var packageName in _packagesToAdd) {
-      var packagePath = convertPath('/package/$packageName');
-      builder.add(name: packageName, rootPath: packagePath);
+      var packagePath = getFolder(convertPath('/package/$packageName'));
+      builder.add(name: packageName, rootFolder: packagePath);
     }
     writePackageConfig(path, builder);
   }

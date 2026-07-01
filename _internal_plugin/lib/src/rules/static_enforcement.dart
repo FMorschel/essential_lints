@@ -81,7 +81,7 @@ class _StaticEnforcementVisitor extends BaseVisitor<StaticEnforcementRule> {
   void visitExtensionTypeDeclaration(ExtensionTypeDeclaration node) {
     _handleInstanceElement(
       node.declaredFragment?.element,
-      node.primaryConstructor.typeName,
+      node.namePart.typeName,
     );
   }
 

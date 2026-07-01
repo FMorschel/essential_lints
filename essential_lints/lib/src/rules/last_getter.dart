@@ -123,7 +123,7 @@ class _PreferLastVisitor extends BaseVisitor<LastGetterRule> {
       super.visitMethodInvocation(node);
       return;
     }
-    var expression = node.argumentList.arguments.first;
+    var expression = node.argumentList.arguments.first.argumentExpression;
     var offset = node.methodName.offset;
     var endOffset = node.methodName.end;
     logger.finer('Checking method invocation arguments for length - 1 pattern');

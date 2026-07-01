@@ -72,17 +72,11 @@ class _ClosureIncorrectTypeVisitor
       'function type',
     );
     for (var parameter in parameters.parameters) {
-      FormalParameter actualParameter;
-      if (parameter is DefaultFormalParameter) {
-        actualParameter = parameter.parameter;
-      } else {
-        actualParameter = parameter;
-      }
-      if (actualParameter is! NormalFormalParameter) {
-        logger.finer('Skipping non-NormalFormalParameter');
+      if (parameter is! RegularFormalParameter) {
+        logger.finer('Skipping non-RegularFormalParameter');
         continue;
       }
-      var actualParameterType = actualParameter.type;
+      var actualParameterType = parameter.type?.type;
       if (actualParameterType == null) {
         logger.finer('Parameter has no declared type, skipping');
         continue;
@@ -117,7 +111,7 @@ class _ClosureIncorrectTypeVisitor
           'actual=${actualParameterType.getDisplayString()} '
           'expected=${expectedType.getDisplayString()} — reporting at node',
         );
-        var range = actualParameter.typeAnnotationRange;
+        var range = parameter.typeAnnotationRange;
         if (range == null) {
           logger.warning(
             'No type annotation found for parameter, skipping reporting. How '

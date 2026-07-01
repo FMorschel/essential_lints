@@ -2,7 +2,6 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/source_range.dart';
-import 'package:analyzer_plugin/utilities/range_factory.dart';
 
 import 'object.dart';
 
@@ -128,7 +127,6 @@ extension ExpressionExt on Expression {
   /// returns `false`.
   bool get canBeConstant {
     return switch (this) {
-      NamedExpression(:var expression) => expression.canBeConstant,
       Literal() => true,
       Identifier(:var element) =>
         element is PropertyAccessorElement && element.variable.isConst,
@@ -158,14 +156,8 @@ extension NormalFormalParameterExt on FormalParameter {
   /// Gets the source range of the parameter's type annotation, or `null` if
   /// it cannot be determined.
   SourceRange? get typeAnnotationRange => switch (this) {
+    RegularFormalParameter(:var type) => type?.sourceRange,
     FieldFormalParameter(:var type) => type?.sourceRange,
-    FunctionTypedFormalParameter(:var returnType, :var parameters) =>
-      range.startEnd(
-        returnType ?? parameters.beginToken.previous!,
-        parameters.parameters.last,
-      ),
-    SimpleFormalParameter(:var type) => type?.sourceRange,
     SuperFormalParameter(:var type) => type?.sourceRange,
-    DefaultFormalParameter(:var parameter) => parameter.typeAnnotationRange,
   };
 }

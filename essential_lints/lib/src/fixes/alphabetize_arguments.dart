@@ -33,11 +33,7 @@ class AlphabetizeArgumentsFix extends CorrectionProducerLogger with LintFix {
     logger.info('AlphabetizeArgumentsFix.compute() started');
     var node = this.node;
     logger.finer('Initial node type: ${node.runtimeType}');
-    if (node.parent case Label parent) {
-      logger.finer('Node parent is Label, updating node');
-      node = parent;
-    }
-    if (node.parent case NamedExpression(:ArgumentList parent)) {
+    if (node case NamedArgument(:ArgumentList parent)) {
       logger.finer(
         'Node parent is NamedExpression with ArgumentList parent, updating '
         'node',
@@ -52,13 +48,13 @@ class AlphabetizeArgumentsFix extends CorrectionProducerLogger with LintFix {
     }
     logger.fine('Node is ArgumentList');
     var ranges = <SourceRange>[];
-    var namedArguments = node.arguments.whereType<NamedExpression>().toList();
+    var namedArguments = node.arguments.whereType<NamedArgument>().toList();
     logger.fine('Found ${namedArguments.length} named arguments');
     for (var argument in namedArguments) {
       ranges.add(range.node(argument));
     }
     namedArguments.sort((a, b) {
-      return a.name.label.name.compareTo(b.name.label.name);
+      return a.name.lexeme.compareTo(b.name.lexeme);
     });
     logger.fine('Named arguments sorted alphabetically');
     await builder.addDartFileEdit(file, (builder) {

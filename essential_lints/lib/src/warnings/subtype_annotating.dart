@@ -75,19 +75,17 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule>
         'Annotation mapped with ${annotation.annotations.length} annotations',
       );
       for (var parameter in [...?node.arguments?.arguments]) {
-        if (parameter case NamedExpression(
+        if (parameter case NamedArgument(
           :var name,
-        ) when name.label.token.lexeme != 'annotations') {
-          logger.finer(
-            'Skipping non-annotations parameter: ${name.label.token.lexeme}',
-          );
+        ) when name.lexeme != 'annotations') {
+          logger.finer('Skipping non-annotations parameter: ${name.lexeme}');
           continue;
         }
-        if (parameter is! NamedExpression) {
-          logger.finer('Parameter is not NamedExpression, skipping');
+        if (parameter is! NamedArgument) {
+          logger.finer('Parameter is not NamedArgument, skipping');
           continue;
         }
-        var list = parameter.expression;
+        var list = parameter.argumentExpression;
         logger.finer('Parameter expression type: ${list.runtimeType}');
         if (list is! ListLiteral) {
           logger.finer('Expression is not ListLiteral, skipping');
@@ -124,19 +122,17 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule>
         'Deannotating with ${annotation.annotations.length} annotations',
       );
       for (var parameter in [...?node.arguments?.arguments]) {
-        if (parameter case NamedExpression(
+        if (parameter case NamedArgument(
           :var name,
-        ) when name.label.token.lexeme != 'annotations') {
-          logger.finer(
-            'Skipping non-annotations parameter: ${name.label.token.lexeme}',
-          );
+        ) when name.lexeme != 'annotations') {
+          logger.finer('Skipping non-annotations parameter: ${name.lexeme}');
           continue;
         }
-        if (parameter is! NamedExpression) {
-          logger.finer('Parameter is not NamedExpression, skipping');
+        if (parameter is! NamedArgument) {
+          logger.finer('Parameter is not NamedArgument, skipping');
           continue;
         }
-        var list = parameter.expression;
+        var list = parameter.argumentExpression;
         logger.finer('Parameter expression type: ${list.runtimeType}');
         if (list is! ListLiteral) {
           logger.finer('Expression is not ListLiteral, skipping');
@@ -216,10 +212,10 @@ class _SubtypeAnnotatingVisitor extends BaseVisitor<SubtypeAnnotatingRule>
   void visitExtensionTypeDeclaration(ExtensionTypeDeclaration node) {
     logger.fine(
       'visitExtensionTypeDeclaration() for: '
-      '${node.primaryConstructor.typeName.lexeme}',
+      '${node.namePart.typeName.lexeme}',
     );
     _verifySuperTypes(
-      node.primaryConstructor.typeName,
+      node.namePart.typeName,
       node.declaredFragment?.element,
       node.metadata,
     );

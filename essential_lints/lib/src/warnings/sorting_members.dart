@@ -474,8 +474,9 @@ class _LintingMemberVisitor extends RecursiveBaseVisitor<SortingMembersRule>
         logger.finer('Reporting at primary constructor body');
         rule.reportAtToken(thisKeyword);
       default:
-        logger.severe('Unexpected node type for member: ${node.runtimeType}');
-        logger.severe('Unexpected node type for member: $node');
+        logger
+          ..severe('Unexpected node type for member: ${node.runtimeType}')
+          ..severe('Unexpected node type for member: $node');
         assert(false, 'Unexpected node type for member: $node');
         // ignore: _internal_plugin/report_shorter_lengths fallback
         rule.reportAtNode(node);
@@ -892,44 +893,54 @@ class ValidatorFromAnnotation {
         typeName = current?.type?.element?.lookupName;
         switch (typeName) {
           case '_Field':
-            list.add(const _FieldMemberTypeValidator());
-            list.add(
-              _ExpectedNamedMemberTypeValidator(
-                expectedName: current?.getField('name')?.toSymbolValue() ?? '',
-              ),
-            );
+            list
+              ..add(const _FieldMemberTypeValidator())
+              ..add(
+                _ExpectedNamedMemberTypeValidator(
+                  expectedName:
+                      current?.getField('name')?.toSymbolValue() ?? '',
+                ),
+              );
             break While;
           case '_Constructor':
-            list.add(const _ConstructorMemberTypeValidator());
-            list.add(
-              _ExpectedNamedMemberTypeValidator(
-                expectedName: current?.getField('name')?.toSymbolValue() ?? '',
-              ),
-            );
+            list
+              ..add(const _ConstructorMemberTypeValidator())
+              ..add(
+                _ExpectedNamedMemberTypeValidator(
+                  expectedName:
+                      current?.getField('name')?.toSymbolValue() ?? '',
+                ),
+              );
             break While;
           case '_Method':
-            list.add(const _MethodMemberTypeValidator());
-            list.add(
-              _ExpectedNamedMemberTypeValidator(
-                expectedName: current?.getField('name')?.toSymbolValue() ?? '',
-              ),
-            );
+            list
+              ..add(const _MethodMemberTypeValidator())
+              ..add(
+                _ExpectedNamedMemberTypeValidator(
+                  expectedName:
+                      current?.getField('name')?.toSymbolValue() ?? '',
+                ),
+              );
             break While;
           case '_Getter':
-            list.add(const _GetterMemberTypeValidator());
-            list.add(
-              _ExpectedNamedMemberTypeValidator(
-                expectedName: current?.getField('name')?.toSymbolValue() ?? '',
-              ),
-            );
+            list
+              ..add(const _GetterMemberTypeValidator())
+              ..add(
+                _ExpectedNamedMemberTypeValidator(
+                  expectedName:
+                      current?.getField('name')?.toSymbolValue() ?? '',
+                ),
+              );
             break While;
           case '_Setter':
-            list.add(const _SetterMemberTypeValidator());
-            list.add(
-              _ExpectedNamedMemberTypeValidator(
-                expectedName: current?.getField('name')?.toSymbolValue() ?? '',
-              ),
-            );
+            list
+              ..add(const _SetterMemberTypeValidator())
+              ..add(
+                _ExpectedNamedMemberTypeValidator(
+                  expectedName:
+                      current?.getField('name')?.toSymbolValue() ?? '',
+                ),
+              );
             break While;
           case 'Fields':
             list.add(const _FieldMemberTypeValidator());

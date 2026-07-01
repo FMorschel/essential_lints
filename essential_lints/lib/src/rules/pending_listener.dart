@@ -553,7 +553,8 @@ class _PendingListenerVisitor extends BaseVisitor<PendingListenerRule> {
       'Processing listener method ${node.methodName.name} on Listenable: '
       '${targetType?.getDisplayString()}',
     );
-    var firstArgument = node.argumentList.arguments.firstOrNull;
+    var firstArgument =
+        node.argumentList.arguments.firstOrNull?.argumentExpression;
     if (firstArgument == null) {
       // No arguments provided yet.
       logger.finer(
@@ -662,7 +663,8 @@ class _PendingListenerVisitor extends BaseVisitor<PendingListenerRule> {
     // Extract the full element chain from the target expression
     // This ensures widget.controller and oldWidget.controller are tracked
     // as different elements
-    var firstArgument = node.argumentList.arguments.firstOrNull;
+    var firstArgument =
+        node.argumentList.arguments.firstOrNull?.argumentExpression;
     var chain = rule._extractElementChain(
       target,
       firstArgument == null ? null : _instantiationListeners,

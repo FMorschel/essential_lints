@@ -52,7 +52,7 @@ class ReplaceWithFromBorderSideFix extends CorrectionProducerLogger
     }
 
     var canBeConst = instanceCreation.argumentList.arguments.every(
-      (p) => p.canBeConstant,
+      (p) => p.argumentExpression.canBeConstant,
     );
     logger.fine('Parent is InstanceCreationExpression');
     await builder.addDartFileEdit(file, (builder) {

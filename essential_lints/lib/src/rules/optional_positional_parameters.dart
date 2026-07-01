@@ -53,9 +53,7 @@ class _OptionalPositionalParametersVisitor
       logger.finer(
         'Found optional positional parameter: ${parameter.toSource()}',
       );
-      if (parameter case DefaultFormalParameter(
-        parameter: SuperFormalParameter(),
-      )) {
+      if (parameter case SuperFormalParameter()) {
         logger.finer('Parameter is a super formal parameter — skipping');
         return;
       }

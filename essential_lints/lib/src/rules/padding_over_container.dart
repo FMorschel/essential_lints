@@ -54,8 +54,8 @@ class _PaddingOverContainerVisitor
       logger.finer('Found Padding constructor, checking arguments');
       var argumentList = node.argumentList;
       for (var argument in argumentList.arguments) {
-        if (argument is NamedExpression && argument.name.label.name == _child) {
-          var expression = argument.expression;
+        if (argument is NamedArgument && argument.name.lexeme == _child) {
+          var expression = argument.argumentExpression;
           logger.finer('Found child argument: ${expression.runtimeType}');
           if (expression is InstanceCreationExpression &&
               expression.constructorName.type.element.isContainer) {

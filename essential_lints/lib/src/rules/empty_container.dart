@@ -116,8 +116,8 @@ class _EmptyContainerVisitor extends BaseVisitor<EmptyContainerRule> {
     var parent = node.parent;
     logger.finer('_getExpectedType() parent: ${parent.runtimeType}');
 
-    // Handle NamedExpression wrapper
-    if (parent is NamedExpression) {
+    // Handle NamedArgument wrapper
+    if (parent is NamedArgument) {
       parent = parent.parent;
       logger.finer(
         '_getExpectedType() unwrapped NamedExpression, new parent: '

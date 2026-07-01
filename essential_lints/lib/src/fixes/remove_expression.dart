@@ -42,7 +42,7 @@ class RemoveExpressionFix extends CorrectionProducerLogger with WarningFix {
       node = node.thisOrAncestorOfType<Expression>() ?? node;
       logger.fine('Node after Expression search: ${node.runtimeType}');
     }
-    if (node.parent case NamedExpression parent) {
+    if (node.parent case NamedArgument parent) {
       logger.finer('Node parent is NamedExpression, updating node');
       node = parent;
     }
@@ -50,7 +50,7 @@ class RemoveExpressionFix extends CorrectionProducerLogger with WarningFix {
       logger.finer('Node parent is NullAwareElement, updating node');
       node = nullAware;
     }
-    if (node is! Expression && node is! NullAwareElement) {
+    if (node is! Argument && node is! NullAwareElement) {
       logger.finer(
         'Node is neither Expression nor NullAwareElement '
         '(${node.runtimeType}), returning',
@@ -69,7 +69,7 @@ class RemoveExpressionFix extends CorrectionProducerLogger with WarningFix {
       return;
     }
     logger.fine('Node parent is safe for deletion');
-    if (node case Expression(
+    if (node case Argument(
       parent: ArgumentList(),
       correspondingParameter: FormalParameterElement(isRequired: true),
     )) {

@@ -1,4 +1,4 @@
-import 'package:analyzer/utilities/package_config_file_builder.dart';
+import 'package:analyzer_testing/package_config_file_builder.dart';
 import 'package:analyzer_testing/utilities/utilities.dart';
 import 'package:essential_lints/src/rules/rule.dart';
 import 'package:essential_lints/src/rules/same_package_direct_import.dart';
@@ -58,8 +58,10 @@ void f() {
     );
     newPackageConfigJsonFileFromBuilder(
       testPackageRootPath,
-      PackageConfigFileBuilder()
-        ..add(name: 'other', rootPath: join(workspaceRootPath, 'other')),
+      PackageConfigFileBuilder()..add(
+        name: 'other',
+        rootFolder: getFolder(join(workspaceRootPath, 'other')),
+      ),
     );
     await assertNoDiagnostics('''
 import 'package:other/export.dart';
@@ -128,8 +130,8 @@ resolution: workspace
     newPackageConfigJsonFileFromBuilder(
       testPackageRootPath,
       PackageConfigFileBuilder()
-        ..add(name: 'test', rootPath: testPackageRootPath)
-        ..add(name: 'another', rootPath: anotherPackageRootPath),
+        ..add(name: 'test', rootFolder: getFolder(testPackageRootPath))
+        ..add(name: 'another', rootFolder: getFolder(anotherPackageRootPath)),
     );
     newFile(join(anotherPackageLibPath, 'a.dart'), 'class A {}');
     newFile(join(anotherPackageLibPath, 'export.dart'), "export 'a.dart';");
@@ -162,8 +164,8 @@ resolution: workspace
     newPackageConfigJsonFileFromBuilder(
       testPackageRootPath,
       PackageConfigFileBuilder()
-        ..add(name: 'test', rootPath: testPackageRootPath)
-        ..add(name: 'another', rootPath: anotherPackageRootPath),
+        ..add(name: 'test', rootFolder: getFolder(testPackageRootPath))
+        ..add(name: 'another', rootFolder: getFolder(anotherPackageRootPath)),
     );
     // Change it so the test file is in the `another` package.
     testFile = newFile(join(anotherPackageLibPath, 'test.dart'), '');
@@ -193,8 +195,8 @@ resolution: workspace
     newPackageConfigJsonFileFromBuilder(
       testPackageRootPath,
       PackageConfigFileBuilder()
-        ..add(name: 'test', rootPath: testPackageRootPath)
-        ..add(name: 'another', rootPath: anotherPackageRootPath),
+        ..add(name: 'test', rootFolder: getFolder(testPackageRootPath))
+        ..add(name: 'another', rootFolder: getFolder(anotherPackageRootPath)),
     );
     await assertNoDiagnostics('''
 import 'package:another/export.dart';

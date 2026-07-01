@@ -225,10 +225,7 @@ class _BooleanAssignmentVisitor extends BaseVisitor<BooleanAssignmentRule> {
       '${node.offset}',
     );
     for (var argument in node.arguments) {
-      var expression = argument;
-      if (expression is NamedExpression) {
-        expression = expression.expression;
-      }
+      var expression = argument.argumentExpression;
       if (expression.staticType?.isDartCoreBool ?? false) {
         logger.fine('Found bool-typed argument — checking for assignment');
         _reportIfAssignment(expression);

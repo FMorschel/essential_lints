@@ -18,7 +18,6 @@ part of 'sort_declarations.dart';
 }
 
 /*final*/ class _Constructor extends _Member {
-  // ignore: use_super_parameters, annotation trick
   const _Constructor._([this.name]) : super._(name);
 
   @override

@@ -58,7 +58,8 @@ class _ReportShorterLengthsVisitor
   @override
   void visitMethodInvocation(MethodInvocation node) {
     if (_isMethodFromEitherClass(node.methodName.element)) {
-      var firstArgument = node.argumentList.arguments.firstOrNull;
+      var firstArgument =
+          node.argumentList.arguments.firstOrNull?.argumentExpression;
       if (firstArgument == null) return;
       if (containsMoreEntities(firstArgument) ||
           containsAbstractSubtypes(firstArgument)) {

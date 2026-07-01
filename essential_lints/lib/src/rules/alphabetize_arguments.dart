@@ -48,7 +48,7 @@ class _AlphabetizeArgumentsVisitor
     );
 
     var arguments = node.arguments;
-    var argumentNames = arguments.whereType<NamedExpression>().toList();
+    var argumentNames = arguments.whereType<NamedArgument>().toList();
     logger.fine('Found ${argumentNames.length} named arguments');
 
     if (argumentNames.length < 2) {
@@ -59,8 +59,8 @@ class _AlphabetizeArgumentsVisitor
     }
 
     for (var i = 1; i < argumentNames.length; i++) {
-      var previousName = argumentNames[i - 1].name.label.name;
-      var currentName = argumentNames[i].name.label.name;
+      var previousName = argumentNames[i - 1].name.lexeme;
+      var currentName = argumentNames[i].name.lexeme;
       logger.finer(
         'Comparing previous="$previousName" with '
         'current="$currentName" at index ${i - 1} -> $i',
@@ -70,7 +70,7 @@ class _AlphabetizeArgumentsVisitor
           'Alphabetical order violation: "$previousName" > "$currentName" — '
           'reporting at node',
         );
-        rule.reportAtNode(argumentNames[i].name.label);
+        rule.reportAtToken(argumentNames[i].name);
         // Stop after the first violation to avoid multiple reports for the same
         // argument list.
         break;

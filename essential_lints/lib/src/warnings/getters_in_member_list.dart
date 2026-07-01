@@ -74,8 +74,8 @@ class _GettersInMemberListVisitor extends BaseVisitor<GettersInMemberListRule> {
           // ignore: _internal_plugin/report_shorter_lengths more meaningful
           node.arguments?.arguments
                   .firstWhereOrNull(_isMemberListName)
-                  .whenTypeOrNull<NamedExpression>()
-                  ?.expression ??
+                  .whenTypeOrNull<NamedArgument>()
+                  ?.argumentExpression ??
               node.name,
           diagnosticCode: GettersInMemberList.invalidMemberListName,
         );
@@ -382,11 +382,11 @@ class _GettersInMemberListVisitor extends BaseVisitor<GettersInMemberListRule> {
         element?.name == _annotationName;
   }
 
-  bool _isMemberListName(Expression element) {
-    if (element is! NamedExpression) {
+  bool _isMemberListName(Argument element) {
+    if (element is! NamedArgument) {
       return false;
     }
-    return element.name.label.name == 'memberListName';
+    return element.name.lexeme == 'memberListName';
   }
 
   _GettersInMemberListAnnotation? _mapKnownArguments(

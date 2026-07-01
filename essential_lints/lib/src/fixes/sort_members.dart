@@ -915,6 +915,18 @@ extension on ClassBody {
   };
 }
 
+extension on EnumBody {
+  Token? get leftBracket => switch (this) {
+    BlockEnumBody(:var leftBracket) => leftBracket,
+    EmptyEnumBody() => null,
+  };
+
+  Token? get rightBracket => switch (this) {
+    BlockEnumBody(:var rightBracket) => rightBracket,
+    EmptyEnumBody() => null,
+  };
+}
+
 extension on AstNode {
   CompilationUnitMember? get enclosingInstanceDeclaration {
     AstNode? current = this;

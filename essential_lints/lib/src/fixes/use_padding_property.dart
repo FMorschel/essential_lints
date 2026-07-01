@@ -63,34 +63,34 @@ class UsePaddingPropertyFix extends CorrectionProducerLogger with LintFix {
       _namedPaddingArgument,
     );
     logger.finer('Found paddingArgument: ${paddingArgument.runtimeType}');
-    if (paddingArgument is! NamedExpression) {
+    if (paddingArgument is! NamedArgument) {
       logger.finer('paddingArgument is not NamedExpression, returning');
       return;
     }
     logger.fine('paddingArgument is NamedExpression: padding=...');
     var childArgument = arguments.arguments.firstWhereOrNull((argument) {
-      if (argument case NamedExpression(:var name)) {
-        return name.label.name == 'child';
+      if (argument case NamedArgument(:var name)) {
+        return name.lexeme == 'child';
       }
       return false;
     });
     logger.finer('Found childArgument: ${childArgument.runtimeType}');
-    if (childArgument is! NamedExpression) {
+    if (childArgument is! NamedArgument) {
       logger.finer('childArgument is not NamedExpression, returning');
       return;
     }
     logger.fine('childArgument is NamedExpression: child=...');
-    if (childArgument case NamedExpression(:var expression)) {
-      logger.finer('Child expression type: ${expression.runtimeType}');
-      if (expression is! InstanceCreationExpression ||
-          !expression.constructorName.type.element.isContainer) {
+    if (childArgument case NamedArgument(:var argumentExpression)) {
+      logger.finer('Child expression type: ${argumentExpression.runtimeType}');
+      if (argumentExpression is! InstanceCreationExpression ||
+          !argumentExpression.constructorName.type.element.isContainer) {
         logger.finer(
           'Child is not a Container InstanceCreationExpression, returning',
         );
         return;
       }
       logger.fine('Child is Container InstanceCreationExpression');
-      arguments = expression.argumentList;
+      arguments = argumentExpression.argumentList;
       logger.finer('Container has ${arguments.arguments.length} arguments');
       if (arguments.arguments.any(_namedPaddingArgument)) {
         logger.fine('Container already has a padding property, returning');
@@ -136,9 +136,9 @@ class UsePaddingPropertyFix extends CorrectionProducerLogger with LintFix {
     logger.info('UsePaddingPropertyFix.compute() completed successfully');
   }
 
-  bool _namedPaddingArgument(Expression argument) {
-    if (argument case NamedExpression(:var name)) {
-      var isPadding = name.label.name == 'padding';
+  bool _namedPaddingArgument(Argument argument) {
+    if (argument case NamedArgument(:var name)) {
+      var isPadding = name.lexeme == 'padding';
       if (isPadding) {
         logger.finer('  Found padding argument');
       }

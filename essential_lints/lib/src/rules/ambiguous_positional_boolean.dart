@@ -89,7 +89,7 @@ class _AmbiguousPositionalBooleanVisitor
       if (parameter.typeAnnotationRange
           case SourceRange(:var offset, :var length)
           when parameter.isPositional &&
-              (parameter.type?.isDartCoreBool ?? false)) {
+              (parameter.type?.type?.isDartCoreBool ?? false)) {
         rule.reportAtOffset(offset, length);
       } else if (parameter case FieldFormalParameter(
         :var thisKeyword,

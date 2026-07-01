@@ -61,7 +61,7 @@ class ReplaceWithBorderRadiusAllFix extends CorrectionProducerLogger
     }
     logger.fine('Instance creation has exactly 1 argument');
     var canBeConst = instanceCreation.argumentList.arguments.every(
-      (p) => p.canBeConstant,
+      (p) => p.argumentExpression.canBeConstant,
     );
     logger.fine('Arguments checked for const: canBeConst=$canBeConst');
     await builder.addDartFileEdit(file, (builder) {

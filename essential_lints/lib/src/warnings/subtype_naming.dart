@@ -223,10 +223,10 @@ class _SubtypeNamingVisitor extends BaseVisitor<SubtypeNamingRule>
   void visitExtensionTypeDeclaration(ExtensionTypeDeclaration node) {
     logger.fine(
       'visitExtensionTypeDeclaration() for: '
-      '${node.primaryConstructor.typeName.lexeme}',
+      '${node.namePart.typeName.lexeme}',
     );
     _verifySuperTypes(
-      node.primaryConstructor.typeName,
+      node.namePart.typeName,
       node.declaredFragment?.element,
     );
     super.visitExtensionTypeDeclaration(node);
