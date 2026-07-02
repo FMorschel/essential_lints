@@ -225,10 +225,7 @@ class _SubtypeNamingVisitor extends BaseVisitor<SubtypeNamingRule>
       'visitExtensionTypeDeclaration() for: '
       '${node.namePart.typeName.lexeme}',
     );
-    _verifySuperTypes(
-      node.namePart.typeName,
-      node.declaredFragment?.element,
-    );
+    _verifySuperTypes(node.namePart.typeName, node.declaredFragment?.element);
     super.visitExtensionTypeDeclaration(node);
   }
 
