@@ -29,14 +29,14 @@ class SubDiagnosticRule
       _SubDiagnosticVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<SubDiagnosticRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
     registry
-      ..addEnumConstantDeclaration(this, visitor)
-      ..addEnumDeclaration(this, visitor);
+      ..addEnumConstantDeclaration(this, timed)
+      ..addEnumDeclaration(this, timed);
   }
 }
 

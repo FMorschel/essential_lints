@@ -37,17 +37,17 @@ class SubtypeAnnotatingRule
       _SubtypeAnnotatingVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<SubtypeAnnotatingRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
     registry
-      ..addAnnotation(this, visitor)
-      ..addClassDeclaration(this, visitor)
-      ..addEnumDeclaration(this, visitor)
-      ..addExtensionTypeDeclaration(this, visitor)
-      ..addMixinDeclaration(this, visitor);
+      ..addAnnotation(this, timed)
+      ..addClassDeclaration(this, timed)
+      ..addEnumDeclaration(this, timed)
+      ..addExtensionTypeDeclaration(this, timed)
+      ..addMixinDeclaration(this, timed);
   }
 }
 

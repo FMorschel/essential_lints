@@ -26,12 +26,12 @@ class AlphabetizeEnumConstantsRule
       _AlphabetizeEnumConstantsVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<AlphabetizeEnumConstantsRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
-    registry.addEnumDeclaration(this, visitor);
+    registry.addEnumDeclaration(this, timed);
   }
 }
 

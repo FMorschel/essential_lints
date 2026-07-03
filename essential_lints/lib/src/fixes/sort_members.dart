@@ -9,6 +9,7 @@ import 'package:logging/logging.dart';
 
 import '../plugin.dart';
 import '../rules/analysis_rule.dart';
+import '../utils/correction_producer.dart';
 import '../warnings/sorting_members.dart';
 import 'essential_lint_fixes.dart';
 import 'fix.dart';

@@ -30,12 +30,12 @@ class SamePackageDirectImportRule
       _SamePackageDirectImportVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<SamePackageDirectImportRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
-    registry.addImportDirective(this, visitor);
+    registry.addImportDirective(this, timed);
   }
 }
 

@@ -39,18 +39,19 @@ class PendingListenerRule
       _PendingListenerVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    // ignore: library_private_types_in_public_api, not really public.
+    covariant _PendingListenerVisitor base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
     registry
-      ..addMethodInvocation(this, visitor)
+      ..addMethodInvocation(this, timed)
       ..afterLibrary(this, () {
-        var addedListeners = visitor.addedListeners;
+        var addedListeners = base.addedListeners;
         var addedListenersFilteringDisposed =
-            visitor.addedListenersFilteringDisposed;
-        var removedListeners = visitor.removedListeners;
+            base.addedListenersFilteringDisposed;
+        var removedListeners = base.removedListeners;
         logger.info(
           'Analysis complete: ${addedListeners.length} element(s) with added '
           'listeners (${addedListenersFilteringDisposed.length} after '
@@ -58,22 +59,22 @@ class PendingListenerRule
           'removed listeners',
         );
         // Report closures based on disposal status
-        visitor.reportPendingClosures();
+        base.reportPendingClosures();
         // Check for pending listeners (filter out disposed elements)
         _reportFor(
           addedListenersFilteringDisposed,
           removedListeners,
-          context,
+          base.context,
           rule,
         );
         // Check for unnecessary removes (use all added listeners)
         _reportFor(
           removedListeners,
           addedListeners,
-          context,
+          base.context,
           PendingListener.unnecessaryRemove,
         );
-        for (var expression in visitor.instantiationListeners) {
+        for (var expression in base.instantiationListeners) {
           logger.fine(
             'Reporting listener instantiation: ${expression.toSource()}',
           );

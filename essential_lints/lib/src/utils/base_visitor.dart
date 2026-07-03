@@ -13,7 +13,8 @@ import '../warnings/essential_lint_warnings.dart';
 ///
 /// It ensures that the rule and context are available to all visitors and
 /// provides easier access to the logger.
-mixin Visitor<Rule extends AbstractEssentialAnalysisRule?, T> on AstVisitor<T> {
+mixin Visitor<Rule extends AbstractEssentialAnalysisRule<dynamic, dynamic>?, T>
+    on AstVisitor<T> {
   /// The context of the rule, used to report diagnostics.
   RuleContext get context;
 
@@ -34,7 +35,9 @@ mixin Visitor<Rule extends AbstractEssentialAnalysisRule?, T> on AstVisitor<T> {
 /// {@template base_visitor}
 /// Base visitor for [AbstractEssentialAnalysisRule]s.
 /// {@endtemplate}
-abstract class BaseVisitor<Rule extends AbstractEssentialAnalysisRule?>
+abstract class BaseVisitor<
+  Rule extends AbstractEssentialAnalysisRule<Rule, WarningCode>?
+>
     extends SimpleAstVisitor<void>
     with Visitor<Rule, void> {
   /// {@macro base_visitor}
@@ -60,7 +63,7 @@ abstract class BaseVisitor<Rule extends AbstractEssentialAnalysisRule?>
 /// for all visitors.
 /// {@endtemplate}
 abstract class GeneralizingBaseVisitor<
-  Rule extends AbstractEssentialAnalysisRule<WarningCode>?
+  Rule extends AbstractEssentialAnalysisRule<Rule, WarningCode>?
 >
     extends GeneralizingAstVisitor<void>
     with Visitor<Rule, void> {
@@ -90,7 +93,9 @@ abstract class GeneralizingBaseVisitor<
 /// A base recursive visitor that provides access to the rule and context for
 /// all visitors.
 /// {@endtemplate}
-abstract class RecursiveBaseVisitor<Rule extends AbstractEssentialAnalysisRule?>
+abstract class RecursiveBaseVisitor<
+  Rule extends AbstractEssentialAnalysisRule<Rule, WarningCode>?
+>
     extends RecursiveAstVisitor<void>
     with Visitor<Rule, void> {
   /// {@macro recursive_base_visitor}

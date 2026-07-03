@@ -29,12 +29,12 @@ class StandardCommentStyleRule extends LintRule<StandardCommentStyleRule> {
       _StandardCommentStyleVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<StandardCommentStyleRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
-    registry.addCompilationUnit(this, visitor);
+    registry.addCompilationUnit(this, timed);
   }
 }
 

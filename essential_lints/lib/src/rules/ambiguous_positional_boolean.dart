@@ -33,22 +33,16 @@ class AmbiguousPositionalBooleanRule
   ) => _AmbiguousPositionalBooleanVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<AmbiguousPositionalBooleanRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    logger.fine(
-      'Registering node processors for AmbiguousPositionalBooleanRule',
-    );
-    var visitor = visitorFor(context);
     registry
-      ..addFunctionExpression(this, visitor)
-      ..addMethodDeclaration(this, visitor)
-      ..addConstructorDeclaration(this, visitor)
-      ..addGenericFunctionType(this, visitor);
-    logger.fine(
-      'Registered node processors for AmbiguousPositionalBooleanRule',
-    );
+      ..addFunctionExpression(this, timed)
+      ..addMethodDeclaration(this, timed)
+      ..addConstructorDeclaration(this, timed)
+      ..addGenericFunctionType(this, timed);
   }
 }
 

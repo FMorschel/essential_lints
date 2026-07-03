@@ -36,12 +36,12 @@ class ReportShorterLengthsRule extends LintRule<ReportShorterLengthsRule> {
       _ReportShorterLengthsVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<ReportShorterLengthsRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
-    registry.addMethodInvocation(this, visitor);
+    registry.addMethodInvocation(this, timed);
   }
 }
 

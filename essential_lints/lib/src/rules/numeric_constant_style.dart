@@ -30,12 +30,12 @@ class NumericConstantStyleRule extends LintRule<NumericConstantStyleRule> {
       _NumericConstantStyleVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<NumericConstantStyleRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
-    registry.addDoubleLiteral(this, visitor);
+    registry.addDoubleLiteral(this, timed);
   }
 }
 

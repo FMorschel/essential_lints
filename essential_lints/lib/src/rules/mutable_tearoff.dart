@@ -28,16 +28,16 @@ class MutableTearoffRule extends LintRule<MutableTearoffRule> {
       _MutableTearoffsVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<MutableTearoffRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
     registry
-      ..addPropertyAccess(this, visitor)
-      ..addPrefixedIdentifier(this, visitor)
-      ..addSimpleIdentifier(this, visitor)
-      ..addFunctionReference(this, visitor);
+      ..addPropertyAccess(this, timed)
+      ..addPrefixedIdentifier(this, timed)
+      ..addSimpleIdentifier(this, timed)
+      ..addFunctionReference(this, timed);
   }
 }
 

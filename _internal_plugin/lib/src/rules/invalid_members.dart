@@ -36,14 +36,14 @@ class InvalidMembersRule extends LintRule<InvalidMembersRule> {
       _InvalidMembersVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<InvalidMembersRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
     registry
-      ..addDotShorthandPropertyAccess(this, visitor)
-      ..addDotShorthandConstructorInvocation(this, visitor);
+      ..addDotShorthandPropertyAccess(this, timed)
+      ..addDotShorthandConstructorInvocation(this, timed);
   }
 }
 

@@ -25,12 +25,12 @@ class IsFutureRule extends LintRule<IsFutureRule> {
       _IsFutureVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<IsFutureRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
-    registry.addIsExpression(this, visitor);
+    registry.addIsExpression(this, timed);
   }
 }
 

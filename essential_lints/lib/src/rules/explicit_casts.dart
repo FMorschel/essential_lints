@@ -23,14 +23,14 @@ class ExplicitCastsRule extends LintRule<ExplicitCastsRule> {
   );
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<ExplicitCastsRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
     registry
-      ..addCastPattern(this, visitor)
-      ..addAsExpression(this, visitor);
+      ..addCastPattern(this, timed)
+      ..addAsExpression(this, timed);
   }
 
   @override

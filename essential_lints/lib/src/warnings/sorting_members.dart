@@ -35,17 +35,17 @@ class SortingMembersRule extends WarningRule<SortingMembersRule> {
       _SortingMembersVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<SortingMembersRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
     registry
-      ..addClassDeclaration(this, visitor)
-      ..addMixinDeclaration(this, visitor)
-      ..addExtensionDeclaration(this, visitor)
-      ..addExtensionTypeDeclaration(this, visitor)
-      ..addEnumDeclaration(this, visitor);
+      ..addClassDeclaration(this, timed)
+      ..addMixinDeclaration(this, timed)
+      ..addExtensionDeclaration(this, timed)
+      ..addExtensionTypeDeclaration(this, timed)
+      ..addEnumDeclaration(this, timed);
   }
 }
 

@@ -4,9 +4,9 @@ import 'package:analyzer_plugin/utilities/assist/assist.dart';
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 import 'package:logging/logging.dart';
 
-import '../fixes/fix.dart';
 import '../plugin.dart';
 import '../rules/analysis_rule.dart';
+import '../utils/correction_producer.dart';
 import 'essential_lint_assists.dart';
 
 /// {@template assist}

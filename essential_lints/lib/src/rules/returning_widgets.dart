@@ -32,14 +32,14 @@ class ReturningWidgetsRule extends LintRule<ReturningWidgetsRule> {
       _ReturningWidgetsVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<ReturningWidgetsRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
     registry
-      ..addFunctionDeclaration(this, visitor)
-      ..addMethodDeclaration(this, visitor);
+      ..addFunctionDeclaration(this, timed)
+      ..addMethodDeclaration(this, timed);
   }
 }
 

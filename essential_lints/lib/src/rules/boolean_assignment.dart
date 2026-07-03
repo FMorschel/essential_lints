@@ -25,27 +25,25 @@ class BooleanAssignmentRule extends LintRule<BooleanAssignmentRule> {
       _BooleanAssignmentVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<BooleanAssignmentRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    logger.fine('Registering node processors for BooleanAssignmentRule');
-    var visitor = visitorFor(context);
     registry
-      ..addIfStatement(this, visitor)
-      ..addVariableDeclaration(this, visitor)
-      ..addWhileStatement(this, visitor)
-      ..addConditionalExpression(this, visitor)
-      ..addWhenClause(this, visitor)
-      ..addForPartsWithDeclarations(this, visitor)
-      ..addForPartsWithExpression(this, visitor)
-      ..addForPartsWithPattern(this, visitor)
-      ..addAssertInitializer(this, visitor)
-      ..addAssertStatement(this, visitor)
-      ..addReturnStatement(this, visitor)
-      ..addAssignmentExpression(this, visitor)
-      ..addArgumentList(this, visitor);
-    logger.fine('Registered node processors for BooleanAssignmentRule');
+      ..addIfStatement(this, timed)
+      ..addVariableDeclaration(this, timed)
+      ..addWhileStatement(this, timed)
+      ..addConditionalExpression(this, timed)
+      ..addWhenClause(this, timed)
+      ..addForPartsWithDeclarations(this, timed)
+      ..addForPartsWithExpression(this, timed)
+      ..addForPartsWithPattern(this, timed)
+      ..addAssertInitializer(this, timed)
+      ..addAssertStatement(this, timed)
+      ..addReturnStatement(this, timed)
+      ..addAssignmentExpression(this, timed)
+      ..addArgumentList(this, timed);
   }
 }
 

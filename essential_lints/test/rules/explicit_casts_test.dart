@@ -41,12 +41,10 @@ void f(Object value) {
   }
 
   Future<void> test_explicit_casts_typeParameter() async {
-    await assertNoDiagnostics(
-      '''
+    await assertNoDiagnostics('''
 void f<T>(Object value) {
   var a = value as T;
 }
-''',
-    );
+''');
   }
 }

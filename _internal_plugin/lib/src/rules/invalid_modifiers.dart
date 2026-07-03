@@ -36,14 +36,14 @@ class InvalidModifiersRule extends LintRule<InvalidModifiersRule> {
       _InvalidModifiersVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<InvalidModifiersRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
     registry
-      ..addDotShorthandPropertyAccess(this, visitor)
-      ..addDotShorthandConstructorInvocation(this, visitor);
+      ..addDotShorthandPropertyAccess(this, timed)
+      ..addDotShorthandConstructorInvocation(this, timed);
   }
 }
 

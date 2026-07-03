@@ -26,14 +26,12 @@ class BorderAllRule extends LintRule<BorderAllRule> {
       _BorderAllVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<BorderAllRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    logger.fine('Registering node processors for BorderAllRule');
-    var visitor = visitorFor(context);
-    registry.addInstanceCreationExpression(this, visitor);
-    logger.fine('Registered node processors for BorderAllRule');
+    registry.addInstanceCreationExpression(this, timed);
   }
 }
 

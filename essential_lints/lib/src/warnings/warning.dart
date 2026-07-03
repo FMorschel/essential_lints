@@ -1,4 +1,8 @@
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+
 import '../rules/analysis_rule.dart';
+import '../utils/extensions/ast_visitor.dart';
 import 'essential_lint_warnings.dart'
     show EssentialLintWarningCode, EssentialMultiWarningCode, SubWarnings;
 
@@ -72,6 +76,21 @@ abstract class WarningRule<Rule extends WarningRule<Rule>>
     extends EssentialAnalysisRule<Rule, EssentialLintWarningCode> {
   /// {@macro rule}
   WarningRule(super.rule, super.logger);
+
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
+  ) {
+    logger.fine('Registering node processors');
+    var base = visitorFor(context);
+    var timed = base.timed;
+    registerVisitor(registry, base, timed);
+    registry.afterLibrary(this, () {
+      logger.info('Completed library analysis in ${timed.stopwatch.elapsed}');
+    });
+    logger.fine('Registered node processors');
+  }
 }
 
 /// {@template rule}
@@ -84,4 +103,19 @@ abstract class MultiWarningRule<
     extends EssentialMultiAnalysisRule<R, EssentialMultiWarningCode<Sub>, Sub> {
   /// {@macro rule}
   MultiWarningRule(super.rule, super.logger);
+
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
+  ) {
+    logger.fine('Registering node processors');
+    var base = visitorFor(context);
+    var timed = base.timed;
+    registerVisitor(registry, base, timed);
+    registry.afterLibrary(this, () {
+      logger.info('Completed library analysis in ${timed.stopwatch.elapsed}');
+    });
+    logger.fine('Registered node processors');
+  }
 }

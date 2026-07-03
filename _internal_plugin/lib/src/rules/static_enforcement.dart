@@ -35,17 +35,17 @@ class StaticEnforcementRule extends LintRule<StaticEnforcementRule> {
       _StaticEnforcementVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<StaticEnforcementRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
     registry
-      ..addClassDeclaration(this, visitor)
-      ..addMixinDeclaration(this, visitor)
-      ..addExtensionDeclaration(this, visitor)
-      ..addEnumDeclaration(this, visitor)
-      ..addExtensionTypeDeclaration(this, visitor);
+      ..addClassDeclaration(this, timed)
+      ..addMixinDeclaration(this, timed)
+      ..addExtensionDeclaration(this, timed)
+      ..addEnumDeclaration(this, timed)
+      ..addExtensionTypeDeclaration(this, timed);
   }
 }
 

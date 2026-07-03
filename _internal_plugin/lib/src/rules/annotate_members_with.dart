@@ -36,15 +36,15 @@ class AnnotateMembersWithRule extends LintRule<AnnotateMembersWithRule> {
       _AnnotateMembersWithVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<AnnotateMembersWithRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
     registry
-      ..addMethodDeclaration(this, visitor)
-      ..addFieldDeclaration(this, visitor)
-      ..addConstructorDeclaration(this, visitor);
+      ..addMethodDeclaration(this, timed)
+      ..addFieldDeclaration(this, timed)
+      ..addConstructorDeclaration(this, timed);
   }
 }
 

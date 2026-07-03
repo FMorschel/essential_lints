@@ -26,15 +26,15 @@ class DuplicateValueRule extends LintRule<DuplicateValueRule> {
       _DuplicateValueVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<DuplicateValueRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
     registry
-      ..addBinaryExpression(this, visitor)
-      ..addSwitchPatternCase(this, visitor)
-      ..addSwitchExpressionCase(this, visitor);
+      ..addBinaryExpression(this, timed)
+      ..addSwitchPatternCase(this, timed)
+      ..addSwitchExpressionCase(this, timed);
   }
 }
 

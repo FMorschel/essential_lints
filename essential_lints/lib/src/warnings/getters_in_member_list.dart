@@ -34,14 +34,14 @@ class GettersInMemberListRule
       _GettersInMemberListVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<GettersInMemberListRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
     registry
-      ..addClassDeclaration(this, visitor)
-      ..addAnnotation(this, visitor);
+      ..addClassDeclaration(this, timed)
+      ..addAnnotation(this, timed);
   }
 }
 

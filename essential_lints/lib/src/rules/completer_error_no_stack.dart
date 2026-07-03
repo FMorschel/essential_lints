@@ -28,12 +28,12 @@ class CompleterErrorNoStackRule extends LintRule<CompleterErrorNoStackRule> {
       _CompleterErrorNoStackVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<CompleterErrorNoStackRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
-    registry.addMethodInvocation(this, visitor);
+    registry.addMethodInvocation(this, timed);
   }
 }
 

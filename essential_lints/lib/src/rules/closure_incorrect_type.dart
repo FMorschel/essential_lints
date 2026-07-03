@@ -27,14 +27,12 @@ class ClosureIncorrectTypeRule extends LintRule<ClosureIncorrectTypeRule> {
       _ClosureIncorrectTypeVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<ClosureIncorrectTypeRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    logger.fine('Registering node processors for ClosureIncorrectTypeRule');
-    var visitor = visitorFor(context);
-    registry.addFunctionExpression(this, visitor);
-    logger.fine('Registered node processors for ClosureIncorrectTypeRule');
+    registry.addFunctionExpression(this, timed);
   }
 }
 

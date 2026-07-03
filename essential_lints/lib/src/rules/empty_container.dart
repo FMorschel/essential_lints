@@ -28,12 +28,12 @@ class EmptyContainerRule extends LintRule<EmptyContainerRule> {
       _EmptyContainerVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<EmptyContainerRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
-    registry.addInstanceCreationExpression(this, visitor);
+    registry.addInstanceCreationExpression(this, timed);
   }
 }
 

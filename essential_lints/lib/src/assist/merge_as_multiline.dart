@@ -4,9 +4,9 @@ import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dar
 import 'package:analyzer_plugin/utilities/range_factory.dart';
 import 'package:logging/logging.dart';
 
-import '../fixes/fix.dart';
 import '../plugin.dart';
 import '../rules/analysis_rule.dart';
+import '../utils/correction_producer.dart';
 import 'assist.dart';
 import 'essential_lint_assists.dart';
 

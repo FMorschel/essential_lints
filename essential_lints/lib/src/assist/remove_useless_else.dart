@@ -9,6 +9,7 @@ import '../fixes/essential_lint_fixes.dart';
 import '../fixes/fix.dart';
 import '../plugin.dart';
 import '../rules/analysis_rule.dart';
+import '../utils/correction_producer.dart';
 import '../utils/extensions/ast.dart';
 import 'assist.dart';
 import 'essential_lint_assists.dart';

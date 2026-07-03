@@ -32,12 +32,12 @@ class PreferExplicitlyNamedParameterRule
   ) => _PreferExplicitlyNamedParametersVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<PreferExplicitlyNamedParameterRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
-    registry.addGenericFunctionType(this, visitor);
+    registry.addGenericFunctionType(this, timed);
   }
 }
 

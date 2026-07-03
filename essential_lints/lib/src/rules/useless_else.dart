@@ -26,12 +26,12 @@ class UselessElseRule extends LintRule<UselessElseRule> {
       _UselessElseVisitor(this, context);
 
   @override
-  void registerNodeProcessors(
+  void registerVisitor(
     RuleVisitorRegistry registry,
-    RuleContext context,
+    Visitor<UselessElseRule, void> base,
+    AstVisitor<void> timed,
   ) {
-    var visitor = visitorFor(context);
-    registry.addIfStatement(this, visitor);
+    registry.addIfStatement(this, timed);
   }
 }
 
