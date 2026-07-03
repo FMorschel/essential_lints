@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.15
+
+Released on: 2026-07-02
+
+- Upgrades `analyzer` to v13
+
 ## 0.1.14
 
 Released on: 2026-03-30
