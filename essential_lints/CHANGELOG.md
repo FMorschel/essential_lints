@@ -2,9 +2,10 @@
 
 ## 0.1.15
 
-Released on: 2026-07-02
+Released on: 2026-07-03
 
 - Upgrades `analyzer` to v13
+- Adds timing information to all implementations.
 
 ## 0.1.14
 
