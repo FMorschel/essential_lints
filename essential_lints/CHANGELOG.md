@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.16
+
+Released on: 2026-07-22
+
+- Upgrades `analyzer` to v14.0.0
+- Migrates imports from `analyzer_plugin` to `analysis_server_plugin` for better compatibility
+- Refactors correction producer timing logic for improved maintainability
+
 ## 0.1.15
 
 Released on: 2026-07-03

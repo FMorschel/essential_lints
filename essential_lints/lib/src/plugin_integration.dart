@@ -1,8 +1,4 @@
-import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analysis_server_plugin/registry.dart';
-// ignore: implementation_imports, open issue
-import 'package:analysis_server_plugin/src/correction/fix_generators.dart'
-    as fix_generators;
 import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:logging/logging.dart';
@@ -57,18 +53,13 @@ import 'rules/standard_comment_style.dart';
 import 'rules/unnecessary_setstate.dart';
 import 'rules/useless_else.dart';
 import 'rules/variable_shadowing.dart';
+import 'utils/correction_producer.dart';
 import 'warnings/essential_lint_warnings.dart';
 import 'warnings/getters_in_member_list.dart';
 import 'warnings/sorting_members.dart';
 import 'warnings/subtype_annotating.dart';
 import 'warnings/subtype_naming.dart';
 import 'warnings/warning.dart';
-
-/// A typedef for the base fix constructor.
-typedef FixGenerator =
-    ResolvedCorrectionProducer Function({
-      required CorrectionProducerContext context,
-    });
 
 /// Mixin to integrate plugin fixes.
 mixin AssistsPluginIntegration {
@@ -78,17 +69,15 @@ mixin AssistsPluginIntegration {
   );
 
   /// Returns the list of registered assists.
-  Set<fix_generators.ProducerGenerator> get assists {
+  Set<GeneratorProducer> get assists {
     logger.info('Mapping assists');
-    var assists = <fix_generators.ProducerGenerator>{};
+    var assists = <GeneratorProducer>{};
 
     for (var assist in EssentialLintAssists.values) {
-      switch (assist) {
-        case EssentialLintAssists.removeUselessElse:
-          assists.add(RemoveUselessElseAssistFix.new);
-        case EssentialLintAssists.mergeAsMultiline:
-          assists.add(MergeAsMultilineAssist.new);
-      }
+      assists.add(switch (assist) {
+        .removeUselessElse => RemoveUselessElseAssistFix.new,
+        .mergeAsMultiline => MergeAsMultilineAssist.new,
+      });
     }
     logger.info('Mapped assists');
     return assists;
@@ -96,9 +85,9 @@ mixin AssistsPluginIntegration {
 
   /// Registers all assists with the given registry.
   void registerAssists(PluginRegistry registry) {
-    void register(fix_generators.ProducerGenerator generator) {
+    void register(GeneratorProducer generator) {
       try {
-        registry.registerAssist(generator);
+        registry.registerAssist(generator.timed);
         // ignore: avoid_catches_without_on_clauses, handles integration
       } catch (e, st) {
         logger.severe(
@@ -124,11 +113,11 @@ mixin FixesPluginIntegration {
   );
 
   /// Returns the list of registered lint fixes.
-  Map<EssentialLintCode, List<FixGenerator>> get lintFixes {
+  Map<EssentialLintCode, List<GeneratorProducer>> get lintFixes {
     logger.info('Mapping lint fixes');
-    var fixes = <EssentialLintCode, List<FixGenerator>>{};
+    var fixes = <EssentialLintCode, List<GeneratorProducer>>{};
 
-    void addFixTo(FixGenerator generator, List<EssentialLintCode> rules) {
+    void addFixTo(GeneratorProducer generator, List<EssentialLintCode> rules) {
       for (var rule in rules) {
         fixes.putIfAbsent(rule, () => []).add(generator);
       }
@@ -183,11 +172,11 @@ mixin FixesPluginIntegration {
   }
 
   /// Returns the list of registered lint fixes.
-  Map<DiagnosticCode, List<FixGenerator>> get warningFixes {
+  Map<DiagnosticCode, List<GeneratorProducer>> get warningFixes {
     logger.info('Mapping warning fixes');
-    var fixes = <EnumDiagnostic, List<FixGenerator>>{};
+    var fixes = <EnumDiagnostic, List<GeneratorProducer>>{};
 
-    void addFixTo(FixGenerator generator, List<EnumDiagnostic> rules) {
+    void addFixTo(GeneratorProducer generator, List<EnumDiagnostic> rules) {
       for (var rule in rules) {
         fixes.putIfAbsent(rule, () => []).add(generator);
       }
@@ -217,11 +206,11 @@ mixin FixesPluginIntegration {
   void registerFixes(PluginRegistry registry) {
     void register(
       DiagnosticCode diagnosticCode,
-      List<FixGenerator> generators,
+      List<GeneratorProducer> generators,
     ) {
       for (var generator in generators) {
         try {
-          registry.registerFixForRule(diagnosticCode, generator);
+          registry.registerFixForRule(diagnosticCode, generator.timed);
           // ignore: avoid_catches_without_on_clauses, handles integration
         } catch (e, st) {
           logger.severe(

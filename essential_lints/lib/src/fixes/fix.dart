@@ -1,5 +1,5 @@
+import 'package:analysis_server_plugin/edit/fix/fix.dart';
 import 'package:analyzer/source/line_info.dart';
-import 'package:analyzer_plugin/utilities/fixes/fixes.dart';
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 import 'package:logging/logging.dart';
 

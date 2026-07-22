@@ -1,6 +1,6 @@
+import 'package:analysis_server_plugin/edit/assist/assist.dart';
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analyzer/source/line_info.dart';
-import 'package:analyzer_plugin/utilities/assist/assist.dart';
 import 'package:essential_lints_annotations/essential_lints_annotations.dart';
 import 'package:logging/logging.dart';
 

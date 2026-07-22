@@ -1,4 +1,4 @@
-import 'package:analyzer_plugin/utilities/assist/assist.dart';
+import 'package:analysis_server_plugin/edit/assist/assist.dart';
 
 import '../fixes/essential_lint_fixes.dart';
 

@@ -1,5 +1,5 @@
 import 'package:analysis_server_plugin/edit/dart/dart_fix_kind_priority.dart';
-import 'package:analyzer_plugin/utilities/fixes/fixes.dart';
+import 'package:analysis_server_plugin/edit/fix/fix.dart';
 
 /// {@template enum_fix}
 /// A mixin for enums that provide a fix kind.
